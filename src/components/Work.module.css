@@ -1,14 +1,18 @@
 /* Stacked work cards. Each card is position: sticky, so it pins while the next one slides up
-   over it; previous cards peek out by --peek per step. Mobile-first; from 901px up the card
-   is the 1440 x 650 Figma card scaled by --px, with elements at their Figma coordinates. */
+   over it; earlier cards peek out above by --peek per step and shrink/dim as they're covered.
+   Card = header row (index, client, expertise, actions) + media slot for the showcase video. */
 
 .work {
-  --peek: 12px;
-  --card-bg: #020109;
+  --peek: 14px;
+  --gutter: 16px;
+  --card-bg: #11121b;
+  --line: rgba(255, 255, 255, 0.18);
+  --muted: #8d8e9c;
+  --label: #d6d7e0;
 
   position: relative;
-  padding-bottom: 12vh;
-  background: var(--card-bg);
+  padding: 24px var(--gutter) 12vh;
+  background: #020109;
 }
 
 .card {
@@ -16,11 +20,16 @@
   --covered-dim: 0;
 
   position: sticky;
-  top: calc(16px + var(--i) * var(--peek));
+  top: calc(var(--gutter) + var(--i) * var(--peek));
+  display: flex;
+  flex-direction: column;
+  max-width: 1320px;
+  margin: 0 auto 24px;
   overflow: hidden;
-  border-top: 1px solid rgba(139, 133, 119, 0.35);
-  border-radius: 24px 24px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
   background: var(--card-bg);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
   transform: scale(var(--covered-scale));
   transform-origin: 50% 0;
 }
@@ -35,135 +44,178 @@
   pointer-events: none;
 }
 
-.inner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  padding: 40px 16px 48px;
+.meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px 24px;
+  align-items: start;
+  padding: 20px 20px 16px;
 }
 
-.copy {
+.index {
+  grid-row: span 2;
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  gap: 28px;
+  gap: 6px;
+  margin: 0;
+  color: #b9bac8;
 }
 
-.text {
+.num {
+  font: 400 52px / 0.9 var(--font-serif);
+  letter-spacing: -1px;
+}
+
+.total {
+  padding-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.fact {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  letter-spacing: -1px;
+  gap: 6px;
+  min-width: 0;
 }
 
-.title {
+.label {
+  color: var(--label);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.value {
   margin: 0;
-  color: #edeade;
-  font: 600 28px / 1.33 var(--font-body);
+  color: var(--muted);
+  font: 400 16px / 1.3 var(--font-body);
 }
 
-.description {
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
   margin: 0;
-  max-width: 438.786px;
-  color: #a6a49a;
-  font: 400 16px / 1.4 var(--font-body);
+  padding: 0;
+  list-style: none;
 }
 
-.button {
-  padding: 12px 32px;
-  border-radius: 40px;
-  background: #fff;
-  color: #121112;
-  font: 500 18px / 24px var(--font-body);
-  letter-spacing: -1px;
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+.arrow,
+.open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font: 400 15px / 1 var(--font-body);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+
+.arrow {
+  width: 56px;
+  font-size: 18px;
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.open {
+  gap: 10px;
+  margin-left: auto;
+  padding: 0 20px;
+  color: #c9cad6;
+  letter-spacing: 0.04em;
   text-decoration: none;
+  text-transform: uppercase;
   white-space: nowrap;
-  transition: background-color 150ms ease, transform 150ms ease;
 }
 
-.button:hover {
-  background: #e6e4dc;
+.arrow:not(:disabled):hover,
+.open:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.button:focus-visible {
+.arrow:focus-visible,
+.open:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
-/* Frame 149:2118: 630 x 430, 1px #8b8577 border, 24px radius. */
-.frame {
+/* Showcase slot: video (or still) fills it edge to edge. */
+.media {
+  position: relative;
   overflow: hidden;
-  width: 100%;
-  aspect-ratio: 630 / 430;
-  border: 1px solid #8b8577;
-  border-radius: 24px;
+  aspect-ratio: 16 / 10;
+  margin: 0 12px 12px;
+  border-radius: 20px;
   background: #000;
 }
 
-.frame img {
+.media img,
+.media video {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 @media (min-width: 901px) {
+  .work {
+    --gutter: 24px;
+    --peek: 18px;
+  }
+
+  /* One card fills the viewport, minus room for every earlier card's peek. */
   .card {
-    top: calc((100vh - 650 * var(--px)) / 2 + var(--i) * var(--peek));
-    height: calc(650 * var(--px));
+    height: calc(100svh - 2 * var(--gutter) - (var(--count) - 1) * var(--peek));
+    min-height: 520px;
   }
 
-  .inner {
-    display: block;
-    width: calc(1440 * var(--px));
-    height: 100%;
-    margin: 0 auto;
-    padding: 0;
+  .meta {
+    grid-template-columns: auto minmax(160px, 0.8fr) 1.2fr auto;
+    gap: 40px;
+    align-items: center;
+    padding: 24px 28px;
   }
 
-  /* Copy column at (105, 148); 16 gap inside, 46 before the button. */
-  .copy {
-    position: absolute;
-    top: calc(148 * var(--px));
-    left: calc(105 * var(--px));
-    width: calc(570.381 * var(--px));
-    gap: calc(46 * var(--px));
+  .index {
+    grid-row: auto;
   }
 
-  .text {
-    gap: calc(16 * var(--px));
+  .num {
+    font-size: 64px;
   }
 
-  .title {
-    font-size: calc(36 * var(--px));
-    line-height: calc(48 * var(--px));
+  .actions {
+    grid-column: auto;
   }
 
-  .description {
-    max-width: calc(438.786 * var(--px));
-    font-size: calc(18 * var(--px));
-    line-height: calc(24 * var(--px));
-  }
-
-  .button {
-    padding: calc(16 * var(--px)) calc(45 * var(--px));
-    font-size: calc(22 * var(--px));
-    line-height: calc(24 * var(--px));
-  }
-
-  /* Frame at (708, 120). */
-  .frame {
-    position: absolute;
-    top: calc(120 * var(--px));
-    left: calc(708 * var(--px));
-    width: calc(630 * var(--px));
-    border-radius: calc(24 * var(--px));
+  .media {
+    flex: 1;
+    aspect-ratio: auto;
+    margin: 0 16px 16px;
+    border-radius: 22px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .button {
+  .arrow,
+  .open {
     transition: none;
   }
 }

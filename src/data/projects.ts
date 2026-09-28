@@ -15,6 +15,18 @@ const slideModules = import.meta.glob<string>('../assets/case-studies/*/slide-*.
   import: 'default',
 })
 
+// UX showcase videos for the work cards: drop `<slug>.mp4` (or .webm) into src/assets/work/videos/
+// and it plays in that project's card. Without one, the card shows its still image.
+const videoModules = import.meta.glob<string>('../assets/work/videos/*.{mp4,webm}', {
+  eager: true,
+  import: 'default',
+})
+
+function videoFor(slug: string) {
+  const path = Object.keys(videoModules).find((p) => /\/([^/]+)\.\w+$/.exec(p)?.[1] === slug)
+  return path ? videoModules[path] : undefined
+}
+
 function slidesFor(slug: string) {
   return Object.keys(slideModules)
     .filter((path) => path.includes(`/case-studies/${slug}/`))
@@ -36,11 +48,14 @@ const PLACEHOLDER = {
 export type Project = {
   slug: string
   title: string
+  client: string
+  expertise: string[]
   description: string
   role: string
   timeline: string
   problem: string
   card: string
+  video?: string
   hero: string
   slides: string[]
 }
@@ -49,11 +64,12 @@ export type Project = {
 // "Pulsefit — Case Study", CLIHUB -> "CLI Hub — Case Study", College Management ->
 // "Dhondi — The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
 export const PROJECTS: Project[] = [
-  { slug: 'jaadu-2', title: 'Jaadu 2.0', card: card1, hero: heroJaadu },
-  { slug: 'fitness-tracker', title: 'Fitness Tracker App', card: card2, hero: heroFitness },
-  { slug: 'bosch-customer-experience', title: 'BOSCH Customer Experience', card: card3, hero: heroBosch },
-  { slug: 'clihub', title: 'CLIHUB', card: card4, hero: heroClihub },
-  { slug: 'college-management', title: 'College Management', card: card5, hero: heroCollege },
-].map((p) => ({ ...PLACEHOLDER, ...p, slides: slidesFor(p.slug) }))
+  // client / expertise are placeholders until confirmed.
+  { slug: 'jaadu-2', title: 'Jaadu 2.0', client: 'Jaadu', expertise: ['App design', 'Visual identity'], card: card1, hero: heroJaadu },
+  { slug: 'fitness-tracker', title: 'Fitness Tracker App', client: 'Zync', expertise: ['App design', 'UX research'], card: card2, hero: heroFitness },
+  { slug: 'bosch-customer-experience', title: 'BOSCH Customer Experience', client: 'BOSCH', expertise: ['App design', 'Web design'], card: card3, hero: heroBosch },
+  { slug: 'clihub', title: 'CLIHUB', client: 'CLI Hub', expertise: ['Web design', 'Dashboard'], card: card4, hero: heroClihub },
+  { slug: 'college-management', title: 'College Management', client: 'Dhondi', expertise: ['App design', 'UX research'], card: card5, hero: heroCollege },
+].map((p) => ({ ...PLACEHOLDER, ...p, video: videoFor(p.slug), slides: slidesFor(p.slug) }))
 
 export const caseStudyHref = (slug: string) => `#/work/${slug}`
