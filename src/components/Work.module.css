@@ -1,0 +1,169 @@
+/* Stacked work cards. Each card is position: sticky, so it pins while the next one slides up
+   over it; previous cards peek out by --peek per step. Mobile-first; from 901px up the card
+   is the 1440 x 650 Figma card scaled by --px, with elements at their Figma coordinates. */
+
+.work {
+  --peek: 12px;
+  --card-bg: #020109;
+
+  position: relative;
+  padding-bottom: 12vh;
+  background: var(--card-bg);
+}
+
+.card {
+  --covered-scale: 1;
+  --covered-dim: 0;
+
+  position: sticky;
+  top: calc(16px + var(--i) * var(--peek));
+  overflow: hidden;
+  border-top: 1px solid rgba(139, 133, 119, 0.35);
+  border-radius: 24px 24px 0 0;
+  background: var(--card-bg);
+  transform: scale(var(--covered-scale));
+  transform-origin: 50% 0;
+}
+
+/* Darkens a card as the next one covers it. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #000;
+  opacity: var(--covered-dim);
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 40px 16px 48px;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  letter-spacing: -1px;
+}
+
+.title {
+  margin: 0;
+  color: #edeade;
+  font: 600 28px / 1.33 var(--font-body);
+}
+
+.description {
+  margin: 0;
+  max-width: 438.786px;
+  color: #a6a49a;
+  font: 400 16px / 1.4 var(--font-body);
+}
+
+.button {
+  padding: 12px 32px;
+  border-radius: 40px;
+  background: #fff;
+  color: #121112;
+  font: 500 18px / 24px var(--font-body);
+  letter-spacing: -1px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.button:hover {
+  background: #e6e4dc;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Frame 149:2118: 630 x 430, 1px #8b8577 border, 24px radius. */
+.frame {
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 630 / 430;
+  border: 1px solid #8b8577;
+  border-radius: 24px;
+  background: #000;
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 901px) {
+  .card {
+    top: calc((100vh - 650 * var(--px)) / 2 + var(--i) * var(--peek));
+    height: calc(650 * var(--px));
+  }
+
+  .inner {
+    display: block;
+    width: calc(1440 * var(--px));
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* Copy column at (105, 148); 16 gap inside, 46 before the button. */
+  .copy {
+    position: absolute;
+    top: calc(148 * var(--px));
+    left: calc(105 * var(--px));
+    width: calc(570.381 * var(--px));
+    gap: calc(46 * var(--px));
+  }
+
+  .text {
+    gap: calc(16 * var(--px));
+  }
+
+  .title {
+    font-size: calc(36 * var(--px));
+    line-height: calc(48 * var(--px));
+  }
+
+  .description {
+    max-width: calc(438.786 * var(--px));
+    font-size: calc(18 * var(--px));
+    line-height: calc(24 * var(--px));
+  }
+
+  .button {
+    padding: calc(16 * var(--px)) calc(45 * var(--px));
+    font-size: calc(22 * var(--px));
+    line-height: calc(24 * var(--px));
+  }
+
+  /* Frame at (708, 120). */
+  .frame {
+    position: absolute;
+    top: calc(120 * var(--px));
+    left: calc(708 * var(--px));
+    width: calc(630 * var(--px));
+    border-radius: calc(24 * var(--px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

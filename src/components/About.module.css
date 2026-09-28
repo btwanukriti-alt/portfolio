@@ -1,0 +1,314 @@
+/* The Figma section uses the light "Paper" ink tokens on a black page, which leaves the
+   headline and roles near-invisible. Mapped to the dark palette used by the work cards. */
+.about {
+  --ink: #edeade;
+  --ink-2: #a6a49a;
+  --ink-3: #8b8577;
+  --line: rgba(237, 234, 222, 0.16);
+  --accent: #f3b44a;
+  --on-accent: #16140e;
+
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding: 48px 16px 96px;
+  background: #000;
+}
+
+/* Eyebrow: pill + rule */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.pill {
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 600 12px / normal var(--font-body);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.headline {
+  margin: 0;
+  max-width: 980px;
+  color: var(--ink);
+  font: 600 32px / 1.17 var(--font-body);
+  letter-spacing: -1.2px;
+}
+
+/* Timeline: a 1180 x 170 track. Scrolls sideways on narrow screens. */
+.timelineScroller {
+  overflow-x: auto;
+  margin-inline: -16px;
+  padding-inline: 16px;
+  scrollbar-width: none;
+}
+
+.timeline {
+  position: relative;
+  min-width: 900px;
+  height: 170px;
+  /* First/last labels hang ~90px past the track ends; keep them inside the scroll area. */
+  margin-inline: 90px;
+  font-family: var(--font-body);
+}
+
+.stops {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studying {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+.segment {
+  position: absolute;
+  top: 61.25px;
+  height: 1.5px;
+}
+
+.stop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.year,
+.yearBadge {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.year {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.yearBadge {
+  top: 26px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Dots centre on the track line at y = 62. */
+.dot {
+  position: absolute;
+  top: 56px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translateX(-50%);
+}
+
+.stop[data-state='current'] .dot {
+  top: 54px;
+  width: 16px;
+  height: 16px;
+}
+
+.role {
+  position: absolute;
+  top: 84px;
+  left: 0;
+  right: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.company {
+  position: absolute;
+  top: 108px;
+  left: 0;
+  right: 0;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.invite {
+  position: absolute;
+  top: 81px;
+  left: 50%;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* About grid: 2 x 2 on desktop, one column on mobile. */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px 64px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.index {
+  flex: none;
+  width: 24px;
+  color: var(--ink-3);
+  font: 600 12px / normal var(--font-body);
+}
+
+.itemText {
+  margin: 0;
+  color: var(--ink-2);
+  font: 400 16px / 26px var(--font-body);
+}
+
+@media (min-width: 901px) {
+  /* Figma: 25 top / 140 bottom / 130 side padding, 45 gap, within a scaled 1440 frame. */
+  .about {
+    gap: calc(45 * var(--px));
+    /* 1180-wide content column centred on the scaled 1440 frame. */
+    padding: calc(25 * var(--px)) calc(50% - 590 * var(--px)) calc(140 * var(--px));
+  }
+
+  .eyebrow {
+    gap: calc(20 * var(--px));
+  }
+
+  .pill {
+    padding: calc(8 * var(--px)) calc(16 * var(--px));
+    font-size: calc(12 * var(--px));
+    letter-spacing: calc(1.2 * var(--px));
+  }
+
+  .headline {
+    max-width: calc(980 * var(--px));
+    font-size: calc(46 * var(--px));
+    line-height: calc(54 * var(--px));
+    letter-spacing: calc(-1.2 * var(--px));
+  }
+
+  .timelineScroller {
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+
+  .timeline {
+    min-width: 0;
+    height: calc(170 * var(--px));
+    margin-inline: 0;
+  }
+
+  .studying {
+    font-size: calc(11 * var(--px));
+    letter-spacing: calc(1.3 * var(--px));
+  }
+
+  .segment {
+    top: calc(61.25 * var(--px));
+    height: calc(1.5 * var(--px));
+  }
+
+  .stop {
+    width: calc(260 * var(--px));
+  }
+
+  .year {
+    top: calc(28 * var(--px));
+    font-size: calc(12 * var(--px));
+  }
+
+  .yearBadge {
+    top: calc(26 * var(--px));
+    padding: calc(3 * var(--px)) calc(10 * var(--px));
+    font-size: calc(11 * var(--px));
+  }
+
+  .dot {
+    top: calc(56 * var(--px));
+    width: calc(12 * var(--px));
+    height: calc(12 * var(--px));
+  }
+
+  .stop[data-state='current'] .dot {
+    top: calc(54 * var(--px));
+    width: calc(16 * var(--px));
+    height: calc(16 * var(--px));
+  }
+
+  .role {
+    top: calc(84 * var(--px));
+    font-size: calc(15 * var(--px));
+  }
+
+  .company {
+    top: calc(108 * var(--px));
+    font-size: calc(12 * var(--px));
+  }
+
+  .invite {
+    top: calc(81 * var(--px));
+    padding: calc(6 * var(--px)) calc(14 * var(--px));
+    font-size: calc(13 * var(--px));
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: calc(36 * var(--px)) calc(64 * var(--px));
+  }
+
+  .item {
+    gap: calc(16 * var(--px));
+    padding-top: calc(16 * var(--px));
+  }
+
+  .index {
+    width: calc(24 * var(--px));
+    font-size: calc(12 * var(--px));
+  }
+
+  .itemText {
+    font-size: calc(16.5 * var(--px));
+    line-height: calc(26 * var(--px));
+  }
+}

@@ -1,0 +1,47 @@
+:root {
+  --color-bg: #0a0a0d;
+  --color-text: #ffffff;
+  --color-ink: #000000;
+  --color-accent: #5d65ff;
+
+  --font-display: 'Rubik Mono One', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  /* Figma Hand isn't a public web font; Architects Daughter is the closest match. */
+  --font-hand: 'Architects Daughter', 'Comic Sans MS', cursive;
+
+  /* One Figma pixel. On desktop the 1440 x 725 frame scales to fit the window. */
+  --px: 1px;
+
+  color-scheme: dark;
+}
+
+@media (min-width: 901px) {
+  :root {
+    --px: min(calc(100vw / 1440), calc(100vh / 725));
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

@@ -1,0 +1,70 @@
+/* Same Paper-token remap as About: ink -> #edeade, ink-2 -> #a6a49a. */
+.contact {
+  padding: 72px 16px 64px;
+  background: #000;
+}
+
+.heading {
+  margin: 0;
+  color: #edeade;
+  font: 800 48px / 0.98 var(--font-body);
+  letter-spacing: -2px;
+}
+
+.rule {
+  height: 1.5px;
+  margin: 32px 0 28px;
+  border: 0;
+  background: #8b8577;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #a6a49a;
+  font: 400 16px / normal var(--font-body);
+}
+
+.details a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.details a:hover {
+  color: #edeade;
+  text-decoration: underline;
+}
+
+.details a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 901px) {
+  /* Heading top at 112.5, rule at 268.5 (1180 wide), lines at 298.5 / 330.5, frame 435 tall. */
+  .contact {
+    height: calc(435 * var(--px));
+    /* 1180-wide content column centred on the scaled 1440 frame. */
+    padding: calc(112.5 * var(--px)) calc(50% - 590 * var(--px)) 0;
+  }
+
+  .heading {
+    font-size: calc(65 * var(--px));
+    line-height: calc(64 * var(--px));
+  }
+
+  .rule {
+    height: calc(1.5 * var(--px));
+    margin: calc(28 * var(--px)) 0 calc(28.5 * var(--px));
+  }
+
+  .details {
+    gap: calc(13 * var(--px));
+    font-size: calc(16 * var(--px));
+    line-height: calc(19 * var(--px));
+  }
+}
