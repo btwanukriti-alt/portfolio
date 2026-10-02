@@ -1,7 +1,12 @@
 :root {
-  --color-bg: #0a0a0d;
-  --color-text: #ffffff;
-  --color-ink: #000000;
+  /* White page; text colours are the Figma "Paper" inks (About / Contact frames). */
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-text: #16140e;
+  --color-text-2: #57534a;
+  --color-muted: #8b8577;
+  --color-line: rgba(22, 20, 14, 0.12);
+  --color-placeholder: #f1f1f1;
   --color-accent: #5d65ff;
 
   --font-display: 'Rubik Mono One', system-ui, sans-serif;
@@ -12,7 +17,7 @@
   /* One Figma pixel. On desktop the 1440 x 725 frame scales to fit the window. */
   --px: 1px;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 @media (min-width: 901px) {

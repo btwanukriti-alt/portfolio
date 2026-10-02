@@ -4,7 +4,7 @@
 
 .work {
   --peek: 12px;
-  --card-bg: #020109;
+  --card-bg: var(--color-bg);
 
   position: relative;
   padding-bottom: 12vh;
@@ -18,7 +18,7 @@
   position: sticky;
   top: calc(16px + var(--i) * var(--peek));
   overflow: hidden;
-  border-top: 1px solid rgba(139, 133, 119, 0.35);
+  border-top: 1px solid var(--color-line);
   border-radius: 24px 24px 0 0;
   background: var(--card-bg);
   transform: scale(var(--covered-scale));
@@ -30,8 +30,9 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: #000;
-  opacity: var(--covered-dim);
+  background: var(--color-text);
+  /* A lighter wash than on dark: the light cards only need to recede a little. */
+  opacity: calc(var(--covered-dim) * 0.35);
   pointer-events: none;
 }
 
@@ -60,22 +61,22 @@
 
 .title {
   margin: 0;
-  color: #edeade;
+  color: var(--color-text);
   font: 600 28px / 1.33 var(--font-body);
 }
 
 .description {
   margin: 0;
   max-width: 438.786px;
-  color: #a6a49a;
+  color: var(--color-text-2);
   font: 400 16px / 1.4 var(--font-body);
 }
 
 .button {
   padding: 12px 32px;
   border-radius: 40px;
-  background: #fff;
-  color: #121112;
+  background: var(--color-text);
+  color: var(--color-bg);
   font: 500 18px / 24px var(--font-body);
   letter-spacing: -1px;
   text-decoration: none;
@@ -84,7 +85,7 @@
 }
 
 .button:hover {
-  background: #e6e4dc;
+  background: #2e2b22;
 }
 
 .button:focus-visible {
@@ -99,7 +100,7 @@
   aspect-ratio: 630 / 430;
   border: 1px solid #8b8577;
   border-radius: 24px;
-  background: #000;
+  background: var(--color-placeholder);
 }
 
 .frame img {

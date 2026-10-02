@@ -1,12 +1,12 @@
-/* Same Paper-token remap as About: ink -> #edeade, ink-2 -> #a6a49a. */
+/* Figma "Paper" tokens: ink for the heading, ink-2 for the details. */
 .contact {
   padding: 72px 16px 64px;
-  background: #000;
+  background: var(--color-bg);
 }
 
 .heading {
   margin: 0;
-  color: #edeade;
+  color: var(--color-text);
   font: 800 48px / 0.98 var(--font-body);
   letter-spacing: -2px;
 }
@@ -15,7 +15,7 @@
   height: 1.5px;
   margin: 32px 0 28px;
   border: 0;
-  background: #8b8577;
+  background: var(--color-muted);
 }
 
 .details {
@@ -25,7 +25,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  color: #a6a49a;
+  color: var(--color-text-2);
   font: 400 16px / normal var(--font-body);
 }
 
@@ -35,7 +35,7 @@
 }
 
 .details a:hover {
-  color: #edeade;
+  color: var(--color-text);
   text-decoration: underline;
 }
 

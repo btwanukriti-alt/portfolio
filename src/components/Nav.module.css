@@ -4,8 +4,9 @@
   align-items: center;
   gap: calc(10 * var(--px));
   padding: calc(4 * var(--px)) calc(5 * var(--px));
-  background: var(--color-text);
+  background: var(--color-surface);
   border-radius: calc(9 * var(--px));
+  box-shadow: 0 0 0 1px var(--color-line), 0 calc(2 * var(--px)) calc(10 * var(--px)) rgba(22, 20, 14, 0.06);
 }
 
 .link {
@@ -13,7 +14,7 @@
   padding: calc(7 * var(--px)) calc(10 * var(--px));
   border-radius: calc(6 * var(--px));
   font: 500 calc(14 * var(--px)) / 1.191 var(--font-body);
-  color: var(--color-ink);
+  color: var(--color-text);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
@@ -21,7 +22,7 @@
 }
 
 .link:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(22, 20, 14, 0.06);
 }
 
 .link:focus-visible {
@@ -31,8 +32,8 @@
 
 .link[aria-current='page'] {
   min-width: 0;
-  background: var(--color-ink);
-  color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
 }
 
 @media (max-width: 640px) {

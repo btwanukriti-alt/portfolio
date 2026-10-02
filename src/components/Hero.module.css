@@ -15,7 +15,7 @@
 
   position: relative;
   height: 100vh;
-  background: #000;
+  background: var(--color-bg);
   overflow: hidden;
 }
 
@@ -23,7 +23,7 @@
 .mosaicLayer {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: var(--color-bg);
   filter: blur(var(--mosaic-blur));
 }
 
@@ -88,9 +88,9 @@
   border: 0;
   border-radius: 9px;
   background: var(--color-text);
-  color: var(--color-ink);
+  color: var(--color-bg);
   font: 500 14px / 1.191 var(--font-body);
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 14px rgba(22, 20, 14, 0.25);
   cursor: pointer;
   transform: translateX(-50%);
   animation: close-in 300ms ease 1200ms both;
@@ -98,7 +98,7 @@
 }
 
 .close:hover {
-  background: #e6e6e6;
+  background: #2e2b22;
 }
 
 @keyframes close-in {
@@ -122,8 +122,8 @@
   margin: 0;
   padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(10, 10, 13, 0.72);
-  color: var(--color-text);
+  background: rgba(22, 20, 14, 0.78);
+  color: var(--color-bg);
   font: 500 13px / 1.2 var(--font-body);
   white-space: nowrap;
   pointer-events: none;

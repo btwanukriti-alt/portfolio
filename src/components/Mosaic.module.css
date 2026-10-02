@@ -12,5 +12,5 @@
   height: 100%;
   border-radius: 4px;
   object-fit: cover;
-  background: #16140e;
+  background: var(--color-placeholder);
 }

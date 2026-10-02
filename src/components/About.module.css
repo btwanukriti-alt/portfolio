@@ -1,10 +1,9 @@
-/* The Figma section uses the light "Paper" ink tokens on a black page, which leaves the
-   headline and roles near-invisible. Mapped to the dark palette used by the work cards. */
+/* Figma "Paper" tokens on the light page. */
 .about {
-  --ink: #edeade;
-  --ink-2: #a6a49a;
-  --ink-3: #8b8577;
-  --line: rgba(237, 234, 222, 0.16);
+  --ink: var(--color-text);
+  --ink-2: var(--color-text-2);
+  --ink-3: var(--color-muted);
+  --line: var(--color-line);
   --accent: #f3b44a;
   --on-accent: #16140e;
 
@@ -12,7 +11,7 @@
   flex-direction: column;
   gap: 36px;
   padding: 48px 16px 96px;
-  background: #000;
+  background: var(--color-bg);
 }
 
 /* Eyebrow: pill + rule */
