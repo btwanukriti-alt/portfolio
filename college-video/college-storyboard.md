@@ -1,6 +1,6 @@
 # College management: Figma-style showcase storyboard
 
-The College Management card video in the Selected Work boxes and the case-study hero. Same look as the Pulsefit 10s cut: one lilac canvas (#DCCFFF) with soft pastel shapes and no dot grid, clipped inside a black selection frame with corner handles; blue selections with size labels, purple component labels, blue prototype hotspots ("On click → Open overlay"), pink auto-layout spacing; one dark cursor with no name tag; no toolbar; text on top only. The product name ("Dhondi") and the group's logo and name ("CMR") appear nowhere.
+The College Management card video in the Selected Work boxes and the case-study hero. Same look as the Pulsefit 10s cut: one lilac canvas (#DCCFFF) with soft pastel shapes and no dot grid, clipped inside a black selection frame with corner handles; blue selections with size labels, purple component labels, blue prototype hotspots ("On click → Open drawer"), pink auto-layout spacing; one dark cursor with no name tag; no toolbar; text on top only. The product name ("Dhondi") and the group's logo and name ("CMR") appear nowhere.
 
 **Source:** Figma `Portfolio`, section "Dhondi" (267:97221): Finance Dashboard (267:97222), Staff Dashboard (267:98194), Attendance (267:104429), Revenue Contribution (267:102038) and the stacked college drawers (Drawer_College frames, e.g. 267:102278, 267:103274, 267:103813, 267:103606).
 
@@ -9,7 +9,7 @@ The College Management card video in the Selected Work boxes and the case-study 
 | Time | Scene | Copy | Visual |
 |---|---|---|---|
 | 0:00–0:03.4 | **Intro** | COLLEGE MANAGEMENT SOFTWARE / **Track fees and staff across your colleges.** | The cursor drags out a frame, *Financial overview*, with a live size label. It fills with the Financial Overview dashboard: ₹94.30 Cr received counts up, the 82% collected bar fills and the Collection Progress line draws. Three components land around it, each selected as it arrives: Alert Card (Fee reduced ₹20,000 → ₹17,000), KPI Card (Present Staff 1,415, ↑8.2% vs yesterday) and Leave Type (On Leave 128 donut). Everything fades out together. |
-| 0:03.4–0:08.6 | **Flow: stacked drawers** | FINANCE / **Drill down from college to fee.** | The *Revenue contribution · Prototype* frame pops in, with ₹94.30 Cr counting up over five college rows. The cursor clicks **Engineering College**: the row shows a blue prototype hotspot ("On click → Open overlay"), the page dims and the college drawer slides in, selected as *Drawer · Level 1*, with ₹28.50 Cr counting. Clicking **B.Tech** stacks a second drawer on top. The first shrinks to its "All Colleges" spine tab, and ₹14.00 Cr counts. Clicking **Tuition Fee** stacks a third, leaving "All Colleges", "Engineering College" and "B.Tech" spines. Its batch breakdown counts to ₹11.20 Cr. |
+| 0:03.4–0:08.6 | **Flow: stacked drawers** | FINANCE / **Drill down from college to fee.** | Each drill-down level is a full sheet. *Revenue Contribution* pops in as a component, with ₹94.30 Cr counting up over five college rows, and a breadcrumb starts at "All colleges". A floating stat chip (collected ring + pending) lands on its corner. The cursor clicks **Engineering College**: the row shows a blue prototype hotspot ("On click → Open drawer") and the Engineering drawer pops in on top. The previous sheet is pushed back (smaller, tilted, faded to lilac), the stack re-centres, the breadcrumb adds "Engineering College", and the stat chip hands over and counts to ₹3.50 Cr pending. **B.Tech** and then **Tuition Fee** stack the same way. The result is a fanned deck of four sheets, the full trail All colleges › Engineering College › B.Tech › Tuition Fee, and ₹11.20 Cr / ₹1.60 Cr pending. In portrait the sheets stack upwards, so each earlier level peeks out above the next. |
 | 0:08.6–0:11 | **Close** | ALL IN ONE / **Finance, staff, banking and reports.** | Eight modules from the sidebar (Dashboard, Finance, Income, Settlements, Staff, Attendance, Banking, Reports) drop in tilted and snap into an auto-layout grid with 24px gap markers and a *Modules · Auto layout* selection. Fades, and loops to the intro on the same lilac. |
 
 ## UI refinements and data notes
@@ -48,10 +48,10 @@ The College Management card video in the Selected Work boxes and the case-study 
     The design's "B.Tech 2023-26 Batch" is a three-year span, so the batches are now four years.
 - **Drawer details:**
   - "Tution Fee" is spelled correctly as **Tuition Fee**.
-  - Column headers match the level: College / Programme / Fee type / Batch. The design says "College" or "Institution" on every level.
-  - Drawer tabs: Programme | Fee breakdown, Batches | Fee breakdown, and By batch | By student.
-  - Each spine names the level it returns to.
-  - The ₹1.60 Cr scholarship sub-values and the "Lowest Collection" banner are left out to keep the drawers readable.
+  - List labels match the level: Colleges / Programmes / Fee types / Batches. The design says "College" or "Institution" on every level.
+  - The drawers' side spines are shown as a breadcrumb trail above the stack, and each level is a sheet in a fanned stack.
+  - Each sheet ends with a total row ("Total · 4 programmes  ₹28.50 Cr of ₹32.00 Cr").
+  - The ₹1.60 Cr scholarship sub-values the "Lowest Collection" banner and the Expected/Pending columns are left out to keep the sheets readable. Pending and expected show in each sheet's summary.
 - **Leave Type split (invented):** CL 52, CCL 26, On Duty 22, LOP 28. It adds up to the design's 128 on leave; the design's donut has no per-type values.
 - **Copy tightened:**
   - Alert copy: "Receipt cancelled · Cancelled after an incorrect amount entry"; "Fee reduced · ₹20,000 → ₹17,000 after concession approval".

@@ -3,12 +3,12 @@
 // frames (section 267:97221).
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
-//   2 · Flow: the stacked-drawer prototype. A college row opens its drawer, a programme
-//       opens a second drawer on top, a fee opens a third; each level keeps a spine tab.
+//   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
+//       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
 //   3 · Close: the eight modules snap into an auto-layout grid.
 import { Cursor, Selection, Spacing } from './fig.jsx'
 import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MODULES, MWIN, ModuleTile, OverviewWindow, ROW0, STACK, StackWindow, drawerLeft, levelBox } from './ui.jsx'
+import { AlertCard, KpiCard, LeaveCard, MODULES, MWIN, ModuleTile, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -100,78 +100,121 @@ export function Hook({ t, L, W, H }) {
 }
 
 // =====================================================================================
-// 2 · FLOW: the stacked-drawer prototype (college → programme → fee → batches)
+// 2 · FLOW: drill down through stacked drawers (college → programme → fee → batches)
 // =====================================================================================
-// The window (native STACK size) sits at (x, y) on the stage at scale K.
-const FLOWW = {
-  land: { K: 1.15, x: 270, y: 272, curFrom: { x: 1960, y: 1120 }, curRest: { x: 1700, y: 1000 } },
-  port: { K: 1.65, x: 45, y: 610, curFrom: { x: 1120, y: 1900 }, curRest: { x: 930, y: 1770 } },
+// Each level is a sheet. Opening the next one slides it in and pushes the earlier sheets back
+// (smaller, dimmer, shifted aside) so the stack builds up in depth; the whole stack re-centres
+// as it grows. Landscape stacks sideways, portrait stacks upwards like sheets.
+const FL = {
+  land: { K: 1.3, step: 200, top: 312, crumb: { y: 226, s: 1.2 }, curFrom: { x: 1980, y: 1120 }, curRest: { x: 1720, y: 1010 } },
+  port: { K: 1.6, step: 96, area: [500, 1860], crumb: { y: 410, s: 1.3 }, curFrom: { x: 1120, y: 1950 }, curRest: { x: 940, y: 1840 } },
 }
-// Click times (scene-local) for level 0, 1 and 2's first row; drawer i opens after click i.
 const CLICKS = [1.05, 2.3, 3.55]
+const levelsOpen = (u) => [1, ...CLICKS.map((c) => P(u, c + 0.08, c + 0.7, E.expo))]
+// Stage rect, scale and dim of every sheet at scene time u.
+function sheetLayout(u, L, W) {
+  const D = FL[L]
+  const p = levelsOpen(u)
+  const n = p[1] + p[2] + p[3]
+  const w = SHEET.w * D.K
+  const h = SHEET.h * D.K
+  return p.map((pi, i) => {
+    const d = p.slice(i + 1).reduce((a, v) => a + v, 0)
+    const sc = 1 - 0.07 * d
+    if (L === 'land') {
+      const A = (W - (n * D.step + w)) / 2 + n * D.step
+      const x = A - D.step * d + (1 - pi) * 260
+      return { x, y: D.top + (h * (1 - sc)) / 2 + (1 - pi) * 30, s: sc, w, h, p: pi, d, rot: -1.6 * d + (1 - pi) * 3 }
+    }
+    const [a0, a1] = D.area
+    const T = a0 + (a1 - a0 - (n * D.step + h)) / 2 + n * D.step
+    return { x: (W - w * sc) / 2, y: T - D.step * d + (1 - pi) * 260, s: sc, w, h, p: pi, d, rot: (1 - pi) * 2 }
+  })
+}
+const rowPoint = (R, K) => ({ x: R.x + R.s * K * (ROW.nameX + 90), y: R.y + R.s * K * (ROW0 + ROW.h / 2) })
+const rowBox = (R, K) => ({ x: R.x + R.s * K * ROW.x, y: R.y + R.s * K * ROW0, w: R.s * K * ROW.w, h: R.s * K * ROW.h })
+// Levels' collected % and pending (₹ Cr) for the floating stat chip.
+const STAT = LEVELS.map((L) => [(L.rec / L.exp) * 100, L.exp - L.rec])
+
 export function Flow({ t, L, W }) {
   const u = local(t, 'flow')
   if (u === null) return null
   const port = L === 'port'
-  const D = FLOWW[L]
-  const G = STACK[L]
+  const D = FL[L]
   const K = D.K
   const exit = P(u, 4.8, 5.2, E.inOut)
-  const win = E.back(clamp((u - 0.1) / 0.55))
-  const open = CLICKS.map((c) => P(u, c + 0.1, c + 0.7, E.expo))
-  const k = [P(u, 0.3, 1.0), ...CLICKS.map((c) => P(u, c + 0.4, c + 1.1))]
-  // Stage point of a level's first row (name column) and its row box.
-  const rowAt = (lv) => {
-    const b = levelBox(G, lv)
-    return { x: D.x + K * (b.x + (port ? 150 : 170)), y: D.y + K * (ROW0 + 27), box: { x: D.x + K * b.x, y: D.y + K * ROW0, w: K * b.w, h: K * 54 } }
-  }
-  const R = [0, 1, 2].map(rowAt)
+  const S = sheetLayout(u, L, W)
+  const p = S.map((r) => r.p)
+  const pop0 = E.back(clamp((u - 0.15) / 0.55))
+  const k = [P(u, 0.35, 1.0), ...CLICKS.map((c) => P(u, c + 0.2, c + 0.95))]
+  const rows = [P(u, 0.3, 0.9), ...CLICKS.map((c) => P(u, c + 0.15, c + 0.7))]
+  // Cursor: aims at the first row of the current sheet, where it rests when clicked.
+  const at = (c) => rowPoint(sheetLayout(c, L, W)[CLICKS.indexOf(c)], K)
   const cur = kf(u, [
-    [0.45, D.curFrom], [0.95, R[0]], [CLICKS[0] + 0.25, R[0]],
-    [CLICKS[1] - 0.15, R[1]], [CLICKS[1] + 0.25, R[1]],
-    [CLICKS[2] - 0.15, R[2]], [CLICKS[2] + 0.3, R[2]], [4.4, D.curRest],
+    [0.55, D.curFrom], [0.95, at(CLICKS[0])], [CLICKS[0] + 0.2, at(CLICKS[0])],
+    [CLICKS[1] - 0.2, at(CLICKS[1])], [CLICKS[1] + 0.2, at(CLICKS[1])],
+    [CLICKS[2] - 0.2, at(CLICKS[2])], [CLICKS[2] + 0.25, at(CLICKS[2])], [4.4, D.curRest],
   ])
   const cs = sway(u, 3, u > 4.4 ? 5 : 0)
-  // Pressed row: the most recent click within its window.
-  let pr = [-1, 0, 0]
-  CLICKS.forEach((c, i) => {
-    const h = u > c - 0.25 && u < c + 0.35 ? clamp(1 - Math.abs(u - c) / 0.3) : 0
-    if (h > 0) pr = [i, 0, h]
-  })
+  const hi = (i) => (i < 3 ? clamp(1 - Math.abs(u - CLICKS[i]) / 0.3) * (u < CLICKS[i] + 0.6 ? 1 : 0) : 0)
+  // Stat chip values move between levels as each drawer lands.
+  const lv = (j) => STAT[0][j] + [1, 2, 3].reduce((a, i) => a + p[i] * (STAT[i][j] - STAT[i - 1][j]), 0)
+  const top = S[3].p > 0.5 ? 3 : S[2].p > 0.5 ? 2 : S[1].p > 0.5 ? 1 : 0
+  // The chip hands over from the previous sheet to the new one as it lands.
+  const anchor = (R) => (port ? { x: 70, y: R.y + R.h * R.s - 60 } : { x: R.x + R.w * R.s - 90, y: R.y - 44 })
+  const j = p[3] > 0 ? 3 : p[2] > 0 ? 2 : p[1] > 0 ? 1 : 0
+  const ca = anchor(S[Math.max(0, j - 1)])
+  const cb = anchor(S[j])
+  const hand = j === 0 ? 1 : E.inOut(p[j])
+  const chip = { x: lerp(ca.x, cb.x, hand), y: lerp(ca.y, cb.y, hand) }
+  const chipIn = E.back(clamp((u - 0.7) / 0.5))
   const sk = port ? 1.35 : 1.1
   return (
     <>
       <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Finance" lines={port ? ['Drill down from', 'college to fee.'] : ['Drill down from college to fee.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        <div style={{ position: 'absolute', left: D.x, top: D.y - 34, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * clamp((u - 0.3) / 0.3) * (1 - open[0]), whiteSpace: 'nowrap' }}>Revenue contribution · Prototype</div>
-        <Abs x={D.x} y={D.y} style={{ width: G.W * K, height: G.H * K, opacity: clamp((u - 0.1) / 0.25), transform: `scale(${0.9 + 0.1 * win})`, transformOrigin: '50% 60%', zIndex: 10 }}>
-          <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-            <StackWindow L={L} open={open} k={k} press={pr} />
-          </div>
+        <Abs x={0} y={D.crumb.y} style={{ width: W, display: 'flex', justifyContent: 'center', opacity: clamp((u - 0.25) / 0.3), zIndex: 20 }}>
+          <Breadcrumb vis={p.map((v, i) => (i === 0 ? clamp((u - 0.25) / 0.3) : clamp((v - 0.3) / 0.6)))} scale={D.crumb.s} />
         </Abs>
-        {/* prototype hotspots: the clicked row outlines in blue with its interaction */}
+        {S.map((R, i) => {
+          if (R.p <= 0.001) return null
+          const enter = i === 0 ? { o: clamp((u - 0.15) / 0.25), s: 0.88 + 0.12 * pop0 } : { o: clamp(R.p * 2.5), s: 0.92 + 0.08 * E.back(clamp((u - CLICKS[i - 1] - 0.08) / 0.55)) }
+          return (
+            <Abs key={i} x={R.x} y={R.y} style={{ width: R.w, height: R.h, opacity: enter.o, transform: `rotate(${R.rot}deg) scale(${R.s * enter.s})`, transformOrigin: i === 0 && u < 1 ? '50% 50%' : '0 0', zIndex: 10 + i }}>
+              <div style={{ transform: `scale(${K})`, transformOrigin: '0 0', filter: `saturate(${1 - 0.2 * Math.min(R.d, 2)})` }}>
+                <SheetCard level={i} k={k[i]} rows={rows[i]} hi={hi(i)} />
+              </div>
+              <div style={{ position: 'absolute', inset: 0, borderRadius: 16 * K, background: `rgba(220,207,255,${0.22 * Math.min(R.d, 2)})`, pointerEvents: 'none' }} />
+            </Abs>
+          )
+        })}
+        {/* prototype hotspot on the clicked row */}
         {CLICKS.map((c, i) => {
-          const o = clamp((u - (c - 0.35)) / 0.2) * (1 - clamp((u - (c + 0.08)) / 0.14))
+          const o = clamp((u - (c - 0.35)) / 0.2) * (1 - clamp((u - c) / 0.1))
           if (o <= 0) return null
-          const b = R[i].box
+          const b = rowBox(S[i], K)
           return (
             <div key={i} style={{ position: 'absolute', left: b.x, top: b.y, width: b.w, height: b.h, opacity: o, zIndex: 30, pointerEvents: 'none' }}>
-              <div style={{ position: 'absolute', inset: -3, border: `2.5px solid ${FIG.proto}`, borderRadius: 14, background: 'rgba(13,153,255,.06)' }} />
-              <div style={{ position: 'absolute', right: 0, top: -44 * (port ? 1.3 : 1), transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '100% 100%', display: 'flex', alignItems: 'center', gap: 6, background: FIG.proto, color: '#fff', font: `600 15px/1 ${UI_FONT}`, padding: '8px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}>
+              <div style={{ position: 'absolute', inset: -3, border: `2.5px solid ${FIG.proto}`, borderRadius: 14 }} />
+              <div style={{ position: 'absolute', right: 0, bottom: '100%', marginBottom: 10, transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '100% 100%', display: 'flex', alignItems: 'center', gap: 6, background: FIG.proto, color: '#fff', font: `600 15px/1 ${UI_FONT}`, padding: '8px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11V5.5a2 2 0 014 0V11M13 9.5a2 2 0 014 0V12M17 11a2 2 0 014 0v3.5a6.5 6.5 0 01-6.5 6.5H13a6 6 0 01-4.6-2.2L5 14.5a2 2 0 013-2.6L9 13" /></svg>
-                On click → Open overlay
+                On click → Open drawer
               </div>
             </div>
           )
         })}
-        {/* each drawer is selected as it lands */}
-        {CLICKS.map((c, i) => {
-          const left = drawerLeft(G, i + 1)
-          const o = u > c + 0.55 ? P(u, c + 0.55, c + 0.7) * (1 - P(u, i < 2 ? CLICKS[i + 1] - 0.4 : 4.55, i < 2 ? CLICKS[i + 1] - 0.25 : 4.75)) : 0
-          return <Selection key={i} x={D.x + K * left} y={D.y} w={K * (G.W - left)} h={K * G.H} o={o} label={`Drawer · Level ${i + 1}`} comp size={`${G.W - left} × ${G.H}`} k={sk} />
+        {/* the sheet on top is selected as it lands */}
+        {S.map((R, i) => {
+          const a = i === 0 ? 0.6 : CLICKS[i - 1] + 0.75
+          const b = i < 3 ? CLICKS[i] - 0.45 : 4.5
+          const o = u > a ? P(u, a, a + 0.15) * (1 - P(u, b, b + 0.15)) : 0
+          return <Selection key={i} x={R.x} y={R.y} w={R.w * R.s} h={R.h * R.s} o={o} label={i === 0 ? 'Revenue Contribution' : `Drawer · Level ${i}`} comp size={`${SHEET.w} × ${SHEET.h}`} k={sk} />
         })}
+        <Abs x={chip.x} y={chip.y} style={{ zIndex: 25, opacity: clamp((u - 0.7) / 0.2), transform: `scale(${(port ? 1.5 : 1.15) * (0.7 + 0.3 * chipIn)}) rotate(${top % 2 ? 2 : -2}deg)`, transformOrigin: '0 0' }}>
+          <StatChip rate={lv(0) * P(u, 0.7, 1.3)} pending={lv(1) * P(u, 0.7, 1.3)} />
+        </Abs>
       </div>
-      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.45, 0.7) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
+      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.55, 0.8) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
     </>
   )
 }

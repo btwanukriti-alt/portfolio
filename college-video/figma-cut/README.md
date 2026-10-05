@@ -9,7 +9,7 @@ An 11s looping UX showcase for the College Management card, built from the Pulse
 
 ## Structure
 - `src/lib.js`: easing, keyframes, UI tokens, `BG`, the scene timeline and stage sizes.
-- `src/ui.jsx`: the rebuilt UI: Financial Overview window, KPI / Leave Type / Alert cards, the stacked-drawer prototype window (`StackWindow`), module tiles.
+- `src/ui.jsx`: the rebuilt UI: Financial Overview window, KPI / Leave Type / Alert cards, the drill-down sheets (`SheetCard`), `Breadcrumb`, `StatChip`, module tiles.
 - `src/scenes.jsx`: Intro, Flow and Close, with layouts for `land` (1920×1080) and `port` (1080×1920).
 - `src/stage.jsx`, `src/fig.jsx`, `src/App.jsx`: unchanged from the reference (stage, editor vocabulary and cursor, clock/embed/player).
 
