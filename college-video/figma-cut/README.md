@@ -1,6 +1,6 @@
-# College management, Figma-style showcase (11.3s)
+# College management, Figma-style showcase (11.8s)
 
-An 11.3s looping UX showcase for the College Management card, built from the Pulsefit reference (`pulsefit-video/figma-cut`): one plain soft-blue canvas inside a black selection frame, Figma editor details, one unnamed cursor, captions on top only. Live React, no screenshots. Storyboard: `../college-storyboard.md`.
+An 11.8s looping UX showcase for the College Management card, built from the Pulsefit reference (`pulsefit-video/figma-cut`): one plain soft-blue canvas inside a black selection frame, Figma editor details, one unnamed cursor, captions on top only. Live React, no screenshots. Storyboard: `../college-storyboard.md`.
 
 ## Run / build
 - `npm install`
@@ -9,7 +9,7 @@ An 11.3s looping UX showcase for the College Management card, built from the Pul
 
 ## Structure
 - `src/lib.js`: easing, keyframes, UI tokens, `BG`, the scene timeline and stage sizes.
-- `src/ui.jsx`: the rebuilt UI: Financial Overview window, KPI / Leave Type / Alert cards, the drill-down sheets (`SheetCard`), `Breadcrumb`, `StatChip`, and the conclusion's `SummaryBanner` and `CollegeColumns`.
+- `src/ui.jsx`: the rebuilt UI: Financial Overview window, KPI / Leave Type / Alert cards, the drill-down sheets (`SheetCard`), `Breadcrumb`, `StatChip`, and the conclusion's platform tree (`ModulePill`, `HubCard`, `CollegeNode`).
 - `src/scenes.jsx`: Intro, Flow and Conclusion, with layouts for `land` (1920×1080) and `port` (1080×1920).
 - `src/stage.jsx`, `src/fig.jsx`, `src/App.jsx`: unchanged from the reference (stage, editor vocabulary and cursor, clock/embed/player).
 

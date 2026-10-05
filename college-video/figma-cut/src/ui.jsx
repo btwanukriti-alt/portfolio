@@ -414,106 +414,71 @@ export function OverviewWindow({ k = 1 }) {
 }
 
 // ---------- Conclusion ----------
-// Monthly collection sparkline for the navy summary (CURVE, drawn left to right with k).
-function Spark({ k, w }) {
-  const H = 100
-  const pts = CURVE.map((v, i) => [(i / 11) * w, 6 + (H - 12) * (1 - v / 100)])
-  let d = `M${pts[0][0]} ${pts[0][1]}`
-  for (let i = 1; i < pts.length; i++) {
-    const mx = (pts[i - 1][0] + pts[i][0]) / 2
-    d += ` C${mx} ${pts[i - 1][1]} ${mx} ${pts[i][1]} ${pts[i][0]} ${pts[i][1]}`
-  }
+
+// ---------- Conclusion: the platform tree ----------
+// Module pill (native 230 × 68).
+export const PILLS = [['Fees', IC.rupee, C.primary, C.pSoft], ['Settlements', IC.receipt, C.teal, '#E2F6F5'], ['Staff', IC.users, C.violet, C.vSoft]]
+export function ModulePill({ item }) {
+  const [n, icon, tint, bg] = item
   return (
-    <svg width={w} height="100%" viewBox={`0 0 ${w} ${H}`} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
-      <defs>
-        <linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#5EE0A1" stopOpacity=".35" /><stop offset="1" stopColor="#5EE0A1" stopOpacity="0" /></linearGradient>
-        <clipPath id="sc"><rect x="0" y="-10" width={w * k} height={H + 20} /></clipPath>
-      </defs>
-      <g clipPath="url(#sc)">
-        <path d={`${d} L${w} ${H} L0 ${H} Z`} fill="url(#sg)" />
-        <path d={d} fill="none" stroke="#5EE0A1" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
-      </g>
-    </svg>
+    <div style={card({ width: 230, height: 68, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12, borderRadius: 18, boxShadow: lift })}>
+      <IconTile icon={icon} tint={tint} bg={bg} s={42} i={21} r={11} />
+      <span style={{ fontSize: 19, fontWeight: 600, letterSpacing: '-0.01em' }}>{n}</span>
+    </div>
   )
 }
-// Consolidated summary in the product's navy banner style (native w × h). Counts with k.
-export function SummaryBanner({ w, h, k = 1 }) {
-  const rec = 94.3
-  const exp = 114.8
-  const rate = rec / exp
-  const S = [['Expected', cr(exp * k), '#fff'], ['Pending', cr((exp - rec) * k), '#FF9B80'], ['Colleges', fmt(5 * k), '#fff']]
+// The hub (native 500 × 120): one navy platform card with the overall collection ring.
+export function HubCard({ k = 1 }) {
+  const rate = (94.3 / 114.8) * 100
+  const r = 30
+  const L = 2 * Math.PI * r
   return (
-    <div style={{ position: 'relative', width: w, height: h, borderRadius: 24, overflow: 'hidden', background: `linear-gradient(135deg, ${C.navy} 0%, #0F2C5C 55%, #163F7A 100%)`, color: '#fff', fontFamily: UI_FONT, padding: 36, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', boxShadow: '0 40px 80px -36px rgba(11,31,68,.75)' }}>
-      <div style={{ position: 'absolute', right: -80, top: -120, width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,.35), transparent 65%)' }} />
-      <div style={{ position: 'absolute', left: -120, bottom: -160, width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(94,224,161,.18), transparent 65%)' }} />
-      <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 36, padding: '0 14px', borderRadius: 10, background: '#fff', color: C.navy, fontSize: 14, fontWeight: 600 }}>{IC.bank(C.navy, 17)}All colleges</span>
-        <span style={{ fontSize: 13.5, opacity: 0.7 }}>AY 2025–26</span>
+    <div style={{ position: 'relative', width: 500, height: 120, borderRadius: 22, overflow: 'hidden', background: `linear-gradient(120deg, ${C.navy} 0%, #0F2C5C 60%, #163F7A 100%)`, color: '#fff', fontFamily: UI_FONT, padding: '0 26px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 18, boxShadow: '0 30px 60px -26px rgba(11,31,68,.8)' }}>
+      <div style={{ position: 'absolute', right: -40, top: -90, width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,.35), transparent 65%)' }} />
+      <div style={{ position: 'relative', width: 56, height: 56, borderRadius: 15, background: '#fff', display: 'grid', placeItems: 'center', flex: 'none' }}>{IC.cap(C.navy, 28)}</div>
+      <div style={{ position: 'relative', flex: 1 }}>
+        <div style={{ fontSize: 23, fontWeight: 600, letterSpacing: '-0.02em' }}>One platform</div>
+        <div style={{ fontSize: 14, opacity: 0.7, marginTop: 2 }}>Fees, settlements and staff · {Math.round(5 * k)} colleges</div>
       </div>
-      <div style={{ position: 'relative', flex: 1, minHeight: 0, margin: '18px 0 14px', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: 12.5, opacity: 0.6, marginBottom: 6 }}>Monthly collection</div>
-        <div style={{ flex: 1, minHeight: 0 }}><Spark k={k} w={w - 72} /></div>
-      </div>
-      <div style={{ position: 'relative' }}>
-        <div style={{ fontSize: 15, opacity: 0.7 }}>Total fees received</div>
-        <div style={{ fontSize: 60, fontWeight: 600, letterSpacing: '-0.03em', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{cr(rec * k)}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 16 }}>
-          <div style={{ flex: 1 }}><Bar f={rate * k} h={10} fill="linear-gradient(90deg,#60A5FA,#5EE0A1)" track="rgba(255,255,255,.14)" /></div>
-          <span style={{ fontSize: 15, fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{fmt(rate * 100 * k, 1)}% collected</span>
-        </div>
-      </div>
-      <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 24 }}>
-        {S.map(([l, v, c]) => (
-          <div key={l} style={{ padding: '14px 16px', borderRadius: 14, background: 'rgba(255,255,255,.08)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.08)' }}>
-            <div style={{ fontSize: 13, opacity: 0.65 }}>{l}</div>
-            <div style={{ fontSize: 21, fontWeight: 600, marginTop: 2, color: c, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{v}</div>
-          </div>
-        ))}
+      <div style={{ position: 'relative', width: 72, height: 72, flex: 'none' }}>
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r={r} fill="none" stroke="rgba(255,255,255,.14)" strokeWidth="8" />
+          <circle cx="36" cy="36" r={r} fill="none" stroke="#5EE0A1" strokeWidth="8" strokeLinecap="round" strokeDasharray={L} strokeDashoffset={L * (1 - (rate / 100) * k)} transform="rotate(-90 36 36)" />
+        </svg>
+        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 15, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{Math.round(rate * k)}%</div>
       </div>
     </div>
   )
 }
-// Collection by college as columns (native w × h); column i grows with bars(i) (0..1).
-const SHORT = ['Engineering', 'Medical', 'Science', 'Law', 'Arts & Mgmt']
-export function CollegeColumns({ w, h, bars }) {
-  const ch = h - 200
+// College node: tall card (native 300 × 176) in landscape, a row (840 × 128) in portrait.
+export function CollegeNode({ i, p = 1, row = false }) {
+  const [n, rec, exp] = COLLEGES[i]
+  const pct = (rec / exp) * 100
+  const good = pct >= 85
+  const fill = good ? 'linear-gradient(90deg,#16A34A,#5EE0A1)' : 'linear-gradient(90deg,#F5A524,#FFD27A)'
+  const chip = <Chip fg={good ? C.green : '#B26A00'} bg={good ? C.gSoft : C.aSoft} h={30} style={{ fontSize: 14, fontWeight: 600 }}>{fmt(pct * p, 1)}%</Chip>
+  if (row) {
+    return (
+      <div style={card({ width: 840, height: 128, padding: '0 28px', display: 'flex', alignItems: 'center', gap: 20, boxShadow: lift })}>
+        <IconTile icon={IC.bank} s={56} i={28} r={15} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 22, fontWeight: 600, color: C.link, letterSpacing: '-0.01em' }}>{n}</div>
+          <div style={{ fontSize: 15, color: C.sub, marginTop: 2 }}>{cr(rec)} received</div>
+        </div>
+        <div style={{ width: 200 }}><Bar f={(pct / 100) * p} h={10} fill={fill} /></div>
+        {chip}
+      </div>
+    )
+  }
   return (
-    <div style={card({ width: w, height: h, padding: '28px 32px', boxShadow: lift, display: 'flex', flexDirection: 'column' })}>
+    <div style={card({ width: 300, height: 176, padding: 22, display: 'flex', flexDirection: 'column', boxShadow: lift })}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <div style={{ fontSize: 19, fontWeight: 600 }}>Collection by college</div>
-          <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>Share of expected fees received</div>
-        </div>
-        <div style={{ display: 'flex', gap: 14, fontSize: 12.5, color: C.sub }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><i style={{ width: 9, height: 9, borderRadius: 3, background: C.green }} />85% and above</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><i style={{ width: 9, height: 9, borderRadius: 3, background: C.amber }} />Below 85%</span>
-        </div>
+        <IconTile icon={IC.bank} s={44} i={22} />
+        {chip}
       </div>
-      <div style={{ position: 'relative', marginTop: 'auto', height: ch }}>
-        {[0, 50, 100].map((v) => (
-          <div key={v} style={{ position: 'absolute', left: 0, right: 0, top: ch * (1 - v / 100), borderTop: `1px dashed ${C.line}` }}>
-            <span style={{ position: 'absolute', left: 0, top: -9, fontSize: 11.5, color: C.faint, background: '#fff', paddingRight: 6 }}>{v}%</span>
-          </div>
-        ))}
-        <div style={{ position: 'absolute', left: 44, right: 0, top: 0, bottom: 0, display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end' }}>
-          {COLLEGES.map(([n, rec, exp], i) => {
-            const pct = (rec / exp) * 100
-            const b = bars(i)
-            const good = pct >= 85
-            return (
-              <div key={n} style={{ position: 'relative', width: 58, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
-                <div style={{ position: 'absolute', inset: 0, borderRadius: 14, background: C.page }} />
-                <div style={{ position: 'relative', width: '100%', height: `${pct * b}%`, borderRadius: 14, background: good ? 'linear-gradient(180deg,#5EE0A1,#16A34A)' : 'linear-gradient(180deg,#FFD27A,#F5A524)' }}>
-                  <span style={{ position: 'absolute', left: '50%', bottom: '100%', marginBottom: 8, transform: 'translateX(-50%)', fontSize: 15, fontWeight: 600, color: good ? C.green : '#B26A00', fontVariantNumeric: 'tabular-nums', opacity: clamp(b * 3), whiteSpace: 'nowrap' }}>{fmt(pct * b, 1)}%</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-around', marginLeft: 44, marginTop: 14 }}>
-        {SHORT.map((n) => <span key={n} style={{ width: 58, textAlign: 'center', fontSize: 13, fontWeight: 500, color: C.t2, whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center' }}>{n}</span>)}
-      </div>
+      <div style={{ fontSize: 17, fontWeight: 600, color: C.link, marginTop: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{n}</div>
+      <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>{cr(rec)} of {cr(exp)}</div>
+      <div style={{ marginTop: 'auto' }}><Bar f={(pct / 100) * p} h={8} fill={fill} /></div>
     </div>
   )
 }
