@@ -1,12 +1,17 @@
-// clihub: 16s product-flow cut (loop). How the app is used, step by step, on the real screens
+// clihub: 18.7s product-flow cut (loop). How the app is used, step by step, on the real screens
 // from the clihub Figma file: a dragged selection box opens the window, then 1 Add a host,
-// 2 Connect, 3 Monitor, 4 Run commands, 5 Move files, tracked by a step rail. Grey canvas, no
+// 2 Connect, 3 Monitor (all five dashboard tabs), 4 Run commands, 5 Move files, tracked by a step rail. Grey canvas, no
 // drop shadows. One clock t; <Stage t sw sh /> renders the frame.
 import newhost from "./assets/newhost.png";
 import perf from "./assets/perf.png";
 import terminal from "./assets/terminal.png";
 import panel_askai from "./assets/panel_askai.png";
 import sftp from "./assets/sftp.png";
+import tab_overview from "./assets/tab_overview.png";
+import tab_performance from "./assets/tab_performance.png";
+import tab_storage from "./assets/tab_storage.png";
+import tab_network from "./assets/tab_network.png";
+import tab_activity from "./assets/tab_activity.png";
 
 // ---------- theme (sampled from the clihub Figma file) ----------
 const C = {
@@ -21,8 +26,8 @@ const C = {
   primary: "#7D28FE",
 };
 const FONT = "'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
-const DURATION = 16;
-const IMG = { newhost, perf, terminal, panel_askai, sftp };
+const DURATION = 18.7;
+const IMG = { newhost, perf, terminal, panel_askai, sftp, tab_overview, tab_performance, tab_storage, tab_network, tab_activity };
 
 // ---------- timing ----------
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -132,10 +137,14 @@ const STEPS = [
   { a: 1.4, label: "Add a host", title: "Add a host in seconds." },
   { a: 4.6, label: "Connect", title: "Connect in one click." },
   { a: 7.4, label: "Monitor", title: "Watch it live." },
-  { a: 10.3, label: "Run commands", title: "Run commands, with AI to help." },
-  { a: 13.0, label: "Move files", title: "Move files across, side by side." },
+  { a: 13.0, label: "Run commands", title: "Run commands, with AI to help." },
+  { a: 15.7, label: "Move files", title: "Move files across, side by side." },
 ];
-const FLOW_END = 15.4;
+const FLOW_END = 18.1;
+// Monitor: the five dashboard tabs, clicked in turn (Overview is open on arrival).
+const DASH_TABS = [["Overview", 83], ["Performance", 284], ["Storage", 480], ["Network", 659], ["Activity", 837]];
+const DASH_IMG = ["tab_overview", "tab_performance", "tab_storage", "tab_network", "tab_activity"];
+const TAB_AT = [7.4, 8.5, 9.6, 10.7, 11.8]; // when each tab opens
 const stepAt = (t) => STEPS.reduce((k, s, i) => (t >= s.a ? i : k), 0);
 
 // Cursor plan: [time, window point, click?]
@@ -143,11 +152,10 @@ const PLAN = [
   [1.9, { x: 1050, y: 289 }, 1],   // Host Address field
   [2.95, { x: 1050, y: 460 }, 1],  // Label field
   [4.15, { x: 1198, y: 788 }, 1],  // Create Host
-  [8.2, { x: 492, y: 668 }, 0],    // hover the CPU chart peak
-  [9.5, { x: 300, y: 520 }, 0],
-  [10.85, { x: 1232, y: 81 }, 1],  // Ask AI
-  [13.55, { x: 156, y: 357 }, 1],  // select Backups
-  [14.3, { x: 833, y: 385 }, 1],   // Connect to Host
+  ...TAB_AT.slice(1).map((ct, i) => [ct, { x: 192 + DASH_TABS[i + 1][1] + 10, y: 262 }, 1]), // dashboard tabs
+  [13.55, { x: 1232, y: 81 }, 1],  // Ask AI
+  [16.25, { x: 156, y: 357 }, 1],  // select Backups
+  [17.0, { x: 833, y: 385 }, 1],   // Connect to Host
 ];
 
 // ================= pieces =================
@@ -236,9 +244,9 @@ function Screens({ t }) {
   const layers = [
     { k: "newhost", a: 0, b: 4.6 },
     { k: "connect", a: 4.6, b: 7.4 },
-    { k: "perf", a: 7.4, b: 10.3 },
-    { k: "terminal", a: 10.3, b: 13.0 },
-    { k: "sftp", a: 13.0, b: 99 },
+    { k: "perf", a: 7.4, b: 13.0 },
+    { k: "terminal", a: 13.0, b: 15.7 },
+    { k: "sftp", a: 15.7, b: 99 },
   ];
   return layers.map((L, i) => {
     const inP = i === 0 ? 1 : prog(t, L.a - 0.15, L.a + 0.3);
@@ -267,9 +275,31 @@ function Screens({ t }) {
         </div>
       );
     } else if (L.k === "perf") {
-      content = <img src={IMG.perf} alt="" style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 917 }} />;
+      // The stats screen's own chrome, with its tab row and content redrawn per tab (same
+      // 960-wide panel as the 20s cut's tab captures, at x 192).
+      const pos = kf(t, TAB_AT.slice(1).flatMap((ct, i) => [[ct, i], [ct + 0.35, i + 1]]));
+      const ux = DASH_TABS[Math.floor(pos)][1] + ((DASH_TABS[Math.min(4, Math.floor(pos) + 1)][1] - DASH_TABS[Math.floor(pos)][1]) * (pos - Math.floor(pos)));
+      content = (
+        <>
+          <img src={IMG.perf} alt="" style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 917 }} />
+          <div style={{ position: "absolute", left: 192, top: 238, width: 960, height: 50, background: "#101018", fontFamily: FONT }}>
+            {DASH_TABS.map(([name, x], i) => {
+              const near = clamp(1 - Math.abs(pos - i));
+              return <div key={name} style={{ position: "absolute", left: x, top: 12, transform: "translateX(-50%)", fontSize: 17, color: "#E4E4E4", fontWeight: near > 0.5 ? 600 : 400, opacity: 0.62 + 0.38 * near, whiteSpace: "nowrap" }}>{name}</div>;
+            })}
+            <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "#2B2B33" }} />
+            <div style={{ position: "absolute", left: ux - 83, width: 166, bottom: 0, height: 2, background: "#E4E4E4" }} />
+          </div>
+          <div style={{ position: "absolute", left: 192, top: 288, width: 960, height: 544, background: "#101018", overflow: "hidden" }}>
+            {DASH_IMG.map((k, i) => {
+              const o = i >= pos ? clamp(1 - (i - pos) * 1.4) : clamp(1 - (pos - i) * 3); // incoming leads, outgoing clears fast
+              return o > 0.001 && <img key={k} src={IMG[k]} alt="" style={{ position: "absolute", left: 0, top: 0, width: 960, height: 540, opacity: o, transform: `translateY(${(i - pos) * 14}px)` }} />;
+            })}
+          </div>
+        </>
+      );
     } else if (L.k === "terminal") {
-      const p = prog(t, 10.95, 11.4);
+      const p = prog(t, 13.65, 14.1);
       content = (
         <>
           <img src={IMG.terminal} alt="" style={{ position: "absolute", inset: 0, width: 1280, height: 832 }} />
@@ -302,12 +332,17 @@ function Callouts({ t }) {
     <>
       {box(4.3, 4.75, "right", 640, () => (<div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 18 }}><span style={{ color: "#71F0C0" }}>✓</span>Host created</div>))}
       {box(6.75, 7.5, "right", 420, () => (<>{lbl("Status")}<div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 26, fontWeight: 500, color: "#71F0C0" }}><span style={{ width: 10, height: 10, borderRadius: 5, background: "#4FA084" }} />Connected</div></>))}
-      {box(7.9, 10.0, "left", 430, (p) => (<>{lbl("Total CPU Usage")}<div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      {box(7.6, 8.55, "right", 470, (p) => (<>{lbl("Uptime")}<div style={{ fontSize: 26, fontWeight: 500, color: "#4FD1A5" }}>{Math.round(15 * p)} days, {Math.round(6 * p)} hours</div><div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 15 }}><span style={{ width: 9, height: 9, borderRadius: 5, background: "#4FA084" }} />Connected</div></>))}
+      {box(8.75, 9.65, "left", 430, (p) => (<>{lbl("Total CPU Usage")}<div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <svg width="76" height="76" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="#2B2B33" strokeWidth="8" /><circle cx="42" cy="42" r="34" fill="none" stroke="#51AFD4" strokeWidth="8" strokeLinecap="round" pathLength="100" strokeDasharray={`${45 * p} 100`} transform="rotate(-90 42 42)" /></svg>
         <div><div style={{ fontSize: 36, fontWeight: 500 }}>{Math.round(45 * p)}%</div><div style={{ fontSize: 13, color: "#909090" }}>Intel Xeon E5-2676 v3</div></div></div></>))}
-      {box(8.6, 10.0, "right", 560, (p) => (<>{lbl("Uptime")}<div style={{ fontSize: 28, fontWeight: 500, color: "#4FD1A5" }}>{Math.round(15 * p)} days, {Math.round(6 * p)} hours</div></>))}
-      {box(11.5, 12.8, "left", 520, (p) => { const q = "How do I find all .txt files in a directory?"; return (<><div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 15, marginBottom: 10 }}><span style={{ color: "#8B5CF6" }}>✦</span>Ask AI</div><div style={{ background: "#2B2B33", borderRadius: 10, padding: "10px 12px", fontSize: 15, minHeight: 42, lineHeight: 1.35 }}>{q.slice(0, Math.round(q.length * p))}</div></>); })}
-      {box(14.45, 15.3, "right", 600, (p) => (<>{lbl("Backups → API Gateway")}<div style={{ height: 8, borderRadius: 4, background: "#2B2B33" }}><div style={{ height: 8, borderRadius: 4, width: `${100 * p}%`, background: p < 1 ? "#7D28FE" : "#4FA084" }} /></div><div style={{ fontSize: 14, color: p < 1 ? "#E4E4E4" : "#71F0C0", marginTop: 8 }}>{p < 1 ? `Uploading ${Math.round(100 * p)}%` : "Uploaded"}</div></>))}
+      {box(9.85, 10.75, "right", 470, (p) => (<>{lbl("Used Storage")}<div style={{ fontSize: 28, fontWeight: 500 }}>{Math.round(184 * p)} GB <span style={{ fontSize: 16, color: "#909090" }}>of 200 GB</span></div><div style={{ height: 8, borderRadius: 4, background: "#2B2B33", marginTop: 12 }}><div style={{ height: 8, borderRadius: 4, width: `${92 * p}%`, background: "#D9485F" }} /></div></>))}
+      {box(10.95, 11.85, "left", 470, () => (<>{lbl("Eth0")}{[["Download", "1.1", "#C6B8FF", 0], ["Upload", "1.6", "#4FD1A5", 2]].map(([n, v, c, sd]) => (
+        <div key={n} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, marginTop: 6 }}><div><div style={{ fontSize: 13, color: "#909090" }}>{n}</div><div style={{ fontSize: 24, fontWeight: 500, color: c }}>{v}<span style={{ fontSize: 13, color: "#909090" }}> MB/s</span></div></div>
+          <svg width="100" height="28" viewBox="0 0 100 28">{Array.from({ length: 12 }, (_, k) => { const h = 5 + 20 * Math.abs(Math.sin(k * 1.7 + sd + t * 2.2)); return <rect key={k} x={k * 8.4} y={28 - h} width="5" height={h} rx="1.5" fill={c} />; })}</svg></div>))}</>))}
+      {box(12.05, 12.95, "right", 470, (p) => (<>{lbl("Processes")}<div style={{ display: "flex", gap: 22 }}>{[["Total", 187], ["Running", 3], ["Sleeping", 240]].map(([n, v]) => (<div key={n}><div style={{ fontSize: 28, fontWeight: 500 }}>{Math.round(v * p)}</div><div style={{ fontSize: 13, color: "#909090" }}>{n}</div></div>))}</div></>))}
+      {box(14.2, 15.5, "left", 520, (p) => { const q = "How do I find all .txt files in a directory?"; return (<><div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 15, marginBottom: 10 }}><span style={{ color: "#8B5CF6" }}>✦</span>Ask AI</div><div style={{ background: "#2B2B33", borderRadius: 10, padding: "10px 12px", fontSize: 15, minHeight: 42, lineHeight: 1.35 }}>{q.slice(0, Math.round(q.length * p))}</div></>); })}
+      {box(17.15, 18.0, "right", 600, (p) => (<>{lbl("Backups → API Gateway")}<div style={{ height: 8, borderRadius: 4, background: "#2B2B33" }}><div style={{ height: 8, borderRadius: 4, width: `${100 * p}%`, background: p < 1 ? "#7D28FE" : "#4FA084" }} /></div><div style={{ fontSize: 14, color: p < 1 ? "#E4E4E4" : "#71F0C0", marginTop: 8 }}>{p < 1 ? `Uploading ${Math.round(100 * p)}%` : "Uploaded"}</div></>))}
     </>
   );
 }
