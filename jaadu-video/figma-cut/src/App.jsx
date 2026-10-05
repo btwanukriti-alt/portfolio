@@ -112,7 +112,7 @@ export default function App() {
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: OUTSIDE }}>
       <div style={{ position: 'absolute', left: m, top: m, width: iw, height: ih, overflow: 'hidden' }}>
-        <Backdrop />
+        <Backdrop t={t} w={iw} h={ih} />
         <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
           <Research {...props} />
           <Alert {...props} />
