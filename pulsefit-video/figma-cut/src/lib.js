@@ -87,24 +87,19 @@ export const PEOPLE = {
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
 
-// Beats: each has an eyebrow and a headline (landscape lines / portrait lines). The camera
-// flies between the screens on the canvas over the 1.2s around each beat change.
-export const BEATS = [
-  { id: 'overview', a: 0, b: 5.0, eyebrow: 'Gym management', land: [['Run', 'the', 'whole', 'gym', 'from', 'one\u00a0place.']], port: [['Run', 'the', 'whole', 'gym'], ['from', 'one\u00a0place.']] },
-  { id: 'leads', a: 5.0, b: 11.0, eyebrow: 'Leads', land: [['Turn', 'every', 'lead', 'into', 'a', 'member.']], port: [['Turn', 'every', 'lead'], ['into', 'a', 'member.']] },
-  { id: 'performance', a: 11.0, b: 16.6, eyebrow: 'Lead performance', land: [['Know', 'which', 'leads', 'convert.']], port: [['Know', 'which'], ['leads', 'convert.']] },
-  { id: 'members', a: 16.6, b: 22.2, eyebrow: 'Members', land: [['Every', 'member,', 'at', 'a', 'glance.']], port: [['Every', 'member,'], ['at', 'a', 'glance.']] },
-  { id: 'plans', a: 22.2, b: 27.4, eyebrow: 'Plans', land: [['A', 'plan', 'for', 'every', 'member.']], port: [['A', 'plan', 'for'], ['every', 'member.']] },
-  { id: 'more', a: 27.4, b: 30.4, eyebrow: 'Staff · Workouts · Equipment', land: [['And', 'the', 'rest', 'of', 'the', 'gym.']], port: [['And', 'the', 'rest'], ['of', 'the', 'gym.']] },
-  { id: 'outro', a: 30.4, b: 33.4, eyebrow: 'All in one', land: [['Everything', 'your', 'gym', 'runs', 'on.']], port: [['Everything', 'your'], ['gym', 'runs', 'on.']] },
+// Chapters of the one flow (lead → member → renewal). Each has a solid pastel stage, an
+// eyebrow and a headline (landscape lines / portrait lines).
+export const CHAPTERS = [
+  { id: 'intro', a: 0, b: 5.5, bg: '#E7E1FF', eyebrow: 'Lead to member', land: [['From', 'first', 'lead'], ['to', 'loyal', 'member.']], port: [['From', 'first'], ['lead', 'to', 'loyal'], ['member.']] },
+  { id: 'follow', a: 5.5, b: 12.0, bg: '#D9E8FF', eyebrow: '01 · Follow up', land: [['Never', 'miss', 'a', 'follow-up.']], port: [['Never', 'miss', 'a'], ['follow-up.']] },
+  { id: 'convert', a: 12.0, b: 18.5, bg: '#D4F2E4', eyebrow: '02 · Convert', land: [['Convert', 'a', 'lead', 'in', 'two', 'clicks.']], port: [['Convert', 'a', 'lead'], ['in', 'two', 'clicks.']] },
+  { id: 'onboard', a: 18.5, b: 26.0, bg: '#FFE3D3', eyebrow: '03 · Onboard', land: [['Plan', 'and', 'billing', 'in', 'one', 'step.']], port: [['Plan', 'and', 'billing'], ['in', 'one', 'step.']] },
+  { id: 'renew', a: 26.0, b: 32.5, bg: '#FFF0C4', eyebrow: '04 · Renew · 3 months later', land: [['Renew', 'before', 'a', 'plan', 'lapses.']], port: [['Renew', 'before'], ['a', 'plan', 'lapses.']] },
+  { id: 'outro', a: 32.5, b: 37.0, bg: '#E7E1FF', eyebrow: 'Lead to member', land: [['Every', 'step,', 'in', 'one', 'place.']], port: [['Every', 'step,'], ['in', 'one', 'place.']] },
 ]
-export const DURATION = 33.4
+export const DURATION = 37.0
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 2.6
+export const POSTER = 3.9
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
-// VIEW is the area the canvas camera frames (below the headline).
-export const STAGES = {
-  land: { W: 1920, H: 1080, VIEW: { x: 70, y: 250, w: 1780, h: 790 } },
-  port: { W: 1080, H: 1920, VIEW: { x: 40, y: 500, w: 1000, h: 1360 } },
-}
+export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }

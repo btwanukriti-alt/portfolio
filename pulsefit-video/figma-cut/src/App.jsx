@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { BEATS, DURATION, POSTER, STAGES, UI_FONT } from './lib.js'
-import { Canvas, camera } from './canvas.jsx'
-import { Backdrop } from './stage.jsx'
+import { CHAPTERS, DURATION, POSTER, STAGES, UI_FONT } from './lib.js'
+import { Story } from './story.jsx'
+import { Backdrop, Wipe } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
 // poster frame until the page posts 'showcase:play', looping after that.
@@ -101,14 +101,14 @@ export default function App() {
   const { W, H } = STAGES[L]
   const s = Math.min(vw / W, vh / H)
   const st = { s, ox: (vw - W * s) / 2, oy: (vh - H * s) / 2, W, H }
-  const cam = camera(t, L)
 
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: '#E9EBF0' }}>
-      <Backdrop cam={cam} st={st} />
+    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: '#E7E1FF' }}>
+      <Backdrop t={t} />
       <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
-        <Canvas t={t} L={L} W={W} />
+        <Story t={t} L={L} W={W} />
       </div>
+      <Wipe t={t} vw={vw} vh={vh} st={st} />
       {!ui.hidden && <Player t={t} playing={playing} idle={ui.idle} />}
     </div>
   )
@@ -126,7 +126,7 @@ function Player({ t, playing, idle }) {
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12a8 8 0 108-8 8.5 8.5 0 00-6 2.5L4 8.5M4 4v4.5h4.5" /></svg>
       </button>
       <div style={{ display: 'flex', gap: 4, padding: '0 6px' }}>
-        {BEATS.map((sc) => {
+        {CHAPTERS.map((sc) => {
           const f = Math.min(1, Math.max(0, (t - sc.a) / (sc.b - sc.a)))
           return (
             <button key={sc.id} aria-label={`Go to ${sc.id}`} onClick={() => api.seek(sc.a)} style={{ width: `clamp(28px, ${(sc.b - sc.a) * 1.6}vw, ${(sc.b - sc.a) * 14}px)`, height: 18, border: 0, padding: 0, background: 'transparent', cursor: 'pointer', display: 'grid', alignItems: 'center' }}>

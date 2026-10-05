@@ -11,7 +11,6 @@ const STATUS = {
   Hot: ['#D6383F', '#FFDCDC'],
   Converted: [C.green, '#D7F3E3'],
 }
-const TYPE = { Permanent: ['#6D3FE0', '#EEE7FF'], Freelancer: ['#C27410', '#FFF1DA'], Consultant: ['#D2491E', '#FFE6DD'] }
 
 // Shared table toolbar + pagination (Leads Table, Staff Table).
 function TableCard({ x, y, w, h, cols, head, rows, renderRow, rowH = 54, checked = 1 }) {
@@ -132,11 +131,29 @@ const SOURCES = [['Social Media', 8, 5.8], ['Website', 6.2, 4.2], ['Walk-ins', 5
 export const LD = {
   w: 1440, h: 1130,
   week3: { x: 731, y: 758 + 250 * (1 - 67 / 100) },
+  // Missed Follow-ups, first item (Neha Singh): box and its Follow-up button.
+  item: { x: 691, y: 224, w: 313, h: 60 },
+  follow: { x: 927, y: 254 },
   perf: { x: 300, y: 500, w: 1100, h: 610 },
 }
+// One task row (Stale / Missed / Low quality cards): 313 × 60. Used in the dashboard and lifted
+// out on its own. `hi` rings it (selected), `pr` presses its Follow-up button.
+export function TaskItem({ nm, st, note, col, act = 'follow', pr = 0, hi = 0, w = 313 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: w, height: 60, padding: '0 12px', boxSizing: 'border-box', borderRadius: 10, background: '#fff', boxShadow: `inset 0 0 0 ${1 + hi}px ${hi > 0.5 ? col : C.line}`, fontFamily: 'Poppins, sans-serif', color: C.ink }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 500 }}>{nm}<Chip fg={STATUS[st][0]} bg={STATUS[st][1]} h={20} style={{ fontSize: 11, padding: '0 6px' }}>{st}</Chip></div>
+        <div style={{ fontSize: 12, color: col, marginTop: 3 }}>{note}</div>
+      </div>
+      {act === 'follow' ? <Btn h={28} pr={pr} style={{ fontSize: 12 }}>Follow-up</Btn> : IC.pencil(C.violet, 15)}
+      {IC.dots(C.t2, 16)}
+    </div>
+  )
+}
+export const MISSED = { nm: 'Neha Singh', st: 'Hot', note: 'Missed by 5 days', col: '#D6383F' }
 const wx = (i) => 424 + i * 153.3
 const wy = (v) => 758 + 250 * (1 - v / 100)
-export const LeadsDash = memo(function LeadsDash({ k = 1, draw = 1, bars = 1, tip = 0 }) {
+export const LeadsDash = memo(function LeadsDash({ k = 1, draw = 1, bars = 1, tip = 0, fpr = 0, hi = 0 }) {
   return (
     <Shell active="Leads" h={LD.h} sub={[['Leads Dashboard', true], ['Create New Lead'], ['Leads Table']]}>
       <Abs x={320} y={92} style={{ fontSize: 12.5, color: C.sub, display: 'flex', gap: 6, alignItems: 'center' }}>Leads{IC.chevR(C.sub, 12)}<span style={{ color: C.primary }}>Leads Tasks</span></Abs>
@@ -148,14 +165,9 @@ export const LeadsDash = memo(function LeadsDash({ k = 1, draw = 1, bars = 1, ti
             {ic(col, 16)}<span style={{ flex: 1 }}>{title}</span>
             <span style={{ width: 20, height: 20, borderRadius: 10, background: col, color: '#fff', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 600 }}>{n}</span>
           </div>
-          {items.map(([nm, st, note]) => (
-            <div key={nm + note} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 60, marginTop: 8, padding: '0 12px', borderRadius: 10, boxShadow: `inset 0 0 0 1px ${C.line}` }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 500 }}>{nm}<Chip fg={STATUS[st][0]} bg={STATUS[st][1]} h={20} style={{ fontSize: 11, padding: '0 6px' }}>{st}</Chip></div>
-                <div style={{ fontSize: 12, color: col, marginTop: 3 }}>{note}</div>
-              </div>
-              {act === 'follow' ? <Btn h={28} style={{ fontSize: 12 }}>Follow-up</Btn> : IC.pencil(C.violet, 15)}
-              {IC.dots(C.t2, 16)}
+          {items.map(([nm, st, note], ii) => (
+            <div key={nm + note} style={{ marginTop: 8 }}>
+              <TaskItem nm={nm} st={st} note={note} col={col} act={act} pr={ci === 1 && ii === 0 ? fpr : 0} hi={ci === 1 && ii === 0 ? hi : 0} />
             </div>
           ))}
         </div>
@@ -234,14 +246,16 @@ export const LeadsDash = memo(function LeadsDash({ k = 1, draw = 1, bars = 1, ti
 })
 
 // ---------------------------------------------------------------------------- Members Dashboard
+// Refined: the design's placeholder "Plan A-E" become real plans from the Plans screen, and
+// Neha Singh's row carries her phone number and trainer from the Leads Table.
 const EXP = [
-  ['Robert Fox', '+91 98886 23443', 'Apurva Jha', 'Plan A', 'Today'],
-  ['Neha Singh', '+91 98676 23562', 'Shikhar Tiwari', 'Plan B', '2 days'],
-  ['Alex John', '+91 98568 96512', 'Abhishek M', 'Plan C', '5 days'],
-  ['Cameron', '+91 78556 54916', 'Ritesh Jha', 'Plan D', '6 days'],
-  ['Aaron J.', '+91 78556 54916', 'Shikhar Tiwari', 'Plan E', '7 days'],
+  ['Robert Fox', '+91 98450 21134', 'Anukriti Mishra', 'Monthly', 'Today'],
+  ['Neha Singh', '+91 99021 44870', 'Apurva Jha', 'Quarterly', '2 days'],
+  ['Alex John', '+91 90876 33215', 'Anukriti Mishra', 'Half-Yearly', '5 days'],
+  ['Cameron', '+91 78556 54916', 'Ritesh Jha', 'Annual', '6 days'],
+  ['Aaron Joseph', '+91 80455 19023', 'Abhishek Menon', 'PT Starter', '7 days'],
 ]
-const PLAN_C = { 'Plan A': [C.primary, C.pSoft], 'Plan B': [C.amber, C.aSoft], 'Plan C': [C.violet, C.vSoft], 'Plan D': [C.teal, '#E3F7F4'], 'Plan E': [C.pink, '#FDE9F1'] }
+const PLAN_C = { Monthly: ['#4F46E5', '#ECEBFF'], Quarterly: [C.primary, C.pSoft], 'Half-Yearly': [C.violet, C.vSoft], Annual: [C.teal, '#E3F7F4'], 'PT Starter': ['#C27410', '#FFF1DA'] }
 const MKPI = [
   ['Active Members', 234, IC.users, C.primary, C.pSoft, '+21', true],
   ['New Joinees', 12, IC.userPlusLine, C.green, C.gSoft, '+21', true],
@@ -249,14 +263,14 @@ const MKPI = [
   ['Frozen Accounts', 26, IC.alert, C.red, C.rSoft, '+21', true],
   ['Biometrics Missing', 34, IC.staff, C.violet, C.vSoft, '+2', false],
 ]
-const EXP_COLS = '150px 144px 76px 80px 1fr'
-// Frame 1440 × 720. Row 0 = Robert Fox; ROW0 is its "Expires in" cell.
+const EXP_COLS = '144px 150px 96px 76px 1fr'
+// Frame 1440 × 720. Neha Singh is row 1 of Expiring Subscription.
 export const MD = {
   w: 1440, h: 720,
-  row0: { x: 734, y: 421 },
-  row: { x: 337, y: 396, w: 646, h: 51 },
+  row: { x: 340, y: 445, w: 640, h: 51 },
+  renew: { x: 855, y: 470 },
 }
-export const Members = memo(function Members({ k = 1, rowHi = 0 }) {
+export const Members = memo(function Members({ k = 1, rowHi = 0, rpr = 0 }) {
   return (
     <Shell active="Members" h={MD.h}>
       <Abs x={320} y={104} style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}>Members</Abs>
@@ -285,12 +299,12 @@ export const Members = memo(function Members({ k = 1, rowHi = 0 }) {
           <span>Name</span><span>Assigned to</span><span>Plan</span><span>Expires in</span><span style={{ textAlign: 'right' }}>Actions</span>
         </div>
         {EXP.map(([n, ph, as, pl, ex], i) => (
-          <div key={n} style={{ display: 'grid', gridTemplateColumns: EXP_COLS, alignItems: 'center', height: 51, padding: '0 8px', borderBottom: i < 4 ? `1px solid ${C.line2}` : 'none', background: i === 0 ? `rgba(31,79,244,${0.07 * rowHi})` : 'transparent', borderRadius: 8 }}>
+          <div key={n} style={{ display: 'grid', gridTemplateColumns: EXP_COLS, alignItems: 'center', height: 51, padding: '0 8px', borderBottom: i < 4 ? `1px solid ${C.line2}` : 'none', background: i === 1 ? `rgba(31,79,244,${0.07 * rowHi})` : 'transparent', borderRadius: 8 }}>
             <div><div style={{ fontSize: 13.5, fontWeight: 500 }}>{n}</div><div style={{ fontSize: 11.5, color: C.faint }}>{ph}</div></div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: C.t2 }}><Avatar name={as} s={22} />{as}</div>
             <div><Chip fg={PLAN_C[pl][0]} bg={PLAN_C[pl][1]} h={22}>{pl}</Chip></div>
             <div style={{ fontSize: 13, fontWeight: 500, color: ex === 'Today' ? C.red : ex === '2 days' ? C.amber : C.sub }}>{ex}</div>
-            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}><Btn h={28}>Renew</Btn><Btn h={28} kind="ghost">Reminder</Btn></div>
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}><Btn h={28} pr={i === 1 ? rpr : 0}>Renew</Btn><Btn h={28} kind="ghost">Reminder</Btn></div>
           </div>
         ))}
       </div>
@@ -313,192 +327,121 @@ export const Members = memo(function Members({ k = 1, rowHi = 0 }) {
   )
 })
 
-// ------------------------------------------------------------------------------------- Plans
-const CAT = { Membership: '#4F46E5', Training: '#D97706', Classes: '#0D9488', Student: '#16A34A' }
-const PLANS = [
-  ['Membership', 'Monthly', '1 month', '2,000', '180', '15 Days', '1 Week', 128],
-  ['Membership', 'Quarterly', '3 months', '5,400', '486', '1 Month', '2 Weeks', 94],
-  ['Membership', 'Half-Yearly', '6 months', '9,600', '864', '1 Month', '3 Weeks', 61],
-  ['Membership', 'Annual', '12 months', '16,800', '1,512', '2 Months', '1 Month', 143],
-  ['Training', 'PT Starter', '1 month', '6,000', '540', '15 Days', '1 Week', 38],
-  ['Training', 'PT Pro', '3 months', '16,500', '1,485', '1 Month', '2 Weeks', 22],
-  ['Classes', 'Yoga Monthly', '1 month', '1,800', '162', '15 Days', '1 Week', 76],
-  ['Classes', 'Zumba Monthly', '1 month', '1,600', '144', '15 Days', '1 Week', 54],
-]
-// Frame 1440 × 800. Cards 249 × 262 at x 320 + i·269, rows y 216 / 494. Quarterly = card 1.
-export const PL = {
-  w: 1440, h: 800,
-  cardAt: (i) => ({ x: 320 + (i % 4) * 269, y: 216 + Math.floor(i / 4) * 278, w: 249, h: 262 }),
-}
-function PlanCard({ p, lift = 0, users = 1 }) {
-  const [cat, name, dur, amt, tax, ext, pause, n] = p
-  const Row = ({ k, v }) => <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.sub, height: 20, alignItems: 'center' }}><span>{k}</span><span style={{ color: C.t2, width: 70 }}>{v}</span></div>
+// --------------------------------------------------------------------------- Convert to Member
+// The design's "Convert to Member" modal (Add Member 9), refined: real lead data, a plan
+// picker with real plans, no placeholder helper text, billing copy that matches the plan.
+const PLAN_OPTS = [['Monthly', '1 month', '2,000'], ['Quarterly', '3 months', '5,400'], ['Half-Yearly', '6 months', '9,600'], ['Annual', '12 months', '16,800']]
+const Toggle = ({ on }) => (
+  <div style={{ width: 40, height: 22, borderRadius: 11, background: on ? C.primary : '#D5D8E2', position: 'relative', flex: 'none' }}>
+    <div style={{ position: 'absolute', top: 3, left: on ? 21 : 3, width: 16, height: 16, borderRadius: 8, background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+  </div>
+)
+const typed = (s, u) => s.slice(0, Math.round(s.length * clamp(u)))
+function Field({ x, y, w = 280, label, value, u = 1, ph, active, children }) {
+  const v = value ? typed(value, u) : ''
   return (
-    <div style={{ position: 'relative', width: 249, height: 262, background: '#fff', borderRadius: 12, boxShadow: `0 0 0 1px ${C.line}, 0 ${24 * lift}px ${40 * lift}px -${18 * lift}px rgba(20,30,90,.35)`, transform: `translateY(${-8 * lift}px)`, fontSize: 13 }}>
-      <div style={{ position: 'absolute', left: -6, top: 16, height: 22, padding: '0 12px 0 16px', display: 'flex', alignItems: 'center', background: CAT[cat], color: '#fff', fontSize: 11.5, fontWeight: 600, borderRadius: '2px 4px 4px 0' }}>{cat}</div>
-      <div style={{ position: 'absolute', right: 12, top: 18 }}>{IC.vdots()}</div>
-      <div style={{ position: 'absolute', left: 20, right: 18, top: 52 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.01em' }}>{name}</div>
-        <div style={{ display: 'flex', marginTop: 10 }}>
-          <div style={{ flex: 1 }}><div style={{ fontSize: 11.5, color: C.sub }}>Duration:</div><div style={{ fontWeight: 500, marginTop: 2 }}>{dur}</div></div>
-          <div style={{ width: 92 }}><div style={{ fontSize: 11.5, color: C.sub }}>Subscription Amt:</div><div style={{ fontWeight: 500, marginTop: 2 }}>₹ {amt}</div></div>
-        </div>
-        <div style={{ marginTop: 10 }}><Row k="Taxes:" v={`₹ ${tax}`} /><Row k="Extended Days:" v={ext} /><Row k="Pause Days:" v={pause} /></div>
+    <Abs x={x} y={y - 19}>
+      <div style={{ fontSize: 13, color: C.t2, marginBottom: 6 }}>{label}</div>
+      <div style={{ width: w, height: 42, borderRadius: 8, boxSizing: 'border-box', padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: v ? C.ink : C.faint, background: '#fff', boxShadow: `inset 0 0 0 ${active ? 2 : 1}px ${active ? C.primary : '#CDD1DB'}` }}>
+        {children}{v || ph}{active && <span style={{ width: 1.5, height: 18, background: C.primary, marginLeft: -6 }} />}
       </div>
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 52, borderTop: `1px solid ${C.line2}`, display: 'flex', alignItems: 'center', padding: '0 14px 0 18px', gap: 8 }}>
-        <div style={{ display: 'flex' }}><Avatar name="Robert Fox" s={22} /><div style={{ marginLeft: -7 }}><Avatar name="Neha Singh" s={22} /></div></div>
-        <div style={{ flex: 1 }}><div style={{ fontSize: 10.5, color: C.faint }}>Active Users</div><div style={{ fontSize: 12.5, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{Math.round(n * users)}</div></div>
-        <Btn h={28} kind="soft" style={{ fontSize: 12 }}>View Plan</Btn>
+    </Abs>
+  )
+}
+// Billing total box (584 × 200). p counts the amounts up.
+function TotalBox({ p = 1, w = 584 }) {
+  const rows = [['Subscription Amount', 5400], ['Joining Fee (waived)', 0], ['Discount', 0], ['Tax', 486]]
+  return (
+    <div style={{ width: w, height: 200, boxSizing: 'border-box', padding: '18px 24px', borderRadius: 12, background: '#F6F7FA', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
+      <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Total</div>
+      {rows.map(([k, v]) => <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.sub, height: 23, alignItems: 'center' }}><span>{k}</span><span style={{ color: C.t2, fontVariantNumeric: 'tabular-nums' }}>₹{fmt(v * p, 2)}</span></div>)}
+      <div style={{ height: 1, background: C.line, margin: '8px 0 10px' }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ width: 20, height: 20, borderRadius: 10, background: '#F5B82E', color: '#8A5A00', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 700 }}>₹</span>
+        <span style={{ flex: 1, fontSize: 15, fontWeight: 600 }}>Total Amount</span>
+        <span style={{ fontSize: 19, fontWeight: 600, color: C.primary, fontVariantNumeric: 'tabular-nums' }}>₹{fmt(5886 * p, 2)}</span>
       </div>
     </div>
   )
 }
-export const Plans = memo(function Plans({ hover = -1, lift = 0, users = 1 }) {
-  return (
-    <Shell active="Plans" h={PL.h}>
-      <Abs x={320} y={100} style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}>Plans</Abs>
-      <Abs x={320} y={150} style={{ display: 'flex', gap: 28, fontSize: 14.5, height: 40, alignItems: 'center', borderBottom: `1px solid ${C.line}`, paddingRight: 12 }}>
-        <span style={{ color: C.primary, fontWeight: 500, boxShadow: `0 2px 0 ${C.primary}`, height: 40, display: 'flex', alignItems: 'center', padding: '0 12px', marginBottom: -1 }}>Active Plans</span>
-        <span style={{ color: C.sub }}>Deleted Plans</span>
-      </Abs>
-      <Abs x={868} y={150} style={{ display: 'flex', gap: 10 }}>
-        <Btn kind="ghost" h={38} style={{ width: 120, justifyContent: 'space-between' }}>All{IC.chev(C.t2, 14)}</Btn>
-        <Btn kind="ghost" h={38}>{IC.filter()}Filter</Btn>
-        <Btn kind="ghost" h={38}>{IC.plus(C.t2)}Add Category</Btn>
-        <Btn h={38}>{IC.plus()}Add Plan</Btn>
-      </Abs>
-      {PLANS.map((p, i) => {
-        const c = PL.cardAt(i)
-        return (
-          <Abs key={p[1]} x={c.x} y={c.y} style={{ zIndex: i === hover ? 2 : 1 }}>
-            <PlanCard p={p} lift={i === hover ? lift : 0} users={i === hover ? users : 1} />
-          </Abs>
-        )
-      })}
-    </Shell>
+// Frame 1440 × 1200: Leads Table dimmed under the modal (modal at 384, 44; 672 × 1112).
+export const CV = {
+  w: 1440, h: 1200,
+  select: { x: 560, y: 573 },
+  option: (i) => ({ x: 560, y: 630 + i * 44 }),
+  total: { x: 428, y: 840, w: 584, h: 200 },
+  add: { x: 966, y: 1120 },
+}
+// fill 0..1 types the member details; open / hover (option index) / picked drive the plan picker;
+// p counts the total; apr presses Add Member.
+export const ConvertFrame = memo(function ConvertFrame({ fill = 1, open = 0, hover = -1, picked = 1, p = 1, apr = 0 }) {
+  const f = (i) => clamp(fill * 4 - i)
+  const sec = (y, h, title) => (
+    <div style={{ position: 'absolute', left: 24, top: y, width: 624, height: h, borderRadius: 12, boxShadow: `inset 0 0 0 1px ${C.line}` }}>
+      <div style={{ height: 48, display: 'flex', alignItems: 'center', padding: '0 24px', background: '#FAFAFC', borderRadius: '12px 12px 0 0', borderBottom: `1px solid ${C.line}`, fontSize: 15, fontWeight: 600 }}>{title}</div>
+    </div>
   )
-})
-
-// ------------------------------------------------------------------------------------- Staff
-const STAFF = [
-  [2314, 'Anukriti Mishra', '+91 98450 60127', 'anukriti.mishra@puls…', 'Permanent', 'Gym Manager'],
-  [2789, 'Shikhar Tiwari', '+91 78798 63288', 'shikhar.tiwari@pulsefit.in', 'Permanent', 'Assistant Manager'],
-  [3051, 'Apurva Jha', '+91 99021 87450', 'apurva.jha@pulsefit.in', 'Freelancer', 'Personal Trainer'],
-  [3168, 'Ritesh Jha', '+91 90876 21094', 'ritesh.jha@pulsefit.in', 'Consultant', 'Gym Consultant'],
-  [3294, 'Abhishek Menon', '+91 80455 34760', 'abhishek.menon@pu…', 'Permanent', 'Gym Manager'],
-  [3407, 'Farida Sheikh', '+91 97411 09832', 'farida.sheikh@pulsefi…', 'Permanent', 'Housekeeping'],
-  [3512, 'Sneha Kulkarni', '+91 93450 55018', 'sneha.kulkarni@puls…', 'Freelancer', 'Personal Trainer'],
-  [3688, 'Vikram Rao', '+91 76690 71243', 'vikram.rao@pulsefit.in', 'Consultant', 'Gym Consultant'],
-]
-export const ST = { w: 1440, h: 860 }
-export const Staff = memo(function Staff() {
   return (
-    <Shell active="Staff" h={ST.h}>
-      <TableCard
-        x={320} y={124} w={1056} h={680} cols="56px 76px 168px 88px 168px 218px 134px 148px"
-        head={['ID', 'Employee', 'Action', 'Contact', 'Email', 'Employment Type', 'Designation']}
-        rows={STAFF}
-        renderRow={([id, n, ph, em, ty, de]) => (
-          <>
-            <span>{id}</span>
-            <span style={{ fontWeight: 500, color: C.ink }}>{n}</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 10 }}>{IC.dots()}{IC.pencil()}</span>
-            <span>{ph}</span>
-            <span>{em}</span>
-            <span><Chip fg={TYPE[ty][0]} bg={TYPE[ty][1]} w={92}>{ty}</Chip></span>
-            <span>{de}</span>
-          </>
-        )}
-      />
-    </Shell>
-  )
-})
-
-// ----------------------------------------------------------------------------------- Workouts
-const LEVEL = { Beginner: ['#139B55', '#E3F6EC'], Intermediate: ['#C27410', '#FFF1DA'], Advance: ['#D6383F', '#FFE3E3'] }
-const GOAL = { 'Weight Loss': ['#3B5BDB', '#E5EBFF'], 'Weight Gain': ['#D2491E', '#FFE9E1'], 'Muscle Gain': ['#C2255C', '#FFE3EF'], 'Strength Training': ['#0C8599', '#DDF6FA'], 'Cardio Health': ['#D6383F', '#FFE3E3'] }
-const WORKOUTS = [['Beginner', 'Weight Loss'], ['Intermediate', 'Weight Gain'], ['Advance', 'Muscle Gain'], ['Beginner', 'Strength Training'], ['Beginner', 'Strength Training'], ['Advance', 'Weight Loss'], ['Intermediate', 'Cardio Health'], ['Intermediate', 'Weight Gain']]
-export const WO = { w: 1440, h: 760 }
-export const Workouts = memo(function Workouts() {
-  return (
-    <Shell active="Workouts" h={WO.h} sub={[['Add Workout'], ['Workout List', true], ['Add Exercise']]}>
-      <Abs x={320} y={108} style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em' }}>Workout Plan</Abs>
-      <Abs x={1100} y={104} style={{ display: 'flex', gap: 10 }}><Btn kind="ghost" h={38}>{IC.filter()}Filter</Btn><Btn h={38}>{IC.plus()}Add Workout Plan</Btn></Abs>
-      {WORKOUTS.map(([lvl, goal], i) => (
-        <div key={i} style={card({ left: 320 + (i % 4) * 269, top: 168 + Math.floor(i / 4) * 254, width: 249, height: 236, padding: 18 })}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}><Chip fg={LEVEL[lvl][0]} bg={LEVEL[lvl][1]}>{lvl}</Chip>{IC.vdots()}</div>
-          <div style={{ fontSize: 16.5, fontWeight: 600, marginTop: 12, letterSpacing: '-0.01em' }}>{goal}</div>
-          <div style={{ fontSize: 12, color: C.t2, marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>Goals:<Chip fg={GOAL[goal][0]} bg={GOAL[goal][1]} h={20} style={{ fontSize: 11 }}>{goal}</Chip></div>
-          <div style={{ display: 'flex', marginTop: 14, fontSize: 12 }}>
-            <div style={{ flex: 1 }}><div style={{ fontWeight: 500 }}>Active Days</div><div style={{ display: 'flex', alignItems: 'center', gap: 5, color: C.sub, marginTop: 3 }}>{IC.calSmall()}6 days/ week</div></div>
-            <div style={{ width: 80 }}><div style={{ fontWeight: 500 }}>Duration</div><div style={{ color: C.sub, marginTop: 3 }}>2 Months</div></div>
-          </div>
-          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 50, borderTop: `1px solid ${C.line2}`, display: 'flex', alignItems: 'center', padding: '0 14px 0 18px', gap: 8 }}>
-            <div style={{ display: 'flex' }}><Avatar name="Apurva Jha" s={22} /><div style={{ marginLeft: -7 }}><Avatar name="Sneha Kulkarni" s={22} /></div></div>
-            <div style={{ flex: 1 }}><div style={{ fontSize: 10.5, color: C.faint }}>Active Users</div><div style={{ fontSize: 12.5, fontWeight: 600 }}>50</div></div>
-            <Btn h={28} kind="soft" style={{ fontSize: 12 }}>View{IC.chevR(C.primary, 12)}</Btn>
-          </div>
+    <div style={{ position: 'relative', width: CV.w, height: CV.h, background: '#F4F5F8', overflow: 'hidden', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
+      <LeadsTable conv={1} />
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,18,34,.42)' }} />
+      <div style={{ position: 'absolute', left: 384, top: 44, width: 672, height: 1112, background: '#fff', borderRadius: 16, boxShadow: '0 40px 100px -30px rgba(10,14,40,.6)' }}>
+        <div style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: `1px solid ${C.line}` }}>
+          <span style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em' }}>Convert to Member</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.t2} strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </div>
-      ))}
-      <Abs x={320} y={690} w={1056} style={{ display: 'flex', justifyContent: 'center', gap: 6, fontSize: 12.5 }}>
-        <span style={{ color: C.faint, marginRight: 4 }}>Prev</span>
-        {['1', '2', '3', '…', '10'].map((p) => <span key={p} style={{ minWidth: 26, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center', background: p === '1' ? C.primary : '#EBEDF2', color: p === '1' ? '#fff' : C.t2 }}>{p}</span>)}
-        <span style={{ fontWeight: 600, marginLeft: 4 }}>Next</span>
-      </Abs>
-    </Shell>
-  )
-})
-
-// ------------------------------------------------------------------------------ Add Equipment
-export const EQ = { w: 1440, h: 1000 }
-const Field = ({ label, w = 300, children, h = 40 }) => (
-  <div style={{ marginTop: 14 }}>
-    <div style={{ fontSize: 12.5, color: C.t2, marginBottom: 6 }}>{label}</div>
-    <div style={{ width: w, height: h, borderRadius: 8, boxShadow: `inset 0 0 0 1px #CDD1DB`, display: 'flex', alignItems: 'center', padding: '0 12px', boxSizing: 'border-box', fontSize: 13, color: C.faint, justifyContent: 'space-between' }}>{children}</div>
-  </div>
-)
-const Section = ({ y, h, title, children }) => (
-  <div style={card({ left: 566, top: y, width: 810, height: h, overflow: 'hidden' })}>
-    <div style={{ height: 52, display: 'flex', alignItems: 'center', padding: '0 28px', background: '#FAFAFC', borderBottom: `1px solid ${C.line}`, fontSize: 15, fontWeight: 600 }}>{title}<span style={{ color: C.red, marginLeft: 2 }}>*</span></div>
-    <div style={{ padding: '4px 40px' }}>{children}</div>
-  </div>
-)
-export const Equipment = memo(function Equipment() {
-  return (
-    <Shell active="Equipments" h={EQ.h}>
-      <div style={card({ left: 320, top: 100, width: 230, height: 300, padding: 22 })}>
-        <div style={{ fontSize: 17, fontWeight: 600 }}>Add Equipment</div>
-        <div style={{ fontSize: 11.5, color: C.sub, marginTop: 6 }}>Follow these steps to add equipment</div>
-        {['Equipment Info', 'Purchase Details', 'Invoice', 'Repair Schedule'].map((s, i) => (
-          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 34, marginTop: i ? 0 : 16, fontSize: 12.5, color: i ? C.sub : C.ink }}>
-            <span style={{ width: 14, height: 14, borderRadius: 7, boxSizing: 'border-box', border: `1.5px solid ${i ? '#B9BECB' : C.primary}`, display: 'grid', placeItems: 'center' }}>{!i && <span style={{ width: 6, height: 6, borderRadius: 3, background: C.primary }} />}</span>{s}
-          </div>
+        {sec(88, 317, 'Member Details')}
+        <Field x={48} y={175} label="First Name" value="Neha" u={f(0)} ph="First name" active={fill > 0 && fill < 0.25} />
+        <Field x={344} y={175} label="Last Name" value="Singh" u={f(1)} ph="Last name" active={fill >= 0.25 && fill < 0.5} />
+        <Field x={48} y={250} label="Email" ph="name@email.com" />
+        <Field x={344} y={250} label="Phone Number" value="+91 99021 44870" u={f(2)} ph="+91" active={fill >= 0.5 && fill < 0.75} />
+        <Field x={48} y={325} label="Assign To" value={fill >= 0.75 ? 'Apurva Jha' : ''} ph="Select staff">{fill >= 0.75 && <Avatar name="Apurva Jha" s={24} />}</Field>
+        {sec(421, 595, 'Plan Info')}
+        <Field x={48} y={508} label="Select Plan" value={picked ? 'Quarterly' : ''} ph="Select plan" active={open > 0.5} />
+        {picked > 0 && <Abs x={150} y={519}><Chip fg="#6D3FE0" bg="#EEE7FF" h={22} style={{ fontSize: 11.5 }}>Recurring</Chip></Abs>}
+        <Abs x={300} y={518}>{IC.chev(C.t2, 18)}</Abs>
+        <Field x={344} y={508} label="Starting Date" ph="Select date" />
+        <Abs x={592} y={518}>{IC.calSmall(C.t2, 18)}</Abs>
+        <Abs x={24} y={570} w={624} h={1} style={{ background: C.line }} />
+        <Abs x={48} y={594} style={{ fontSize: 16, fontWeight: 600 }}>Billing Information</Abs>
+        {[['Waive off joining fee', true, 632], ['Apply discount', false, 668]].map(([l, on, y]) => (
+          <Abs key={l} x={48} y={y} w={576} h={30} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 14, fontWeight: 500 }}>{l}<Toggle on={on} /></Abs>
         ))}
-      </div>
-      <Abs x={566} y={96} style={{ fontSize: 18, fontWeight: 600 }}>Equipment</Abs>
-      <Section y={132} h={258} title="Equipment Info">
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}><Field label="Category">{IC.chev(C.t2)}</Field><span style={{ width: 30, height: 30, borderRadius: 15, background: C.primary, display: 'grid', placeItems: 'center', marginBottom: 5 }}>{IC.plus('#fff', 16)}</span></div>
-        <Field label="Model Name"><i>Enter model name</i></Field>
-        <div style={{ marginTop: 14, fontSize: 12.5, color: C.t2 }}>Quantity</div>
-        <div style={{ display: 'flex', marginTop: 6, width: 150, height: 32, borderRadius: 8, boxShadow: `inset 0 0 0 1px #CDD1DB`, overflow: 'hidden', fontSize: 13 }}><span style={{ width: 36, display: 'grid', placeItems: 'center', background: '#F1F2F6' }}>−</span><span style={{ flex: 1, display: 'grid', placeItems: 'center' }}>1</span><span style={{ width: 36, display: 'grid', placeItems: 'center', background: '#F1F2F6' }}>+</span></div>
-      </Section>
-      <Section y={406} h={210} title="Purchase Details">
-        <Field label="Date of Purchase">{IC.calSmall(C.t2, 16)}</Field>
-        <Field label="Cost of Purchase"><span style={{ color: C.t2 }}>INR (₹)</span></Field>
-      </Section>
-      <Section y={632} h={150} title="Invoice">
-        <div style={{ fontSize: 12.5, color: C.t2, marginTop: 14 }}>Upload Invoice</div>
-        <div style={{ marginTop: 8, height: 40, borderRadius: 8, border: '1.5px dashed #C3C8D4', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 13, color: C.t2 }}><span style={{ width: 20, height: 20, borderRadius: 10, background: C.primary, display: 'grid', placeItems: 'center' }}>{IC.plus('#fff', 12)}</span>Add Files</div>
-      </Section>
-      <Section y={798} h={230} title="Repair Schedule">
-        <div style={{ fontSize: 12.5, color: C.t2, marginTop: 14 }}>Repair Reminder:</div>
-        <div style={{ display: 'flex', gap: 18, marginTop: 8, fontSize: 12.5, color: C.t2 }}>
-          {['Dashboard', 'SMS', 'Email'].map((s, i) => <span key={s} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Box on={!i} />{s}</span>)}
+        <Abs x={44} y={716} w={584} h={64} style={{ borderRadius: 10, background: '#FFF6DA', padding: '12px 16px', boxSizing: 'border-box', fontSize: 12.5, color: '#8A6100' }}>
+          <div style={{ fontWeight: 600 }}>Billing Information</div>
+          <div style={{ marginTop: 2 }}>Billed every 3 months, starting from the selected start date.</div>
+        </Abs>
+        <Abs x={44} y={796}><TotalBox p={p} /></Abs>
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 72, borderTop: `1px solid ${C.line}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: C.t2, padding: '0 8px' }}>Cancel</span>
+          <Btn h={42} pr={apr}>Add Member</Btn>
         </div>
-        <div style={{ fontSize: 12.5, color: C.t2, marginTop: 16 }}>Frequency:</div>
-        <div style={{ display: 'flex', gap: 10, marginTop: 8, fontSize: 12.5 }}><Chip fg={C.primary} bg={C.pSoft} h={28}>Monthly</Chip><Chip fg={C.t2} bg="#F1F2F6" h={28}>Yearly</Chip></div>
-      </Section>
-    </Shell>
+        {open > 0 && (
+          <Abs x={48} y={556} w={280} style={{ padding: 6, borderRadius: 12, background: '#fff', boxShadow: '0 0 0 1px rgba(15,18,34,.06), 0 18px 40px -12px rgba(15,18,34,.3)', opacity: clamp(open * 2), transform: `translateY(${-8 * (1 - E.out(open))}px)`, zIndex: 3 }}>
+            {PLAN_OPTS.map(([n, d, a], i) => (
+              <div key={n} style={{ display: 'flex', alignItems: 'center', height: 44, padding: '0 10px', borderRadius: 8, background: i === hover ? C.pSoft : 'transparent', fontSize: 13.5 }}>
+                <span style={{ flex: 1, fontWeight: 500, color: i === hover ? C.primary : C.ink }}>{n}<span style={{ display: 'block', fontSize: 11.5, color: C.faint, fontWeight: 400 }}>{d}</span></span>
+                <span style={{ color: C.t2 }}>₹{a}</span>
+              </div>
+            ))}
+          </Abs>
+        )}
+      </div>
+    </div>
   )
 })
 
+// ---------------------------------------------------------------------------- Lifted components
+// Lead status change (Leads Table → Converted), 340 × 120.
+export function StatusSwap({ u = 1 }) {
+  return (
+    <div style={{ width: 340, height: 120, boxSizing: 'border-box', padding: '18px 22px', borderRadius: 16, background: '#fff', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}><Avatar name="Neha Singh" s={28} />Neha Singh<span style={{ color: C.faint, fontWeight: 400, fontSize: 12.5 }}>#3051</span></div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
+        <Chip fg={STATUS.Hot[0]} bg={STATUS.Hot[1]} w={64} style={{ opacity: 1 - 0.5 * u }}>Hot</Chip>
+        <svg width="40" height="10" viewBox="0 0 40 10"><path d="M0 5h34M30 1l5 4-5 4" fill="none" stroke={C.faint} strokeWidth="1.8" strokeLinecap="round" strokeDasharray="40" strokeDashoffset={40 * (1 - u)} /></svg>
+        <Chip fg={STATUS.Converted[0]} bg={STATUS.Converted[1]} w={104} style={{ opacity: u, transform: `scale(${0.8 + 0.2 * E.back(u)})` }}>{IC.check(C.green, 12)}Converted</Chip>
+      </div>
+    </div>
+  )
+}

@@ -1,44 +1,53 @@
-# Pulsefit: Figma-style showcase storyboard (v5, 33.4s loop)
+# Pulsefit: Figma-style showcase storyboard (v6, 37s loop)
 
 This is the Pulsefit card video for the portfolio's Selected Work boxes and the case-study hero.
 
-**v5 changes, from feedback on v4 ("colours too bright, use more UI screens"):**
-- **Calmer look:** the bold colour stages are gone. The whole piece sits on one calm Figma canvas: soft grey #E9EBF0, a dot grid that pans and zooms with the camera, and faint blue and lavender light in two corners.
-- **More screens:** it is now a camera journey across **seven real Pulsefit screens** rebuilt from the file: Leads Table, Leads Dashboard, Members Dashboard, Plans, Staff Table, Workout Plan and Add Equipment.
-- **Figma details:** multiplayer cursors with name tags, frame names, blue selections, purple component labels, comment pins and the canvas toolbar.
-- **Motion:** smooth zoom-to-frame camera flights with a small zoom-out dip on long moves, plus snappy headline reveals.
-- **Type:** Inter Tight for headlines and Poppins for the product UI.
+**v6 brief (from feedback):**
+- solid pastel colours;
+- one flow, told as a story, not a tour of unrelated screens;
+- a proper intro;
+- component infographics supporting the UI;
+- only the best screens, polished where needed.
 
-| Time | Beat | Copy | Visual |
+**The flow:** one lead's journey, told with Neha Singh, a lead from the file (#3051, Hot, assigned to Apurva Jha). She moves from a missed follow-up, to converted lead, to new member on the Quarterly plan, to renewal three months later.
+
+**Look:**
+- **Stages:** each chapter has one solid pastel stage: lavender #E7E1FF, sky #D9E8FF, mint #D4F2E4, peach #FFE3D3 and butter #FFF0C4.
+- **Chapter changes:** each new chapter opens with a Figma "draw a frame" wipe. A teammate's cursor drags a frame in the next pastel out to full screen.
+- **Screens:** each chapter shows one real screen in a window that rises and tilts into place, with a teammate's cursor doing the step.
+- **Lifted cards:** that step's component lifts out of the screen into a purple-labelled component card, joined to its source by a dashed line.
+- **Recurring cards:** the same four cards form the intro and outro infographic.
+- **Type:** Inter Tight for headlines and Poppins for the UI.
+
+| Time | Chapter | Copy | Visual |
 |---|---|---|---|
-| 0:00–0:05 | Overview | GYM MANAGEMENT / **Run the whole gym from one place.** ("one place." on a soft blue highlight) | The canvas with all seven frames and their names, plus the toolbar. Four teammates' cursors (Anu, Apurva Jha, Shikhar Tiwari, Neha Singh) work across the frames. Apurva clicks the *Leads Table* frame and it is selected (1440 × 860). |
-| 0:05–0:11 | Leads Table | LEADS / **Turn every lead into a member.** | The camera flies into Leads Table. Apurva clicks ··· on Neha Singh's row. The design's menu opens (Mark as Converted · Mark as Lost · Delete). Apurva hovers and clicks *Mark as Converted*, the status chip turns from Hot to **Converted**, and the row tints green. |
-| 0:11–0:16.6 | Leads Dashboard | LEAD PERFORMANCE / **Know which leads convert.** | The camera flies to Lead Performance. The KPIs count up (New Leads 234 · Conversion Rate 34% · Demo Booking Rate 23% · Lost Leads 65), the Lead Flow Trend lines draw and the Lead Source bars grow. Shikhar hovers Week 3 and the tooltip shows 67 New Leads · 45 Demo Booked · 27 Converted · 12 Drop-offs. |
-| 0:16.6–0:22.2 | Members Dashboard | MEMBERS / **Every member, at a glance.** | The KPIs count up (234 · 12 · 42 · 26 · 34). Shikhar clicks Robert Fox's Expiring Subscription row, which is selected and tinted. Apurva Jha (his assigned trainer) comments: *Robert Fox · Plan A expires today*. |
-| 0:22.2–0:27.4 | Plans | PLANS / **A plan for every member.** | Active Plans grid (Monthly, Quarterly, Half-Yearly, Annual, PT Starter, PT Pro, Yoga Monthly, Zumba Monthly). Neha hovers **Quarterly**, which lifts and is selected as *Plan Card*. She comments: *Quarterly · 94 active users*. |
-| 0:27.4–0:30.4 | Staff · Workouts · Equipment | **And the rest of the gym.** | The camera pans across Staff Table, Workout Plan and Add Equipment, with Anu's cursor travelling along. |
-| 0:30.4–0:33.4 | Outro | ALL IN ONE / **Everything your gym runs on.** | The camera pulls back to the whole canvas, all cursors return, and all frames are selected together. Loops to the overview. |
+| 0:00–0:05.5 | Intro (lavender) | LEAD TO MEMBER / **From first lead to loyal member.** | The flow infographic builds node by node with dashed links: 01 Follow up (Missed Follow-ups: Neha Singh · Hot · Missed by 5 days) → 02 Convert (Hot → Converted) → 03 Onboard (Quarterly · Recurring · ₹5,886) → 04 Renew (Expires in 2 days · Renew). Anu's cursor walks along the flow. |
+| 0:05.5–0:12 | 01 Follow up (sky) | **Never miss a follow-up.** | The Leads Dashboard (Leads Tasks). Apurva Jha clicks **Follow-up** on Neha's Missed Follow-ups alert, which rings red. The alert lifts out as the *Follow-up alert* card. |
+| 0:12–0:18.5 | 02 Convert (mint) | **Convert a lead in two clicks.** | The Leads Table. Apurva clicks ··· on Neha's row, then **Mark as Converted**. The status turns from Hot to Converted and the row tints green. The *Lead status* card lifts out (Hot → Converted). |
+| 0:18.5–0:26 | 03 Onboard (peach) | **Plan and billing in one step.** | The **Convert to Member** modal over the dimmed table. Neha's details type in (Neha · Singh · +91 99021 44870 · Apurva Jha). The view scrolls to Plan Info, where Anu opens Select Plan (Monthly ₹2,000 / Quarterly ₹5,400 / Half-Yearly ₹9,600 / Annual ₹16,800) and picks **Quarterly**. The total counts up: ₹5,400 + ₹486 tax = **₹5,886**, joining fee waived. The *Plan & total* card lifts out and Anu clicks **Add Member**. |
+| 0:26–0:32.5 | 04 Renew · 3 months later (butter) | **Renew before a plan lapses.** | The Members dashboard: KPIs count up (234 · 12 · 42 · 26 · 34), and Neha's Quarterly plan expires in 2 days. Apurva clicks **Renew**. The *Expiring member* card lifts out. |
+| 0:32.5–0:37 | Outro (lavender) | **Every step, in one place.** | The four flow cards return, each ticked green. Loops to the intro. |
 
 **Layouts:**
-- **Landscape:** a 16:9 stage, where the camera frames whole screens.
-- **Portrait:** a 9:16 stage, where the camera frames the key part of each screen, so the UI stays readable on phones.
-- The canvas always fills the viewport edge to edge.
+- **Landscape:** the screen sits left and the lifted card in a clear column on the right.
+- **Portrait:** the screen is cropped to the step, with the lifted card below it.
+- **Background:** the pastel always fills the viewport.
 
-## Data and refinements (for review)
-**Data sources:**
-- **Values:** all values come from the Pulsefit Figma section (317:129218): Leads Table 4, Lead_Dashboard, Members_Dashboard, Plan List, Staff Table, Workout and Equipments.
-- **Names:** cursor and comment names are people from the file.
-
-**Refinements:**
+## UI refinements (the brief allowed polishing the real UI)
+- **Convert to Member modal:**
+  - real lead data replaces the placeholders "Balaji / Nant / John Doe";
+  - the plan picker lists the real plans from the Plans screen;
+  - "Premium Memership" (typo, placeholder) becomes **Quarterly**;
+  - the Lorem Ipsum helper text under the toggles is removed;
+  - the billing note now matches the plan ("Billed every 3 months…" instead of "30-day cycle");
+  - "Joining Fee (waived)" is labelled;
+  - Apply Discount is off, so the total isn't muddied by a 0% discount.
+- **Total:** ₹5,886 is Quarterly's ₹5,400 plus its ₹486 tax, both from the Plans screen. The design itself shows ₹00.00.
+- **Expiring Subscription:**
+  - placeholder plans "Plan A-E" become real plans (Monthly, Quarterly, Half-Yearly, Annual, PT Starter);
+  - Neha's row uses her phone number and trainer from the Leads Table;
+  - Aaron J. becomes Aaron Joseph.
+- **Leads Table:** after Mark as Converted the status reads **Converted**. That status label comes from the dashboard's Lead Status Breakdown.
 - **Avatars:** initials replace stock photos.
-- **Sidebar:** "Excercise" and "Workouts" are unified as **Workouts**.
-- **Workout Plan cards:** the design's placeholder title "Workout Name" is replaced with each card's goal (Weight Loss, Muscle Gain…).
-- **Lead Flow Trend:** Week 3 uses the tooltip's values (67 / 45 / 27 / 12). The drawn Converted point sits a little lower in the design.
-- **Leads Table:** after "Mark as Converted" the status shows **Converted**. That status label comes from the dashboard's Lead Status Breakdown; the table design doesn't show this state.
-- **Comments:** the comment texts are written for the video, but only restate data on screen.
-
-**Left out:**
-- the Plans screen's third row (to keep cards readable);
-- Leads Dashboard sections below the charts (Lead Status Breakdown, Agent Performance, Recent Leads, Conversion Sources).
-
-**Earlier cuts:** v4 (bold colour stages) is in git history; v3 is `PulsefitShowcase.jsx`.
+- **Story beats:** "3 months later" is a story device. Neha in Expiring Subscription with "2 days" is the design's own row.
+- **Screens dropped as weaker or off-flow:** Staff Table (repeats the leads table), Workout Plan (placeholder names), Add Equipment (plain form) and Plans (the plan is picked inside the modal instead).
