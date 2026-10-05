@@ -1,13 +1,18 @@
-// clihub: 10s dashboard cut (loop). The API Gateway stats dashboard from the clihub Figma file,
-// shown as a working prototype: it rises in, the cursor clicks through Overview, Performance,
-// Storage and Network, and one small metric callout appears beside each tab. Grey canvas, no
-// drop shadows. Scene pieces come from the 20s agency cut (clihub-showcase-20s-react).
-// One clock t; <Stage t sw sh /> renders the frame.
+// clihub: 12s cut (loop). The cursor drags out a selection box and the API Gateway stats
+// dashboard fills it; the cursor clicks through Overview, Performance, Storage and Network with
+// one small callout per tab; then the window steps through the other features (Terminal + Ask AI,
+// SFTP, Port mapping, Key manager). Real screens from the clihub Figma file, shown as a working
+// prototype. Grey canvas, no drop shadows. One clock t; <Stage t sw sh /> renders the frame.
 import stats_head from "./assets/stats_head.png";
 import tab_overview from "./assets/tab_overview.png";
 import tab_performance from "./assets/tab_performance.png";
 import tab_storage from "./assets/tab_storage.png";
 import tab_network from "./assets/tab_network.png";
+import terminal from "./assets/terminal.png";
+import panel_askai from "./assets/panel_askai.png";
+import sftp from "./assets/sftp.png";
+import ports from "./assets/ports.png";
+import keys from "./assets/keys.png";
 
 // ---------- theme (sampled from the clihub Figma file) ----------
 const C = {
@@ -22,8 +27,8 @@ const C = {
   primary: "#7D28FE",
 };
 const FONT = "'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
-const DURATION = 10;
-const IMG = { stats_head, tab_overview, tab_performance, tab_storage, tab_network };
+const DURATION = 12;
+const IMG = { stats_head, tab_overview, tab_performance, tab_storage, tab_network, terminal, panel_askai, sftp, ports, keys };
 
 // ---------- timing ----------
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -114,24 +119,40 @@ function StatCallout({ i, u, s0, s1 }) {
   );
 }
 
-// ================= the dashboard shot =================
-const INK = "#0E1424", SUB = "#4A5468";
-const CLICK = [2.5, 4.5, 6.5]; // Performance, Storage, Network
-const CALLOUTS = [[1.0, 2.55], [3.0, 4.55], [5.0, 6.55], [7.0, 9.1]]; // one per tab, while it is open
+// ================= shots =================
+const INK = "#0E1424", SUB = "#4A5468", BLUE = "#0D99FF";
+// Dashboard rect: the 1008 x 702 stats panel at 1.06, centred at (960, 648).
+const DS = 1.06, DW = 1008 * DS, DH = 702 * DS, DX = 960 - DW / 2, DY = 648 - DH / 2;
+// Feature window: a 1280 x 832 screen at the dashboard's width, same centre.
+const FK = DW / 1280, FW = DW, FH = 832 * FK, FX = DX, FY = 648 - FH / 2;
+const onDash = (p) => ({ x: DX + p.x * DS, y: DY + p.y * DS });
+const onWin = (p) => ({ x: FX + p.x * FK, y: FY + p.y * FK });
 
-function Headline({ t }) {
-  const out = prog(t, 9.0, 9.5);
-  const e = prog(t, 0.15, 0.7);
-  const words = "Everything about a server, one tab away.".split(" ");
+const TAB_CLICK = [2.6, 3.9, 5.1]; // Performance, Storage, Network
+const CALLOUTS = [[1.6, 2.65], [2.95, 3.95], [4.25, 5.15], [5.45, 6.4]];
+// Feature screens: when each is on, where the cursor clicks in it, and its label.
+const FEATS = [
+  { k: "terminal", a: 6.6, label: "Terminal + Ask AI", click: { x: 1232, y: 81 }, ct: 7.05 },
+  { k: "sftp", a: 7.8, label: "SFTP", click: { x: 833, y: 385 }, ct: 8.4 },
+  { k: "ports", a: 9.0, label: "Port mapping", click: { x: 776, y: 323 }, ct: 9.55 },
+  { k: "keys", a: 10.1, label: "Key manager", click: { x: 335, y: 260 }, ct: 10.6 },
+];
+const FEAT_END = 11.2;
+
+function Headline({ t, a, b, eyebrow, title }) {
+  if (t < a || t > b) return null;
+  const out = prog(t, b - 0.45, b);
+  const e = prog(t, a, a + 0.5);
+  const words = title.split(" ");
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, top: 64, textAlign: "center" }}>
-      <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "7px 16px 7px 12px", borderRadius: 999, border: "1px solid rgba(255,255,255,.8)", background: "rgba(255,255,255,.45)", opacity: e * (1 - out), transform: `translateY(${(1 - e) * 12 - out * 10}px)`, marginBottom: 18 }}>
+    <div style={{ position: "absolute", left: 0, right: 0, top: 58, textAlign: "center" }}>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "7px 16px 7px 12px", borderRadius: 999, border: "1px solid rgba(255,255,255,.8)", background: "rgba(255,255,255,.45)", opacity: e * (1 - out), transform: `translateY(${(1 - e) * 12 - out * 10}px)`, marginBottom: 16 }}>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: INK }} />
-        <span style={{ fontSize: 17, fontWeight: 500, letterSpacing: "0.16em", textTransform: "uppercase", color: SUB }}>SSH client · Host stats</span>
+        <span style={{ fontSize: 17, fontWeight: 500, letterSpacing: "0.16em", textTransform: "uppercase", color: SUB }}>{eyebrow}</span>
       </div>
-      <div style={{ fontSize: 62, fontWeight: 600, letterSpacing: "-0.035em", color: INK, lineHeight: 1.15, whiteSpace: "nowrap" }}>
+      <div style={{ fontSize: 60, fontWeight: 600, letterSpacing: "-0.035em", color: INK, lineHeight: 1.15, whiteSpace: "nowrap" }}>
         {words.map((w, k) => {
-          const p = prog(t, 0.3 + k * 0.07, 1.0 + k * 0.07);
+          const p = prog(t, a + 0.12 + k * 0.07, a + 0.8 + k * 0.07);
           return (
             <span key={k} style={{ display: "inline-block", overflow: "hidden", verticalAlign: "top", paddingBottom: 8, marginRight: k < words.length - 1 ? "0.26em" : 0 }}>
               <span style={{ display: "inline-block", transform: `translateY(${(1 - p) * 110 - out * 110}%)`, opacity: Math.min(p, 1 - out) }}>{w}</span>
@@ -143,26 +164,103 @@ function Headline({ t }) {
   );
 }
 
-function Dashboard({ t }) {
-  const e = prog(t, 0.05, 0.95);
-  const out = prog(t, 9.15, 10);
-  const clicks = CLICK.map((ct, i) => [ct, { x: TABS[i + 1][1] + 24 + 12, y: 88 + 30 }]);
-  const pos = kf(t, [[2.5, 0], [2.9, 1], [4.5, 1], [4.9, 2], [6.5, 2], [6.9, 3]]);
-  const cur = kf(t, clickPath([1.7, { x: 820, y: 640 }], clicks, 0.55));
-  // Slow camera push across the shot, then it leaves past the lens for the loop.
-  const s = 1.06 * (0.9 + 0.1 * e) * (1 + 0.035 * (t / DURATION)) * (1 + 0.22 * out);
-  const blur = 10 * (1 - e) + 14 * out;
+// Figma-style selection box (blue, white corner handles, size label), no shadow.
+function Selection({ x, y, w, h, o, label }) {
+  if (o <= 0.001) return null;
+  const hd = (hx, hy, i) => <div key={i} style={{ position: "absolute", left: hx - 5, top: hy - 5, width: 10, height: 10, background: "#fff", border: `1.5px solid ${BLUE}`, boxSizing: "border-box" }} />;
   return (
-    <div style={{ position: "absolute", left: 960, top: 648, opacity: e * (1 - out), filter: blur > 0.3 ? `blur(${blur.toFixed(2)}px)` : "none", perspective: 2400 }}>
-      <div style={{ position: "relative", transform: `translate(-50%, -50%) translateY(${70 * (1 - e)}px) rotateX(${14 * (1 - e)}deg) scale(${s})` }}>
-        <div style={{ position: "relative", borderRadius: 18, border: "1px solid rgba(255,255,255,.55)" }}>
-          <StatsPanel pos={pos} />
-          {CALLOUTS.map(([s0, s1], i) => <StatCallout key={i} i={i} u={t} s0={s0} s1={s1} />)}
-          <Cursor {...cur} o={inOut(t, 1.6, 8.9, 0.3, 0.3)} press={pressedAt(t, clicks)} size={1.15} />
-        </div>
+    <div style={{ position: "absolute", inset: 0, opacity: o, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: x, top: y, width: w, height: h, border: `2px solid ${BLUE}`, background: "rgba(13,153,255,.06)", boxSizing: "border-box" }} />
+      {[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([hx, hy], i) => hd(hx, hy, i))}
+      <div style={{ position: "absolute", left: x + w / 2, top: y + h + 10, transform: "translateX(-50%)", background: BLUE, color: "#fff", fontSize: 15, fontWeight: 500, lineHeight: "24px", padding: "0 9px", borderRadius: 5, whiteSpace: "nowrap" }}>{label}</div>
+    </div>
+  );
+}
+
+function Dashboard({ t }) {
+  if (t < 1.0 || t > 6.9) return null;
+  const fill = prog(t, 1.05, 1.5);
+  const out = prog(t, 6.3, 6.75);
+  const clicks = TAB_CLICK.map((ct, i) => [ct, { x: TABS[i + 1][1] + 24 + 12, y: 88 + 30 }]);
+  const pos = kf(t, [[2.6, 0], [2.95, 1], [3.9, 1], [4.25, 2], [5.1, 2], [5.45, 3]]);
+  return (
+    <div style={{ position: "absolute", left: DX, top: DY, width: DW, height: DH, opacity: fill * (1 - out), transform: `scale(${(0.985 + 0.015 * fill) * (1 - 0.04 * out)})` }}>
+      <div style={{ transform: `scale(${DS})`, transformOrigin: "0 0", position: "relative", width: 1008, borderRadius: 18, outline: "1px solid rgba(255,255,255,.5)" }}>
+        <StatsPanel pos={pos} />
+        {CALLOUTS.map(([s0, s1], i) => <StatCallout key={i} i={i} u={t} s0={s0} s1={s1} />)}
       </div>
     </div>
   );
+}
+
+// SFTP capture fix: its recent connections show "192.333.4.545" (not a valid IP).
+const SftpFix = () => [0, 1, 2].map((i) => (
+  <div key={i} style={{ position: "absolute", left: 804, top: 563 + 82 * i, width: 150, height: 22, background: "#111119", color: "#A3A3AC", fontSize: 14, lineHeight: "22px", fontFamily: FONT }}>192.168.1.100</div>
+));
+
+function Features({ t }) {
+  if (t < 6.4) return null;
+  const e = prog(t, 6.45, 6.9);
+  return (
+    <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, opacity: e, transform: `scale(${0.97 + 0.03 * e})`, borderRadius: 16, overflow: "hidden", outline: "1px solid rgba(255,255,255,.5)", background: "#111119" }}>
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 832, transform: `scale(${FK})`, transformOrigin: "0 0" }}>
+        {FEATS.map((f, i) => {
+          const next = FEATS[i + 1];
+          const inP = i === 0 ? 1 : prog(t, f.a - 0.2, f.a + 0.25);
+          const outP = next ? prog(t, next.a - 0.2, next.a + 0.05) : 0;
+          const o = inP * (1 - outP);
+          if (o <= 0.001) return null;
+          return (
+            <div key={f.k} style={{ position: "absolute", inset: 0, opacity: o, transform: `translateX(${40 * (1 - inP) - 40 * outP}px)` }}>
+              <img src={IMG[f.k]} alt="" draggable={false} style={{ position: "absolute", inset: 0, width: 1280, height: 832 }} />
+              {f.k === "sftp" && <SftpFix />}
+              {f.k === "terminal" && (() => {
+                const p = prog(t, 7.1, 7.55);
+                return p > 0 && <img src={IMG.panel_askai} alt="" style={{ position: "absolute", right: 14, top: 22, width: 383, height: 793, opacity: p, transform: `translateX(${60 * (1 - p)}px)`, borderRadius: 12, outline: "1px solid rgba(255,255,255,.08)" }} />;
+              })()}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Feature label chip on the window's bottom edge.
+function FeatureChip({ t }) {
+  const f = [...FEATS].reverse().find((x) => t >= x.a - 0.1);
+  if (!f || t > FEAT_END) return null;
+  const p = prog(t, f.a - 0.1, f.a + 0.25);
+  return (
+    <div style={{ position: "absolute", left: 960, top: FY + FH - 26, transform: `translateX(-50%) translateY(${(1 - p) * 10}px)`, opacity: p * (1 - prog(t, FEAT_END - 0.3, FEAT_END)), padding: "10px 22px", borderRadius: 999, background: "#F4F6FA", border: "1px solid rgba(14,20,36,.08)", color: INK, fontSize: 22, fontWeight: 600, whiteSpace: "nowrap" }}>{f.label}</div>
+  );
+}
+
+// One cursor for the whole cut: drags the selection, clicks the tabs, then a control on each feature screen.
+function StageCursor({ t }) {
+  const start = { x: DX, y: DY };
+  const end = { x: DX + DW, y: DY + DH };
+  const tabClicks = TAB_CLICK.map((ct, i) => [ct, onDash({ x: TABS[i + 1][1] + 24 + 12, y: 88 + 30 })]);
+  const featClicks = FEATS.map((f) => [f.ct, onWin(f.click)]);
+  const keys = [[0, { x: start.x - 90, y: start.y - 60 }], [0.25, start], [1.2, end], [1.6, { x: end.x - 120, y: end.y - 40 }]];
+  [...tabClicks, ...featClicks].forEach(([ct, p]) => { keys.push([ct - 0.45, keys[keys.length - 1][1]]); keys.push([ct - 0.04, p]); });
+  keys.push([FEAT_END, { x: 1500, y: 980 }]);
+  const cur = kf(t, keys);
+  const clicks = [[0.25, start], ...tabClicks, ...featClicks];
+  const press = (t > 0.25 && t < 1.2) || pressedAt(t, clicks);
+  const ripple = clicks.map(([ct]) => prog(t, ct, ct + 0.5)).find((p) => p > 0 && p < 1);
+  return (
+    <>
+      {ripple !== undefined && <div style={{ position: "absolute", left: cur.x - 30, top: cur.y - 30, width: 60, height: 60, borderRadius: 30, border: `2px solid ${INK}`, opacity: 0.5 * (1 - ripple), transform: `scale(${0.4 + ripple})` }} />}
+      <Cursor {...cur} o={inOut(t, 0, FEAT_END + 0.2, 0.25, 0.3)} press={press} size={1.2} />
+    </>
+  );
+}
+
+function Shot({ t, children }) {
+  const out = prog(t, FEAT_END, DURATION);
+  const s = 1 + 0.25 * out;
+  return <div style={{ position: "absolute", inset: 0, opacity: 1 - out, transform: `scale(${s})`, filter: out > 0.01 ? `blur(${(14 * out).toFixed(2)}px)` : "none" }}>{children}</div>;
 }
 
 // ---- Backdrop: grey only. Soft radial gradient on the swatch #B9C7DB, a slow drifting light, grain. ----
@@ -180,12 +278,21 @@ function Backdrop({ t, w, h }) {
 // sw x sh is the canvas in stage px (at least 1920x1080): the backdrop fills it and the
 // 1920x1080 composition sits centred.
 export function Stage({ t, sw = 1920, sh = 1080 }) {
+  const drag = prog(t, 0.25, 1.2);
+  const selO = Math.min(prog(t, 0.2, 0.3), 1 - prog(t, 1.45, 1.8));
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: sw, height: sh, overflow: "hidden", fontFamily: FONT, WebkitFontSmoothing: "antialiased" }}>
       <Backdrop t={t} w={sw} h={sh} />
       <div style={{ position: "absolute", left: (sw - 1920) / 2, top: (sh - 1080) / 2, width: 1920, height: 1080 }}>
-        <Dashboard t={t} />
-        <Headline t={t} />
+        <Shot t={t}>
+          <Dashboard t={t} />
+          <Features t={t} />
+          <FeatureChip t={t} />
+          <Selection x={DX} y={DY} w={DW * drag} h={DH * drag} o={selO} label={`${Math.round(1008 * drag)} × ${Math.round(702 * drag)}`} />
+          <StageCursor t={t} />
+        </Shot>
+        <Headline t={t} a={0.15} b={6.45} eyebrow="SSH client · Host stats" title="Everything about a server, one tab away." />
+        <Headline t={t} a={6.5} b={11.5} eyebrow="Built in" title="Terminal, files, tunnels and keys." />
       </div>
     </div>
   );
