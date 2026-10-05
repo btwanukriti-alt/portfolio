@@ -70,7 +70,7 @@ export const Btn = ({ children, kind = 'primary', h = 36, pr = 0, style }) => {
 export const card = (extra) => ({ position: 'absolute', background: '#fff', borderRadius: 14, boxShadow: `0 0 0 1px ${C.line}`, boxSizing: 'border-box', ...extra })
 export const Abs = ({ x, y, w, h, children, style }) => <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, ...style }}>{children}</div>
 
-const Mark = ({ s = 26 }) => (
+export const Mark = ({ s = 26 }) => (
   <svg width={s} height={s} viewBox="0 0 26 26"><path d="M6 23.5L9.8 3h7.7a5.6 5.6 0 015.3 7l-.3 1.1a6 6 0 01-5.8 4.4H12.4L10.9 23.5z" fill={C.primary} /><path d="M13.7 7.6h3.4c1 0 1.8 1 1.5 2l-.3 1.2a2 2 0 01-1.9 1.4h-3.6z" fill={C.yellow} /></svg>
 )
 const NAV = [['Dashboard', IC.grid], ['Members', IC.users], ['Leads', IC.star], ['Staff', IC.staff], ['Plans', IC.plans], ['Communication', IC.mail], ['Equipments', IC.dumbbell], ['Workouts', IC.heart]]

@@ -77,17 +77,20 @@ export const C = {
 
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 
-// One flow (lead → member → renewal), no captions: the cards, then each real screen whole.
+// Hook → middle → end. One background; captions sit beside the screens.
 export const BG = '#E6EBFA'
+export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
 export const CHAPTERS = [
-  { id: 'cards', a: 0, b: 6.5 },
-  { id: 'table', a: 6.5, b: 13.0 },
-  { id: 'form', a: 13.0, b: 21.5 },
-  { id: 'members', a: 21.5, b: 28.0 },
+  { id: 'hook', a: 0, b: 5.5 },
+  { id: 'follow', a: 5.5, b: 11.5 },
+  { id: 'convert', a: 11.5, b: 17.5 },
+  { id: 'onboard', a: 17.5, b: 25.0 },
+  { id: 'retain', a: 25.0, b: 31.0 },
+  { id: 'end', a: 31.0, b: 35.5 },
 ]
-export const DURATION = 28.0
+export const DURATION = 35.5
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 4.8
+export const POSTER = 3.6
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }
