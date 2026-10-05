@@ -1,116 +1,58 @@
-// Viewport layers: the full-bleed stage colour with its big shapes (always edge to edge, at any
-// aspect ratio) and the frame wipe that opens each scene, drawn above the content.
-import { Cursor } from './fig.jsx'
-import { DURATION, E, FIG, P, SCENES, clamp, lerp } from './lib.js'
-import { HOOK_FRAME } from './scenes.jsx'
+// The stage: one lilac background for the whole piece with a few soft pastel shapes drifting,
+// and the black Figma-style selection frame around the whole canvas (corner handles).
+import { BG } from './lib.js'
 
-// Big background shapes per scene, in viewport units: cx/cy as fractions, size as a fraction
-// of the viewport's longer side (M). They pop in after the wipe and drift slowly.
-const SHAPES = {
-  hook: [
-    { k: 'circle', cx: 0.06, cy: 0.9, d: 0.3, c: '#FFC2DD' },
-    { k: 'pill', cx: 0.93, cy: 0.14, w: 0.26, h: 0.09, r: 22, c: '#FFE07A' },
-    { k: 'star', cx: 0.92, cy: 0.84, d: 0.11, c: '#9F86FF' },
-    { k: 'ring', cx: 0.08, cy: 0.12, d: 0.14, c: 'rgba(255,255,255,.7)' },
-  ],
-  leads: [
-    { k: 'circle', cx: 0.95, cy: 0.95, d: 0.36, c: '#FFD7A8' },
-    { k: 'pill', cx: 0.05, cy: 0.16, w: 0.28, h: 0.1, r: -26, c: '#D6C8FF' },
-    { k: 'ring', cx: 0.07, cy: 0.88, d: 0.18, c: 'rgba(255,255,255,.75)' },
-    { k: 'circle', cx: 0.92, cy: 0.12, d: 0.06, c: '#FF9CC6' },
-  ],
-  modules: [
-    { k: 'half', cx: 0.0, cy: 0.24, pcy: 0.7, d: 0.34, r: 90, c: '#BFE8CF' },
-    { k: 'circle', cx: 0.96, cy: 0.9, d: 0.3, c: '#FFC2DD' },
-    { k: 'star', cx: 0.9, cy: 0.14, pcy: 0.07, d: 0.1, c: '#9F86FF' },
-  ],
-}
-
-function Shape({ s, M, vw, vh, u, i }) {
-  const p = E.back(clamp((u - 0.05 - i * 0.07) / 0.7))
-  if (p <= 0) return null
-  const dx = Math.sin(u * 0.35 + i * 1.9) * M * 0.012
-  const dy = Math.cos(u * 0.3 + i * 1.3) * M * 0.012
-  // pcx / pcy: position override for portrait viewports.
+// Shapes in viewport units: cx/cy as fractions, size as a fraction of the longer side (M).
+// pcy: position override for portrait viewports.
+const SHAPES = [
+  { k: 'circle', cx: 0.05, cy: 0.92, d: 0.3, c: '#FFC2DD' },
+  { k: 'pill', cx: 0.94, cy: 0.13, w: 0.26, h: 0.09, r: 22, c: '#FFE07A' },
+  { k: 'star', cx: 0.93, cy: 0.86, pcy: 0.9, d: 0.1, c: '#A48CFF' },
+  { k: 'ring', cx: 0.07, cy: 0.12, pcy: 0.07, d: 0.13, c: 'rgba(255,255,255,.7)' },
+]
+function Shape({ s, M, vw, vh, t, i }) {
   const port = vw / vh < 0.9
-  const x = (port && s.pcx != null ? s.pcx : s.cx) * vw + dx
-  const y = (port && s.pcy != null ? s.pcy : s.cy) * vh + dy
-  const base = { position: 'absolute', left: x, top: y, transform: `translate(-50%,-50%) rotate(${(s.r || 0) + u * (i % 2 ? 2 : -2)}deg) scale(${p})` }
+  const x = s.cx * vw + Math.sin(t * 0.35 + i * 1.9) * M * 0.01
+  const y = (port && s.pcy != null ? s.pcy : s.cy) * vh + Math.cos(t * 0.3 + i * 1.3) * M * 0.01
+  const base = { position: 'absolute', left: x, top: y, transform: `translate(-50%,-50%) rotate(${(s.r || 0) + Math.sin(t * 0.4 + i) * 4}deg)` }
   const d = (s.d || 0) * M
-  if (s.k === 'glow') return <div style={{ ...base, transform: 'translate(-50%,-50%)', width: d, height: d, borderRadius: '50%', background: `radial-gradient(closest-side, ${s.c}, transparent)` }} />
   if (s.k === 'circle') return <div style={{ ...base, width: d, height: d, borderRadius: '50%', background: s.c }} />
   if (s.k === 'ring') return <div style={{ ...base, width: d, height: d, borderRadius: '50%', border: `${d * 0.12}px solid ${s.c}`, boxSizing: 'border-box' }} />
   if (s.k === 'pill') return <div style={{ ...base, width: s.w * M, height: s.h * M, borderRadius: s.h * M, background: s.c }} />
-  if (s.k === 'half') return <div style={{ ...base, width: d, height: d / 2, borderRadius: `${d}px ${d}px 0 0`, background: s.c, transformOrigin: '50% 100%' }} />
-  const path = {
-    star: 'M50 2 61 34 96 36 68 57 79 92 50 71 21 92 32 57 4 36 39 34z',
-    squiggle: 'M6 60 C 20 20, 34 20, 40 50 S 62 80, 70 44 S 90 14, 96 40',
-  }[s.k]
-  const line = s.k === 'squiggle'
   return (
     <svg width={d} height={d} viewBox="0 0 100 100" style={{ ...base, overflow: 'visible' }}>
-      <path d={path} fill={line ? 'none' : s.c} stroke={line ? s.c : 'none'} strokeWidth="9" strokeLinecap="round" />
+      <path d="M50 2 61 34 96 36 68 57 79 92 50 71 21 92 32 57 4 36 39 34z" fill={s.c} />
     </svg>
   )
 }
 
 const GRAIN = `url("data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>')}")`
 
-const sceneAt = (t) => SCENES.findIndex((s) => t >= s.a && t < s.b)
-
-export function Backdrop({ t, vw, vh, st }) {
+export function Backdrop({ t, vw, vh }) {
   const M = Math.max(vw, vh)
-  const i = Math.max(0, sceneAt(t))
-  const sc = SCENES[i]
-  const u = t - sc.a
-  const shapes = SHAPES[sc.id] || []
   return (
-    <div style={{ position: 'absolute', inset: 0, background: sc.bg, overflow: 'hidden' }}>
-      {/* soft key light so the flat colour has depth */}
+    <div style={{ position: 'absolute', inset: 0, background: BG, overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(70% 60% at 50% 40%, rgba(255,255,255,.35), transparent 70%)' }} />
-      {/* Figma canvas dot grid */}
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(40,30,90,.16) 1.4px, transparent 1.5px)', backgroundSize: `${28 * st.s}px ${28 * st.s}px`, backgroundPosition: `${st.ox}px ${st.oy}px` }} />
-      {shapes.map((s, j) => (
-        <Shape key={j} s={s} M={M} vw={vw} vh={vh} u={u} i={j} />
+      {SHAPES.map((s, i) => (
+        <Shape key={i} s={s} M={M} vw={vw} vh={vh} t={t} i={i} />
       ))}
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: GRAIN, opacity: 0.14, mixBlendMode: 'overlay' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: GRAIN, opacity: 0.12, mixBlendMode: 'overlay' }} />
     </div>
   )
 }
 
-// The frame wipe into the next scene: a frame grows from a rect to cover the viewport, with
-// Figma selection handles while it's small. Runs over the last 0.65s of each scene.
-const WIPE = 0.65
-const DRAGGER = { modules: 'Neha Singh', hook: 'Anu' }
-export function Wipe({ t, vw, vh, st, L }) {
-  const i = sceneAt(t)
-  if (i < 0) return null
-  const next = SCENES[(i + 1) % SCENES.length]
-  const T = i + 1 < SCENES.length ? SCENES[i + 1].a : DURATION
-  if (t < T - WIPE) return null
-  const u = E.inOut(clamp((t - (T - WIPE)) / WIPE))
-  const toVp = (r) => ({ x: st.ox + r.x * st.s, y: st.oy + r.y * st.s, w: r.w * st.s, h: r.h * st.s })
-  const fromFrame = next.id === 'leads'
-  const o = fromFrame ? toVp(HOOK_FRAME[L]) : { x: st.ox + (st.W / 2) * st.s, y: st.oy + (st.H / 2) * st.s, w: 0, h: 0 }
-  const full = { x: -4, y: -4, w: vw + 8, h: vh + 8 }
-  const r = { x: lerp(o.x, full.x, u), y: lerp(o.y, full.y, u), w: lerp(o.w, full.w, u), h: lerp(o.h, full.h, u) }
-  const rad = (fromFrame ? 28 : 36) * st.s * (1 - u)
-  const hand = 1 - P(u, 0.75, 0.95)
-  const hs = 10 * st.s * 1.3
-  const handle = (x, y) => <div key={`${x}-${y}`} style={{ position: 'absolute', left: x - hs / 2, top: y - hs / 2, width: hs, height: hs, background: '#fff', border: `${2 * st.s}px solid ${FIG.sel}`, boxSizing: 'border-box', borderRadius: 2 }} />
+// Black selection frame around the whole canvas, inset from the edges, with corner handles.
+export function CanvasFrame({ vw, vh }) {
+  const m = Math.round(Math.max(10, Math.min(28, Math.min(vw, vh) * 0.022)))
+  const hs = Math.round(Math.max(7, Math.min(11, Math.min(vw, vh) * 0.009)))
+  const handle = (left, top) => <div key={`${left}${top}`} style={{ position: 'absolute', left: left - hs / 2, top: top - hs / 2, width: hs, height: hs, background: '#fff', border: '1.5px solid #111', boxSizing: 'border-box' }} />
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, borderRadius: rad, background: next.bg, boxShadow: `0 ${40 * st.s}px ${100 * st.s}px -${30 * st.s}px rgba(10,14,40,${0.45 * (1 - u)})` }} />
-      {hand > 0 && (
-        <div style={{ opacity: hand }}>
-          <div style={{ position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, border: `${2.5 * st.s}px solid ${FIG.sel}`, boxSizing: 'border-box' }} />
-          {handle(r.x, r.y)}
-          {handle(r.x + r.w, r.y)}
-          {handle(r.x, r.y + r.h)}
-          {handle(r.x + r.w, r.y + r.h)}
-        </div>
-      )}
-      {!fromFrame && <Cursor x={r.x + r.w} y={r.y + r.h} name={DRAGGER[next.id]} s={1.5 * st.s} o={1 - P(u, 0.8, 1)} />}
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 90 }}>
+      <div style={{ position: 'absolute', left: m, top: m, right: m, bottom: m, border: '1.5px solid #111' }} />
+      {handle(m, m)}
+      {handle(vw - m, m)}
+      {handle(m, vh - m)}
+      {handle(vw - m, vh - m)}
     </div>
   )
 }

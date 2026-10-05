@@ -76,23 +76,15 @@ export const C = {
 // Figma editor colours (selection, components, spacing, prototype noodles).
 export const FIG = { sel: '#0D99FF', comp: '#9747FF', spacing: '#F24822', proto: '#0D99FF' }
 
-// Multiplayer cursors: one colour per person, readable on every stage colour.
-export const PEOPLE = {
-  Anu: '#FF6B2C',
-  'Apurva Jha': '#12B76A',
-  'Shikhar Tiwari': '#FF3D8B',
-  'Neha Singh': '#00A8E0',
-}
-
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
-export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
 
 // Scenes and their stage colours. A frame wipe in the next colour opens each scene.
-// Bright Figma-style pastels: lilac intro, sky-blue feature, butter-yellow close.
+// One lilac background for the whole piece.
+export const BG = '#DCCFFF'
 export const SCENES = [
-  { id: 'hook', a: 0, b: 3.6, bg: '#DCCFFF' },
-  { id: 'leads', a: 3.6, b: 7.6, bg: '#BFDBFF' },
-  { id: 'modules', a: 7.6, b: 10.0, bg: '#FFE79E' },
+  { id: 'hook', a: 0, b: 3.6 },
+  { id: 'leads', a: 3.6, b: 7.6 },
+  { id: 'modules', a: 7.6, b: 10.0 },
 ]
 export const DURATION = 10.0
 // Paused poster frame (embed before it first plays, and reduced motion).

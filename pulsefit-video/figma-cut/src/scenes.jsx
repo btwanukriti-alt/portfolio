@@ -1,7 +1,7 @@
 // The three scenes of the 10s cut, each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the Pulsefit Figma frames.
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
-//       Pulsefit Members dashboard; teammates drag product components in around it.
+//       Pulsefit Members dashboard; product components land around it.
 //   2 · Leads: the lead card → Convert to Member → Assign Plan flow, with selections,
 //       a prototype noodle and the total counting up.
 //   3 · Close: the seven modules snap into an auto-layout grid.
@@ -40,14 +40,14 @@ export const HOOK_FRAME = { land: { x: 500, y: 330, w: 920, h: 424 }, port: { x:
 const CS = 1.15
 const CARDS = {
   land: [
-    { kind: 'score', name: 'Apurva Jha', label: 'Lead Score', w: 320, h: 152, to: { x: 110, y: 300 }, from: { x: -520, y: 220 }, rot: -6, grab: { x: 330, y: 160 } },
-    { kind: 'kpi', name: 'Shikhar Tiwari', label: 'KPI Card', w: 300, h: 128, to: { x: 1450, y: 290 }, from: { x: 2100, y: 200 }, rot: 5, grab: { x: 40, y: 130 } },
-    { kind: 'plan', name: 'Neha Singh', label: 'Plan Card', w: 280, h: 178, to: { x: 1480, y: 650 }, from: { x: 2100, y: 900 }, rot: -4, grab: { x: 40, y: 190 } },
+    { kind: 'score', label: 'Lead Score', w: 320, h: 152, to: { x: 110, y: 300 }, from: { x: -520, y: 220 }, rot: -6 },
+    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 1450, y: 290 }, from: { x: 2100, y: 200 }, rot: 5 },
+    { kind: 'plan', label: 'Plan Card', w: 280, h: 178, to: { x: 1480, y: 650 }, from: { x: 2100, y: 900 }, rot: -4 },
   ],
   port: [
-    { kind: 'score', name: 'Apurva Jha', label: 'Lead Score', w: 320, h: 152, to: { x: 70, y: 1110 }, from: { x: -520, y: 1200 }, rot: -5, grab: { x: 330, y: 160 } },
-    { kind: 'kpi', name: 'Shikhar Tiwari', label: 'KPI Card', w: 300, h: 128, to: { x: 640, y: 1150 }, from: { x: 1300, y: 1250 }, rot: 5, grab: { x: 40, y: 130 } },
-    { kind: 'plan', name: 'Neha Singh', label: 'Plan Card', w: 280, h: 178, to: { x: 330, y: 1400 }, from: { x: 330, y: 2100 }, rot: -3, grab: { x: 260, y: 190 } },
+    { kind: 'score', label: 'Lead Score', w: 320, h: 152, to: { x: 70, y: 1110 }, from: { x: -520, y: 1200 }, rot: -5 },
+    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 640, y: 1150 }, from: { x: 1300, y: 1250 }, rot: 5 },
+    { kind: 'plan', label: 'Plan Card', w: 280, h: 178, to: { x: 330, y: 1400 }, from: { x: 330, y: 2100 }, rot: -3 },
   ],
 }
 export function Hook({ t, L, W, H }) {
@@ -67,7 +67,7 @@ export function Hook({ t, L, W, H }) {
       <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Pulsefit · gym management software" lines={port ? ['Run your whole gym', 'from one place.'] : ['Run your whole gym from one place.']} />
       <Toolbar x={W / 2} y={port ? 1810 : 990} o={P(u, 0.05, 0.4) * (1 - exit)} active={u > 0.3 && u < 1.15 ? 1 : 0} />
       {u > 0.35 && (
-        <div style={{ position: 'absolute', left: fr.x, top: fr.y, width: fr.w, height: fr.h, borderRadius: 16 * fill, background: '#fff', overflow: 'hidden', boxShadow: `0 40px 90px -40px rgba(40,30,110,${0.55 * fill})` }}>
+        <div style={{ position: 'absolute', left: fr.x, top: fr.y, width: fr.w, height: fr.h, borderRadius: 16 * fill, background: '#fff', overflow: 'hidden', boxShadow: `0 40px 90px -40px rgba(40,30,110,${0.55 * fill})`, opacity: 1 - exit, transform: `translateY(${-30 * exit}px) scale(${1 - 0.03 * exit})` }}>
           <div style={{ opacity: fill, transform: `scale(${k})`, transformOrigin: '0 0' }}>
             <MembersWindow k={P(u, 1.2, 2.2)} />
           </div>
@@ -83,8 +83,6 @@ export function Hook({ t, L, W, H }) {
         const pos = { x: lerp(c.from.x, c.to.x, fly), y: lerp(c.from.y, c.to.y, fly) - 30 * exit }
         const rot = c.rot * (0.4 + 0.6 * fly) + (1 - fly) * 12
         const sel = u > a ? 1 - P(u, a + 0.85, a + 1.1) : 0
-        const sw = sway(u, i * 2.1, 4)
-        const cur = { x: pos.x + c.grab.x * CS + (u > a + 0.9 ? sw.x : 0), y: pos.y + c.grab.y * CS + (u > a + 0.9 ? sw.y : 0) }
         return (
           <div key={c.kind}>
             <Abs x={pos.x} y={pos.y} style={{ transform: `rotate(${rot}deg)`, opacity: clamp((u - a) / 0.15) * (1 - exit), zIndex: 10 }}>
@@ -93,11 +91,10 @@ export function Hook({ t, L, W, H }) {
               </div>
               <Selection x={0} y={0} w={cw} h={ch} o={sel} label={c.label} comp k={port ? 1.3 : 1.05} />
             </Abs>
-            <Cursor x={cur.x} y={cur.y} name={c.name} o={P(u, a - 0.25, a) * (1 - exit)} s={port ? 2 : 1.5} />
           </div>
         )
       })}
-      <Cursor x={anu.x + asw.x} y={anu.y + asw.y} name="Anu" o={1 - exit} s={port ? 2 : 1.5} />
+      <Cursor x={anu.x + asw.x} y={anu.y + asw.y} o={1 - exit} s={port ? 2 : 1.5} />
     </>
   )
 }
@@ -115,7 +112,7 @@ export function Leads({ t, L, W }) {
   const port = L === 'port'
   const D = LEADS[L]
   const K = D.K
-  const exit = P(u, 3.25, 3.6, E.inOut)
+  const exit = P(u, 3.45, 3.85, E.inOut)
   const lw = LEAD.w * K
   const lh = LEAD.h * K
   const move = P(u, 1.75, 2.35, E.inOut)
@@ -135,7 +132,7 @@ export function Leads({ t, L, W }) {
   const sk = port ? 1.35 : 1.15
   return (
     <>
-      <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Leads" lines={port ? ['Turn every lead', 'into a member.'] : ['Turn every lead into a member.']} />
+      <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Leads" lines={port ? ['Convert a lead', 'into a member.'] : ['Convert a lead into a member.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
         <Noodle x1={n1.x} y1={n1.y} x2={n2.x} y2={n2.y} u={P(u, 1.95, 2.5, E.inOut)} vertical={D.vertical} label="On click" />
         <Abs x={tl.x} y={tl.y} style={{ width: lw, height: lh, opacity: clamp((u - 0.2) / 0.2), transform: `scale(${0.85 + 0.15 * pop})`, zIndex: 10 }}>
@@ -156,7 +153,7 @@ export function Leads({ t, L, W }) {
           </Abs>
         )}
       </div>
-      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} name="Apurva Jha" o={P(u, 0.7, 0.95) * (1 - exit)} pr={press(u, tc)} rp={ripple(u, tc)} s={port ? 2 : 1.5} />
+      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.7, 0.95) * (1 - exit)} pr={press(u, tc)} rp={ripple(u, tc)} s={port ? 2 : 1.5} />
     </>
   )
 }
@@ -171,8 +168,7 @@ const MODS = {
     scatter: [[150, 400, -14], [1560, 360, 12], [240, 800, 10], [1500, 820, -10], [720, 880, 8], [1100, 330, -6], [1080, 880, 14]],
     box: { x: 292, y: 418, w: 1336, h: 312 },
     gaps: [[624, 648], [948, 972], [1272, 1296]].map(([a, b]) => ({ x1: a, x2: b, y: 450 })),
-    people: [['Anu', { x: 300, y: 770 }], ['Apurva Jha', { x: 1660, y: 400 }], ['Shikhar Tiwari', { x: 1600, y: 770 }], ['Neha Singh', { x: 230, y: 390 }]],
-    from: [{ x: -100, y: 1100 }, { x: 2050, y: 200 }, { x: 2050, y: 1150 }, { x: -120, y: 200 }],
+    cursor: { from: { x: 2050, y: 1150 }, to: { x: 1580, y: 780 } },
   },
   port: {
     tw: 440,
@@ -180,8 +176,7 @@ const MODS = {
     scatter: [[60, 580, -12], [580, 540, 10], [40, 920, 8], [600, 880, -9], [80, 1260, 10], [560, 1220, -8], [300, 1400, 12]],
     box: { x: 56, y: 608, w: 968, h: 584 },
     gaps: [0, 1, 2].map((r) => ({ x1: 528, x2: 552, y: 640 + r * 136 })),
-    people: [['Anu', { x: 120, y: 1280 }], ['Apurva Jha', { x: 960, y: 580 }], ['Shikhar Tiwari', { x: 900, y: 1270 }], ['Neha Singh', { x: 60, y: 560 }]],
-    from: [{ x: -100, y: 1700 }, { x: 1200, y: 300 }, { x: 1200, y: 1800 }, { x: -120, y: 300 }],
+    cursor: { from: { x: 1200, y: 1800 }, to: { x: 900, y: 1280 } },
   },
 }
 export function Modules({ t, L, W }) {
@@ -189,13 +184,15 @@ export function Modules({ t, L, W }) {
   if (u === null) return null
   const port = L === 'port'
   const D = MODS[L]
-  const exit = P(u, 1.55, 1.75, E.inOut)
+  const exit = P(u, 1.95, 2.35, E.inOut)
   const snap = (i) => P(u, 0.45 + i * 0.03, 0.95 + i * 0.03, E.inOut)
   const sel = P(u, 0.95, 1.1)
   const gap = P(u, 1.0, 1.15)
+  const cp = P(u, 0.7, 1.3, E.expo)
+  const csw = sway(u, 2, 5)
   return (
     <>
-      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="All in one" lines={port ? ['Everything your', 'gym runs on.'] : ['Everything your gym runs on.']} />
+      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="All in one" lines={port ? ['Members, leads,', 'plans and more.'] : ['Members, leads, plans and more.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `scale(${1 - 0.04 * exit})`, transformOrigin: '50% 55%' }}>
         {MODULES.map(([name, icon, tint], i) => {
           const a = 0.05 + i * 0.05
@@ -213,11 +210,7 @@ export function Modules({ t, L, W }) {
         {D.gaps.map((g, i) => (
           <Spacing key={i} x1={g.x1} x2={g.x2} y={g.y} h={112} o={gap} value="24" />
         ))}
-        {D.people.map(([name, at], i) => {
-          const p = P(u, 0.7 + i * 0.08, 1.25 + i * 0.08, E.expo)
-          const sw = sway(u, i * 2.4, 5)
-          return <Cursor key={name} name={name} x={lerp(D.from[i].x, at.x, p) + sw.x} y={lerp(D.from[i].y, at.y, p) + sw.y} o={p} s={port ? 2 : 1.5} />
-        })}
+        <Cursor x={lerp(D.cursor.from.x, D.cursor.to.x, cp) + csw.x} y={lerp(D.cursor.from.y, D.cursor.to.y, cp) + csw.y} o={P(u, 0.7, 1.0)} s={port ? 2 : 1.5} />
       </div>
     </>
   )

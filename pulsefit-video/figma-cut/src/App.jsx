@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
+import { BG, DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
 import { Hook, Leads, Modules } from './scenes.jsx'
-import { Backdrop, Wipe } from './stage.jsx'
+import { Backdrop, CanvasFrame } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
 // poster frame until the page posts 'showcase:play', looping after that.
@@ -104,14 +104,14 @@ export default function App() {
   const props = { t, L, W, H }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: '#EEF0F5' }}>
-      <Backdrop t={t} vw={vw} vh={vh} st={st} />
+    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: BG }}>
+      <Backdrop t={t} vw={vw} vh={vh} />
       <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
         <Hook {...props} />
         <Leads {...props} />
         <Modules {...props} />
       </div>
-      <Wipe t={t} vw={vw} vh={vh} st={st} L={L} />
+      <CanvasFrame vw={vw} vh={vh} />
       {!ui.hidden && <Player t={t} playing={playing} idle={ui.idle} />}
     </div>
   )
