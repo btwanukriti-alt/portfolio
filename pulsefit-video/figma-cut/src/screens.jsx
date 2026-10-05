@@ -366,7 +366,7 @@ function TotalBox({ p = 1, w = 584 }) {
 }
 // Frame 1440 × 1200: Leads Table dimmed under the modal (modal at 384, 44; 672 × 1112).
 export const CV = {
-  w: 1440, h: 1200,
+  w: 1440, h: 1200, mx: 384, my: 44,
   select: { x: 560, y: 573 },
   option: (i) => ({ x: 560, y: 630 + i * 44 }),
   total: { x: 428, y: 840, w: 584, h: 200 },
@@ -374,7 +374,7 @@ export const CV = {
 }
 // fill 0..1 types the member details; open / hover (option index) / picked drive the plan picker;
 // p counts the total; apr presses Add Member.
-export const ConvertFrame = memo(function ConvertFrame({ fill = 1, open = 0, hover = -1, picked = 1, p = 1, apr = 0 }) {
+export const ConvertModal = memo(function ConvertModal({ fill = 1, open = 0, hover = -1, picked = 1, p = 1, apr = 0 }) {
   const f = (i) => clamp(fill * 4 - i)
   const sec = (y, h, title) => (
     <div style={{ position: 'absolute', left: 24, top: y, width: 624, height: h, borderRadius: 12, boxShadow: `inset 0 0 0 1px ${C.line}` }}>
@@ -382,10 +382,7 @@ export const ConvertFrame = memo(function ConvertFrame({ fill = 1, open = 0, hov
     </div>
   )
   return (
-    <div style={{ position: 'relative', width: CV.w, height: CV.h, background: '#F4F5F8', overflow: 'hidden', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
-      <LeadsTable conv={1} />
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,18,34,.42)' }} />
-      <div style={{ position: 'absolute', left: 384, top: 44, width: 672, height: 1112, background: '#fff', borderRadius: 16, boxShadow: '0 40px 100px -30px rgba(10,14,40,.6)' }}>
+      <div style={{ position: 'relative', width: 672, height: 1112, background: '#fff', borderRadius: 16, fontFamily: 'Poppins, sans-serif', color: C.ink }}>
         <div style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: `1px solid ${C.line}` }}>
           <span style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em' }}>Convert to Member</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.t2} strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -427,21 +424,18 @@ export const ConvertFrame = memo(function ConvertFrame({ fill = 1, open = 0, hov
           </Abs>
         )}
       </div>
-    </div>
   )
 })
 
-// ---------------------------------------------------------------------------- Lifted components
-// Lead status change (Leads Table → Converted), 340 × 120.
-export function StatusSwap({ u = 1 }) {
+// The modal over the dimmed Leads Table, as the full 1440 × 1200 frame.
+export const ConvertFrame = memo(function ConvertFrame(props) {
   return (
-    <div style={{ width: 340, height: 120, boxSizing: 'border-box', padding: '18px 22px', borderRadius: 16, background: '#fff', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}><Avatar name="Neha Singh" s={28} />Neha Singh<span style={{ color: C.faint, fontWeight: 400, fontSize: 12.5 }}>#3051</span></div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
-        <Chip fg={STATUS.Hot[0]} bg={STATUS.Hot[1]} w={64} style={{ opacity: 1 - 0.5 * u }}>Hot</Chip>
-        <svg width="40" height="10" viewBox="0 0 40 10"><path d="M0 5h34M30 1l5 4-5 4" fill="none" stroke={C.faint} strokeWidth="1.8" strokeLinecap="round" strokeDasharray="40" strokeDashoffset={40 * (1 - u)} /></svg>
-        <Chip fg={STATUS.Converted[0]} bg={STATUS.Converted[1]} w={104} style={{ opacity: u, transform: `scale(${0.8 + 0.2 * E.back(u)})` }}>{IC.check(C.green, 12)}Converted</Chip>
+    <div style={{ position: 'relative', width: CV.w, height: CV.h, background: '#F4F5F8', overflow: 'hidden' }}>
+      <LeadsTable conv={1} />
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,18,34,.42)' }} />
+      <div style={{ position: 'absolute', left: CV.mx, top: CV.my, borderRadius: 16, boxShadow: '0 40px 100px -30px rgba(10,14,40,.6)' }}>
+        <ConvertModal {...props} />
       </div>
     </div>
   )
-}
+})

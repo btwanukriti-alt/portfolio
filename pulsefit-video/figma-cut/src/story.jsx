@@ -1,240 +1,161 @@
-// One flow, told as a story: Neha Singh goes from a missed follow-up to a converted lead, is
-// onboarded on the Quarterly plan, and renews three months later. Intro and outro show the
-// flow as an infographic of its four components; each chapter shows the real screen with the
-// cursor doing the step, and lifts the key component out beside it.
-import { Cursor, Headline, Selection, Tag } from './fig.jsx'
-import { C, CHAPTERS, E, FIG, P, clamp, fmt, kf, lerp, press, ripple, sway } from './lib.js'
-import { CV, ConvertFrame, LD, LT, LeadsDash, LeadsTable, MD, MISSED, Members, StatusSwap, TaskItem } from './screens.jsx'
+// One flow, no captions: Neha Singh goes from a missed follow-up to a member who renews.
+// 1. the flow as four cards, 2. Leads Table (Mark as Converted), 3. the Convert to Member form,
+// 4. Members (Renew). Every screen is shown whole, fitted to the stage.
+import { Cursor } from './fig.jsx'
+import { C, CHAPTERS, E, P, clamp, fmt, kf, press, ripple, sway } from './lib.js'
+import { CV, ConvertFrame, ConvertModal, LT, LeadsTable, MD, Members } from './screens.jsx'
 import { Avatar, Btn, Chip, IC } from './ui.jsx'
 
 const CH = Object.fromEntries(CHAPTERS.map((c) => [c.id, c]))
 const local = (t, id) => (t >= CH[id].a - 0.02 && t < CH[id].b + 0.02 ? t - CH[id].a : null)
+const CUR = { land: 1.5, port: 2.1 }
 
-// Screen window and caption positions per layout.
-const LAY = {
-  land: { S: { x: 110, y: 236, w: 1240, h: 790 }, tagY: 58, headY: 108, size: 72, ui: 1.35 },
-  port: { S: { x: 50, y: 480, w: 980, h: 800 }, tagY: 150, headY: 220, size: 88, ui: 1.9 },
-}
-
-// The four flow nodes (340 × 120): shown together in the intro and outro, and each lifted out
-// of its screen in its own chapter.
-function PlanPick({ p = 1 }) {
+// ------------------------------------------------------------------------------- flow cards
+// 380 × 150 each: a small labelled header, then the step. Button centre at (316, 104).
+const BTN = { x: 316, y: 104 }
+function FlowCard({ icon, tint, bg, label, children }) {
   return (
-    <div style={{ width: 340, height: 120, boxSizing: 'border-box', padding: '18px 22px', borderRadius: 16, background: '#fff', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ width: 30, height: 30, borderRadius: 8, background: C.pSoft, display: 'grid', placeItems: 'center' }}>{IC.plans(C.primary, 16)}</span>
-        <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>Quarterly</span>
-        <Chip fg="#6D3FE0" bg="#EEE7FF" h={22} style={{ fontSize: 11.5 }}>Recurring</Chip>
+    <div style={{ position: 'relative', width: 380, height: 150, boxSizing: 'border-box', padding: '18px 22px', borderRadius: 18, background: '#fff', fontFamily: 'Poppins, sans-serif', color: C.ink, boxShadow: '0 1px 0 rgba(20,30,80,.04), 0 24px 50px -28px rgba(20,30,80,.35)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: C.sub, fontWeight: 500 }}>
+        <span style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'grid', placeItems: 'center' }}>{icon(tint, 15)}</span>
+        {label}
       </div>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 14 }}>
-        <span style={{ fontSize: 12.5, color: C.sub }}>3 months · Total</span>
-        <span style={{ fontSize: 24, fontWeight: 600, color: C.primary, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>₹{fmt(5886 * p)}</span>
-      </div>
+      <div style={{ position: 'absolute', left: 22, right: 22, top: 70, height: 64, display: 'flex', alignItems: 'center', gap: 12 }}>{children}</div>
     </div>
   )
 }
-function RenewMini() {
-  return (
-    <div style={{ width: 340, height: 120, boxSizing: 'border-box', padding: '18px 22px', borderRadius: 16, background: '#fff', fontFamily: 'Poppins, sans-serif', color: C.ink }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}><Avatar name="Neha Singh" s={28} />Neha Singh</div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
-        <span style={{ fontSize: 13, color: C.amber, fontWeight: 500 }}>Expires in 2 days</span>
-        <Btn h={32}>Renew</Btn>
-      </div>
+const Who = ({ sub, subColor = C.sub, chip }) => (
+  <>
+    <Avatar name="Neha Singh" s={38} />
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>Neha Singh{chip}</div>
+      <div style={{ fontSize: 12.5, color: subColor, marginTop: 2 }}>{sub}</div>
     </div>
-  )
-}
-const FollowNode = () => (
-  <div style={{ width: 340, height: 120, boxSizing: 'border-box', padding: '16px 14px', borderRadius: 16, background: '#fff' }}>
-    <div style={{ font: "600 12px/1 'Poppins', sans-serif", color: MISSED.col, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>{IC.calX(MISSED.col, 14)}Missed Follow-ups</div>
-    <TaskItem {...MISSED} w={312} />
-  </div>
+  </>
 )
-const NODES = [
-  ['01', 'Follow up', <FollowNode key="f" />],
-  ['02', 'Convert', <StatusSwap key="c" />],
-  ['03', 'Onboard', <PlanPick key="o" />],
-  ['04', 'Renew', <RenewMini key="r" />],
+const CARDS = [
+  ({ pr }) => (
+    <FlowCard icon={IC.calX} tint="#D6383F" bg="#FFE3E3" label="Missed follow-up">
+      <Who sub="Missed by 5 days" subColor="#D6383F" chip={<Chip fg="#D6383F" bg="#FFDCDC" h={20} style={{ fontSize: 11 }}>Hot</Chip>} />
+      <Btn h={34} pr={pr} style={{ fontSize: 13 }}>Follow-up</Btn>
+    </FlowCard>
+  ),
+  ({ u }) => (
+    <FlowCard icon={IC.star} tint={C.primary} bg={C.pSoft} label="Lead status">
+      <Who sub="Lead #3051" />
+      <div style={{ position: 'relative', width: 104, height: 26 }}>
+        <Chip fg="#D6383F" bg="#FFDCDC" w={104} h={26} style={{ position: 'absolute', opacity: 1 - u }}>Hot</Chip>
+        <Chip fg={C.green} bg="#D7F3E3" w={104} h={26} style={{ position: 'absolute', opacity: u, transform: `scale(${0.85 + 0.15 * E.back(u)})` }}>{IC.check(C.green, 12)}Converted</Chip>
+      </div>
+    </FlowCard>
+  ),
+  ({ u }) => (
+    <FlowCard icon={IC.plans} tint="#6D3FE0" bg="#EEE7FF" label="Plan">
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>Quarterly<Chip fg="#6D3FE0" bg="#EEE7FF" h={20} style={{ fontSize: 11 }}>Recurring</Chip></div>
+        <div style={{ fontSize: 12.5, color: C.sub, marginTop: 2 }}>3 months · incl. tax</div>
+      </div>
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>₹{fmt(5886 * u)}</div>
+    </FlowCard>
+  ),
+  ({ pr }) => (
+    <FlowCard icon={IC.clock} tint={C.amber} bg={C.aSoft} label="Renewal">
+      <Who sub="Quarterly · expires in 2 days" subColor={C.amber} />
+      <Btn h={34} pr={pr} style={{ fontSize: 13 }}>Renew</Btn>
+    </FlowCard>
+  ),
 ]
 
-// ---------------------------------------------------------------------------- flow infographic
-function Flow({ u, L, W, done = false, out = 0 }) {
+function Cards({ u, L, W, H }) {
   const port = L === 'port'
-  const k = port ? 1.45 : 1.2
-  const cw = 340 * k
-  const ch = 120 * k
-  const pos = (i) => (port ? { x: W / 2, y: 760 + i * 270 } : { x: W / 2 + (i - 1.5) * 462, y: 690 })
-  const step = done ? 0.22 : 0.55
-  const t0 = done ? 0.3 : 1.0
+  // portrait: one column; landscape: a 2 × 2 grid read left to right, top to bottom
+  const k = port ? 2.2 : 1.6
+  const cw = 380 * k
+  const ch = 150 * k
+  const gap = port ? 30 : 36
+  const pos = (i) =>
+    port
+      ? { x: (W - cw) / 2, y: (H - (4 * ch + 3 * gap)) / 2 + i * (ch + gap) }
+      : { x: (W - (2 * cw + gap)) / 2 + (i % 2) * (cw + gap), y: (H - (2 * ch + gap)) / 2 + Math.floor(i / 2) * (ch + gap) }
+  const at = (i, p) => ({ x: pos(i).x + p.x * k, y: pos(i).y + p.y * k })
+  const cur = kf(u, [[1.3, { x: W * 0.7, y: H * 0.9 }], [2.1, at(0, BTN)], [2.5, at(0, BTN)], [4.3, at(3, { x: 200, y: 120 })], [4.8, at(3, BTN)], [6.5, at(3, BTN)]])
+  const sw = sway(u, 1, 3)
+  const clicks = [2.3, 4.95]
   return (
-    <div style={{ position: 'absolute', inset: 0, opacity: 1 - out, transform: `translateY(${-30 * E.inOut(out)}px)` }}>
-      <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width="1" height="1">
-        {NODES.slice(0, 3).map((_, i) => {
-          const a = pos(i)
-          const b = pos(i + 1)
-          const d = port ? `M${a.x} ${a.y + ch / 2 + 14} L${b.x} ${b.y - ch / 2 - 58}` : `M${a.x + cw / 2 + 14} ${a.y} L${b.x - cw / 2 - 14} ${b.y}`
-          const g = P(u, t0 + i * step + 0.3, t0 + i * step + 0.3 + step, E.inOut)
-          return (
-            <path key={i} d={d} fill="none" stroke={FIG.comp} strokeWidth="3" strokeLinecap="round" strokeDasharray="6 10" opacity={g} />
-          )
-        })}
-      </svg>
-      {NODES.map(([n, label, comp], i) => {
-        const a = t0 + i * step
-        const pop = E.back(clamp((u - a) / 0.5))
+    <>
+      {CARDS.map((Card, i) => {
+        const a = 0.3 + i * 0.3
+        const inn = P(u, a, a + 0.8, E.expo)
+        const out = P(u, 5.8 + i * 0.06, 6.3 + i * 0.06, E.inOut)
         const p = pos(i)
-        const check = done ? E.back(clamp((u - a - 0.35) / 0.4)) : 0
         return (
-          <div key={n} style={{ position: 'absolute', left: p.x - cw / 2, top: p.y - ch / 2, width: cw, height: ch, opacity: clamp((u - a) / 0.2), transform: `scale(${0.6 + 0.4 * pop})` }}>
-            <div style={{ position: 'absolute', left: 0, top: -40 * k, display: 'flex', alignItems: 'center', gap: 10 * k, font: `600 ${16 * k}px/1 'Poppins', sans-serif`, color: C.ink }}>
-              <span style={{ width: 28 * k, height: 28 * k, borderRadius: 14 * k, background: C.ink, color: '#fff', display: 'grid', placeItems: 'center', fontSize: 12 * k }}>{n}</span>
-              {label}
+          <div key={i} style={{ position: 'absolute', left: p.x, top: p.y, width: cw, height: ch, opacity: clamp((u - a) / 0.35) * (1 - out), transform: `translateY(${(1 - inn) * 60 - out * 30}px)` }}>
+            <div style={{ width: 380, height: 150, transform: `scale(${k})`, transformOrigin: '0 0' }}>
+              <Card pr={i === 0 ? press(u, 2.3) : press(u, 4.95)} u={i === 1 ? P(u, 2.7, 3.2) : P(u, 3.4, 4.3)} />
             </div>
-            <div style={{ width: 340, height: 120, transform: `scale(${k})`, transformOrigin: '0 0', boxShadow: '0 30px 60px -30px rgba(40,30,110,.35)', borderRadius: 16 }}>{comp}</div>
-            {check > 0 && (
-              <div style={{ position: 'absolute', right: -12 * k, top: -12 * k, width: 32 * k, height: 32 * k, borderRadius: 16 * k, background: C.green, display: 'grid', placeItems: 'center', transform: `scale(${check})`, boxShadow: '0 0 0 4px #fff' }}>{IC.check('#fff', 16 * k)}</div>
-            )}
           </div>
         )
       })}
-    </div>
+      <Cursor x={cur.x + sw.x} y={cur.y + sw.y} o={P(u, 1.3, 1.6) * (1 - P(u, 5.8, 6.2))} pr={Math.max(...clicks.map((c) => press(u, c)))} rp={Math.max(...clicks.map((c) => ripple(u, c)))} s={CUR[L]} />
+    </>
   )
 }
 
-// ------------------------------------------------------------------------------ chapter frame
-// Renders `screen` (frame coords) cropped to `crop` inside the stage window S, plus the cursor,
-// a lifted component with its dashed connector, and the caption.
-function Chapter({ id, u, L, W, screen, crop, cursor, lift }) {
-  const { S, ui } = LAY[L]
-  const c = CH[id]
-  const len = c.b - c.a
-  const k = S.w / crop.w
-  const out = P(u, len - 0.55, len - 0.1, E.inOut)
-  const enter = P(u, 0.25, 1.15, E.out)
-  const map = (p) => ({ x: S.x + (p.x - crop.x) * k, y: S.y + (p.y - crop.y) * k })
-  const cur = cursor && kf(u, cursor.track)
-  const cp = cur && map(cur)
-  const cs = sway(u, 1.7, 4)
-  const pr = cursor ? Math.max(0, ...cursor.clicks.map((x) => press(u, x))) : 0
-  const rp = cursor ? Math.max(0, ...cursor.clicks.map((x) => ripple(u, x))) : 0
-  // lifted component: from its place in the screen to the side, scaling up
-  const lp = lift ? P(u, lift.at, lift.at + 0.75, E.inOut) : 0
-  let liftEl = null
-  if (lift && lp > 0) {
-    const src = map({ x: lift.src.x + lift.src.w / 2, y: lift.src.y + lift.src.h / 2 })
-    const s0 = (lift.src.w * k) / lift.w
-    const to = lift.to[L]
-    const sc = lerp(s0, to.s, lp)
-    const cx = lerp(src.x, to.x, lp)
-    const cy = lerp(src.y, to.y, lp)
-    const line = P(u, lift.at + 0.5, lift.at + 1.0, E.inOut)
-    const lw = lift.w * to.s
-    const lh = lift.h * to.s
-    liftEl = (
-      <>
-        <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: 29 }} width="1" height="1">
-          <path d={`M${src.x} ${src.y} L${to.x} ${to.y}`} fill="none" stroke={FIG.comp} strokeWidth="3" strokeDasharray="6 9" strokeLinecap="round" opacity={line} />
-          <circle cx={src.x} cy={src.y} r={7 * line} fill="#fff" stroke={FIG.comp} strokeWidth="3" />
-        </svg>
-        <div style={{ position: 'absolute', left: cx - (lift.w * sc) / 2, top: cy - (lift.h * sc) / 2, width: lift.w * sc, height: lift.h * sc, zIndex: 30 }}>
-          <div style={{ width: lift.w, height: lift.h, transform: `scale(${sc}) rotate(${-1.5 * lp}deg)`, transformOrigin: '0 0', borderRadius: 16, boxShadow: `0 ${40 * lp}px ${80 * lp}px -${30 * lp}px rgba(30,30,80,.45)` }}>{lift.el(u)}</div>
-        </div>
-        <Selection x={to.x - lw / 2} y={to.y - lh / 2} w={lw} h={lh} o={line * (1 - out)} label={lift.label} comp k={ui * 0.8} color={FIG.comp} />
-      </>
-    )
-  }
-  const port = L === 'port'
+// ----------------------------------------------------------------------------- whole screens
+// Fits a frame (fw × fh) into the stage with a margin, whole and centred. `track` and `clicks`
+// drive the cursor in frame coordinates.
+function Screen({ u, len, L, W, H, fw, fh, children, track, clicks }) {
+  const M = L === 'port' ? { x: 40, y: 120 } : { x: 80, y: 60 }
+  const k = Math.min((W - 2 * M.x) / fw, (H - 2 * M.y) / fh)
+  const x = (W - fw * k) / 2
+  const y = (H - fh * k) / 2
+  const inn = P(u, 0.05, 0.85, E.expo)
+  const out = P(u, len - 0.55, len - 0.05, E.inOut)
+  const c = kf(u, track)
+  const sw = sway(u, 2, 3)
   return (
-    <div style={{ position: 'absolute', inset: 0, opacity: 1 - out }}>
-      <Tag x={W / 2} y={LAY[L].tagY} text={c.eyebrow} u={u - 0.1} icon={<span style={{ width: 8, height: 8, borderRadius: 4, background: C.ink }} />} />
-      <Headline lines={port ? c.port : c.land} u={u - 0.2} size={LAY[L].size} color={C.ink} x={0} w={W} y={LAY[L].headY} />
-      <div style={{ position: 'absolute', left: S.x, top: S.y, width: S.w, height: S.h, perspective: 2400 }}>
-        <div style={{ width: '100%', height: '100%', borderRadius: 22, overflow: 'hidden', background: '#F4F5F8', boxShadow: '0 0 0 1px rgba(20,20,60,.06), 0 60px 120px -50px rgba(30,30,80,.5)', opacity: clamp((u - 0.25) / 0.3), transform: `translateY(${120 * (1 - enter)}px) rotateX(${18 * (1 - enter)}deg)`, transformOrigin: '50% 100%' }}>
-          <div style={{ transformOrigin: '0 0', transform: `translate(${-crop.x * k}px, ${-crop.y * k}px) scale(${k})` }}>{screen}</div>
-        </div>
+    <div style={{ position: 'absolute', inset: 0, opacity: clamp(u / 0.4) * (1 - out), transform: `translateY(${(1 - inn) * 50 - out * 30}px)` }}>
+      <div style={{ position: 'absolute', left: x, top: y, width: fw * k, height: fh * k, borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 0 rgba(20,30,80,.05), 0 50px 100px -50px rgba(20,30,80,.45)', transform: `scale(${0.97 + 0.03 * inn})` }}>
+        <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>{children}</div>
       </div>
-      {liftEl}
-      {cp && <Cursor x={cp.x + cs.x} y={cp.y + cs.y} name={cursor.name} o={P(u, cursor.track[0][0], cursor.track[0][0] + 0.3)} pr={pr} rp={rp} s={ui} />}
+      <Cursor x={x + c.x * k + sw.x} y={y + c.y * k + sw.y} o={P(u, track[0][0], track[0][0] + 0.3)} pr={Math.max(...clicks.map((t) => press(u, t)))} rp={Math.max(...clicks.map((t) => ripple(u, t)))} s={CUR[L]} />
     </div>
   )
 }
 
-// Crop rects (frame coords; height follows the window's aspect).
-const crop = (L, x, y, w) => ({ x, y, w, h: (LAY[L].S.h * w) / LAY[L].S.w })
-
-export function Story({ t, L, W }) {
+export function Story({ t, L, W, H }) {
   const port = L === 'port'
-  let u
   const parts = []
-
-  if ((u = local(t, 'intro')) !== null) {
-    const out = P(u, 4.85, 5.3, E.inOut)
-    const anu = kf(u, [[0.9, { x: W + 40, y: port ? 1700 : 980 }], [1.6, port ? { x: 760, y: 820 } : { x: 360, y: 780 }], [2.2, port ? { x: 760, y: 1090 } : { x: 830, y: 780 }], [2.8, port ? { x: 760, y: 1360 } : { x: 1300, y: 780 }], [3.4, port ? { x: 760, y: 1630 } : { x: 1760, y: 780 }]])
+  let u
+  if ((u = local(t, 'cards')) !== null) parts.push(<Cards key="cards" u={u} L={L} W={W} H={H} />)
+  if ((u = local(t, 'table')) !== null) {
     parts.push(
-      <div key="intro">
-        <div style={{ opacity: 1 - out }}>
-          <Tag x={W / 2} y={150} text={CH.intro.eyebrow} u={u - 0.1} icon={<span style={{ width: 8, height: 8, borderRadius: 4, background: C.ink }} />} />
-          <Headline lines={port ? CH.intro.port : CH.intro.land} u={u - 0.2} out={out} size={port ? 110 : 104} color={C.ink} x={0} w={W} y={port ? 230 : 226} hi={{ 'member.': { bg: '#FFFFFF', fg: C.primary } }} />
-        </div>
-        <Flow u={u} L={L} W={W} out={out} />
-        <Cursor x={anu.x} y={anu.y} name="Anu" o={P(u, 0.9, 1.2) * (1 - out)} s={LAY[L].ui} />
-      </div>,
+      <Screen key="table" u={u} len={6.5} L={L} W={W} H={H} fw={LT.w} fh={LT.h}
+        track={[[0.8, { x: 1200, y: 760 }], [1.6, LT.dots], [1.95, LT.dots], [2.7, LT.item], [3.1, LT.item], [4.0, { x: 1120, y: 560 }]]}
+        clicks={[1.75, 3.05]}>
+        <LeadsTable menu={P(u, 1.85, 2.1) * (1 - P(u, 3.1, 3.3))} hover={P(u, 2.5, 2.6)} conv={P(u, 3.2, 3.6)} rowHi={P(u, 3.2, 3.5)} />
+      </Screen>,
     )
   }
-
-  if ((u = local(t, 'follow')) !== null) {
+  if ((u = local(t, 'form')) !== null) {
+    const o = port ? { x: CV.mx, y: CV.my } : { x: 0, y: 0 }
+    const m = (p) => ({ x: p.x - o.x, y: p.y - o.y })
+    const props = { fill: P(u, 1.0, 2.6, (x) => x), open: P(u, 3.4, 3.6) * (1 - P(u, 4.3, 4.45)), hover: u > 3.85 ? 1 : -1, picked: u > 4.3 ? 1 : 0, p: P(u, 4.6, 5.6), apr: press(u, 6.6) }
     parts.push(
-      <Chapter key="follow" id="follow" u={u} L={L} W={W}
-        screen={<LeadsDash fpr={press(u, 2.6)} hi={P(u, 2.65, 2.85)} />}
-        crop={port ? crop(L, 560, 110, 520) : crop(L, 300, 70, 1100)}
-        cursor={{ name: 'Apurva Jha', track: [[1.3, { x: 1200, y: 520 }], [2.4, LD.follow], [6.5, LD.follow]], clicks: [2.6] }}
-        lift={{ at: 3.0, src: LD.item, w: 340, h: 120, label: 'Follow-up alert', el: () => <FollowNode />, to: { land: { x: 1620, y: 560, s: 1.4 }, port: { x: 540, y: 1520, s: 2.3 } } }}
-      />,
+      <Screen key="form" u={u} len={8.5} L={L} W={W} H={H} fw={port ? 672 : CV.w} fh={port ? 1112 : CV.h}
+        track={[[1.0, m({ x: 940, y: 420 })], [3.1, m(CV.select)], [3.5, m(CV.select)], [3.9, m(CV.option(1))], [4.3, m(CV.option(1))], [5.8, m({ x: 1010, y: 1000 })], [6.4, m(CV.add)], [8.5, m(CV.add)]]}
+        clicks={[3.35, 4.25, 6.6]}>
+        {port ? <ConvertModal {...props} /> : <ConvertFrame {...props} />}
+      </Screen>,
     )
   }
-
-  if ((u = local(t, 'convert')) !== null) {
+  if ((u = local(t, 'members')) !== null) {
     parts.push(
-      <Chapter key="convert" id="convert" u={u} L={L} W={W}
-        screen={<LeadsTable menu={P(u, 1.75, 2.0) * (1 - P(u, 3.0, 3.2))} hover={P(u, 2.4, 2.5)} conv={P(u, 3.1, 3.5)} rowHi={P(u, 3.1, 3.4)} />}
-        crop={port ? crop(L, 300, 110, 720) : crop(L, 280, 100, 1140)}
-        cursor={{ name: 'Apurva Jha', track: [[1.0, { x: 1100, y: 640 }], [1.5, LT.dots], [1.85, LT.dots], [2.6, LT.item], [3.0, LT.item], [3.8, { x: 1080, y: 560 }]], clicks: [1.6, 2.95] }}
-        lift={{ at: 3.5, src: { x: LT.status.x - 32, y: LT.status.y - 12, w: 64, h: 24 }, w: 340, h: 120, label: 'Lead status', el: (uu) => <StatusSwap u={P(uu, 4.1, 4.7)} />, to: { land: { x: 1620, y: 560, s: 1.4 }, port: { x: 540, y: 1520, s: 2.3 } } }}
-      />,
-    )
-  }
-
-  if ((u = local(t, 'onboard')) !== null) {
-    const cy = kf(u, port ? [[0, 20], [2.5, 20], [3.2, 380], [4.6, 380], [5.2, 590]] : [[0, -10], [2.5, -10], [3.2, 300], [4.6, 300], [5.2, 470]])
-    parts.push(
-      <Chapter key="onboard" id="onboard" u={u} L={L} W={W}
-        screen={<ConvertFrame fill={P(u, 1.0, 2.4, (x) => x)} open={P(u, 3.5, 3.7) * (1 - P(u, 4.35, 4.5))} hover={u > 3.9 ? 1 : -1} picked={u > 4.35 ? 1 : 0} p={P(u, 5.0, 5.8)} apr={press(u, 6.4)} />}
-        crop={port ? crop(L, 364, cy, 712) : crop(L, 170, cy, 1100)}
-        cursor={{ name: 'Anu', track: [[1.0, { x: 900, y: 420 }], [3.0, { x: 760, y: 640 }], [3.4, CV.select], [3.6, CV.select], [4.0, CV.option(1)], [4.35, CV.option(1)], [5.6, { x: 1100, y: 1080 }], [6.2, CV.add], [7.5, CV.add]], clicks: [3.45, 4.3, 6.4] }}
-        lift={{ at: 5.1, src: CV.total, w: 340, h: 120, label: 'Plan & total', el: (uu) => <PlanPick p={P(uu, 5.2, 6.0)} />, to: { land: { x: 1620, y: 600, s: 1.4 }, port: { x: 540, y: 1520, s: 2.3 } } }}
-      />,
-    )
-  }
-
-  if ((u = local(t, 'renew')) !== null) {
-    parts.push(
-      <Chapter key="renew" id="renew" u={u} L={L} W={W}
-        screen={<Members k={P(u, 0.9, 1.9)} rowHi={P(u, 2.75, 2.95)} rpr={press(u, 2.8)} />}
-        crop={port ? crop(L, 300, 150, 720) : crop(L, 300, 80, 1100)}
-        cursor={{ name: 'Apurva Jha', track: [[1.4, { x: 1150, y: 640 }], [2.5, MD.renew], [6.5, MD.renew]], clicks: [2.8] }}
-        lift={{ at: 3.2, src: MD.row, w: 340, h: 120, label: 'Expiring member', el: () => <RenewMini />, to: { land: { x: 1620, y: 600, s: 1.4 }, port: { x: 540, y: 1520, s: 2.3 } } }}
-      />,
-    )
-  }
-
-  if ((u = local(t, 'outro')) !== null) {
-    const out = P(u, 3.9, 4.45, E.inOut)
-    parts.push(
-      <div key="outro" style={{ opacity: 1 - out }}>
-        <Tag x={W / 2} y={150} text={CH.outro.eyebrow} u={u - 0.1} icon={<span style={{ width: 8, height: 8, borderRadius: 4, background: C.ink }} />} />
-        <Headline lines={port ? CH.outro.port : CH.outro.land} u={u - 0.2} size={port ? 110 : 104} color={C.ink} x={0} w={W} y={port ? 230 : 226} hi={{ 'place.': { bg: '#FFFFFF', fg: C.primary } }} />
-        <Flow u={u} L={L} W={W} done />
-      </div>,
+      <Screen key="members" u={u} len={6.5} L={L} W={W} H={H} fw={MD.w} fh={MD.h}
+        track={[[1.2, { x: 1150, y: 660 }], [2.5, MD.renew], [6.5, MD.renew]]}
+        clicks={[2.8]}>
+        <Members k={P(u, 0.8, 1.8)} rowHi={P(u, 2.75, 2.95)} rpr={press(u, 2.8)} />
+      </Screen>,
     )
   }
   return parts

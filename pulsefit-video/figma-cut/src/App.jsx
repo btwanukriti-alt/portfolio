@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { CHAPTERS, DURATION, POSTER, STAGES, UI_FONT } from './lib.js'
+import { BG, CHAPTERS, DURATION, POSTER, STAGES, UI_FONT } from './lib.js'
 import { Story } from './story.jsx'
-import { Backdrop, Wipe } from './stage.jsx'
+import { Backdrop } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
 // poster frame until the page posts 'showcase:play', looping after that.
@@ -103,12 +103,11 @@ export default function App() {
   const st = { s, ox: (vw - W * s) / 2, oy: (vh - H * s) / 2, W, H }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: '#E7E1FF' }}>
-      <Backdrop t={t} />
+    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: BG }}>
+      <Backdrop />
       <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
-        <Story t={t} L={L} W={W} />
+        <Story t={t} L={L} W={W} H={H} />
       </div>
-      <Wipe t={t} vw={vw} vh={vh} st={st} />
       {!ui.hidden && <Player t={t} playing={playing} idle={ui.idle} />}
     </div>
   )

@@ -73,33 +73,21 @@ export const C = {
   yellow: '#F2B21B',
 }
 
-// Figma editor colours (selection, components, spacing, prototype noodles).
-export const FIG = { sel: '#0D99FF', comp: '#9747FF', spacing: '#F24822', proto: '#0D99FF' }
 
-// Multiplayer cursors: one colour per person.
-export const PEOPLE = {
-  Anu: '#F76B15',
-  'Apurva Jha': '#12A150',
-  'Shikhar Tiwari': '#E5397A',
-  'Neha Singh': '#0B8AD9',
-}
 
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
-export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
 
-// Chapters of the one flow (lead → member → renewal). Each has a solid pastel stage, an
-// eyebrow and a headline (landscape lines / portrait lines).
+// One flow (lead → member → renewal), no captions: the cards, then each real screen whole.
+export const BG = '#E6EBFA'
 export const CHAPTERS = [
-  { id: 'intro', a: 0, b: 5.5, bg: '#E7E1FF', eyebrow: 'Lead to member', land: [['From', 'first', 'lead'], ['to', 'loyal', 'member.']], port: [['From', 'first'], ['lead', 'to', 'loyal'], ['member.']] },
-  { id: 'follow', a: 5.5, b: 12.0, bg: '#D9E8FF', eyebrow: '01 · Follow up', land: [['Never', 'miss', 'a', 'follow-up.']], port: [['Never', 'miss', 'a'], ['follow-up.']] },
-  { id: 'convert', a: 12.0, b: 18.5, bg: '#D4F2E4', eyebrow: '02 · Convert', land: [['Convert', 'a', 'lead', 'in', 'two', 'clicks.']], port: [['Convert', 'a', 'lead'], ['in', 'two', 'clicks.']] },
-  { id: 'onboard', a: 18.5, b: 26.0, bg: '#FFE3D3', eyebrow: '03 · Onboard', land: [['Plan', 'and', 'billing', 'in', 'one', 'step.']], port: [['Plan', 'and', 'billing'], ['in', 'one', 'step.']] },
-  { id: 'renew', a: 26.0, b: 32.5, bg: '#FFF0C4', eyebrow: '04 · Renew · 3 months later', land: [['Renew', 'before', 'a', 'plan', 'lapses.']], port: [['Renew', 'before'], ['a', 'plan', 'lapses.']] },
-  { id: 'outro', a: 32.5, b: 37.0, bg: '#E7E1FF', eyebrow: 'Lead to member', land: [['Every', 'step,', 'in', 'one', 'place.']], port: [['Every', 'step,'], ['in', 'one', 'place.']] },
+  { id: 'cards', a: 0, b: 6.5 },
+  { id: 'table', a: 6.5, b: 13.0 },
+  { id: 'form', a: 13.0, b: 21.5 },
+  { id: 'members', a: 21.5, b: 28.0 },
 ]
-export const DURATION = 37.0
+export const DURATION = 28.0
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 3.9
+export const POSTER = 4.8
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }
