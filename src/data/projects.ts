@@ -54,7 +54,7 @@ export const PROJECTS: Project[] = [
     hero: caseStudyImage('bosch-customer-experience'),
     showcase: '/showcase/bosch-customer-experience.html',
   },
-  // The clihub cut is the 18.9s UI-prototype loop in clihub-video/prototype-cut (npm run embed there).
+  // The clihub cut is the 10s dashboard loop in clihub-video/prototype-cut (npm run embed there).
   {
     slug: 'clihub',
     title: 'CLIHUB',
