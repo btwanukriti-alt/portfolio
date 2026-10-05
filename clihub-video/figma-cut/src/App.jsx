@@ -6,12 +6,12 @@
 // window.__showcase = { seek(t), play(), pause(), duration, t } for tests and captures.
 import { useEffect, useRef, useState } from 'react'
 import { DURATION } from './lib.js'
-import { Background, CanvasFrame, frameInset, MARGIN } from './stage.jsx'
+import { Background } from './stage.jsx'
 import { Scenes } from './scenes.jsx'
 
 const embed = typeof window !== 'undefined' && (window.__SHOWCASE_EMBED__ || new URLSearchParams(location.search).has('embed'))
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches
-const STILL_T = 2.9
+const STILL_T = 2.6
 
 export default function App() {
   const [t, setT] = useState(still ? STILL_T : embed ? 0.6 : 0)
@@ -75,9 +75,8 @@ export default function App() {
   const mode = w / h < 1 ? 'port' : 'land'
   const BW = mode === 'port' ? 1080 : 1920
   const BH = mode === 'port' ? 1920 : 1080
-  const d = frameInset(w, h)
-  const iw = w - 2 * d
-  const ih = h - 2 * d
+  const iw = w
+  const ih = h
   // Fit the base stage, then extend it to the canvas aspect so the content can be centred in
   // the extra room instead of leaving empty bands.
   const s = Math.min(iw / BW, ih / BH)
@@ -85,8 +84,8 @@ export default function App() {
   const SH = ih / s
 
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: MARGIN, cursor: embed ? 'default' : 'pointer' }}>
-      <div style={{ position: 'absolute', left: d, top: d, width: iw, height: ih, overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: '#B9C7DB', cursor: embed ? 'default' : 'pointer' }}>
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
         <Background t={t} w={iw} h={ih} />
         <div
           style={{
@@ -102,7 +101,6 @@ export default function App() {
           <Scenes t={t} mode={mode} sw={SW} sh={SH} />
         </div>
       </div>
-      <CanvasFrame w={w} h={h} d={d} />
     </div>
   )
 }

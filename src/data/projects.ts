@@ -54,7 +54,7 @@ export const PROJECTS: Project[] = [
     hero: caseStudyImage('bosch-customer-experience'),
     showcase: '/showcase/bosch-customer-experience.html',
   },
-  // The clihub cut is the 10s Figma-style loop in clihub-video/figma-cut (npm run embed there).
+  // The clihub cut is the 11.6s infographic loop in clihub-video/figma-cut (npm run embed there).
   {
     slug: 'clihub',
     title: 'CLIHUB',
