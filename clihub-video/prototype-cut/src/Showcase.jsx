@@ -319,16 +319,19 @@ function Screens({ t }) {
 }
 
 // ================= camera =================
-// Focus point in window px and zoom; it pushes in on what each step is about and pulls back
-// out between beats (and for every dashboard tab click).
+// Full view by default. Short punch-ins (in ~0.3s, brief hold, back out) only on the moments that
+// matter: Create Host, the connection going green, the CPU chart, the Ask AI answer, and the
+// SFTP connect that starts the upload.
 const CAM = (() => {
   const F = { x: 640, y: 416, z: 1 };
-  const k = [[0, F], [1.6, F], [2.1, { x: 1060, y: 400, z: 1.45 }], [3.85, { x: 1060, y: 520, z: 1.45 }], [4.25, { x: 1090, y: 690, z: 1.3 }], [4.7, F],
-    [5.0, F], [6.6, { x: 640, y: 390, z: 1.28 }], [7.25, F]];
-  // Monitor: out for each tab click, in on the content after it.
-  TAB_AT.forEach((ct, i) => { if (i > 0) k.push([ct - 0.15, F]); k.push([ct + 0.6, { x: 672, y: 500, z: 1.22 }]); });
-  k.push([12.9, F], [13.4, F], [14.2, { x: 1080, y: 430, z: 1.4 }], [15.35, { x: 1080, y: 430, z: 1.4 }], [15.75, F],
-    [16.0, F], [16.35, { x: 330, y: 390, z: 1.45 }], [16.75, { x: 330, y: 390, z: 1.45 }], [17.1, { x: 830, y: 430, z: 1.3 }], [17.85, { x: 830, y: 430, z: 1.3 }], [18.15, F]);
+  const k = [[0, F]];
+  const punch = (at, f, z, hold = 0.3) => k.push([at - 0.3, F], [at, { ...f, z }], [at + hold, { ...f, z }], [at + hold + 0.38, F]);
+  punch(4.12, { x: 1120, y: 720 }, 1.32, 0.25);  // Create Host
+  punch(6.55, { x: 640, y: 390 }, 1.38, 0.4);    // shield turns green: Connected
+  punch(9.0, { x: 500, y: 640 }, 1.3, 0.2);      // CPU usage chart (Performance tab)
+  punch(14.45, { x: 1080, y: 400 }, 1.35, 0.45); // Ask AI answer
+  punch(17.05, { x: 833, y: 420 }, 1.28, 0.35);  // Connect to Host: upload starts
+  k.push([DURATION, F]);
   return k;
 })();
 // Clamped so the zoomed screen always covers the frame (no empty edge inside it).
