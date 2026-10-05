@@ -5,10 +5,10 @@
 //       Financial Overview dashboard; product components land around it.
 //   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
 //       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
-//   3 · Conclusion: the key figures snap into an auto-layout row; collection by college grows.
+//   3 · Conclusion: a consolidated navy summary and collection-by-college columns in auto layout.
 import { Cursor, Selection, Spacing } from './fig.jsx'
 import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SUMMARY, SheetCard, StatChip, SummaryTile, CollegeBars } from './ui.jsx'
+import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip, SummaryBanner, CollegeColumns } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -220,50 +220,47 @@ export function Flow({ t, L, W }) {
 }
 
 // =====================================================================================
-// 3 · CONCLUSION: the key figures snap into an auto-layout row and collection by college grows
+// 3 · CONCLUSION: the consolidated summary and collection by college, in auto layout
 // =====================================================================================
+// Native card sizes are drawn at scale `k` on the stage.
 const END = {
-  land: { tw: 340, th: 128, gap: 24, row: (i) => ({ x: 244 + i * 364, y: 330 }), box: { x: 228, y: 314, w: 1464, h: 160 }, bars: { x: 244, y: 522, w: 1432, h: 420 }, cursor: { from: { x: 2000, y: 1120 }, to: { x: 1700, y: 960 } } },
-  port: { tw: 460, th: 150, gap: 24, row: (i) => ({ x: 68 + (i % 2) * 484, y: 540 + Math.floor(i / 2) * 174 }), box: { x: 52, y: 524, w: 976, h: 356 }, bars: { x: 68, y: 930, w: 944, h: 760 }, cursor: { from: { x: 1150, y: 1950 }, to: { x: 930, y: 1780 } } },
+  land: { k: 1, a: { x: 290, y: 338, w: 680, h: 520 }, b: { x: 994, y: 338, w: 636, h: 520 }, chip: { x: 620, y: 280, r: 4 }, box: { x: 274, y: 322, w: 1372, h: 552 }, cursor: { from: { x: 2000, y: 1120 }, to: { x: 1660, y: 900 } } },
+  port: { k: 1.3, a: { x: 68, y: 500, w: 726, h: 450 }, b: { x: 68, y: 1109, w: 726, h: 450 }, chip: { x: 560, y: 430, r: 4 }, box: { x: 52, y: 484, w: 976, h: 1210 }, cursor: { from: { x: 1150, y: 1950 }, to: { x: 520, y: 1820 } } },
 }
 export function Conclusion({ t, L, W }) {
   const u = local(t, 'end')
   if (u === null) return null
   const port = L === 'port'
   const D = END[L]
+  const K = D.k
   const exit = P(u, 2.3, 2.7, E.inOut)
-  const sel = u > 1.15 ? P(u, 1.15, 1.3) * (1 - P(u, 2.05, 2.2)) : 0
-  const gap = u > 1.2 ? P(u, 1.2, 1.35) * (1 - P(u, 2.05, 2.2)) : 0
-  const cp = P(u, 0.8, 1.5, E.expo)
+  const sel = u > 1.3 ? P(u, 1.3, 1.45) * (1 - P(u, 2.05, 2.2)) : 0
+  const gap = u > 1.35 ? P(u, 1.35, 1.5) * (1 - P(u, 2.05, 2.2)) : 0
+  const cp = P(u, 0.9, 1.6, E.expo)
   const csw = sway(u, 2, 5)
-  const bk = 0.88 + 0.12 * E.back(clamp((u - 0.4) / 0.5))
+  const card = (r, a, kids) => {
+    const pp = E.back(clamp((u - a) / 0.55))
+    return (
+      <Abs x={r.x} y={r.y + (1 - P(u, a, a + 0.6, E.expo)) * 80} style={{ width: r.w * K, height: r.h * K, opacity: clamp((u - a) / 0.2), transform: `scale(${0.9 + 0.1 * pp})`, transformOrigin: '50% 60%', zIndex: 10 }}>
+        <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>{kids}</div>
+      </Abs>
+    )
+  }
+  const ca = 0.95
+  const cpop = E.back(clamp((u - ca) / 0.5))
+  const gx = port ? null : { x1: D.a.x + D.a.w * K, x2: D.b.x }
   return (
     <>
       <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="College management software" lines={port ? ['Every college’s fees', 'in one view.'] : ['Every college’s fees in one view.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        {SUMMARY.map((item, i) => {
-          const a = 0.1 + i * 0.09
-          const to = D.row(i)
-          const pp = E.back(clamp((u - a) / 0.45))
-          return (
-            <Abs key={item[0]} x={to.x} y={to.y + (1 - P(u, a, a + 0.5, E.expo)) * 60} style={{ opacity: clamp((u - a) / 0.15), transform: `scale(${0.85 + 0.15 * pp})`, zIndex: 10 }}>
-              <div style={{ transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '0 0' }}>
-                <SummaryTile item={item} p={P(u, a + 0.2, a + 1.0)} w={D.tw / (port ? 1.3 : 1)} h={D.th / (port ? 1.3 : 1)} />
-              </div>
-            </Abs>
-          )
-        })}
-        <Selection {...D.box} o={sel} label="Summary · Auto layout" size="Hug × Hug" k={port ? 1.4 : 1.2} />
-        {(port ? [0, 1] : [0, 1, 2]).map((i) => {
-          const r = D.row(port ? i * 2 : i)
-          return <Spacing key={i} x1={r.x + D.tw} x2={r.x + D.tw + D.gap} y={r.y} h={D.th} o={gap} value="24" />
-        })}
-        <Abs x={D.bars.x} y={D.bars.y} style={{ opacity: clamp((u - 0.4) / 0.2), transform: `scale(${bk})`, transformOrigin: '50% 30%', zIndex: 9 }}>
-          <div style={{ transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '0 0' }}>
-            <CollegeBars w={D.bars.w / (port ? 1.3 : 1)} h={D.bars.h / (port ? 1.3 : 1)} bars={(i) => P(u, 0.6 + i * 0.07, 1.4 + i * 0.07, E.out)} />
-          </div>
+        {card(D.a, 0.1, <SummaryBanner w={D.a.w} h={D.a.h} k={P(u, 0.35, 1.3)} />)}
+        {card(D.b, 0.25, <CollegeColumns w={D.b.w} h={D.b.h} bars={(i) => P(u, 0.55 + i * 0.08, 1.3 + i * 0.08, E.out)} />)}
+        <Abs x={D.chip.x} y={D.chip.y} style={{ zIndex: 20, opacity: clamp((u - ca) / 0.15), transform: `rotate(${D.chip.r * cpop}deg) scale(${(port ? 1.45 : 1.1) * (0.7 + 0.3 * cpop)})`, transformOrigin: '0 0' }}>
+          <KpiCard p={P(u, ca + 0.1, ca + 0.8)} />
         </Abs>
-        <Cursor x={lerp(D.cursor.from.x, D.cursor.to.x, cp) + csw.x} y={lerp(D.cursor.from.y, D.cursor.to.y, cp) + csw.y} o={P(u, 0.8, 1.1)} s={port ? 2 : 1.5} />
+        <Selection {...D.box} o={sel} label="Summary · Auto layout" size="Hug × Hug" k={port ? 1.4 : 1.2} />
+        {gx ? <Spacing x1={gx.x1} x2={gx.x2} y={D.a.y} h={D.a.h * K} o={gap} value="24" /> : <Spacing x1={D.a.x} x2={D.a.x + D.a.w * K} y={D.a.y + D.a.h * K} h={D.b.y - D.a.y - D.a.h * K} o={gap} value="24" />}
+        <Cursor x={lerp(D.cursor.from.x, D.cursor.to.x, cp) + csw.x} y={lerp(D.cursor.from.y, D.cursor.to.y, cp) + csw.y} o={P(u, 0.9, 1.2)} s={port ? 2 : 1.5} />
       </div>
     </>
   )
