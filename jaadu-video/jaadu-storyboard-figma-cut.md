@@ -18,7 +18,7 @@ The Jaadu 2.0 card video in the Selected Work boxes and the case-study hero (`pu
 | 0:13.9–0:19.9 | **Overnight discoveries** | OVERNIGHT DISCOVERIES / **642 strategies tested overnight. 3 survived.** | The *Falsification funnel* and *Discoveries per night* cards appear side by side (stacked in portrait), each drawn whole inside its card. The funnel draws as its stages count 642 → 128 → 31 → 3, and the 30 nightly bars grow, with last night's 3 highlighted. The cursor clicks "642 → 3 survived" (hotspot "On click → View survivors"); both cards step back and the three surviving strategy cards pop in with their equity curves drawing. |
 
 ## UI refinements and data notes
-- **Removed:** the logo and wordmark. The top bar shows "Trading terminal" in their place.
+- **Removed:** the logo and wordmark.
 - **Trading pair:** the alert is on BTCUSDT (the design's chart is labelled ETHUSDC but priced like Bitcoin, up to a 116,280.56 tag).
 - **Create Alert:**
   - The alert is on BTCUSDT, Crossing **116,000**. The design's value was 7800, which matches no price shown.
