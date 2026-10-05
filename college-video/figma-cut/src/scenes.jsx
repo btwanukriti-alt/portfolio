@@ -1,15 +1,14 @@
-// The three scenes of the 11.8s cut, each a pure function of the clock `t` and the layout
+// The three scenes of the 12.8s cut, each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the college management Figma
 // frames (section 267:97221).
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
 //   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
 //       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
-//   3 · Conclusion: the platform tree. Fees, Settlements and Staff feed one platform that fans
-//       out to the five colleges.
-import { Cursor, Selection, Spacing } from './fig.jsx'
+//   3 · Conclusion: the hierarchy filter. College → Programme → Apply opens the filtered result.
+import { Cursor, Noodle, Selection } from './fig.jsx'
 import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip, COLLEGES, PILLS, ModulePill, HubCard, CollegeNode } from './ui.jsx'
+import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip, FILTER, FilterPanel, FilterResult, RESULT, fieldAt, optionAt } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -221,110 +220,67 @@ export function Flow({ t, L, W }) {
 }
 
 // =====================================================================================
-// 3 · CONCLUSION: the platform tree. Fees, Settlements and Staff feed one platform, which fans
-// out to the five colleges; connectors draw in and data pulses run along them.
+// 3 · CONCLUSION: the hierarchy filter. The cursor picks a college, which unlocks the
+// programme; picks B.Tech, clicks Apply, and a prototype connector opens the filtered result.
 // =====================================================================================
-const TREE = {
-  land: {
-    pills: [0, 1, 2].map((j) => ({ x: 960 + (j - 1) * 330 - 132, y: 290, s: 1.15 })),
-    hub: { x: 660, y: 452, s: 1.2 },
-    node: (i) => ({ x: 162 + i * 324, y: 772 }),
-    nodeSize: { w: 300, h: 176 },
-    cursor: { from: { x: 2000, y: 1120 }, to: { x: 1230, y: 590 }, rest: { x: 1760, y: 1000 } },
-  },
-  port: {
-    pills: [0, 1, 2].map((j) => ({ x: 540 + (j - 1) * 330 - 138, y: 470, s: 1.2 })),
-    hub: { x: 165, y: 640, s: 1.5 },
-    node: (i) => ({ x: 170, y: 900 + i * 172 }),
-    nodeSize: { w: 840, h: 128 },
-    cursor: { from: { x: 1150, y: 1950 }, to: { x: 870, y: 770 }, rest: { x: 960, y: 1800 } },
-  },
+const FLT = {
+  land: { K: 1.55, panel: { x: 200, y: 336 }, center: 635, res: { x: 1004, y: 336 }, vertical: false, curFrom: { x: 2000, y: 1120 }, curRest: { x: 1720, y: 1010 } },
+  port: { K: 1.6, panel: { x: 204, y: 480 }, center: 204, res: { x: 172, y: 1230 }, vertical: true, curFrom: { x: 1150, y: 1950 }, curRest: { x: 200, y: 1800 } },
 }
-const LINE = '#7C93C8'
+// Click times (scene-local): open College, pick Engineering, open Programme, pick B.Tech, Apply.
+const FC = [0.75, 1.15, 1.6, 2.0, 2.45]
 export function Conclusion({ t, L, W }) {
   const u = local(t, 'end')
   if (u === null) return null
   const port = L === 'port'
-  const D = TREE[L]
-  const exit = P(u, 2.8, 3.2, E.inOut)
-  const ps = D.pills[0].s || 1
-  const hs = D.hub.s || 1
-  const hub = { x: D.hub.x, y: D.hub.y, w: 500 * hs, h: 120 * hs }
-  const hubC = hub.x + hub.w / 2
-  // Connector paths (stage px): module pill → hub, hub → each college.
-  const up = D.pills.map((q) => {
-    const x = q.x + 115 * ps
-    const y0 = q.y + 68 * ps
-    const my = (y0 + hub.y) / 2
-    return `M${x} ${y0} C${x} ${my} ${hubC} ${my} ${hubC} ${hub.y}`
-  })
-  const down = COLLEGES.map((_, i) => {
-    const n = D.node(i)
-    if (!port) {
-      const x = n.x + D.nodeSize.w / 2
-      const y0 = hub.y + hub.h
-      const my = (y0 + n.y) / 2
-      return `M${hubC} ${y0} C${hubC} ${my} ${x} ${my} ${x} ${n.y}`
-    }
-    const tx = 110
-    const cy = n.y + D.nodeSize.h / 2
-    const y0 = hub.y + hub.h
-    return `M${hubC} ${y0} V${y0 + 24} Q${hubC} ${y0 + 40} ${hubC - 16} ${y0 + 40} H${tx + 16} Q${tx} ${y0 + 40} ${tx} ${y0 + 56} V${cy - 16} Q${tx} ${cy} ${tx + 16} ${cy} H${n.x}`
-  })
-  const drawUp = (j) => P(u, 0.3 + j * 0.06, 0.75 + j * 0.06, E.inOut)
-  const drawDown = (i) => P(u, 0.85 + i * 0.05, 1.4 + i * 0.05, E.inOut)
-  const pulse = (i, base) => {
-    const v = ((u - base - i * 0.13) / 0.9) % 1
-    return u > base ? (v < 0 ? v + 1 : v) : -1
-  }
-  const hubPop = E.back(clamp((u - 0.55) / 0.5))
-  const selHub = u > 0.85 ? P(u, 0.85, 1.0) * (1 - P(u, 1.4, 1.55)) : 0
-  const rowBox = port ? { x: 154, y: 884, w: 872, h: 5 * 172 - 44 + 32 } : { x: 146, y: 756, w: 5 * 324 - 24 + 32, h: 208 }
-  const selRow = u > 1.9 ? P(u, 1.9, 2.05) * (1 - P(u, 2.55, 2.7)) : 0
-  const cur = kf(u, [[0.3, D.cursor.from], [0.7, D.cursor.to], [1.5, D.cursor.to], [2.2, D.cursor.rest]])
-  const csw = sway(u, 2, u > 2.2 ? 5 : 0)
+  const D = FLT[L]
+  const K = D.K
+  const exit = P(u, 3.85, 4.25, E.inOut)
+  // The panel sits centred until Apply, then slides aside to make room for the result.
+  const px = lerp(D.center, D.panel.x, P(u, FC[4] + 0.05, FC[4] + 0.6, E.inOut))
+  const at = (q) => ({ x: px + K * q.x, y: D.panel.y + K * q.y })
+  const atC = (q) => ({ x: D.center + K * q.x, y: D.panel.y + K * q.y })
+  const pts = [atC(fieldAt(0)), atC(optionAt(0, 0)), atC(fieldAt(1)), atC(optionAt(1, 0)), atC({ x: FILTER.apply.x + FILTER.apply.w / 2, y: FILTER.apply.y + FILTER.apply.h / 2 })]
+  const cur = kf(u, [[0.35, D.curFrom], ...FC.flatMap((c, i) => [[c - 0.2, pts[i]], [c + 0.08, pts[i]]]), [3.2, D.curRest]])
+  const cs = sway(u, 4, u > 3.2 ? 5 : 0)
+  const sel = [u > FC[1] ? 0 : -1, u > FC[3] ? 0 : -1, -1]
+  const openC = u > FC[0] && u < FC[1] + 0.15 ? clamp((u - FC[0]) / 0.15) * (1 - clamp((u - FC[1] - 0.04) / 0.08)) : 0
+  const openP = u > FC[2] && u < FC[3] + 0.15 ? clamp((u - FC[2]) / 0.15) * (1 - clamp((u - FC[3] - 0.04) / 0.08)) : 0
+  const open = openC > 0 ? [0, openC, u > FC[1] - 0.3 ? 0 : -1] : openP > 0 ? [1, openP, u > FC[3] - 0.3 ? 0 : -1] : [-1, 0, -1]
+  const pop = E.back(clamp((u - 0.1) / 0.55))
+  const rIn = FC[4] + 0.35
+  const rpop = E.back(clamp((u - rIn) / 0.55))
+  const rw = RESULT.w * K
+  const rh = RESULT.h * K
+  const ap = at({ x: 0, y: FILTER.apply.y + FILTER.apply.h / 2 })
+  const n1 = D.vertical ? { x: px + K * (FILTER.apply.x + FILTER.apply.w / 2), y: D.panel.y + K * FILTER.h + 14 } : { x: px + K * FILTER.w + 14, y: ap.y }
+  const n2 = D.vertical ? { x: D.res.x + rw / 2, y: D.res.y - 16 } : { x: D.res.x - 16, y: D.res.y + rh / 2 }
+  const sk = port ? 1.35 : 1.15
+  const selP = u > 0.5 ? P(u, 0.5, 0.65) * (1 - P(u, FC[0] - 0.15, FC[0])) : 0
+  const selR = u > rIn + 0.45 ? P(u, rIn + 0.45, rIn + 0.6) * (1 - P(u, 3.6, 3.75)) : 0
+  const clicks = FC.reduce((a, c) => a + press(u, c), 0)
+  const rips = FC.reduce((a, c) => a + ripple(u, c), 0)
   return (
     <>
-      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="College management software" lines={port ? ['Every college.', 'One system.'] : ['Every college. One system.']} />
+      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="Filters" lines={port ? ['Filter by college,', 'programme and batch.'] : ['Filter by college, programme and batch.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: 5 }} width="1" height="1">
-          {[...up.map((d, j) => [d, drawUp(j), pulse(j, 0.9)]), ...down.map((d, i) => [d, drawDown(i), pulse(i, 1.5)])].map(([d, w, pp], k) => (
-            <g key={k}>
-              <path d={d} fill="none" stroke={LINE} strokeWidth={port ? 3.5 : 3} strokeLinecap="round" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - w} opacity=".75" />
-              {pp >= 0 && w >= 1 && <path d={d} fill="none" stroke={FIG.proto} strokeWidth={port ? 7 : 6} strokeLinecap="round" pathLength="1" strokeDasharray="0.06 1" strokeDashoffset={-pp} />}
-            </g>
-          ))}
-        </svg>
-        {D.pills.map((q, j) => {
-          const a = 0.1 + j * 0.08
-          const pp = E.back(clamp((u - a) / 0.45))
-          return (
-            <Abs key={j} x={q.x} y={q.y} style={{ opacity: clamp((u - a) / 0.15), transform: `translateY(${(1 - pp) * 24}px) scale(${ps * (0.8 + 0.2 * pp)})`, transformOrigin: '0 0', zIndex: 10 }}>
-              <ModulePill item={PILLS[j]} />
-            </Abs>
-          )
-        })}
-        <Abs x={hub.x} y={hub.y} style={{ opacity: clamp((u - 0.55) / 0.15), transform: `scale(${hs * (0.8 + 0.2 * hubPop)})`, transformOrigin: '0 0', zIndex: 11 }}>
-          <HubCard k={P(u, 0.7, 1.5)} />
+        <Noodle x1={n1.x} y1={n1.y} x2={n2.x} y2={n2.y} u={P(u, FC[4] + 0.05, FC[4] + 0.5, E.inOut)} vertical={D.vertical} label="On click" />
+        <Abs x={px} y={D.panel.y} style={{ width: FILTER.w * K, height: FILTER.h * K, opacity: clamp((u - 0.1) / 0.2), transform: `scale(${0.88 + 0.12 * pop})`, transformOrigin: '50% 40%', zIndex: 12 }}>
+          <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
+            <FilterPanel sel={sel} open={open} applyPr={press(u, FC[4])} applied={P(u, FC[4] + 0.05, FC[4] + 0.3)} />
+          </div>
+          <Selection x={0} y={0} w={FILTER.w * K} h={FILTER.h * K} o={selP} label="Filters" comp size={`${FILTER.w} × ${FILTER.h}`} k={sk} />
         </Abs>
-        <Selection x={hub.x} y={hub.y} w={hub.w} h={hub.h} o={selHub} label="One Platform" comp k={port ? 1.4 : 1.1} />
-        {COLLEGES.map((_, i) => {
-          const n = D.node(i)
-          const a = 1.15 + i * 0.07
-          const pp = E.back(clamp((u - a) / 0.45))
-          return (
-            <Abs key={i} x={n.x} y={n.y} style={{ opacity: clamp((u - a) / 0.15), transform: `translateY(${(1 - pp) * 30}px) scale(${0.85 + 0.15 * pp})`, transformOrigin: '50% 0', zIndex: 10 }}>
-              <CollegeNode i={i} row={port} p={P(u, a + 0.15, a + 0.85)} />
-            </Abs>
-          )
-        })}
-        <Selection {...rowBox} o={selRow} label="Colleges · Auto layout" size="Hug × Hug" k={port ? 1.4 : 1.1} />
-        {(port ? [] : [0, 1, 2, 3]).map((i) => {
-          const n = D.node(i)
-          return <Spacing key={i} x1={n.x + 300} x2={n.x + 324} y={n.y} h={176} o={selRow} value="24" />
-        })}
-        <Cursor x={cur.x + csw.x} y={cur.y + csw.y} o={P(u, 0.3, 0.55)} pr={press(u, 0.62)} rp={ripple(u, 0.62)} s={port ? 2 : 1.5} />
+        {u > rIn && (
+          <Abs x={D.res.x} y={D.res.y} style={{ width: rw, height: rh, opacity: clamp((u - rIn) / 0.2), transform: `scale(${0.85 + 0.15 * rpop})`, transformOrigin: port ? '50% 0' : '0 50%', zIndex: 10 }}>
+            <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
+              <FilterResult k={P(u, rIn + 0.15, rIn + 0.85)} rows={P(u, rIn + 0.2, rIn + 0.7)} />
+            </div>
+            <Selection x={0} y={0} w={rw} h={rh} o={selR} label="Filtered Result" comp size={`${RESULT.w} × ${RESULT.h}`} k={sk} />
+          </Abs>
+        )}
       </div>
+      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.35, 0.6) * (1 - exit)} pr={clicks} rp={rips} s={port ? 2 : 1.5} />
     </>
   )
 }
