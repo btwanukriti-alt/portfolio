@@ -1,24 +1,22 @@
 :root {
-  --color-bg: #0a0a0d;
-  --color-text: #ffffff;
-  --color-ink: #000000;
-  --color-accent: #5d65ff;
+  --pearl: #f7f6fb;
+  --pearl-2: #eeecf6;
+  --ink: #1e1b3a;
+  --ink-2: #5f5c7a;
+  --ink-3: #9a98b0;
+  --hairline: rgb(30 27 58 / 0.12);
+  --gold: #b88c3e;
+  --violet: #7662e2;
 
-  --font-display: 'Rubik Mono One', system-ui, sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
-  /* Figma Hand isn't a public web font; Architects Daughter is the closest match. */
-  --font-hand: 'Architects Daughter', 'Comic Sans MS', cursive;
+  --sans: 'Geist', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-  /* One Figma pixel. On desktop the 1440 x 725 frame scales to fit the window. */
-  --px: 1px;
+  --gutter: clamp(16px, 4vw, 64px);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  color-scheme: dark;
-}
-
-@media (min-width: 901px) {
-  :root {
-    --px: min(calc(100vw / 1440), calc(100vh / 725));
-  }
+  color-scheme: light;
 }
 
 *,
@@ -27,21 +25,43 @@
   box-sizing: border-box;
 }
 
-html,
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--pearl);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 img {
   display: block;
+  max-width: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+::selection {
+  color: var(--pearl);
+  background: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 3px;
+}
+
+/* A whisper of film grain over everything. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }

@@ -1,22 +1,20 @@
-import Hero from './components/Hero'
+import { useEffect } from 'react'
+import Header from './components/Header'
+import Story from './components/Story'
 import Work from './components/Work'
-import About from './components/About'
 import Contact from './components/Contact'
-import CaseStudy from './components/CaseStudy'
-import { PROJECTS } from './data/projects'
-import { useHashRoute } from './useHashRoute'
+import { startSmoothScroll } from './smoothScroll'
 
 export default function App() {
-  const { caseStudy } = useHashRoute()
-  const project = caseStudy ? PROJECTS.find((p) => p.slug === caseStudy) : undefined
-
-  if (project) return <CaseStudy key={project.slug} project={project} />
+  useEffect(() => startSmoothScroll(), [])
 
   return (
     <>
-      <Hero />
-      <Work />
-      <About />
+      <Header />
+      <main id="top">
+        <Story />
+        <Work />
+      </main>
       <Contact />
     </>
   )

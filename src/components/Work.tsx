@@ -1,83 +1,55 @@
-import { useEffect, useRef, type CSSProperties } from 'react'
-import LineBackground from './LineBackground'
-import cardLines from '../assets/work/card-lines.svg'
-import { PROJECTS, caseStudyHref } from '../data/projects'
+import { useRef, type CSSProperties } from 'react'
+import { PROJECTS } from '../data/projects'
+import { useReveal } from '../useReveal'
 import styles from './Work.module.css'
 
-// Figma "Homepage — Paper" (156:14295) work list: five "Zync C" cards, 1440 x 650 each.
-
-// How much a card shrinks and dims once the next one fully covers it.
-const COVERED_SCALE = 0.06
-const COVERED_DIM = 0.45
-
 export default function Work() {
-  const cards = useRef<(HTMLElement | null)[]>([])
-
-  // Cards pin via position: sticky; this only adds the "pushed back" look as the next card slides over.
-  useEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let frame = 0
-
-    const update = () => {
-      frame = 0
-      const els = cards.current
-      els.forEach((card, i) => {
-        const next = els[i + 1]
-        if (!card) return
-        let covered = 0
-        if (next) {
-          const a = card.getBoundingClientRect()
-          const b = next.getBoundingClientRect()
-          covered = Math.min(1, Math.max(0, (a.bottom - b.top) / a.height))
-        }
-        const scale = reduceMotion.matches ? 1 : 1 - COVERED_SCALE * covered
-        card.style.setProperty('--covered-scale', String(scale))
-        card.style.setProperty('--covered-dim', String(COVERED_DIM * covered))
-      })
-    }
-
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule)
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
-    }
-  }, [])
+  const root = useRef<HTMLElement>(null)
+  useReveal(root)
 
   return (
-    <section id="work" className={styles.work} aria-label="Work">
-      {PROJECTS.map((project, i) => (
-        <article
-          key={project.title}
-          ref={(el) => {
-            cards.current[i] = el
-          }}
-          className={styles.card}
-          style={{ '--i': i } as CSSProperties}
-        >
-          <LineBackground src={cardLines} />
-          <div className={styles.inner}>
-            <div className={styles.copy}>
-              <div className={styles.text}>
-                <h2 className={styles.title}>{project.title}</h2>
-                <p className={styles.description}>{project.description}</p>
+    <section ref={root} id="work" className={styles.work} aria-labelledby="work-title">
+      <header className={styles.head}>
+        <p className={styles.eyebrow} data-reveal>
+          <span aria-hidden="true">✦</span> Selected work
+        </p>
+        <h2 id="work-title" className={styles.title} data-reveal>
+          Where the crafts <em>land.</em>
+          <sup className={styles.count}>({String(PROJECTS.length).padStart(2, '0')})</sup>
+        </h2>
+        <p className={styles.lede} data-reveal>
+          A few projects where research, identity and interface had to work as one.
+        </p>
+      </header>
+
+      <ol className={styles.grid}>
+        {PROJECTS.map((project, i) => (
+          <li
+            key={project.slug}
+            className={styles.item}
+            data-reveal
+            style={{ '--stagger': `${(i % 2) * 0.12}s` } as CSSProperties}
+          >
+            <article className={styles.card}>
+              <div className={styles.frame}>
+                <img src={project.card} alt="" width={628} height={428} loading="lazy" decoding="async" />
+                <span className={styles.peek}>Case study soon</span>
               </div>
-              <a className={styles.button} href={caseStudyHref(project.slug)}>
-                Open Project
-              </a>
-            </div>
-            <div className={styles.frame}>
-              <img src={project.card}width={628} height={428} alt={`${project.title} screens`} loading="lazy" />
-            </div>
-          </div>
-          <div className={styles.shade} aria-hidden="true" />
-        </article>
-      ))}
+              <div className={styles.meta}>
+                <span className={styles.index}>{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3 className={styles.name}>{project.title}</h3>
+                  <p className={styles.desc}>{project.description}</p>
+                </div>
+                <p className={styles.facts}>
+                  <span>{project.role}</span>
+                  <span>{project.timeline}</span>
+                </p>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
     </section>
   )
 }

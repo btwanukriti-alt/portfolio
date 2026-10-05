@@ -1,28 +1,49 @@
+import { useRef } from 'react'
+import { useReveal } from '../useReveal'
 import styles from './Contact.module.css'
 
-// Figma "Contact — Paper (New)" (156:14595). Email and phone are the design's placeholders.
-const EMAIL = 'your@email.com'
-const PHONE = 'phone number'
+// Placeholders until the real addresses are supplied.
+const EMAIL = 'hello@example.com'
+const LINKS = [
+  { label: 'LinkedIn', href: '#' },
+  { label: 'Dribbble', href: '#' },
+  { label: 'Behance', href: '#' },
+]
 
-export default function Contact({ className }: { className?: string }) {
+export default function Contact() {
+  const root = useRef<HTMLElement>(null)
+  useReveal(root)
+
   return (
-    <footer
-      id="reach-out"
-      className={className ? `${styles.contact} ${className}` : styles.contact}
-      aria-labelledby="contact-heading"
-    >
-      <h2 id="contact-heading" className={styles.heading}>
-        lets
-        <br />
-        connect
-      </h2>
-      <hr className={styles.rule} />
-      <ul className={styles.details}>
-        <li>
-          email : <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
-        </li>
-        <li>phone : {PHONE}</li>
-      </ul>
+    <footer ref={root} id="contact" className={styles.contact}>
+      <div className={styles.inner}>
+        <p className={styles.eyebrow} data-reveal>
+          <span aria-hidden="true">✦</span> Next chapter
+        </p>
+        <h2 className={styles.title} data-reveal>
+          Let's make something
+          <br />
+          <em>quietly magical.</em>
+        </h2>
+        <div className={styles.actions} data-reveal>
+          <a className={styles.cta} href={`mailto:${EMAIL}`}>
+            <span className={styles.ctaDot} aria-hidden="true" />
+            {EMAIL}
+            <span aria-hidden="true">↗</span>
+          </a>
+          <ul className={styles.links}>
+            {LINKS.map((link) => (
+              <li key={link.label}>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className={styles.base}>
+        <span>© {new Date().getFullYear()} Anukriti Mishra</span>
+        <span>Drawn in a few thousand dots</span>
+      </div>
     </footer>
   )
 }
