@@ -54,17 +54,10 @@ const env = (e, s, end, i = 0.6, o = 0.5) => {
 }
 const fmt = (n) => Math.round(n).toLocaleString('en-US')
 
-// ---------- Studio vocabulary (College Management layout on the lilac canvas) ----------
+// ---------- Studio vocabulary (College Management layout on a flat lilac canvas) ----------
 
-function Studio({ t }) {
-  const a = Math.sin(t * 0.22), b = Math.cos(t * 0.17)
-  const blob = (x, y, w, hh, c) => h('div', { style: { position: 'absolute', left: x, top: y, width: w, height: hh, borderRadius: '50%', background: `radial-gradient(closest-side, ${c}, transparent)` } })
+function Studio() {
   return h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden', background: '#DCCFFF' } },
-    blob(-260 + a * 70, -340 + b * 40, 1300, 1000, 'rgba(164,140,255,0.45)'),
-    blob(1050 - a * 80, -260 + a * 30, 1200, 900, 'rgba(255,194,221,0.55)'),
-    blob(520 + b * 90, 640, 1100, 760, 'rgba(255,255,255,0.30)'),
-    blob(-200, 700 + a * 30, 900, 700, 'rgba(255,194,221,0.35)'),
-    h('div', { style: { position: 'absolute', left: 260, top: 160, width: 1400, height: 900, borderRadius: '50%', background: 'radial-gradient(closest-side, rgba(255,255,255,0.45), rgba(255,255,255,0))' } }),
     h('svg', { width: W, height: H, style: { position: 'absolute', inset: 0, opacity: 0.05, mixBlendMode: 'multiply' } },
       h('filter', { id: 'gr' }, h('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.85', numOctaves: '2', seed: '3' })),
       h('rect', { width: W, height: H, filter: 'url(#gr)' })),
@@ -615,7 +608,7 @@ function Outro({ t }) { return h(Trackers, { t, s0: 18.4 + IN, end: BASE, out: r
 
 function Frame({ t }) {
   return h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden' } },
-    h(Studio, { t }),
+    h(Studio),
     t < 4.6 && h(Intro, { t }),
     t > 3.5 + IN && t < 9.6 + IN && h(LogScene, { t: t - IN }),
     t > 9.3 + IN && t < 13 + SHIFT && h(WorkoutScene, { t: t - SHIFT }),
