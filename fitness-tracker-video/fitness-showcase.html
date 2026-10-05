@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Showcase</title>
+<title>Fitness App Showcase</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>:root{color-scheme:dark;--bg:#000}html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}*{-webkit-font-smoothing:antialiased}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
@@ -630,16 +630,5 @@ function Player() {
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(Player, null))
 </script>
-<script>(function(){
-const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
-let ready=false,want=false,pos=0,since=0,timer=0;
-const z=()=>window.__zync;
-const play=()=>{want=true;if(!ready||still)return;clearTimeout(timer);z().seek(pos);z().play();since=performance.now();timer=setTimeout(()=>{pos=0;play()},(z().duration-pos)*1000)};
-const pause=()=>{if(ready&&want){pos=(pos+(performance.now()-since)/1000)%z().duration;z().pause();clearTimeout(timer)}want=false};
-const init=()=>{if(!z())return setTimeout(init,50);
-dispatchEvent(new KeyboardEvent("keydown",{key:"h",code:"KeyH"}));
-pos=z().duration*(still?0.3:0.05);z().pause();z().seek(pos);ready=true;if(want){want=false;play()}};
-addEventListener("message",e=>{if(e.data==="showcase:play")play();else if(e.data==="showcase:pause")pause()});
-init();
-})()</script></body>
+</body>
 </html>
