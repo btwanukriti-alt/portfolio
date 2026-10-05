@@ -2,14 +2,9 @@
 
 Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/clihub.html`). Real screens from Figma *Portfolio* (section 250:32492) are shown as a working prototype.
 
-**Brief (Anu, rounds 6–8):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with zoom in / zoom out and more infographics.
+**Brief (Anu, rounds 6–11):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
 
-**Camera (rounds 9–10):** full view by default. The window frame stays fixed and the screen zooms inside it. The camera zooms only to highlight a key moment, with a short punch-in (about 0.3s in, a brief hold, back out). There are three:
-- **Create Host:** the click.
-- **Ask AI:** the answer.
-- **Connect to Host:** the click that starts the upload.
-
-The **Connect** and **Monitor (dashboard)** steps never zoom.
+**Camera (round 11):** no zoom anywhere. The screen stays at full view for the whole cut; the motion comes from the cursor, screen changes, callouts and the loop transition.
 
 **Infographic callouts (round 8):** dark cards beside the frame, each tied to its spot in the UI by a dashed leader line and a pulsing target dot that follow the camera.
 - **New host:** a checklist (Address / Port / Label).
