@@ -53,7 +53,7 @@ const Bar = ({ f, h = 8, fill = C.green, track = C.line2, r }) => (
 // ---------- Flow: the stacked-drawer prototype ----------
 // One consistent data set (see the storyboard's data notes): five colleges add up to the
 // design's ₹94.30 Cr received; each level of the drill-down adds up to its parent.
-const COLLEGES = [
+export const COLLEGES = [
   ['Engineering College', 28.5, 32.0],
   ['Medical College', 22.4, 27.5],
   ['Science College', 18.2, 21.0],
@@ -408,6 +408,54 @@ export function OverviewWindow({ k = 1 }) {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ---------- Conclusion ----------
+// Summary tile (native w × h): an icon, a label and a value that counts with p.
+export const SUMMARY = [
+  ['Colleges', 5, (v) => fmt(v), IC.bank, C.primary, C.pSoft],
+  ['Fees received', 94.3, (v) => cr(v), IC.rupee, C.navy2, '#E4E9F2'],
+  ['Collected', 82.1, (v) => `${fmt(v, 1)}%`, IC.income, C.green, C.gSoft],
+  ['Staff present today', 1415, (v) => fmt(v), IC.users, C.violet, C.vSoft],
+]
+export function SummaryTile({ item, p = 1, w, h }) {
+  const [label, value, show, icon, tint, bg] = item
+  return (
+    <div style={card({ width: w, height: h, padding: '0 22px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: lift })}>
+      <IconTile icon={icon} tint={tint} bg={bg} s={52} i={26} r={14} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 14, color: C.sub, whiteSpace: 'nowrap' }}>{label}</div>
+        <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{show(value * p)}</div>
+      </div>
+    </div>
+  )
+}
+// Collection by college: one bar per college, growing with bars(i) (0..1).
+export function CollegeBars({ w, h, bars, p = 1 }) {
+  return (
+    <div style={card({ width: w, height: h, padding: '24px 28px', boxShadow: lift, display: 'flex', flexDirection: 'column' })}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 32 }}>
+        <span style={{ fontSize: 18, fontWeight: 600 }}>Collection by college</span>
+        <Chip fg={C.t2} bg={C.page} h={30}>AY 2025–26{IC.chev(C.sub, 14)}</Chip>
+      </div>
+      <div style={{ flex: 1, display: 'grid', alignContent: 'space-evenly' }}>
+        {COLLEGES.map(([n, rec, exp], i) => {
+          const pct = (rec / exp) * 100
+          const b = bars(i)
+          return (
+            <div key={n} style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.6fr 70px', alignItems: 'center', gap: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                <IconTile icon={IC.bank} s={30} i={16} r={8} />
+                <span style={{ fontSize: 15, fontWeight: 500, color: C.link, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{n}</span>
+              </div>
+              <Bar f={(pct / 100) * b * p} h={12} fill={pct >= 85 ? 'linear-gradient(90deg,#16A34A,#5EE0A1)' : 'linear-gradient(90deg,#F5A524,#FFD27A)'} />
+              <span style={{ textAlign: 'right', fontSize: 15, fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: pct >= 85 ? C.green : '#B26A00' }}>{fmt(pct * b, 1)}%</span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

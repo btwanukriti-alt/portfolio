@@ -1,13 +1,14 @@
-// The two scenes of the 8.6s cut, each a pure function of the clock `t` and the layout
+// The three scenes of the 11.3s cut, each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the college management Figma
 // frames (section 267:97221).
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
 //   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
 //       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
-import { Cursor, Selection } from './fig.jsx'
+//   3 · Conclusion: the key figures snap into an auto-layout row; collection by college grows.
+import { Cursor, Selection, Spacing } from './fig.jsx'
 import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip } from './ui.jsx'
+import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SUMMARY, SheetCard, StatChip, SummaryTile, CollegeBars } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -214,6 +215,56 @@ export function Flow({ t, L, W }) {
         </Abs>
       </div>
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.55, 0.8) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
+    </>
+  )
+}
+
+// =====================================================================================
+// 3 · CONCLUSION: the key figures snap into an auto-layout row and collection by college grows
+// =====================================================================================
+const END = {
+  land: { tw: 340, th: 128, gap: 24, row: (i) => ({ x: 244 + i * 364, y: 330 }), box: { x: 228, y: 314, w: 1464, h: 160 }, bars: { x: 244, y: 522, w: 1432, h: 420 }, cursor: { from: { x: 2000, y: 1120 }, to: { x: 1700, y: 960 } } },
+  port: { tw: 460, th: 150, gap: 24, row: (i) => ({ x: 68 + (i % 2) * 484, y: 540 + Math.floor(i / 2) * 174 }), box: { x: 52, y: 524, w: 976, h: 356 }, bars: { x: 68, y: 930, w: 944, h: 760 }, cursor: { from: { x: 1150, y: 1950 }, to: { x: 930, y: 1780 } } },
+}
+export function Conclusion({ t, L, W }) {
+  const u = local(t, 'end')
+  if (u === null) return null
+  const port = L === 'port'
+  const D = END[L]
+  const exit = P(u, 2.3, 2.7, E.inOut)
+  const sel = u > 1.15 ? P(u, 1.15, 1.3) * (1 - P(u, 2.05, 2.2)) : 0
+  const gap = u > 1.2 ? P(u, 1.2, 1.35) * (1 - P(u, 2.05, 2.2)) : 0
+  const cp = P(u, 0.8, 1.5, E.expo)
+  const csw = sway(u, 2, 5)
+  const bk = 0.88 + 0.12 * E.back(clamp((u - 0.4) / 0.5))
+  return (
+    <>
+      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="College management software" lines={port ? ['Every college’s fees', 'in one view.'] : ['Every college’s fees in one view.']} />
+      <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
+        {SUMMARY.map((item, i) => {
+          const a = 0.1 + i * 0.09
+          const to = D.row(i)
+          const pp = E.back(clamp((u - a) / 0.45))
+          return (
+            <Abs key={item[0]} x={to.x} y={to.y + (1 - P(u, a, a + 0.5, E.expo)) * 60} style={{ opacity: clamp((u - a) / 0.15), transform: `scale(${0.85 + 0.15 * pp})`, zIndex: 10 }}>
+              <div style={{ transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '0 0' }}>
+                <SummaryTile item={item} p={P(u, a + 0.2, a + 1.0)} w={D.tw / (port ? 1.3 : 1)} h={D.th / (port ? 1.3 : 1)} />
+              </div>
+            </Abs>
+          )
+        })}
+        <Selection {...D.box} o={sel} label="Summary · Auto layout" size="Hug × Hug" k={port ? 1.4 : 1.2} />
+        {(port ? [0, 1] : [0, 1, 2]).map((i) => {
+          const r = D.row(port ? i * 2 : i)
+          return <Spacing key={i} x1={r.x + D.tw} x2={r.x + D.tw + D.gap} y={r.y} h={D.th} o={gap} value="24" />
+        })}
+        <Abs x={D.bars.x} y={D.bars.y} style={{ opacity: clamp((u - 0.4) / 0.2), transform: `scale(${bk})`, transformOrigin: '50% 30%', zIndex: 9 }}>
+          <div style={{ transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '0 0' }}>
+            <CollegeBars w={D.bars.w / (port ? 1.3 : 1)} h={D.bars.h / (port ? 1.3 : 1)} bars={(i) => P(u, 0.6 + i * 0.07, 1.4 + i * 0.07, E.out)} />
+          </div>
+        </Abs>
+        <Cursor x={lerp(D.cursor.from.x, D.cursor.to.x, cp) + csw.x} y={lerp(D.cursor.from.y, D.cursor.to.y, cp) + csw.y} o={P(u, 0.8, 1.1)} s={port ? 2 : 1.5} />
+      </div>
     </>
   )
 }

@@ -4,12 +4,13 @@ The College Management card video in the Selected Work boxes and the case-study 
 
 **Source:** Figma `Portfolio`, section "Dhondi" (267:97221): Finance Dashboard (267:97222), Staff Dashboard (267:98194), Attendance (267:104429), Revenue Contribution (267:102038) and the stacked college drawers (Drawer_College frames, e.g. 267:102278, 267:103274, 267:103813, 267:103606).
 
-**Length:** an 8.6s loop of two scenes (intro and drill-down); there is no closing modules scene. The drill-down fades out and the intro starts again on the same blue.
+**Length:** an 11.3s loop of three scenes: intro, drill-down and a summary conclusion. There is no modules scene. The conclusion fades out and the intro starts again on the same blue.
 
 | Time | Scene | Copy | Visual |
 |---|---|---|---|
 | 0:00–0:03.4 | **Intro** | COLLEGE MANAGEMENT SOFTWARE / **Track fees and staff across your colleges.** | The cursor drags out a frame, *Financial overview*, with a live size label. It fills with the Financial Overview dashboard: ₹94.30 Cr received counts up, the 82% collected bar fills and the Collection Progress line draws. Three components land around it, each selected as it arrives: Alert Card (Fee reduced ₹20,000 → ₹17,000), KPI Card (Present Staff 1,415, ↑8.2% vs yesterday) and Leave Type (On Leave 128 donut). Everything fades out together. |
 | 0:03.4–0:08.6 | **Flow: stacked drawers** | FINANCE / **Drill down from college to fee.** | Each drill-down level is a full sheet. *Revenue Contribution* pops in as a component, with ₹94.30 Cr counting up over five college rows, and a breadcrumb starts at "All colleges". A floating stat chip (collected ring + pending) lands on its corner. The cursor clicks **Engineering College**: the row shows a blue prototype hotspot ("On click → Open drawer") and the Engineering drawer pops in on top. The previous sheet is pushed back (smaller, tilted, faded into the blue), the stack re-centres, the breadcrumb adds "Engineering College", and the stat chip hands over and counts to ₹3.50 Cr pending. **B.Tech** and then **Tuition Fee** stack the same way. The result is a fanned deck of four sheets, the full trail All colleges › Engineering College › B.Tech › Tuition Fee, and ₹11.20 Cr / ₹1.60 Cr pending. In portrait the sheets stack upwards, so each earlier level peeks out above the next. |
+| 0:08.6–0:11.3 | **Conclusion** | COLLEGE MANAGEMENT SOFTWARE / **Every college’s fees in one view.** | Four summary tiles rise and pop into a row, counting up: Colleges 5, Fees received ₹94.30 Cr, Collected 82.1% and Staff present today 1,415. They are selected as *Summary · Auto layout* (Hug × Hug), with pink 24px gap markers. Below, a *Collection by college* card grows one bar per college: Engineering 89.1%, Medical 81.5%, Science 86.7%, Law 71.1%, Arts & Management 76.1%. Everything fades together and the loop restarts. |
 
 ## UI refinements and data notes
 - **Removed:** the logo, plus the group's name everywhere. "CMR Engineering College" becomes "Engineering College". The sidebar's logo slot becomes an "All Colleges" workspace switcher.
@@ -55,6 +56,7 @@ The College Management card video in the Selected Work boxes and the case-study 
 - **Copy tightened:**
   - Alert copy: "Receipt cancelled · Cancelled after an incorrect amount entry"; "Fee reduced · ₹20,000 → ₹17,000 after concession approval".
   - The Fee updated card names a student, "Ananya K · B.Tech 2023", from the design's alert.
+- **Conclusion figures:** all from the same data set (5 colleges, ₹94.30 Cr, 82.1%) plus the design's Present Staff, labelled "Staff present today".
 - **Present Staff:** stays at the design's 1,415. The design's Total Staff (1,250) is lower than its Present Staff, so Total Staff isn't shown.
 - **Collection Progress:** the curve is read off the design's chart, and the axis is labelled ₹ Cr (the design said "Crores").
 
