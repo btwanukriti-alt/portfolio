@@ -5,18 +5,16 @@
 //   'showcase:pause' from the portfolio's work card.
 // window.__showcase = { seek(t), play(), pause(), duration, t } for tests and captures.
 import { useEffect, useRef, useState } from 'react'
-import { DURATION } from './lib.js'
-import { Background } from './stage.jsx'
-import { Scenes } from './scenes.jsx'
+import { Stage, DURATION } from './Showcase.jsx'
 
 const embed = typeof window !== 'undefined' && (window.__SHOWCASE_EMBED__ || new URLSearchParams(location.search).has('embed'))
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches
-const STILL_T = 2.6
+const STILL_T = 7.6
 
 export default function App() {
-  const [t, setT] = useState(still ? STILL_T : embed ? 0.6 : 0)
+  const [t, setT] = useState(still ? STILL_T : embed ? 1.2 : 0)
   const [size, setSize] = useState({ w: innerWidth, h: innerHeight })
-  const clock = useRef({ t: still ? STILL_T : embed ? 0.6 : 0, playing: false, frame: 0, last: 0 })
+  const clock = useRef({ t: still ? STILL_T : embed ? 1.2 : 0, playing: false, frame: 0, last: 0 })
 
   useEffect(() => {
     const c = clock.current
@@ -71,34 +69,15 @@ export default function App() {
     }
   }, [])
 
+  // One 1920x1080 composition, fitted whole; the backdrop extends to fill the rest. On tall
+  // screens it may crop up to 100px of empty margin per side so the screens read larger.
   const { w, h } = size
-  const mode = w / h < 1 ? 'port' : 'land'
-  const BW = mode === 'port' ? 1080 : 1920
-  const BH = mode === 'port' ? 1920 : 1080
-  const iw = w
-  const ih = h
-  // Fit the base stage, then extend it to the canvas aspect so the content can be centred in
-  // the extra room instead of leaving empty bands.
-  const s = Math.min(iw / BW, ih / BH)
-  const SW = iw / s
-  const SH = ih / s
-
+  const s = Math.max(Math.min(w / 1920, h / 1080), Math.min(w / 1720, h / 1080))
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: '#B9C7DB', cursor: embed ? 'default' : 'pointer' }}>
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-        <Background t={t} w={iw} h={ih} />
-        <div
-          style={{
-            position: 'absolute',
-            left: (iw - SW * s) / 2,
-            top: (ih - SH * s) / 2,
-            width: SW,
-            height: SH,
-            transform: `scale(${s})`,
-            transformOrigin: '0 0',
-          }}
-        >
-          <Scenes t={t} mode={mode} sw={SW} sh={SH} />
+      <div style={{ position: 'absolute', left: 0, top: 0, transform: `scale(${s})`, transformOrigin: '0 0' }}>
+        <div style={{ position: 'absolute', left: Math.min(0, (w / s - 1920) / 2), top: 0 }}>
+          <Stage t={t} sw={Math.max(1920, w / s)} sh={h / s} />
         </div>
       </div>
     </div>

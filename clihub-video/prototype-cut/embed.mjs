@@ -1,4 +1,4 @@
-// Builds the cut and writes the single-file card embed to public/showcase/clihub.html.
+// Builds the cut and writes the single-file card embed (images inlined) to public/showcase/clihub.html.
 // The embed waits for postMessage 'showcase:play' / 'showcase:pause' from the work card.
 import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
