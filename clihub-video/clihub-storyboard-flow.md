@@ -1,8 +1,12 @@
-# clihub: 18.7s product-flow cut (loop)
+# clihub: 26.2s product-flow cut (loop)
 
 Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/clihub.html`). Real screens from Figma *Portfolio* (section 250:32492) are shown as a working prototype.
 
-**Brief (Anu, rounds 6–13):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
+**Pace (round 14):** the timeline below is authored at base speed and plays 1.4× slower (`PACE` in `Showcase.jsx`): 18.7s base, 26.2s real. Multiply the times in the table by 1.4 for real seconds.
+
+**Callouts (round 14):** docked over the window's edge (60px overlap, 300px wide) instead of the canvas edges, so they never run off screen at any aspect. "New host" sits on the empty left side of its screen.
+
+**Brief (Anu, rounds 6–14):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
 
 **Camera (round 11):** no zoom anywhere. The screen stays at full view for the whole cut; the motion comes from the cursor, screen changes, callouts and the loop transition.
 

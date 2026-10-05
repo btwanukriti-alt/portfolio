@@ -9,7 +9,7 @@ import { Stage, DURATION } from './Showcase.jsx'
 
 const embed = typeof window !== 'undefined' && (window.__SHOWCASE_EMBED__ || new URLSearchParams(location.search).has('embed'))
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches
-const STILL_T = 8.6
+const STILL_T = 12.0
 
 export default function App() {
   const [t, setT] = useState(still ? STILL_T : embed ? 1.2 : 0)

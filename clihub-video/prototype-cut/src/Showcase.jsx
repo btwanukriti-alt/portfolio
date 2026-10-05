@@ -1,4 +1,4 @@
-// clihub: 18.7s product-flow cut (loop). How the app is used, step by step, on the real screens
+// clihub: 26.2s product-flow cut (loop; authored at 18.7s base, played at PACE 1.4). How the app is used, step by step, on the real screens
 // from the clihub Figma file: a dragged selection box opens the window, then 1 Add a host,
 // 2 Connect, 3 Monitor (all five dashboard tabs), 4 Run commands, 5 Move files. Each step has a
 // headline and one plain line beneath it. Grey canvas, no
@@ -349,7 +349,7 @@ const Donut = ({ p, v, color, size = 84 }) => (
 );
 // CPU usage over the day, traced from the Performance chart (values in %).
 const CPU_DAY = [52, 44, 35, 27, 31, 38, 46, 58, 72, 61, 50, 49, 56, 47, 38, 41, 52, 63, 66, 65, 62];
-const Spark = ({ p, data, color, w = 230, h = 54 }) => {
+const Spark = ({ p, data, color, w = 250, h = 50 }) => {
   const n = data.length, pts = data.map((v, i) => [(i / (n - 1)) * w, h - (v / 80) * h]);
   const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
   return (
@@ -359,7 +359,7 @@ const Spark = ({ p, data, color, w = 230, h = 54 }) => {
     </svg>
   );
 };
-const Bars = ({ t, color, seed, n = 14, w = 120, h = 34 }) => (
+const Bars = ({ t, color, seed, n = 12, w = 104, h = 32 }) => (
   <svg width={w} height={h}>{Array.from({ length: n }, (_, k) => { const bh = 5 + (h - 6) * Math.abs(Math.sin(k * 1.7 + seed + t * 2.4)); return <rect key={k} x={k * (w / n)} y={h - bh} width={w / n - 3} height={bh} rx="1.5" fill={color} />; })}</svg>
 );
 const Check = ({ on }) => (
@@ -369,7 +369,7 @@ const Check = ({ on }) => (
 );
 
 const CALLOUTS = [
-  { a: 3.7, b: 4.62, side: "right", top: 330, at: { x: 1050, y: 460 }, body: (p) => (<>
+  { a: 3.7, b: 4.62, side: "left", top: 470, at: { x: 1050, y: 460 }, body: (p) => (<>
     <Lbl>New host</Lbl>
     {[["Address", "192.168.1.100"], ["Port", "22"], ["Label", "API Gateway"]].map(([k, v], i) => (
       <div key={k} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", fontSize: 16 }}><Check on={p > 0.2 + i * 0.25} /><span style={{ color: G.sub, width: 70 }}>{k}</span><span>{v}</span></div>))}
@@ -422,7 +422,7 @@ const CALLOUTS = [
         {[["This computer", "M3 5h18v11H3zM8 20h8M12 16v4"], ["Server", "M4 4h16v6H4zM4 14h16v6H4z"]].map(([n, d]) => (
           <div key={n} style={{ textAlign: "center", width: 80, zIndex: 1 }}><div style={{ width: 44, height: 44, margin: "0 auto", borderRadius: 12, background: G.line, display: "grid", placeItems: "center" }}><svg width="22" height="22" viewBox="0 0 24 24"><path d={d} fill="none" stroke={G.text} strokeWidth="1.8" strokeLinejoin="round" /></svg></div><div style={{ fontSize: 12, color: G.sub, marginTop: 4 }}>{n}</div></div>))}
         <div style={{ position: "absolute", left: 66, right: 66, top: 22, borderTop: `2px dashed ${G.line}` }} />
-        {f < 1 && <div style={{ position: "absolute", top: 13, left: 66 + (260 - 132 - 18) * ((t0 * 1.6) % 1), width: 18, height: 18, borderRadius: 4, background: G.purple }} />}
+        {f < 1 && <div style={{ position: "absolute", top: 13, left: 66 + (260 - 132 - 18) * ((t0 * 1.1) % 1), width: 18, height: 18, borderRadius: 4, background: G.purple }} />}
       </div>
       <div style={{ height: 8, borderRadius: 4, background: G.line, marginTop: 6 }}><div style={{ height: 8, borderRadius: 4, width: `${100 * f}%`, background: f < 1 ? G.purple : "#4FA084" }} /></div>
       <div style={{ fontSize: 14, color: f < 1 ? G.text : G.ok, marginTop: 8 }}>{f < 1 ? `Uploading ${Math.round(100 * f)}%` : "✓ Uploaded"}</div>
@@ -439,7 +439,8 @@ function Callouts({ t }) {
         const e = inOut(t, k.a, k.b, 0.35, 0.3);
         if (e <= 0.001) return null;
         const p = prog(t, k.a + 0.1, k.a + 0.85);
-        const W = 320, X = k.side === "left" ? 90 : 1920 - 90 - W;
+        // Docked over the window's edge (60px overlap), so they stay on screen at every aspect.
+        const W = 300, X = k.side === "left" ? FX - W + 60 : FX + FW - 60;
         const anchor = { x: k.side === "left" ? X + W : X, y: k.top + 34 };
         const pr = project(c, k.at);
         const tgt = { x: clamp(pr.x, FX + 18, FX + FW - 18), y: clamp(pr.y, FY + 18, FY + FH - 18) };
@@ -510,9 +511,15 @@ function Backdrop({ t, w, h }) {
   );
 }
 
+// The timeline above is authored at base speed; PACE slows the whole cut evenly so every
+// beat, cursor move and callout has time to read.
+const PACE = 1.4;
+const TOTAL = DURATION * PACE;
+
 // sw x sh is the canvas in stage px (at least 1920x1080): the backdrop fills it and the
-// 1920x1080 composition sits centred.
-export function Stage({ t, sw = 1920, sh = 1080 }) {
+// 1920x1080 composition sits centred. tReal is real seconds.
+export function Stage({ t: tReal, sw = 1920, sh = 1080 }) {
+  const t = tReal / PACE;
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: sw, height: sh, overflow: "hidden", fontFamily: FONT, WebkitFontSmoothing: "antialiased" }}>
       <Backdrop t={t} w={sw} h={sh} />
@@ -539,4 +546,4 @@ export function Stage({ t, sw = 1920, sh = 1080 }) {
   );
 }
 
-export { DURATION };
+export { TOTAL as DURATION };
