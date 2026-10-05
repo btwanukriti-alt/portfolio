@@ -1,5 +1,5 @@
 // The stage: one lilac background for the whole piece with a few soft pastel shapes drifting,
-// and the black Figma-style selection frame around the whole canvas (corner handles).
+// and the black Figma-style selection frame (corner handles) that the canvas sits inside.
 import { BG } from './lib.js'
 
 // Shapes in viewport units: cx/cy as fractions, size as a fraction of the longer side (M).
@@ -41,9 +41,13 @@ export function Backdrop({ t, vw, vh }) {
   )
 }
 
-// Black selection frame around the whole canvas, inset from the edges, with corner handles.
+// Inset of the black selection frame from the viewport edges.
+export const frameInset = (vw, vh) => Math.round(Math.max(10, Math.min(28, Math.min(vw, vh) * 0.022)))
+
+// Black selection frame around the canvas, inset from the edges, with corner handles. The canvas
+// itself is clipped to the inside of this frame (see App).
 export function CanvasFrame({ vw, vh }) {
-  const m = Math.round(Math.max(10, Math.min(28, Math.min(vw, vh) * 0.022)))
+  const m = frameInset(vw, vh)
   const hs = Math.round(Math.max(7, Math.min(11, Math.min(vw, vh) * 0.009)))
   const handle = (left, top) => <div key={`${left}${top}`} style={{ position: 'absolute', left: left - hs / 2, top: top - hs / 2, width: hs, height: hs, background: '#fff', border: '1.5px solid #111', boxSizing: 'border-box' }} />
   return (

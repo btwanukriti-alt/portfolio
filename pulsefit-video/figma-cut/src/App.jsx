@@ -1,10 +1,12 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { BG, DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
+import { DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
 import { Hook, Leads, Modules } from './scenes.jsx'
-import { Backdrop, CanvasFrame } from './stage.jsx'
+import { Backdrop, CanvasFrame, frameInset } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
 // poster frame until the page posts 'showcase:play', looping after that.
+// Outside the selection frame: a plain light canvas.
+const OUTSIDE = '#F4F2FA'
 const EMBED = typeof window !== 'undefined' && (window.__EMBED__ || /[?&]embed\b/.test(location.search))
 const STILL = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -58,7 +60,7 @@ export default function App() {
       c.last = 0
       render()
     }
-    window.__pulsefit = { seek, play, pause, duration: DURATION, get t() { return c.t } }
+    window.__showcase = { seek, play, pause, duration: DURATION, get t() { return c.t } }
     if (c.playing) c.raf = requestAnimationFrame(tick)
     const onMsg = (e) => (e.data === 'showcase:play' ? play() : e.data === 'showcase:pause' ? pause() : null)
     const onKey = (e) => {
@@ -97,19 +99,25 @@ export default function App() {
   }, [])
 
   const { t, playing } = clock.current
-  const L = vw / vh < 0.9 ? 'port' : 'land'
+  // The canvas lives inside the black selection frame and never crosses it.
+  const m = frameInset(vw, vh)
+  const iw = vw - 2 * m
+  const ih = vh - 2 * m
+  const L = iw / ih < 0.9 ? 'port' : 'land'
   const { W, H } = STAGES[L]
-  const s = Math.min(vw / W, vh / H)
-  const st = { s, ox: (vw - W * s) / 2, oy: (vh - H * s) / 2, W, H }
+  const s = Math.min(iw / W, ih / H)
+  const st = { s, ox: (iw - W * s) / 2, oy: (ih - H * s) / 2, W, H }
   const props = { t, L, W, H }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: BG }}>
-      <Backdrop t={t} vw={vw} vh={vh} />
-      <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
-        <Hook {...props} />
-        <Leads {...props} />
-        <Modules {...props} />
+    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: OUTSIDE }}>
+      <div style={{ position: 'absolute', left: m, top: m, width: iw, height: ih, overflow: 'hidden' }}>
+        <Backdrop t={t} vw={iw} vh={ih} />
+        <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
+          <Hook {...props} />
+          <Leads {...props} />
+          <Modules {...props} />
+        </div>
       </div>
       <CanvasFrame vw={vw} vh={vh} />
       {!ui.hidden && <Player t={t} playing={playing} idle={ui.idle} />}
@@ -118,7 +126,7 @@ export default function App() {
 }
 
 function Player({ t, playing, idle }) {
-  const api = window.__pulsefit
+  const api = window.__showcase
   const btn = { width: 36, height: 36, borderRadius: 18, border: 0, background: 'rgba(255,255,255,.14)', color: '#fff', display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0 }
   return (
     <div style={{ position: 'absolute', left: '50%', bottom: 'max(16px, env(safe-area-inset-bottom))', transform: `translate(-50%, ${idle ? 16 : 0}px)`, opacity: idle ? 0 : 1, transition: 'opacity .4s, transform .4s', display: 'flex', alignItems: 'center', gap: 10, padding: 8, borderRadius: 26, background: 'rgba(15,18,34,.72)', backdropFilter: 'blur(14px)', boxShadow: '0 12px 30px -12px rgba(0,0,0,.5)', zIndex: 100 }}>

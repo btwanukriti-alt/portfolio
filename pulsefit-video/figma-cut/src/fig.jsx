@@ -1,5 +1,5 @@
 // Figma editor vocabulary, drawn in stage coordinates: the cursor, selection boxes, component
-// labels, prototype noodles, auto-layout spacing and the canvas toolbar.
+// labels, prototype noodles and auto-layout spacing.
 import { E, FIG, UI_FONT, clamp } from './lib.js'
 
 const abs = (x, y, extra) => ({ position: 'absolute', left: x, top: y, ...extra })
@@ -89,29 +89,6 @@ export function Spacing({ x1, x2, y, h, o, value }) {
     <div style={abs(x1, y, { width: x2 - x1, height: h, opacity: o, zIndex: 35 })}>
       <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(135deg, rgba(242,72,34,.28) 0 3px, transparent 3px 7px)' }} />
       <div style={abs((x2 - x1) / 2, h / 2, { transform: 'translate(-50%,-50%)', background: FIG.spacing, color: '#fff', font: `600 13px/1 ${UI_FONT}`, padding: '4px 6px', borderRadius: 4 })}>{value}</div>
-    </div>
-  )
-}
-
-// Canvas toolbar (bottom of the editor). `active` is the tool index.
-export function Toolbar({ x, y, o, active }) {
-  if (o <= 0) return null
-  const st = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }
-  const tools = [
-    <path key="m" {...st} d="M6 4l12 7-5.4 1.4L10 18z" />,
-    <path key="f" {...st} d="M8 3v18M16 3v18M3 8h18M3 16h18" />,
-    <rect key="r" {...st} x="4.5" y="4.5" width="15" height="15" rx="1.5" />,
-    <path key="p" {...st} d="M12 3l6 9-6 9-6-9zM12 3v8" />,
-    <path key="t" {...st} d="M5 5h14M12 5v14" />,
-    <path key="c" {...st} d="M5 18.5V7.5A3.5 3.5 0 018.5 4h7A3.5 3.5 0 0119 7.5v4a3.5 3.5 0 01-3.5 3.5H9z" />,
-  ]
-  return (
-    <div style={abs(x, y, { transform: `translate(-50%, ${(1 - o) * 30}px)`, opacity: o, display: 'flex', gap: 6, padding: 8, background: '#fff', borderRadius: 16, boxShadow: '0 1px 0 rgba(0,0,0,.04), 0 18px 40px -16px rgba(10,14,40,.35)', zIndex: 20 })}>
-      {tools.map((p, i) => (
-        <div key={i} style={{ width: 48, height: 48, borderRadius: 11, display: 'grid', placeItems: 'center', color: i === active ? '#fff' : '#2B2F42', background: i === active ? FIG.sel : 'transparent' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24">{p}</svg>
-        </div>
-      ))}
     </div>
   )
 }

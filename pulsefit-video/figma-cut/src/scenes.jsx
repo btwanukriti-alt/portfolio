@@ -1,11 +1,11 @@
 // The three scenes of the 10s cut, each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the Pulsefit Figma frames.
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
-//       Pulsefit Members dashboard; product components land around it.
+//       Members dashboard; product components land around it.
 //   2 · Leads: the lead card → Convert to Member → Assign Plan flow, with selections,
 //       a prototype noodle and the total counting up.
 //   3 · Close: the seven modules snap into an auto-layout grid.
-import { Cursor, Noodle, Selection, Spacing, Toolbar } from './fig.jsx'
+import { Cursor, Noodle, Selection, Spacing } from './fig.jsx'
 import { C, E, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
 import { ASSIGN, AssignCard, KpiCard, LEAD, LeadCard, MODULES, MWIN, MembersWindow, ModuleTile, PlanMini, ScoreCard, ScoreChip } from './ui.jsx'
 
@@ -64,8 +64,7 @@ export function Hook({ t, L, W, H }) {
   const asw = sway(u, 1, u > 1.9 ? 6 : 0)
   return (
     <>
-      <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Pulsefit · gym management software" lines={port ? ['Run your whole gym', 'from one place.'] : ['Run your whole gym from one place.']} />
-      <Toolbar x={W / 2} y={port ? 1810 : 990} o={P(u, 0.05, 0.4) * (1 - exit)} active={u > 0.3 && u < 1.15 ? 1 : 0} />
+      <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Gym management software" lines={port ? ['Run your whole gym', 'from one place.'] : ['Run your whole gym from one place.']} />
       {u > 0.35 && (
         <div style={{ position: 'absolute', left: fr.x, top: fr.y, width: fr.w, height: fr.h, borderRadius: 16 * fill, background: '#fff', overflow: 'hidden', boxShadow: `0 40px 90px -40px rgba(40,30,110,${0.55 * fill})`, opacity: 1 - exit, transform: `translateY(${-30 * exit}px) scale(${1 - 0.03 * exit})` }}>
           <div style={{ opacity: fill, transform: `scale(${k})`, transformOrigin: '0 0' }}>
@@ -73,7 +72,7 @@ export function Hook({ t, L, W, H }) {
           </div>
         </div>
       )}
-      {u > 0.35 && <div style={{ position: 'absolute', left: F.x, top: F.y - 34, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * (1 - exit), whiteSpace: 'nowrap' }}>Pulsefit — Members</div>}
+      {u > 0.35 && <div style={{ position: 'absolute', left: F.x, top: F.y - 34, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * (1 - exit), whiteSpace: 'nowrap' }}>Members dashboard</div>}
       <Selection x={fr.x} y={fr.y} w={fr.w} h={fr.h} o={u > 0.35 ? 1 - P(u, 1.3, 1.55) : 0} size={`${Math.round(fr.w)} × ${Math.round(fr.h)}`} k={port ? 1.4 : 1} />
       {CARDS[L].map((c, i) => {
         const a = 1.45 + i * 0.22

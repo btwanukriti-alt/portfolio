@@ -183,9 +183,6 @@ export function PlanMini() {
 
 // ---------- Members window ----------
 const NAV = [['Dashboard', IC.grid], ['Members', IC.users], ['Leads', IC.star], ['Staff', IC.staff], ['Plans', IC.plans], ['Communication', IC.mail], ['Equipments', IC.dumbbell], ['Workouts', IC.heart]]
-const Mark = ({ s = 26 }) => (
-  <svg width={s} height={s} viewBox="0 0 26 26"><path d="M6 23.5L9.8 3h7.7a5.6 5.6 0 015.3 7l-.3 1.1a6 6 0 01-5.8 4.4H12.4L10.9 23.5z" fill={C.primary} /><path d="M13.7 7.6h3.4c1 0 1.8 1 1.5 2l-.3 1.2a2 2 0 01-1.9 1.4h-3.6z" fill={C.yellow} /></svg>
-)
 const EXP = [
   ['Robert Fox', '+91 98886 23443', 'Apurva Jha', 'Plan A', 'Today'],
   ['Neha Singh', '+91 98676 23562', 'Shikhar Tiwari', 'Plan B', '2 days'],
@@ -220,7 +217,7 @@ export function MembersWindow({ narrow = false, k = 1, rowHi = 0 }) {
       <div style={{ display: 'flex', height: G.h - 44 }}>
         {!narrow && (
           <div style={{ width: 232, flex: 'none', background: '#fff', borderRight: `1px solid ${C.line}`, padding: '20px 16px', boxSizing: 'border-box' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 36, padding: '0 8px', marginBottom: 20 }}><Mark /><span style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.02em' }}>Pulsefit</span></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 44, padding: '0 10px', marginBottom: 16, borderRadius: 10, background: C.page, fontSize: 14, fontWeight: 500, color: C.t2 }}><Avatar name="Anu" s={26} /><span style={{ flex: 1 }}>My Workspace</span>{IC.chev(C.sub)}</div>
             {NAV.map(([n, ic]) => {
               const on = n === 'Members'
               return (
