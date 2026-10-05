@@ -221,8 +221,8 @@ function Screens({ t }) {
     { k: "sftp", a: 15.7, b: 99 },
   ];
   return layers.map((L, i) => {
-    const inP = i === 0 ? 1 : prog(t, L.a - 0.15, L.a + 0.3);
-    const outP = prog(t, L.b - 0.15, L.b + 0.15);
+    const inP = i === 0 ? 1 : expoOut(raw(t, L.a - 0.1, L.a + 0.45));
+    const outP = raw(t, L.b - 0.18, L.b + 0.08);
     const o = inP * (1 - outP);
     if (o <= 0.001) return null;
     let content = null;
@@ -233,6 +233,10 @@ function Screens({ t }) {
           <img src={IMG.newhost} alt="" style={{ position: "absolute", inset: 0, width: 1280, height: 832 }} />
           {t > 1.95 && <Field x={910} y={276} text={ip} caret={t < 3.0 && blink(t)} />}
           {t > 3.0 && <Field x={910} y={447} text={label} caret={t < 4.1 && blink(t)} />}
+          {/* focus rings follow the field being typed in, like a prototype's focused state */}
+          <div style={{ position: "absolute", left: 870, top: 266, width: 374, height: 45, borderRadius: 8, border: "2px solid #8B5CF6", boxSizing: "border-box", opacity: raw(t, 1.9, 2.0) * (1 - raw(t, 2.9, 3.0)) }} />
+          <div style={{ position: "absolute", left: 870, top: 438, width: 374, height: 45, borderRadius: 8, border: "2px solid #8B5CF6", boxSizing: "border-box", opacity: raw(t, 2.95, 3.05) * (1 - raw(t, 4.05, 4.15)) }} />
+          <div style={{ position: "absolute", left: 1144, top: 770, width: 109, height: 36, borderRadius: 7, background: "#000", opacity: t > 4.15 && t < 4.35 ? 0.22 : 0 }} />
         </>
       );
     } else if (L.k === "connect") {
@@ -257,7 +261,10 @@ function Screens({ t }) {
           <div style={{ position: "absolute", left: 192, top: 238, width: 960, height: 50, background: "#101018", fontFamily: FONT }}>
             {DASH_TABS.map(([name, x], i) => {
               const near = clamp(1 - Math.abs(pos - i));
-              return <div key={name} style={{ position: "absolute", left: x, top: 12, transform: "translateX(-50%)", fontSize: 17, color: "#E4E4E4", fontWeight: near > 0.5 ? 600 : 400, opacity: 0.62 + 0.38 * near, whiteSpace: "nowrap" }}>{name}</div>;
+              const hover = i > 0 ? raw(t, TAB_AT[i] - 0.35, TAB_AT[i] - 0.2) * (1 - raw(t, TAB_AT[i] + 0.1, TAB_AT[i] + 0.3)) : 0;
+              return (
+                <div key={name} style={{ position: "absolute", left: x, top: 7, transform: "translateX(-50%)", padding: "5px 14px", borderRadius: 7, background: `rgba(255,255,255,${0.07 * hover})`, fontSize: 17, color: "#E4E4E4", fontWeight: near > 0.5 ? 600 : 400, opacity: 0.62 + 0.38 * Math.max(near, hover), whiteSpace: "nowrap" }}>{name}</div>
+              );
             })}
             <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "#2B2B33" }} />
             <div style={{ position: "absolute", left: ux - 83, width: 166, bottom: 0, height: 2, background: "#E4E4E4" }} />
@@ -286,7 +293,7 @@ function Screens({ t }) {
         </>
       );
     }
-    return <div key={L.k} style={{ position: "absolute", inset: 0, opacity: o, transform: `translateX(${36 * (1 - inP) - 36 * outP}px)` }}>{content}</div>;
+    return <div key={L.k} style={{ position: "absolute", inset: 0, opacity: o, transform: `translateY(${18 * (1 - inP) - 10 * outP}px) scale(${0.992 + 0.008 * inP})`, transformOrigin: "50% 40%" }}>{content}</div>;
   });
 }
 
@@ -309,6 +316,27 @@ function Camera({ t, children }) {
   const c = camAt(t);
   const Fp = onWin(c);
   return <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "0 0", transform: `translate(${960 - Fp.x * c.z}px, ${610 - Fp.y * c.z}px) scale(${c.z})` }}>{children}</div>;
+}
+
+// ================= motion helpers =================
+// Figma-style curves: expo out for entrances, a gentle spring for settles.
+const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x)));
+const raw = (t, a, b) => clamp((t - a) / (b - a));
+const spring = (x) => { const u = clamp(x); return u >= 1 ? 1 : 1 - Math.exp(-6.5 * u) * Math.cos(9 * u); };
+const quintInOut = (u) => (u < 0.5 ? 16 * u ** 5 : 1 - Math.pow(-2 * u + 2, 5) / 2);
+// Cursor path: snappy quint timing on a slight arc between keyframes, like a real hand.
+function cursorPath(t, keys) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 0; i < keys.length - 1; i++) {
+    const [t0, a] = keys[i], [t1, b] = keys[i + 1];
+    if (t <= t1) {
+      const u = quintInOut(clamp((t - t0) / Math.max(1e-6, t1 - t0)));
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+      const bow = Math.sin(Math.PI * u) * Math.min(60, d * 0.12);
+      return { x: a.x + dx * u + (d ? (-dy / d) * bow : 0), y: a.y + dy * u + (d ? (dx / d) * bow : 0) };
+    }
+  }
+  return keys[keys.length - 1][1];
 }
 
 // ================= infographic callouts =================
@@ -415,19 +443,21 @@ function Callouts({ t }) {
         const anchor = { x: k.side === "left" ? X + W : X, y: k.top + 34 };
         const pr = project(c, k.at);
         const tgt = { x: clamp(pr.x, FX + 18, FX + FW - 18), y: clamp(pr.y, FY + 18, FY + FH - 18) };
-        const ln = prog(t, k.a + 0.15, k.a + 0.55);
+        const ln = expoOut(raw(t, k.a + 0.2, k.a + 0.65));
+        const pop = spring(raw(t, k.a + 0.6, k.a + 1.1));
+        const sIn = spring(raw(t, k.a, k.a + 0.7));
         const lx = anchor.x + (tgt.x - anchor.x) * ln, ly = anchor.y + (tgt.y - anchor.y) * ln;
         const pulse = ((t - k.a) * 1.4) % 1;
         return (
           <div key={i} style={{ position: "absolute", inset: 0, opacity: e, pointerEvents: "none" }}>
             <svg width="1920" height="1080" style={{ position: "absolute", inset: 0, overflow: "visible" }}>
               <line x1={anchor.x} y1={anchor.y} x2={lx} y2={ly} stroke="#0E1424" strokeOpacity=".55" strokeWidth="1.5" strokeDasharray="5 5" />
-              {ln >= 1 && <>
-                <circle cx={tgt.x} cy={tgt.y} r={8 + 16 * pulse} fill="none" stroke="#fff" strokeWidth="2" opacity={1 - pulse} />
-                <circle cx={tgt.x} cy={tgt.y} r="7" fill="#0E1424" stroke="#fff" strokeWidth="2.5" />
+              {pop > 0 && <>
+                <circle cx={tgt.x} cy={tgt.y} r={8 + 16 * pulse} fill="none" stroke="#fff" strokeWidth="2" opacity={(1 - pulse) * clamp(pop)} />
+                <circle cx={tgt.x} cy={tgt.y} r={7 * pop} fill="#0E1424" stroke="#fff" strokeWidth="2.5" />
               </>}
             </svg>
-            <div style={{ position: "absolute", left: X, top: k.top, width: W, padding: "18px 20px", borderRadius: 16, background: G.card, border: `1px solid ${G.line}`, color: G.text, fontFamily: FONT, boxSizing: "border-box", transform: `translateX(${(k.side === "left" ? -24 : 24) * (1 - e)}px) scale(${0.96 + 0.04 * e})` }}>{k.body(p)}</div>
+            <div style={{ position: "absolute", left: X, top: k.top, width: W, padding: "18px 20px", borderRadius: 16, background: G.card, border: `1px solid ${G.line}`, color: G.text, fontFamily: FONT, boxSizing: "border-box", transform: `translateX(${(k.side === "left" ? -28 : 28) * (1 - sIn)}px) scale(${0.94 + 0.06 * sIn})`, transformOrigin: k.side === "left" ? "100% 20%" : "0 20%" }}>{k.body(p)}</div>
           </div>
         );
       })}
@@ -436,7 +466,7 @@ function Callouts({ t }) {
 }
 
 function AppWindow({ t }) {
-  const fill = prog(t, 1.0, 1.45);
+  const fill = expoOut(raw(t, 1.0, 1.6));
   return (
     <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, borderRadius: 16, overflow: "hidden", background: "#111119", opacity: fill, transform: `scale(${0.985 + 0.015 * fill})` }}>
       <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 832, transform: `scale(${FK})`, transformOrigin: "0 0" }}>
@@ -451,13 +481,13 @@ function StageCursor({ t }) {
   const keys = [[0, { x: start.x - 90, y: start.y - 60 }], [0.25, start], [1.15, end], [1.5, { x: end.x - 160, y: end.y - 60 }]];
   PLAN.forEach(([ct, p]) => { keys.push([ct - 0.5, keys[keys.length - 1][1]]); keys.push([ct - 0.04, onWin(p)]); });
   keys.push([FLOW_END, { x: 1560, y: 1000 }]);
-  const cur = kf(t, keys);
+  const cur = cursorPath(t, keys);
   const clicks = [[0.25, start], ...PLAN.filter((c) => c[2]).map(([ct, p]) => [ct, onWin(p)])];
   const press = (t > 0.25 && t < 1.15) || pressedAt(t, clicks);
-  const ripple = clicks.map(([ct]) => prog(t, ct, ct + 0.5)).find((p) => p > 0 && p < 1);
+  const tap = clicks.map(([ct]) => raw(t, ct, ct + 0.4)).find((p) => p > 0 && p < 1);
   return (
     <>
-      {ripple !== undefined && <div style={{ position: "absolute", left: cur.x - 30, top: cur.y - 30, width: 60, height: 60, borderRadius: 30, border: `2px solid ${BLUE}`, opacity: 0.7 * (1 - ripple), transform: `scale(${0.4 + ripple})` }} />}
+      {tap !== undefined && <div style={{ position: "absolute", left: cur.x - 18, top: cur.y - 18, width: 36, height: 36, borderRadius: 18, background: "rgba(255,255,255,.35)", opacity: 1 - tap, transform: `scale(${0.5 + 0.8 * expoOut(tap)})` }} />}
       <Cursor {...cur} o={inOut(t, 0, FLOW_END + 0.2, 0.25, 0.3)} press={press} size={1.2} />
     </>
   );
@@ -465,7 +495,7 @@ function StageCursor({ t }) {
 
 function Shot({ t, children }) {
   const out = prog(t, FLOW_END, DURATION);
-  return <div style={{ position: "absolute", inset: 0, opacity: 1 - out, transform: `scale(${1 + 0.25 * out})`, filter: out > 0.01 ? `blur(${(14 * out).toFixed(2)}px)` : "none" }}>{children}</div>;
+  return <div style={{ position: "absolute", inset: 0, opacity: 1 - out, transform: `translateY(${-16 * out}px)` }}>{children}</div>;
 }
 
 // ---- Backdrop: grey only. Soft radial gradient on the swatch #B9C7DB, a slow drifting light, grain. ----
@@ -498,6 +528,7 @@ export function Stage({ t, sw = 1920, sh = 1080 }) {
             </div>
           </div>
           <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, borderRadius: 16, outline: "1px solid rgba(255,255,255,.55)", opacity: prog(t, 1.0, 1.45), pointerEvents: "none" }} />
+          <div style={{ position: "absolute", left: FX, top: FY - 30, fontSize: 15, fontWeight: 500, color: SUB, opacity: raw(t, 0.3, 0.6) * (1 - raw(t, FLOW_END, FLOW_END + 0.3)) }}>Desktop</div>
           <Selection t={t} />
           {t < 1.45 && <StageCursor t={t} />}
           <Callouts t={t} />

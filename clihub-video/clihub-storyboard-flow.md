@@ -2,9 +2,21 @@
 
 Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/clihub.html`). Real screens from Figma *Portfolio* (section 250:32492) are shown as a working prototype.
 
-**Brief (Anu, rounds 6–12):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
+**Brief (Anu, rounds 6–13):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
 
 **Camera (round 11):** no zoom anywhere. The screen stays at full view for the whole cut; the motion comes from the cursor, screen changes, callouts and the loop transition.
+
+**Motion (round 13, Figma prototype standard):**
+- **Screen changes:** Smart Animate style. The frame stays put; the old content dissolves out rising 10px, and the new content rises 18px into place with an expo ease-out.
+- **Cursor:** moves on slight arcs with quint timing and presses on click with a soft white tap (no ripple ring).
+- **Interaction states:**
+  - a purple focus ring on the field being typed in;
+  - a pressed state on Create Host;
+  - a hover highlight on each dashboard tab just before it's clicked.
+- **Callouts:** settle on a gentle spring; the leader line draws, then the target dot pops.
+- **Frame label:** a grey "Desktop" label sits above the frame, like a Figma frame name.
+- **Window fill:** after the selection drag, the window fills with an expo ease.
+- **Loop exit:** a clean dissolve with a 16px lift (no zoom or blur).
 
 **Infographic callouts (round 8):** dark cards beside the frame, each tied to its spot in the UI by a dashed leader line and a pulsing target dot that follow the camera.
 - **New host:** a checklist (Address / Port / Label).
@@ -32,7 +44,7 @@ Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/cli
 | 7.4–13.0 | 3 · Monitor | Watch it live. | The host stats dashboard (chrome from 250:33200). The cursor clicks through all five tabs; the underline slides and the content switches in place: **Overview** (Uptime 15 days, 6 hours · Connected), **Performance** (CPU ring to 45%), **Storage** (184 GB of 200 GB), **Network** (Eth0 1.1 / 1.6 MB/s with live bars), **Activity** (Processes 187 total, 3 running, 240 sleeping). |
 | 13.0–15.7 | 4 · Run commands | Run commands, with AI to help. | Terminal; the cursor clicks Ask AI and the panel slides in. Callout types "How do I find all .txt files in a directory?". |
 | 15.7–18.1 | 5 · Move files | Move files across, side by side. | SFTP: select Backups, then Connect to Host. Callout: Backups → API Gateway, uploading to 100%, Uploaded. |
-| 18.1–18.7 | Loop | | Pushes past the lens with a blur; the loop restarts. |
+| 18.1–18.7 | Loop | | Dissolves with a small lift; the loop restarts. |
 
 ## Fixes painted over the captures
 - **SFTP recent connections:** "192.333.4.545" (not a valid IP) → **192.168.1.100**.
