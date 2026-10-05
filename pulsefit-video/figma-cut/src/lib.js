@@ -76,27 +76,35 @@ export const C = {
 // Figma editor colours (selection, components, spacing, prototype noodles).
 export const FIG = { sel: '#0D99FF', comp: '#9747FF', spacing: '#F24822', proto: '#0D99FF' }
 
-// Multiplayer cursors: one colour per person, readable on every stage colour.
+// Multiplayer cursors: one colour per person.
 export const PEOPLE = {
-  Anu: '#FF6B2C',
-  'Apurva Jha': '#12B76A',
-  'Shikhar Tiwari': '#FF3D8B',
-  'Neha Singh': '#00A8E0',
+  Anu: '#F76B15',
+  'Apurva Jha': '#12A150',
+  'Shikhar Tiwari': '#E5397A',
+  'Neha Singh': '#0B8AD9',
 }
 
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
 
-// Scenes and their stage colours. A frame wipe in the next colour opens each scene.
-export const SCENES = [
-  { id: 'hook', a: 0, b: 6.4, bg: '#EEF0F5' },
-  { id: 'leads', a: 6.4, b: 13.4, bg: '#1F4FF4' },
-  { id: 'members', a: 13.4, b: 20.4, bg: '#F5BD25' },
-  { id: 'modules', a: 20.4, b: 26.4, bg: '#7358F5' },
+// Beats: each has an eyebrow and a headline (landscape lines / portrait lines). The camera
+// flies between the screens on the canvas over the 1.2s around each beat change.
+export const BEATS = [
+  { id: 'overview', a: 0, b: 5.0, eyebrow: 'Gym management', land: [['Run', 'the', 'whole', 'gym', 'from', 'one\u00a0place.']], port: [['Run', 'the', 'whole', 'gym'], ['from', 'one\u00a0place.']] },
+  { id: 'leads', a: 5.0, b: 11.0, eyebrow: 'Leads', land: [['Turn', 'every', 'lead', 'into', 'a', 'member.']], port: [['Turn', 'every', 'lead'], ['into', 'a', 'member.']] },
+  { id: 'performance', a: 11.0, b: 16.6, eyebrow: 'Lead performance', land: [['Know', 'which', 'leads', 'convert.']], port: [['Know', 'which'], ['leads', 'convert.']] },
+  { id: 'members', a: 16.6, b: 22.2, eyebrow: 'Members', land: [['Every', 'member,', 'at', 'a', 'glance.']], port: [['Every', 'member,'], ['at', 'a', 'glance.']] },
+  { id: 'plans', a: 22.2, b: 27.4, eyebrow: 'Plans', land: [['A', 'plan', 'for', 'every', 'member.']], port: [['A', 'plan', 'for'], ['every', 'member.']] },
+  { id: 'more', a: 27.4, b: 30.4, eyebrow: 'Staff · Workouts · Equipment', land: [['And', 'the', 'rest', 'of', 'the', 'gym.']], port: [['And', 'the', 'rest'], ['of', 'the', 'gym.']] },
+  { id: 'outro', a: 30.4, b: 33.4, eyebrow: 'All in one', land: [['Everything', 'your', 'gym', 'runs', 'on.']], port: [['Everything', 'your'], ['gym', 'runs', 'on.']] },
 ]
-export const DURATION = 26.4
+export const DURATION = 33.4
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 4.4
+export const POSTER = 2.6
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
-export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }
+// VIEW is the area the canvas camera frames (below the headline).
+export const STAGES = {
+  land: { W: 1920, H: 1080, VIEW: { x: 70, y: 250, w: 1780, h: 790 } },
+  port: { W: 1080, H: 1920, VIEW: { x: 40, y: 500, w: 1000, h: 1360 } },
+}

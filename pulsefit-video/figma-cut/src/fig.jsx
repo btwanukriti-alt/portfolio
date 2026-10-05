@@ -1,7 +1,6 @@
 // Figma editor vocabulary, drawn in stage coordinates: multiplayer cursors, selection boxes,
-// component labels, prototype noodles, comment pins, auto-layout spacing, the canvas toolbar,
-// plus the headline and the sticker shapes.
-import { E, FIG, HEAD_FONT, P, PEOPLE, UI_FONT, clamp, lerp } from './lib.js'
+// component labels, comment pins and the canvas toolbar, plus the headline and its eyebrow.
+import { E, FIG, HEAD_FONT, P, PEOPLE, UI_FONT, clamp } from './lib.js'
 
 const abs = (x, y, extra) => ({ position: 'absolute', left: x, top: y, ...extra })
 
@@ -81,35 +80,6 @@ export function Selection({ x, y, w, h, o = 1, label, comp = false, size, k = 1,
   )
 }
 
-// Prototype connection: blue noodle from (x1,y1) to (x2,y2) drawn by u (0..1), with a start dot
-// and an arrowhead once it lands. `vertical` bends the curve top-to-bottom instead of sideways.
-export function Noodle({ x1, y1, x2, y2, u, vertical = false, label }) {
-  if (u <= 0) return null
-  const d = vertical
-    ? `M${x1} ${y1} C${x1} ${(y1 + y2) / 2} ${x2} ${(y1 + y2) / 2} ${x2} ${y2}`
-    : `M${x1} ${y1} C${(x1 + x2) / 2} ${y1} ${(x1 + x2) / 2} ${y2} ${x2} ${y2}`
-  const head = clamp((u - 0.85) / 0.15)
-  const mx = (x1 + x2) / 2
-  const my = (y1 + y2) / 2
-  return (
-    <>
-      <svg style={abs(0, 0, { overflow: 'visible', zIndex: 30 })} width="1" height="1">
-        <path d={d} fill="none" stroke={FIG.proto} strokeWidth="4" strokeLinecap="round" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - u} />
-        <circle cx={x1} cy={y1} r="8" fill="#fff" stroke={FIG.proto} strokeWidth="4" />
-        <g opacity={head} transform={`translate(${x2} ${y2}) rotate(${vertical ? 90 : 0})`}>
-          <path d="M-16 -10 L0 0 L-16 10" fill="none" stroke={FIG.proto} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-        </g>
-      </svg>
-      {label && (
-        <div style={abs(mx, my, { transform: `translate(-50%,-50%) scale(${0.6 + 0.4 * E.back(clamp((u - 0.4) / 0.4))})`, opacity: clamp((u - 0.4) / 0.3), background: FIG.proto, color: '#fff', font: `600 15px/1 ${UI_FONT}`, padding: '8px 12px', borderRadius: 8, whiteSpace: 'nowrap', zIndex: 31, display: 'flex', alignItems: 'center', gap: 6 })}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11V5.5a2 2 0 014 0V11M13 9.5a2 2 0 014 0V12M17 11a2 2 0 014 0v3.5a6.5 6.5 0 01-6.5 6.5H13a6 6 0 01-4.6-2.2L5 14.5a2 2 0 013-2.6L9 13" /></svg>
-          {label}
-        </div>
-      )}
-    </>
-  )
-}
-
 // Figma comment: a pin (avatar in a speech-drop) that opens into a bubble.
 export function Comment({ x, y, name, text, u, k = 1 }) {
   if (u <= 0) return null
@@ -128,17 +98,6 @@ export function Comment({ x, y, name, text, u, k = 1 }) {
           <div style={{ font: `400 16px/1.35 ${UI_FONT}`, color: '#2B2F42', marginTop: 4 }}>{text}</div>
         </div>
       </div>
-    </div>
-  )
-}
-
-// Auto-layout spacing marker (Figma's pink gap indicator) between two edges at x1..x2.
-export function Spacing({ x1, x2, y, h, o, value }) {
-  if (o <= 0) return null
-  return (
-    <div style={abs(x1, y, { width: x2 - x1, height: h, opacity: o, zIndex: 35 })}>
-      <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(135deg, rgba(242,72,34,.28) 0 3px, transparent 3px 7px)' }} />
-      <div style={abs((x2 - x1) / 2, h / 2, { transform: 'translate(-50%,-50%)', background: FIG.spacing, color: '#fff', font: `600 13px/1 ${UI_FONT}`, padding: '4px 6px', borderRadius: 4 })}>{value}</div>
     </div>
   )
 }
@@ -166,7 +125,7 @@ export function Toolbar({ x, y, o, active }) {
   )
 }
 
-// Headline: words rise out of a mask, staggered; `hi` marks words set in a sticker pill.
+// Headline: words rise out of a mask, staggered; `hi` marks words set on a highlight pill.
 // lines = [[word, word], ...]; u = time since the headline starts; out = 0..1 exit.
 export function Headline({ lines, u, out = 0, size, color, hi = {}, align = 'center', x, y, w, lh = 1.02 }) {
   let n = 0
@@ -198,31 +157,12 @@ export function Headline({ lines, u, out = 0, size, color, hi = {}, align = 'cen
 }
 
 // Eyebrow: a small pill tag above the headline.
-export function Tag({ x, y, text, u, out = 0, dark = false, icon }) {
+export function Tag({ x, y, text, u, out = 0, icon }) {
   const p = E.back(clamp(u / 0.5))
   return (
-    <div style={abs(x, y, { transform: `translateX(-50%) scale(${1.35 * (0.6 + 0.4 * p)})`, transformOrigin: '50% 0', opacity: clamp(u / 0.25) * (1 - out), display: 'flex', alignItems: 'center', gap: 10, height: 44, padding: '0 18px 0 12px', borderRadius: 22, background: dark ? 'rgba(15,18,34,.9)' : 'rgba(255,255,255,.18)', border: dark ? 'none' : '1.5px solid rgba(255,255,255,.35)', color: '#fff', font: `600 17px/1 ${UI_FONT}`, letterSpacing: '0.12em', textTransform: 'uppercase', backdropFilter: 'blur(8px)', whiteSpace: 'nowrap' })}>
-      <span style={{ width: 24, height: 24, borderRadius: 12, background: '#fff', display: 'grid', placeItems: 'center' }}>{icon}</span>
+    <div style={abs(x, y, { transform: `translateX(-50%) scale(${1.35 * (0.6 + 0.4 * p)})`, transformOrigin: '50% 0', opacity: clamp(u / 0.25) * (1 - out), display: 'flex', alignItems: 'center', gap: 10, height: 40, padding: '0 18px 0 12px', borderRadius: 22, background: 'rgba(255,255,255,.85)', boxShadow: '0 0 0 1px rgba(20,28,60,.07), 0 8px 20px -12px rgba(20,28,70,.3)', color: '#3A3F55', font: `600 15px/1 ${UI_FONT}`, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' })}>
+      <span style={{ width: 20, height: 20, display: 'grid', placeItems: 'center' }}>{icon}</span>
       {text}
     </div>
   )
 }
-
-// Sticker shapes for the canvas.
-export function Sticker({ kind, x, y, s, color, u, rot = 0 }) {
-  if (u <= 0) return null
-  const p = E.back(clamp(u / 0.6))
-  const shape = {
-    star: <path d="M50 2 61 34 96 36 68 57 79 92 50 71 21 92 32 57 4 36 39 34z" fill={color} />,
-    burst: <path d="M50 0 58 22 80 10 74 34 98 38 78 52 96 70 72 70 74 96 54 80 44 100 36 76 12 88 20 64 0 52 22 40 8 18 32 22z" fill={color} />,
-    squiggle: <path d="M6 60 C 20 20, 34 20, 40 50 S 62 80, 70 44 S 90 14, 96 40" fill="none" stroke={color} strokeWidth="10" strokeLinecap="round" />,
-    pill: <rect x="2" y="30" width="96" height="40" rx="20" fill={color} />,
-  }[kind]
-  return (
-    <svg width={s} height={s} viewBox="0 0 100 100" style={abs(x - s / 2, y - s / 2, { transform: `scale(${p}) rotate(${rot + (1 - p) * -40}deg)`, overflow: 'visible', zIndex: 5 })}>
-      {shape}
-    </svg>
-  )
-}
-
-export const lerpRect = (a, b, u) => ({ x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u), w: lerp(a.w, b.w, u), h: lerp(a.h, b.h, u) })
