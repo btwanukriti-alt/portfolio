@@ -4,12 +4,12 @@ Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/cli
 
 **Brief (Anu, rounds 6–8):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with zoom in / zoom out and more infographics.
 
-**Camera (round 9):** full view by default. The window frame stays fixed and the screen zooms inside it, clamped so it always fills the frame. The camera zooms only to highlight a key moment: a short punch-in of about 0.3s in, a brief hold, then back out. There are five:
+**Camera (rounds 9–10):** full view by default. The window frame stays fixed and the screen zooms inside it. The camera zooms only to highlight a key moment, with a short punch-in (about 0.3s in, a brief hold, back out). There are three:
 - **Create Host:** the click.
-- **Connected:** the shield turning green.
-- **CPU chart:** on the Performance tab.
 - **Ask AI:** the answer.
 - **Connect to Host:** the click that starts the upload.
+
+The **Connect** and **Monitor (dashboard)** steps never zoom.
 
 **Infographic callouts (round 8):** dark cards beside the frame, each tied to its spot in the UI by a dashed leader line and a pulsing target dot that follow the camera.
 - **New host:** a checklist (Address / Port / Label).

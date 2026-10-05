@@ -320,15 +320,13 @@ function Screens({ t }) {
 
 // ================= camera =================
 // Full view by default. Short punch-ins (in ~0.3s, brief hold, back out) only on the moments that
-// matter: Create Host, the connection going green, the CPU chart, the Ask AI answer, and the
-// SFTP connect that starts the upload.
+// matter: Create Host, the Ask AI answer, and the
+// SFTP connect that starts the upload. The Connect and dashboard (Monitor) steps never zoom.
 const CAM = (() => {
   const F = { x: 640, y: 416, z: 1 };
   const k = [[0, F]];
   const punch = (at, f, z, hold = 0.3) => k.push([at - 0.3, F], [at, { ...f, z }], [at + hold, { ...f, z }], [at + hold + 0.38, F]);
   punch(4.12, { x: 1120, y: 720 }, 1.32, 0.25);  // Create Host
-  punch(6.55, { x: 640, y: 390 }, 1.38, 0.4);    // shield turns green: Connected
-  punch(9.0, { x: 500, y: 640 }, 1.3, 0.2);      // CPU usage chart (Performance tab)
   punch(14.45, { x: 1080, y: 400 }, 1.35, 0.45); // Ask AI answer
   punch(17.05, { x: 833, y: 420 }, 1.28, 0.35);  // Connect to Host: upload starts
   k.push([DURATION, F]);
