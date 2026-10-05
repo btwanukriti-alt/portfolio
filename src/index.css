@@ -1,20 +1,16 @@
 :root {
-  --pearl: #f7f6fb;
-  --pearl-2: #eeecf6;
-  --ink: #1e1b3a;
-  --ink-2: #5f5c7a;
-  --ink-3: #9a98b0;
-  --hairline: rgb(30 27 58 / 0.12);
-  --gold: #b88c3e;
-  --violet: #7662e2;
+  /* One face, one accent. The dots carry the magic; the type stays out of their way. */
+  --paper: #f3f3f1;
+  --paper-2: #e8e8e5;
+  --ink: #111114;
+  --ink-2: #5d5d66;
+  --hairline: rgb(17 17 20 / 0.14);
+  --accent: #5b3df5;
 
-  /* Headlines are set in dots, like the illustrations. */
-  --display: 'Doto', 'Manrope', ui-monospace, monospace;
-  --sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sans: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --gutter: clamp(16px, 4vw, 64px);
+  --gutter: clamp(16px, 3.6vw, 56px);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   color-scheme: light;
 }
@@ -32,13 +28,11 @@ html {
 body {
   margin: 0;
   font-family: var(--sans);
+  font-optical-sizing: auto;
   color: var(--ink);
-  background: var(--pearl);
-  /* Round dots in Doto, so the type matches the illustrations. */
-  font-variation-settings: 'ROND' 100;
+  background: var(--paper);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
@@ -48,18 +42,11 @@ img {
 }
 
 ::selection {
-  color: var(--pearl);
-  background: var(--ink);
+  color: var(--paper);
+  background: var(--accent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--violet);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
-}
-
-/* The page itself is a field of tiny dots (tile painted in src/texture.ts). */
-body {
-  background-image: var(--texture, none);
-  background-size: 320px 320px;
-  background-attachment: fixed;
 }

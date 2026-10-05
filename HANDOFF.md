@@ -1,41 +1,43 @@
 # Portfolio site: handoff notes
 
-React + Vite + TypeScript. Light, celestial, scroll-told portfolio.
-
-Design: everything sits on one centre axis. Headlines are set in Doto (round-dot setting, `ROND` 100)
-so the type is made of the same dots as the illustrations; Manrope for body and labels. The page
-background is a fine dot texture painted in `src/texture.ts`; spare particles settle into it.
+React + Vite + TypeScript + three.js. Light theme, one typeface (Bricolage Grotesque), one accent (#5b3df5).
 
 Run: `npm install`, then `npm run dev` (or `npm run build && npm run preview`).
 
-## Structure
+## The experience
 
-| Part | Files | Notes |
+The opening is a pinned, scroll-driven story in which ~40,000 dots (16,000 on phones) show a product
+being designed. Each chapter is a "formation" of the same dots; the GPU morphs between them.
+
+| # | Chapter | What the dots do |
 |---|---|---|
-| Smooth scroll | `src/smoothScroll.ts` | Lenis (inertial scrolling). Disabled for `prefers-reduced-motion`. |
-| Story (hero) | `src/components/Story.tsx`, `Story.module.css` | Pinned stage, ~8 screens of scroll. Copy for each chapter lives in `COPY`. |
-| Dot illustrations | `src/story/beats.ts` | One entry per chapter: how the dots are drawn, how it moves, where it sits on desktop/phone. |
-| Particle engine | `src/story/field.ts`, `src/story/cloud.ts` | ~4200 dots on desktop, 2200 on phones / low-core devices. Flat illustrations are drawn on an offscreen canvas and stippled with blue noise (even dot spacing); planets/orbs/galaxy are 3D point sets that spin. |
-| Work | `src/components/Work.tsx` | Staggered two-column grid, clip-reveal on scroll. Data in `src/data/projects.ts`. |
-| Contact / footer | `src/components/Contact.tsx` | |
+| 0 | (load) | All dots start as one point and burst outward |
+| 1 | Noise | Deep drifting cloud; name + intro line |
+| 2 | Listen | Gather into six clusters: Interviews, Analytics, Support tickets, Competitors, Stakeholders, Edge cases |
+| 3 | Map | Become a user flow; dots stream along the paths, the detour in accent colour |
+| 4 | Structure | Draw a wireframe of the Jaadu 2.0 dashboard |
+| 5 | Craft | Take on the screenshot's colours, then resolve into the real image through a dot mask |
+| 6 | Work | Release into a wide orbit, leading into the gallery |
 
-## The story (scroll order)
+The cursor gently parts the dots (not on touch). Reduced motion disables drift, swirl and smooth scroll.
 
-0. **Hello**: ringed planet with two moons. "Hello, I'm Anukriti."
-1. **Designer**: the dots spell *designer.*, completing "By trade, I'm an experienced …"
-2. **Crafts**: the word splits into three orbiting spheres: UX & Product, Branding, UI & Visual
-3. **UX**: user flow (start, screen, decision, two outcomes, dashed iterate loop)
-4. **Brand**: monogram seal, gold spark, colour palette
-5. **UI**: card with image, chips, button + pointer, toggle, slider, checklist
-6. **Together**: spiral galaxy. "One designer. One clear story."
+Then a pinned sideways gallery: each project screen assembles from dots as it reaches the centre and
+dissolves back into dots as it leaves.
 
-To change an illustration, edit its `build` in `beats.ts`: draw with normal canvas calls in a
--0.5..0.5 box using the `PEN` colours (`line` = ink, `tone` = lighter fill, `gold`, `violet`).
-The dots follow whatever is drawn.
+## Files
 
-## Placeholders still to replace
+| Part | Files |
+|---|---|
+| Chapter copy + scroll timeline | `src/components/Experience.tsx` |
+| Dot formations (what each chapter draws) | `src/experience/formations.ts` |
+| GPU renderer (shaders, morph, noise, cursor) | `src/experience/field.ts` |
+| Gallery | `src/components/Work.tsx`, data in `src/data/projects.ts` |
+| Contact / footer | `src/components/Contact.tsx` |
+| Smooth scroll (Lenis) | `src/smoothScroll.ts` |
 
-- Contact email (`hello@example.com`) and LinkedIn / Dribbble / Behance links in `Contact.tsx`.
-- Project descriptions, role and timeline in `src/data/projects.ts` (shared placeholder copy).
-- Case study pages were retired with the old dark design; project cards say "Case study soon".
-  The case study images are still in `src/assets/case-studies/` for when they're rebuilt.
+## Placeholders to replace
+
+- All chapter copy in `Experience.tsx` is a draft; rewrite it in your own voice.
+- Contact email (`hello@example.com`) and LinkedIn / Dribbble / Behance links.
+- Project summaries ("Case study coming soon.") in `src/data/projects.ts`.
+- Case study pages don't exist yet; slides are kept in `src/assets/case-studies/`.
