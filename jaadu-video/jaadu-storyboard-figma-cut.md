@@ -1,6 +1,6 @@
 # AI trading platform (Jaadu 2.0): Figma-style showcase storyboard
 
-The Jaadu 2.0 card video in the Selected Work boxes and the case-study hero (`public/showcase/jaadu-2.html`). It uses the same look and motion as the College Management cut: one plain soft-blue canvas (#CFDDFF) with no shapes and no dot grid, clipped inside a black selection frame with corner handles. It has blue selections with size labels, purple component labels (no click-hotspot outlines), one dark cursor with no name tag, no toolbar, and text on top only. The scenes are planned fresh for this product. The product name and logo appear nowhere.
+The Jaadu 2.0 card video in the Selected Work boxes and the case-study hero (`public/showcase/jaadu-2.html`). It uses the same look and motion as the College Management cut: a warm, grainy peach-to-coral gradient canvas (your supplied image; turned 90° in landscape so the whole gradient shows) with no shapes and no dot grid, clipped inside a black selection frame with corner handles. It has blue selections with size labels, purple component labels (no click-hotspot outlines), one dark cursor with no name tag, no toolbar, and text on top only. The scenes are planned fresh for this product. The product name and logo appear nowhere.
 
 **Source:** Figma `Jaadu-2.0`, section "Desktop" (2804:259012):
 - Quant Lab Research (735:3056 empty state, 810:4672 with results);
