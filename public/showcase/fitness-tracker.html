@@ -455,7 +455,7 @@ const FoodRow = ({ r: [n, q, c], hi = 0 }) =>
 // ---------- Opener / closer: the three daily trackers as live graphs ----------
 
 // Three tracker chips start scattered, glide into a legend column, and the day's progress draws
-// as three nested rings around one centre. A black selection box then closes around the group.
+// as three nested rings around one centre.
 const TRACKS = [
   { n: 'Water', icon: 'drop', c: '#4F86EE', tint: '#E1EBFD', r: 196, f: 1600 / 3000, val: (k) => `${fmt(1600 * k)} ml`, goal: 'of 3,000 ml', start: [300, 300] },
   { n: 'Food', icon: 'food', c: Z.pink, tint: Z.pinkL, r: 150, f: 1385 / 2250, val: (k) => `${fmt(1385 * k)} cal`, goal: 'of 2,250 cal', start: [1480, 300] },
@@ -467,9 +467,6 @@ function Trackers({ t, s0, out, end }) {
   const glide = (i) => ramp(T, 0.95 + i * 0.12, 1.75 + i * 0.12)
   const grow = (i) => ramp(T, 1.0 + i * 0.12, 1.7 + i * 0.12)
   const fill = (i) => ramp(T, 1.6 + i * 0.18, 2.7 + i * 0.18)
-  const sel = ramp(T, 2.75, 3.05)
-  const box = { l: cx - 236, t: cy - 236, r: 1450, b: cy + 236 }
-  const hd = (x, y) => h('div', { key: `${x}-${y}`, style: { position: 'absolute', left: x - 5, top: y - 5, width: 10, height: 10, boxSizing: 'border-box', background: '#fff', border: '1.5px solid #111' } })
   return h('div', { style: { position: 'absolute', inset: 0 } },
     h(Headline, { t, s: s0 + 0.1, e: end, eyebrow: 'Daily tracking', title: 'Water, food and sleep in one place.' }),
     h('div', { style: { position: 'absolute', inset: 0, opacity: 1 - out, transform: `translateY(${-out * 30}px)`, fontFamily: APP, color: Z.ink } },
@@ -500,12 +497,6 @@ function Trackers({ t, s0, out, end }) {
               h('span', { style: { fontSize: 16, color: Z.sub } }, k.goal))),
           h('div', { style: { marginLeft: 'auto', padding: '6px 12px', borderRadius: 10, background: k.tint, color: k.c, fontSize: 16, fontWeight: 600, opacity: ramp(T, 2.2 + i * 0.18, 2.6 + i * 0.18) } }, Math.round(k.f * 100), '%'))
       }),
-      // Selection around the group
-      h('div', { style: { position: 'absolute', left: box.l - 24, top: box.t - 24, width: box.r - box.l + 48, height: box.b - box.t + 48, opacity: sel * (1 - out) } },
-        h('div', { style: { position: 'absolute', inset: 0, border: '1.5px solid #111', clipPath: `inset(0 ${(1 - sel) * 100}% 0 0)` } }),
-        h('div', { style: { position: 'absolute', left: 0, bottom: '100%', marginBottom: 8, fontFamily: FONT, fontSize: 14, fontWeight: 500, color: '#3D3A5C' } }, 'Daily summary'),
-        hd(0, 0), hd(box.r - box.l + 48, 0), hd(0, box.b - box.t + 48), hd(box.r - box.l + 48, box.b - box.t + 48),
-        h('div', { style: { position: 'absolute', left: '50%', top: '100%', marginTop: 10, transform: 'translateX(-50%)', padding: '3px 8px', borderRadius: 4, background: '#111', color: '#fff', fontFamily: FONT, fontSize: 12, fontWeight: 500 } }, 'Hug × Hug')),
     ),
   )
 }
