@@ -50,89 +50,156 @@ const Bar = ({ f, h = 8, fill = C.green, track = C.line2, r }) => (
   </div>
 )
 
-// Engineering College's fee figures (one consistent set; see the storyboard's data notes).
-export const COLLEGE = { name: 'Engineering College', received: 28.5, expected: 32.0, pending: 3.5, rate: 89.1 }
-export const PROGRAMMES = [
-  ['B.Tech', 14.0, 16.0],
-  ['M.Tech', 6.2, 6.8],
-  ['MBA', 5.1, 5.7],
-  ['PhD', 3.2, 3.5],
+// ---------- Flow: the stacked-drawer prototype ----------
+// One consistent data set (see the storyboard's data notes): five colleges add up to the
+// design's ₹94.30 Cr received; each level of the drill-down adds up to its parent.
+const COLLEGES = [
+  ['Engineering College', 28.5, 32.0],
+  ['Medical College', 22.4, 27.5],
+  ['Science College', 18.2, 21.0],
+  ['Law College', 12.8, 18.0],
+  ['Arts & Management College', 12.4, 16.3],
 ]
+const PROGRAMMES = [['B.Tech', 14.0, 16.0], ['M.Tech', 6.2, 6.8], ['MBA', 5.1, 5.7], ['PhD', 3.2, 3.5]]
+const FEES = [['Tuition Fee', 11.2, 12.8], ['Lab Fee', 1.4, 1.6], ['Exam Fee', 0.8, 0.9], ['Hostel Fee', 0.6, 0.7]]
+const BATCHES = [['2022–26 batch', 2.4, 2.8], ['2023–27 batch', 3.1, 3.5], ['2024–28 batch', 2.9, 3.3], ['2025–29 batch', 2.8, 3.2]]
 
-// ---------- Flow ----------
-// College card: 400 × 294. "View breakdown" button centre at (200, 243), right edge x = 376.
-export const COLL = { w: 400, h: 294, btn: { x: 200, y: 243, r: 376 } }
-export function CollegeCard({ pr = 0, p = 1 }) {
-  const S = [['Received', COLLEGE.received], ['Expected', COLLEGE.expected], ['Pending', COLLEGE.pending]]
+// Native geometry of the prototype window. Drawer i (1..3) sits at left = L0 + (i - 1) * SP and
+// starts with an SP-wide spine naming the level it returns to. Rows: top = ROW0 + i * ROWH.
+export const STACK = {
+  land: { W: 1200, H: 640, L0: 96, SP: 44, narrow: false },
+  port: { W: 600, H: 640, L0: 40, SP: 36, narrow: true },
+}
+export const ROW0 = 312
+export const ROWH = 62
+export const drawerLeft = (G, i) => G.L0 + (i - 1) * G.SP
+// Content box of a level (0 = the page, 1..3 = drawers): rows span x..x+w.
+export const levelBox = (G, i) => {
+  const x = (i === 0 ? 0 : drawerLeft(G, i) + G.SP) + 28
+  return { x, w: G.W - 28 - x }
+}
+
+const pctOf = (r, e) => (r / e) * 100
+function DBanner({ rec, exp, k, narrow }) {
+  const rate = rec / exp
   return (
-    <div style={card({ width: COLL.w, height: COLL.h, padding: 24, boxShadow: lift })}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, height: 48 }}>
-        <IconTile icon={IC.bank} s={48} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: C.link }}>{COLLEGE.name}</div>
-          <div style={{ fontSize: 13, color: C.sub, marginTop: 2 }}>Academic year 2025–26</div>
+    <div style={{ position: 'relative', height: 120, borderRadius: 14, overflow: 'hidden', background: `linear-gradient(115deg, ${C.navy} 0%, #0F2C5C 60%, #12396F 100%)`, color: '#fff', padding: '16px 22px', boxSizing: 'border-box', display: 'flex', gap: 20 }}>
+      <div style={{ position: 'absolute', right: 120, top: -90, width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,.26), transparent 65%)' }} />
+      <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 12.5, opacity: 0.7 }}>Total received</div>
+        <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>{cr(rec * k)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
+          <div style={{ flex: 1 }}><Bar f={rate * k} h={6} fill="linear-gradient(90deg,#16A34A,#5EE0A1)" track="rgba(255,255,255,.14)" /></div>
+          <span style={{ fontSize: 12.5, opacity: 0.85, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{fmt(rate * 100 * k, 1)}% collected</span>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', marginTop: 18, height: 50 }}>
-        {S.map(([k, v]) => (
-          <div key={k}>
-            <div style={{ fontSize: 12.5, color: C.sub }}>{k}</div>
-            <div style={{ fontSize: 17, fontWeight: 600, marginTop: 4, letterSpacing: '-0.01em', color: k === 'Pending' ? C.red : C.ink }}>{cr(v)}</div>
+      <div style={{ position: 'relative', display: 'grid', gridAutoFlow: narrow ? 'row' : 'column', gap: narrow ? 6 : 28, alignContent: 'center' }}>
+        {[['Pending', exp - rec], ['Expected', exp]].map(([l, v]) => (
+          <div key={l}>
+            <div style={{ fontSize: 12, opacity: 0.65 }}>{l}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{cr(v * k)}</div>
           </div>
         ))}
-      </div>
-      <div style={{ marginTop: 14, height: 34 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: C.sub, height: 20 }}>
-          <span>Collected</span>
-          <span style={{ color: C.green, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{fmt(COLLEGE.rate * p, 1)}%</span>
-        </div>
-        <div style={{ marginTop: 6 }}><Bar f={(COLLEGE.rate / 100) * p} fill="linear-gradient(90deg,#16A34A,#5EE0A1)" /></div>
-      </div>
-      <div style={{ marginTop: 24, height: 54, borderRadius: 12, background: `linear-gradient(90deg,${C.navy},${C.navy2})`, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 16, fontWeight: 500, transform: `scale(${1 - 0.04 * pr})`, filter: `brightness(${1 + 0.15 * pr})`, boxShadow: '0 14px 26px -12px rgba(11,31,68,.8)' }}>
-        View fee breakdown{IC.arrow('#fff', 18)}
       </div>
     </div>
   )
 }
-
-// Programme breakdown card: 400 × 294. Rows reveal with `rows` 0..1, bars and total with `p`.
-export const BREAK = { w: 400, h: 294 }
-export function BreakdownCard({ rows = 1, p = 1 }) {
+function Table({ head, rows, icon, tint, bg, narrow, hi = -1, hp = 0 }) {
+  const cols = narrow ? '1fr 112px 76px' : '1fr 130px 130px 120px 96px'
+  const cell = { textAlign: 'right', fontVariantNumeric: 'tabular-nums' }
   return (
-    <div style={card({ width: BREAK.w, height: BREAK.h, padding: '22px 24px', boxShadow: lift })}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 32 }}>
-        <IconTile icon={IC.cap} tint={C.green} bg={C.gSoft} s={32} i={18} r={9} />
-        <span style={{ fontSize: 17, fontWeight: 600, flex: 1 }}>Collection by programme</span>
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: cols, alignItems: 'center', gap: 12, height: 36, padding: '0 16px', borderRadius: 10, background: C.page, fontSize: 12.5, color: C.sub }}>
+        <span>{head}</span><span style={cell}>Received</span>{!narrow && <span style={cell}>Expected</span>}{!narrow && <span style={cell}>Pending</span>}<span style={cell}>Collected</span>
       </div>
-      <div style={{ marginTop: 12, display: 'grid', gap: 4 }}>
-        {PROGRAMMES.map(([n, rec, exp], i) => {
-          const r = clamp(rows * 4 - i)
-          const pct = (rec / exp) * 100
+      <div style={{ marginTop: 8 }}>
+        {rows.map(([n, rec, exp], i) => {
+          const pct = pctOf(rec, exp)
+          const on = i === hi ? hp : 0
           return (
-            <div key={n} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 88px 52px', alignItems: 'center', gap: 10, height: 34, fontSize: 14, opacity: r, transform: `translateY(${10 * (1 - r)}px)` }}>
-              <span style={{ fontWeight: 500, color: C.link }}>{n}</span>
-              <Bar f={(pct / 100) * p} h={6} fill={C.green} />
-              <span style={{ fontWeight: 500, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{cr(rec)}</span>
-              <span style={{ textAlign: 'right', fontSize: 12.5, fontWeight: 600, color: C.green }}>{fmt(pct, 1)}%</span>
+            <div key={n} style={{ display: 'grid', gridTemplateColumns: cols, alignItems: 'center', gap: 12, height: 54, marginBottom: 8, padding: '0 16px', borderRadius: 12, background: '#fff', boxShadow: `inset 0 0 0 1px ${on ? `rgba(29,78,216,${0.5 * on})` : C.line}`, backgroundColor: on ? `rgba(232,238,252,${on})` : '#fff', fontSize: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                <IconTile icon={icon} tint={tint} bg={bg} s={30} i={16} r={8} />
+                <span style={{ fontWeight: 500, color: C.link, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{n}</span>
+              </div>
+              <span style={{ ...cell, fontWeight: 600 }}>{cr(rec)}</span>
+              {!narrow && <span style={{ ...cell, color: C.t2 }}>{cr(exp)}</span>}
+              {!narrow && <span style={{ ...cell, color: C.red }}>{cr(exp - rec)}</span>}
+              <span style={{ justifySelf: 'end' }}><Chip fg={pct >= 85 ? C.green : '#B26A00'} bg={pct >= 85 ? C.gSoft : C.aSoft} h={26}>{fmt(pct, 1)}%</Chip></span>
             </div>
           )
         })}
       </div>
-      <div style={{ marginTop: 14, height: 54, padding: '0 16px', borderRadius: 12, background: C.page, display: 'flex', alignItems: 'center', gap: 10, boxSizing: 'border-box' }}>
-        <span style={{ fontSize: 14, fontWeight: 500, color: C.t2, flex: 1 }}>Total received</span>
-        <span style={{ fontSize: 21, fontWeight: 600, color: C.navy, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>{cr(COLLEGE.received * p)}</span>
-      </div>
+    </>
+  )
+}
+const Tabs = ({ items, on }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${items.length}, 1fr)`, height: 40, padding: 4, borderRadius: 10, background: C.page, boxSizing: 'border-box', fontSize: 13, textAlign: 'center' }}>
+    {items.map((x, i) => <div key={x} style={{ display: 'grid', placeItems: 'center', borderRadius: 8, background: i === on ? '#fff' : 'transparent', color: i === on ? C.ink : C.sub, fontWeight: i === on ? 500 : 400, boxShadow: i === on ? '0 1px 2px rgba(15,18,34,.08)' : 'none' }}>{x}</div>)}
+  </div>
+)
+// Level header (title row) shared by the page and the drawers: 48px tall.
+const Head = ({ icon, tint, bg, title, sub, close }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12, height: 48 }}>
+    {icon && <IconTile icon={icon} tint={tint} bg={bg} s={44} i={22} />}
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{title}</div>
+      <div style={{ fontSize: 12.5, color: C.sub, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>
+    </div>
+    {close ? <Ic c={C.t2} s={22} w={2} d="M6 6l12 12M18 6L6 18" /> : <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 36, padding: '0 12px', borderRadius: 9, boxShadow: `inset 0 0 0 1px ${C.line}`, fontSize: 13, fontWeight: 500, color: C.t2 }}>{IC.filter()}Filters</div>}
+  </div>
+)
+// Body of one level, laid out on fixed rows: head 20-68, banner 84-204, tabs 220-260,
+// table head 268-304, rows from ROW0.
+function Level({ L, narrow, k, hi, hp }) {
+  return (
+    <div style={{ position: 'absolute', inset: 0, padding: '20px 28px 0', boxSizing: 'border-box' }}>
+      <Head {...L.head} />
+      <div style={{ marginTop: 16 }}><DBanner rec={L.rec} exp={L.exp} k={k} narrow={narrow} /></div>
+      <div style={{ marginTop: 16 }}>{L.tabs ? <Tabs items={L.tabs} on={L.tab} /> : <div style={{ height: 40, display: 'flex', alignItems: 'center', gap: 8, padding: '0 14px', borderRadius: 10, boxShadow: `inset 0 0 0 1px ${C.line}`, fontSize: 13, color: C.faint }}>{IC.search(C.faint, 16)}Search colleges</div>}</div>
+      <div style={{ marginTop: 8 }}><Table head={L.col} rows={L.rows} icon={L.rowIcon} tint={L.rowTint} bg={L.rowBg} narrow={narrow} hi={hi} hp={hp} /></div>
     </div>
   )
 }
+const LEVELS = [
+  { head: { title: 'Revenue Contribution', sub: 'Academic year 2025–26 (YTD)' }, rec: 94.3, exp: 114.8, col: 'College', rows: COLLEGES, rowIcon: IC.bank, rowTint: C.primary, rowBg: C.pSoft },
+  { spine: 'All Colleges', head: { icon: IC.bank, tint: C.primary, bg: C.pSoft, title: 'Engineering College', sub: 'Academic year 2025–26 (YTD)', close: true }, rec: 28.5, exp: 32.0, tabs: ['Programme', 'Fee breakdown'], tab: 0, col: 'Programme', rows: PROGRAMMES, rowIcon: IC.cap, rowTint: C.green, rowBg: C.gSoft },
+  { spine: 'Engineering College', head: { icon: IC.cap, tint: C.green, bg: C.gSoft, title: 'B.Tech', sub: 'Engineering College · 2025–26 (YTD)', close: true }, rec: 14.0, exp: 16.0, tabs: ['Batches', 'Fee breakdown'], tab: 1, col: 'Fee type', rows: FEES, rowIcon: IC.receipt, rowTint: C.teal, rowBg: '#E2F6F5' },
+  { spine: 'B.Tech', head: { icon: IC.receipt, tint: C.teal, bg: '#E2F6F5', title: 'Tuition Fee', sub: 'B.Tech · Engineering College · 2025–26', close: true }, rec: 11.2, exp: 12.8, tabs: ['By batch', 'By student'], tab: 0, col: 'Batch', rows: BATCHES, rowIcon: IC.calendar, rowTint: C.amber, rowBg: C.aSoft },
+]
 
-// Pending chip (above the college card).
-export function PendingChip({ p }) {
+// The prototype window: the page plus three stacked drawers. open[i] slides drawer i in (0..1),
+// k[i] counts level i's figures, press = [level, row, amount] highlights the clicked row.
+export function StackWindow({ L: lay, open = [0, 0, 0], k = [1, 1, 1, 1], press = [-1, -1, 0] }) {
+  const G = STACK[lay]
+  const { W, H, SP, narrow } = G
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, height: 48, padding: '0 18px 0 14px', borderRadius: 14, background: '#fff', fontFamily: UI_FONT, fontSize: 16, fontWeight: 500, color: C.t2, whiteSpace: 'nowrap', boxShadow: lift }}>
-      {IC.alert(C.amber, 22)}
-      Lowest collection: B.Tech
-      <span style={{ color: C.red, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{cr(2 * p)} pending</span>
+    <div style={{ position: 'relative', width: W, height: H, borderRadius: 18, overflow: 'hidden', background: C.page, fontFamily: UI_FONT, color: C.ink, boxShadow: '0 0 0 1px rgba(255,255,255,.6), 0 60px 120px -40px rgba(20,24,60,.55)' }}>
+      <div style={{ position: 'absolute', inset: 0, background: '#fff' }}>
+        <Level L={LEVELS[0]} narrow={narrow} k={k[0]} hi={press[0] === 0 ? press[1] : -1} hp={press[2]} />
+      </div>
+      {[1, 2, 3].map((i) => {
+        const o = open[i - 1]
+        if (o <= 0.001) return null
+        const left = drawerLeft(G, i)
+        const covered = i < 3 ? open[i] : 0
+        const Lv = LEVELS[i]
+        return (
+          <div key={i}>
+            {/* the level below dims as this drawer opens */}
+            <div style={{ position: 'absolute', inset: 0, left: i === 1 ? 0 : drawerLeft(G, i - 1), background: `rgba(15,23,42,${(i === 1 ? 0.38 : 0.22) * clamp(o * 1.4)})` }} />
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left, width: W - left, transform: `translateX(${(1 - o) * (W - left + 60)}px)`, background: '#fff', borderRadius: '16px 0 0 16px', overflow: 'hidden', boxShadow: '-24px 0 48px -24px rgba(10,20,60,.45)' }}>
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: SP, background: '#E4E9F2' }}>
+                <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%) rotate(-90deg)', whiteSpace: 'nowrap', fontSize: narrow ? 12.5 : 13.5, fontWeight: 600, color: C.navy }}>{Lv.spine}</div>
+              </div>
+              <div style={{ position: 'absolute', left: SP, top: 0, right: 0, bottom: 0 }}>
+                <Level L={Lv} narrow={narrow} k={k[i]} hi={press[0] === i ? press[1] : -1} hp={press[2]} />
+              </div>
+              {covered > 0 && <div style={{ position: 'absolute', inset: 0, left: SP, background: `rgba(15,23,42,${0.22 * clamp(covered * 1.4)})` }} />}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -272,8 +339,8 @@ const ALERTS = [
 export const MWIN = { wide: { w: 1440, h: 664 } }
 export function OverviewWindow({ k = 1 }) {
   const G = MWIN.wide
-  const received = 80.55
-  const expected = 112
+  const received = 94.3
+  const expected = 114.8
   const rate = received / expected
   return (
     <div style={{ width: G.w, height: G.h, borderRadius: 20, overflow: 'hidden', background: C.page, fontFamily: UI_FONT, color: C.ink, boxShadow: '0 0 0 1px rgba(255,255,255,.6), 0 60px 120px -40px rgba(20,24,60,.55)' }}>
@@ -328,7 +395,7 @@ export function OverviewWindow({ k = 1 }) {
             <div style={{ position: 'relative', width: 230, display: 'grid', alignContent: 'space-between' }}>
               <div style={{ justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 8, height: 30, padding: '0 12px', borderRadius: 8, background: '#fff', color: C.navy, fontSize: 12.5, fontWeight: 600 }}>{IC.bank(C.navy, 15)}5 Colleges</div>
               <div style={{ display: 'grid', gap: 10 }}>
-                {[['Total pending', 31.45], ['Total expected', expected]].map(([l, v]) => (
+                {[['Total pending', expected - received], ['Total expected', expected]].map(([l, v]) => (
                   <div key={l}>
                     <div style={{ fontSize: 12, opacity: 0.65 }}>{l}</div>
                     <div style={{ fontSize: 17, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{cr(v * k)}</div>

@@ -86,11 +86,11 @@ export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 // One lilac background for the whole piece.
 export const BG = '#DCCFFF'
 export const SCENES = [
-  { id: 'hook', a: 0, b: 3.6 },
-  { id: 'flow', a: 3.6, b: 7.6 },
-  { id: 'modules', a: 7.6, b: 10.0 },
+  { id: 'hook', a: 0, b: 3.4 },
+  { id: 'flow', a: 3.4, b: 8.6 },
+  { id: 'modules', a: 8.6, b: 11.0 },
 ]
-export const DURATION = 10.0
+export const DURATION = 11.0
 // Paused poster frame (embed before it first plays, and reduced motion).
 export const POSTER = 2.8
 

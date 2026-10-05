@@ -3,12 +3,12 @@
 // frames (section 267:97221).
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
-//   2 · Flow: a college card → View fee breakdown → Collection by programme, with
-//       selections, a prototype noodle and the total counting up.
+//   2 · Flow: the stacked-drawer prototype. A college row opens its drawer, a programme
+//       opens a second drawer on top, a fee opens a third; each level keeps a spine tab.
 //   3 · Close: the eight modules snap into an auto-layout grid.
-import { Cursor, Noodle, Selection, Spacing } from './fig.jsx'
-import { C, E, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, BREAK, BreakdownCard, COLL, CollegeCard, KpiCard, LeaveCard, MODULES, MWIN, ModuleTile, OverviewWindow, PendingChip } from './ui.jsx'
+import { Cursor, Selection, Spacing } from './fig.jsx'
+import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
+import { AlertCard, KpiCard, LeaveCard, MODULES, MWIN, ModuleTile, OverviewWindow, ROW0, STACK, StackWindow, drawerLeft, levelBox } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -100,60 +100,78 @@ export function Hook({ t, L, W, H }) {
 }
 
 // =====================================================================================
-// 2 · FLOW: college → fee breakdown by programme
+// 2 · FLOW: the stacked-drawer prototype (college → programme → fee → batches)
 // =====================================================================================
-const FLOW = {
-  land: { K: 1.6, c0: { x: 960, y: 700 }, c1: { x: 560, y: 700 }, a: { x: 1380, y: 700 }, vertical: false, curFrom: { x: 1700, y: 1060 }, curRest: { x: 990, y: 1000 } },
-  port: { K: 1.6, c0: { x: 540, y: 1120 }, c1: { x: 540, y: 940 }, a: { x: 540, y: 1570 }, vertical: true, curFrom: { x: 1080, y: 1880 }, curRest: { x: 920, y: 1280 } },
+// The window (native STACK size) sits at (x, y) on the stage at scale K.
+const FLOWW = {
+  land: { K: 1.15, x: 270, y: 272, curFrom: { x: 1960, y: 1120 }, curRest: { x: 1700, y: 1000 } },
+  port: { K: 1.65, x: 45, y: 610, curFrom: { x: 1120, y: 1900 }, curRest: { x: 930, y: 1770 } },
 }
+// Click times (scene-local) for level 0, 1 and 2's first row; drawer i opens after click i.
+const CLICKS = [1.05, 2.3, 3.55]
 export function Flow({ t, L, W }) {
   const u = local(t, 'flow')
   if (u === null) return null
   const port = L === 'port'
-  const D = FLOW[L]
+  const D = FLOWW[L]
+  const G = STACK[L]
   const K = D.K
-  const exit = P(u, 3.45, 3.85, E.inOut)
-  const lw = COLL.w * K
-  const lh = COLL.h * K
-  const move = P(u, 1.75, 2.35, E.inOut)
-  const c = { x: lerp(D.c0.x, D.c1.x, move), y: lerp(D.c0.y, D.c1.y, move) }
-  const tl = { x: c.x - lw / 2, y: c.y - lh / 2 }
-  const pop = E.back(clamp((u - 0.2) / 0.55))
-  const btn = { x: tl.x + COLL.btn.x * K, y: tl.y + COLL.btn.y * K }
-  const aw = BREAK.w * K
-  const ah = BREAK.h * K
-  const atl = { x: D.a.x - aw / 2, y: D.a.y - ah / 2 }
-  const apop = E.back(clamp((u - 2.3) / 0.55))
-  const tc = 1.55
-  const cur = kf(u, [[0.7, D.curFrom], [1.4, btn], [1.7, btn], [2.5, D.curRest]])
-  const cs = sway(u, 3, u > 2.5 ? 6 : 0)
-  const n1 = D.vertical ? { x: c.x, y: tl.y + lh + 14 } : { x: tl.x + COLL.btn.r * K + 16, y: btn.y }
-  const n2 = D.vertical ? { x: D.a.x, y: atl.y - 16 } : { x: atl.x - 16, y: D.a.y }
-  const sk = port ? 1.35 : 1.15
+  const exit = P(u, 4.8, 5.2, E.inOut)
+  const win = E.back(clamp((u - 0.1) / 0.55))
+  const open = CLICKS.map((c) => P(u, c + 0.1, c + 0.7, E.expo))
+  const k = [P(u, 0.3, 1.0), ...CLICKS.map((c) => P(u, c + 0.4, c + 1.1))]
+  // Stage point of a level's first row (name column) and its row box.
+  const rowAt = (lv) => {
+    const b = levelBox(G, lv)
+    return { x: D.x + K * (b.x + (port ? 150 : 170)), y: D.y + K * (ROW0 + 27), box: { x: D.x + K * b.x, y: D.y + K * ROW0, w: K * b.w, h: K * 54 } }
+  }
+  const R = [0, 1, 2].map(rowAt)
+  const cur = kf(u, [
+    [0.45, D.curFrom], [0.95, R[0]], [CLICKS[0] + 0.25, R[0]],
+    [CLICKS[1] - 0.15, R[1]], [CLICKS[1] + 0.25, R[1]],
+    [CLICKS[2] - 0.15, R[2]], [CLICKS[2] + 0.3, R[2]], [4.4, D.curRest],
+  ])
+  const cs = sway(u, 3, u > 4.4 ? 5 : 0)
+  // Pressed row: the most recent click within its window.
+  let pr = [-1, 0, 0]
+  CLICKS.forEach((c, i) => {
+    const h = u > c - 0.25 && u < c + 0.35 ? clamp(1 - Math.abs(u - c) / 0.3) : 0
+    if (h > 0) pr = [i, 0, h]
+  })
+  const sk = port ? 1.35 : 1.1
   return (
     <>
-      <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Finance" lines={port ? ['See fee collection', 'by programme.'] : ['See fee collection by programme.']} />
+      <Title L={L} W={W} u={u - 0.1} out={exit} eyebrow="Finance" lines={port ? ['Drill down from', 'college to fee.'] : ['Drill down from college to fee.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        <Noodle x1={n1.x} y1={n1.y} x2={n2.x} y2={n2.y} u={P(u, 1.95, 2.5, E.inOut)} vertical={D.vertical} label="On click" />
-        <Abs x={tl.x} y={tl.y} style={{ width: lw, height: lh, opacity: clamp((u - 0.2) / 0.2), transform: `scale(${0.85 + 0.15 * pop})`, zIndex: 10 }}>
+        <div style={{ position: 'absolute', left: D.x, top: D.y - 34, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * clamp((u - 0.3) / 0.3) * (1 - open[0]), whiteSpace: 'nowrap' }}>Revenue contribution · Prototype</div>
+        <Abs x={D.x} y={D.y} style={{ width: G.W * K, height: G.H * K, opacity: clamp((u - 0.1) / 0.25), transform: `scale(${0.9 + 0.1 * win})`, transformOrigin: '50% 60%', zIndex: 10 }}>
           <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-            <CollegeCard pr={press(u, tc)} p={P(u, 0.45, 1.3)} />
+            <StackWindow L={L} open={open} k={k} press={pr} />
           </div>
-          <Selection x={0} y={0} w={lw} h={lh} o={u > 0.4 ? P(u, 0.4, 0.55) * (1 - P(u, 1.65, 1.8)) : 0} label="College Card" comp size="400 × 294" k={sk} />
-          <Abs x={lw / 2} y={-30 - 48 * K} style={{ transform: `translateX(-50%) scale(${K * (0.7 + 0.3 * E.back(clamp((u - 0.5) / 0.45)))})`, transformOrigin: '50% 0', opacity: clamp((u - 0.5) / 0.2) }}>
-            <PendingChip p={P(u, 0.6, 1.4)} />
-          </Abs>
         </Abs>
-        {u > 2.25 && (
-          <Abs x={atl.x} y={atl.y} style={{ width: aw, height: ah, opacity: clamp((u - 2.3) / 0.2), transform: `scale(${0.82 + 0.18 * apop})`, zIndex: 10 }}>
-            <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-              <BreakdownCard rows={P(u, 2.5, 2.95, E.out)} p={P(u, 2.6, 3.3, E.out)} />
+        {/* prototype hotspots: the clicked row outlines in blue with its interaction */}
+        {CLICKS.map((c, i) => {
+          const o = clamp((u - (c - 0.35)) / 0.2) * (1 - clamp((u - (c + 0.08)) / 0.14))
+          if (o <= 0) return null
+          const b = R[i].box
+          return (
+            <div key={i} style={{ position: 'absolute', left: b.x, top: b.y, width: b.w, height: b.h, opacity: o, zIndex: 30, pointerEvents: 'none' }}>
+              <div style={{ position: 'absolute', inset: -3, border: `2.5px solid ${FIG.proto}`, borderRadius: 14, background: 'rgba(13,153,255,.06)' }} />
+              <div style={{ position: 'absolute', right: 0, top: -44 * (port ? 1.3 : 1), transform: `scale(${port ? 1.3 : 1})`, transformOrigin: '100% 100%', display: 'flex', alignItems: 'center', gap: 6, background: FIG.proto, color: '#fff', font: `600 15px/1 ${UI_FONT}`, padding: '8px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11V5.5a2 2 0 014 0V11M13 9.5a2 2 0 014 0V12M17 11a2 2 0 014 0v3.5a6.5 6.5 0 01-6.5 6.5H13a6 6 0 01-4.6-2.2L5 14.5a2 2 0 013-2.6L9 13" /></svg>
+                On click → Open overlay
+              </div>
             </div>
-            <Selection x={0} y={0} w={aw} h={ah} o={P(u, 2.45, 2.6)} label="Programme Breakdown" comp k={sk} />
-          </Abs>
-        )}
+          )
+        })}
+        {/* each drawer is selected as it lands */}
+        {CLICKS.map((c, i) => {
+          const left = drawerLeft(G, i + 1)
+          const o = u > c + 0.55 ? P(u, c + 0.55, c + 0.7) * (1 - P(u, i < 2 ? CLICKS[i + 1] - 0.4 : 4.55, i < 2 ? CLICKS[i + 1] - 0.25 : 4.75)) : 0
+          return <Selection key={i} x={D.x + K * left} y={D.y} w={K * (G.W - left)} h={K * G.H} o={o} label={`Drawer · Level ${i + 1}`} comp size={`${G.W - left} × ${G.H}`} k={sk} />
+        })}
       </div>
-      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.7, 0.95) * (1 - exit)} pr={press(u, tc)} rp={ripple(u, tc)} s={port ? 2 : 1.5} />
+      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.45, 0.7) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
     </>
   )
 }
