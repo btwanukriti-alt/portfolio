@@ -87,7 +87,7 @@ export const MONO = "'Geist Mono', ui-monospace, monospace"
 
 // Scenes and their stage colours. A frame wipe in the next colour opens each scene.
 // One soft blue background for the whole piece.
-export const BG = '#E2E7F5'
+export const BG = '#D8E0F5'
 // Scene lengths are written in scene-local seconds; SLOW stretches every scene uniformly so the
 // piece reads calmly for a first-time viewer (motion and holds both get longer).
 export const SLOW = 1.2
