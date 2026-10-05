@@ -73,24 +73,30 @@ export const C = {
   yellow: '#F2B21B',
 }
 
+// Figma editor colours (selection, components, spacing, prototype noodles).
+export const FIG = { sel: '#0D99FF', comp: '#9747FF', spacing: '#F24822', proto: '#0D99FF' }
 
+// Multiplayer cursors: one colour per person, readable on every stage colour.
+export const PEOPLE = {
+  Anu: '#FF6B2C',
+  'Apurva Jha': '#12B76A',
+  'Shikhar Tiwari': '#FF3D8B',
+  'Neha Singh': '#00A8E0',
+}
 
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
-
-// Hook → middle → end. One background; captions on top; a camera moves over each screen.
-export const BG = '#E6EBFA'
 export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
-export const CHAPTERS = [
-  { id: 'hook', a: 0, b: 6.0 },
-  { id: 'follow', a: 6.0, b: 13.0 },
-  { id: 'convert', a: 13.0, b: 20.0 },
-  { id: 'onboard', a: 20.0, b: 28.5 },
-  { id: 'retain', a: 28.5, b: 35.0 },
-  { id: 'end', a: 35.0, b: 39.5 },
+
+// Scenes and their stage colours. A frame wipe in the next colour opens each scene.
+// Bright Figma-style pastels: lilac intro, sky-blue feature, butter-yellow close.
+export const SCENES = [
+  { id: 'hook', a: 0, b: 3.6, bg: '#DCCFFF' },
+  { id: 'leads', a: 3.6, b: 7.6, bg: '#BFDBFF' },
+  { id: 'modules', a: 7.6, b: 10.0, bg: '#FFE79E' },
 ]
-export const DURATION = 39.5
+export const DURATION = 10.0
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 3.4
+export const POSTER = 2.8
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }
