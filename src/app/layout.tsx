@@ -1,0 +1,51 @@
+import type { Metadata, Viewport } from 'next'
+import { Architects_Daughter, Hanken_Grotesk, Inter_Tight, JetBrains_Mono, Poppins, Rubik_Mono_One } from 'next/font/google'
+import SmoothScroll from '@/components/SmoothScroll'
+import { SITE_URL } from '@/lib/site'
+import './globals.css'
+
+// Self-hosted at build time by next/font: no layout shift, no request to Google at runtime.
+const hanken = Hanken_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800'], variable: '--font-hanken' })
+const rubikMono = Rubik_Mono_One({ subsets: ['latin'], weight: '400', variable: '--font-rubik-mono' })
+// Figma Hand isn't a public web font; Architects Daughter is the closest match.
+const architects = Architects_Daughter({ subsets: ['latin'], weight: '400', variable: '--font-architects' })
+// Used by the slide counter patch, to match the Poppins in the presentation slides.
+const poppins = Poppins({ subsets: ['latin'], weight: '500', variable: '--font-poppins' })
+// The intro hero (Figma-style type and UI labels).
+const interTight = Inter_Tight({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-inter-tight' })
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], weight: '400', variable: '--font-jetbrains' })
+
+const DESCRIPTION = "Anukriti Mishra, UI/UX designer in Bangalore. I spot what's confusing and design it clear."
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: { default: 'Anukriti Mishra — UI/UX Designer', template: '%s — Anukriti Mishra' },
+  description: DESCRIPTION,
+  icons: { icon: '/favicon.svg' },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: 'Anukriti Mishra',
+    title: 'Anukriti Mishra — UI/UX Designer',
+    description: DESCRIPTION,
+    images: [{ url: '/work/project-1.jpg' }],
+  },
+  twitter: { card: 'summary_large_image' },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#ffffff',
+  colorScheme: 'light',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${hanken.variable} ${rubikMono.variable} ${architects.variable} ${poppins.variable} ${interTight.variable} ${jetbrainsMono.variable}`}>
+      <body>
+        <div id="top" />
+        <SmoothScroll />
+        {children}
+      </body>
+    </html>
+  )
+}

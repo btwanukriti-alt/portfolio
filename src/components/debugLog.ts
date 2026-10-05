@@ -1,3 +1,5 @@
+'use client'
+
 // Temporary: open the page with ?debug to see which pinch events the device actually sends.
 export type DebugLog = ((line: string) => void) & { remove: () => void }
 
