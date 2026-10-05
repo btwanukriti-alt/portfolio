@@ -36,18 +36,18 @@ function Title({ L, W, u, out, eyebrow, lines }) {
 // 1 · INTRO
 // =====================================================================================
 // The drawn frame holds the Members dashboard (1440 × 664) at k = frame width / 1440.
-export const HOOK_FRAME = { land: { x: 500, y: 330, w: 920, h: 424 }, port: { x: 90, y: 600, w: 900, h: 415 } }
-const CS = 1.15
+export const HOOK_FRAME = { land: { x: 440, y: 370, w: 1040, h: 480 }, port: { x: 70, y: 660, w: 940, h: 433 } }
+const CS = 1.2
 const CARDS = {
   land: [
-    { kind: 'score', label: 'Lead Score', w: 320, h: 152, to: { x: 110, y: 300 }, from: { x: -520, y: 220 }, rot: -6 },
-    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 1450, y: 290 }, from: { x: 2100, y: 200 }, rot: 5 },
-    { kind: 'plan', label: 'Plan Card', w: 280, h: 178, to: { x: 1480, y: 650 }, from: { x: 2100, y: 900 }, rot: -4 },
+    { kind: 'score', label: 'Lead Score', w: 320, h: 152, to: { x: 70, y: 400 }, from: { x: -520, y: 320 }, rot: -6 },
+    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 1500, y: 360 }, from: { x: 2100, y: 260 }, rot: 5 },
+    { kind: 'plan', label: 'Plan Card', w: 280, h: 178, to: { x: 1490, y: 690 }, from: { x: 2100, y: 940 }, rot: -4 },
   ],
   port: [
-    { kind: 'score', label: 'Lead Score', w: 320, h: 152, to: { x: 70, y: 1110 }, from: { x: -520, y: 1200 }, rot: -5 },
-    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 640, y: 1150 }, from: { x: 1300, y: 1250 }, rot: 5 },
-    { kind: 'plan', label: 'Plan Card', w: 280, h: 178, to: { x: 330, y: 1400 }, from: { x: 330, y: 2100 }, rot: -3 },
+    { kind: 'score', label: 'Lead Score', w: 320, h: 152, to: { x: 60, y: 1200 }, from: { x: -520, y: 1290 }, rot: -5 },
+    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 620, y: 1240 }, from: { x: 1300, y: 1340 }, rot: 5 },
+    { kind: 'plan', label: 'Plan Card', w: 280, h: 178, to: { x: 330, y: 1500 }, from: { x: 330, y: 2100 }, rot: -3 },
   ],
 }
 export function Hook({ t, L, W, H }) {
@@ -102,8 +102,8 @@ export function Hook({ t, L, W, H }) {
 // 2 · LEADS
 // =====================================================================================
 const LEADS = {
-  land: { K: 1.45, c0: { x: 960, y: 650 }, c1: { x: 580, y: 650 }, a: { x: 1350, y: 650 }, vertical: false, curFrom: { x: 1700, y: 1060 }, curRest: { x: 980, y: 930 } },
-  port: { K: 1.6, c0: { x: 540, y: 1060 }, c1: { x: 540, y: 880 }, a: { x: 540, y: 1500 }, vertical: true, curFrom: { x: 1080, y: 1880 }, curRest: { x: 920, y: 1220 } },
+  land: { K: 1.6, c0: { x: 960, y: 700 }, c1: { x: 560, y: 700 }, a: { x: 1380, y: 700 }, vertical: false, curFrom: { x: 1700, y: 1060 }, curRest: { x: 990, y: 1000 } },
+  port: { K: 1.6, c0: { x: 540, y: 1120 }, c1: { x: 540, y: 940 }, a: { x: 540, y: 1570 }, vertical: true, curFrom: { x: 1080, y: 1880 }, curRest: { x: 920, y: 1280 } },
 }
 export function Leads({ t, L, W }) {
   const u = local(t, 'leads')
@@ -162,20 +162,22 @@ export function Leads({ t, L, W }) {
 // =====================================================================================
 const MODS = {
   land: {
-    tw: 300,
-    slot: (i) => (i < 4 ? { x: 324 + i * 324, y: 450 } : { x: 486 + (i - 4) * 324, y: 586 }),
-    scatter: [[150, 400, -14], [1560, 360, 12], [240, 800, 10], [1500, 820, -10], [720, 880, 8], [1100, 330, -6], [1080, 880, 14]],
-    box: { x: 292, y: 418, w: 1336, h: 312 },
-    gaps: [[624, 648], [948, 972], [1272, 1296]].map(([a, b]) => ({ x1: a, x2: b, y: 450 })),
-    cursor: { from: { x: 2050, y: 1150 }, to: { x: 1580, y: 780 } },
+    tw: 340,
+    th: 124,
+    slot: (i) => (i < 4 ? { x: 244 + i * 364, y: 540 } : { x: 426 + (i - 4) * 364, y: 688 }),
+    scatter: [[150, 420, -14], [1540, 400, 12], [220, 820, 10], [1480, 840, -10], [700, 900, 8], [1100, 360, -6], [1060, 900, 14]],
+    box: { x: 212, y: 508, w: 1496, h: 336 },
+    gaps: [[584, 608], [948, 972], [1312, 1336]].map(([a, b]) => ({ x1: a, x2: b, y: 540 })),
+    cursor: { from: { x: 2050, y: 1150 }, to: { x: 1690, y: 910 } },
   },
   port: {
     tw: 440,
-    slot: (i) => (i < 6 ? { x: 88 + (i % 2) * 464, y: 640 + Math.floor(i / 2) * 136 } : { x: 320, y: 640 + 3 * 136 }),
-    scatter: [[60, 580, -12], [580, 540, 10], [40, 920, 8], [600, 880, -9], [80, 1260, 10], [560, 1220, -8], [300, 1400, 12]],
-    box: { x: 56, y: 608, w: 968, h: 584 },
-    gaps: [0, 1, 2].map((r) => ({ x1: 528, x2: 552, y: 640 + r * 136 })),
-    cursor: { from: { x: 1200, y: 1800 }, to: { x: 900, y: 1280 } },
+    th: 160,
+    slot: (i) => (i < 6 ? { x: 88 + (i % 2) * 464, y: 760 + Math.floor(i / 2) * 184 } : { x: 320, y: 760 + 3 * 184 }),
+    scatter: [[60, 640, -12], [580, 600, 10], [40, 1000, 8], [600, 960, -9], [80, 1360, 10], [560, 1320, -8], [300, 1560, 12]],
+    box: { x: 56, y: 728, w: 968, h: 776 },
+    gaps: [0, 1, 2].map((r) => ({ x1: 528, x2: 552, y: 760 + r * 184 })),
+    cursor: { from: { x: 1200, y: 1800 }, to: { x: 920, y: 1580 } },
   },
 }
 export function Modules({ t, L, W }) {
@@ -201,13 +203,13 @@ export function Modules({ t, L, W }) {
           const to = D.slot(i)
           return (
             <Abs key={name} x={lerp(sx, to.x, s)} y={lerp(sy, to.y, s)} style={{ transform: `rotate(${sr * (1 - s)}deg) scale(${pp})`, opacity: clamp((u - a) / 0.15), zIndex: 10 }}>
-              <ModuleTile name={name} icon={icon} tint={tint} w={D.tw} />
+              <ModuleTile name={name} icon={icon} tint={tint} w={D.tw} h={D.th} />
             </Abs>
           )
         })}
         <Selection {...D.box} o={sel} label="Modules · Auto layout" size="Hug × Hug" k={port ? 1.4 : 1.2} />
         {D.gaps.map((g, i) => (
-          <Spacing key={i} x1={g.x1} x2={g.x2} y={g.y} h={112} o={gap} value="24" />
+          <Spacing key={i} x1={g.x1} x2={g.x2} y={g.y} h={D.th} o={gap} value="24" />
         ))}
         <Cursor x={lerp(D.cursor.from.x, D.cursor.to.x, cp) + csw.x} y={lerp(D.cursor.from.y, D.cursor.to.y, cp) + csw.y} o={P(u, 0.7, 1.0)} s={port ? 2 : 1.5} />
       </div>
