@@ -412,23 +412,3 @@ export function OverviewWindow({ k = 1 }) {
     </div>
   )
 }
-
-// ---------- Module tiles ----------
-export const MODULES = [
-  ['Dashboard', IC.grid, C.primary],
-  ['Finance', IC.rupee, C.navy2],
-  ['Income', IC.income, C.green],
-  ['Settlements', IC.receipt, C.teal],
-  ['Staff', IC.users, C.violet],
-  ['Attendance', IC.calendar, C.amber],
-  ['Banking', IC.bank, '#3B82F6'],
-  ['Reports', IC.report, C.red],
-]
-export function ModuleTile({ name, icon, tint, w, h = 112 }) {
-  return (
-    <div style={card({ width: w, height: h, padding: '0 24px', display: 'flex', alignItems: 'center', gap: 18, boxShadow: lift })}>
-      <div style={{ width: 60, height: 60, borderRadius: 16, background: tint, display: 'grid', placeItems: 'center', flex: 'none' }}>{icon('#fff', 28)}</div>
-      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>{name}</div>
-    </div>
-  )
-}

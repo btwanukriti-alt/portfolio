@@ -83,14 +83,13 @@ export const FIG = { sel: '#0D99FF', comp: '#9747FF', spacing: '#F24822', proto:
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 
 // Scenes and their stage colours. A frame wipe in the next colour opens each scene.
-// One lilac background for the whole piece.
-export const BG = '#DCCFFF'
+// One soft blue background for the whole piece.
+export const BG = '#CFDDFF'
 export const SCENES = [
   { id: 'hook', a: 0, b: 3.4 },
   { id: 'flow', a: 3.4, b: 8.6 },
-  { id: 'modules', a: 8.6, b: 11.0 },
 ]
-export const DURATION = 11.0
+export const DURATION = 8.6
 // Paused poster frame (embed before it first plays, and reduced motion).
 export const POSTER = 2.8
 

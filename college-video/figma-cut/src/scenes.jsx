@@ -1,14 +1,13 @@
-// The three scenes of the 10s cut, each a pure function of the clock `t` and the layout
+// The two scenes of the 8.6s cut, each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the college management Figma
 // frames (section 267:97221).
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
 //   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
 //       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
-//   3 · Close: the eight modules snap into an auto-layout grid.
-import { Cursor, Selection, Spacing } from './fig.jsx'
+import { Cursor, Selection } from './fig.jsx'
 import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MODULES, MWIN, ModuleTile, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip } from './ui.jsx'
+import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -184,7 +183,7 @@ export function Flow({ t, L, W }) {
               <div style={{ transform: `scale(${K})`, transformOrigin: '0 0', filter: `saturate(${1 - 0.2 * Math.min(R.d, 2)})` }}>
                 <SheetCard level={i} k={k[i]} rows={rows[i]} hi={hi(i)} />
               </div>
-              <div style={{ position: 'absolute', inset: 0, borderRadius: 16 * K, background: `rgba(220,207,255,${0.22 * Math.min(R.d, 2)})`, pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', inset: 0, borderRadius: 16 * K, background: `rgba(207,221,255,${0.22 * Math.min(R.d, 2)})`, pointerEvents: 'none' }} />
             </Abs>
           )
         })}
@@ -215,66 +214,6 @@ export function Flow({ t, L, W }) {
         </Abs>
       </div>
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.55, 0.8) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
-    </>
-  )
-}
-
-// =====================================================================================
-// 3 · CLOSE: the eight modules snap into auto layout
-// =====================================================================================
-const MODS = {
-  land: {
-    tw: 340,
-    th: 124,
-    slot: (i) => ({ x: 244 + (i % 4) * 364, y: i < 4 ? 540 : 688 }),
-    scatter: [[150, 420, -14], [700, 380, -6], [1100, 360, 8], [1540, 400, 12], [220, 820, 10], [660, 900, 8], [1080, 900, 14], [1480, 840, -10]],
-    box: { x: 212, y: 508, w: 1496, h: 336 },
-    gaps: [[584, 608], [948, 972], [1312, 1336]].map(([a, b]) => ({ x1: a, x2: b, y: 540 })),
-    cursor: { from: { x: 2050, y: 1150 }, to: { x: 1690, y: 910 } },
-  },
-  port: {
-    tw: 440,
-    th: 160,
-    slot: (i) => ({ x: 88 + (i % 2) * 464, y: 760 + Math.floor(i / 2) * 184 }),
-    scatter: [[60, 640, -12], [580, 600, 10], [40, 1000, 8], [600, 960, -9], [80, 1360, 10], [560, 1320, -8], [60, 1600, 12], [600, 1640, -10]],
-    box: { x: 56, y: 728, w: 968, h: 776 },
-    gaps: [0, 1, 2, 3].map((r) => ({ x1: 528, x2: 552, y: 760 + r * 184 })),
-    cursor: { from: { x: 1200, y: 1800 }, to: { x: 920, y: 1580 } },
-  },
-}
-export function Modules({ t, L, W }) {
-  const u = local(t, 'modules')
-  if (u === null) return null
-  const port = L === 'port'
-  const D = MODS[L]
-  const exit = P(u, 1.95, 2.35, E.inOut)
-  const snap = (i) => P(u, 0.45 + i * 0.03, 0.95 + i * 0.03, E.inOut)
-  const sel = P(u, 0.95, 1.1)
-  const gap = P(u, 1.0, 1.15)
-  const cp = P(u, 0.7, 1.3, E.expo)
-  const csw = sway(u, 2, 5)
-  return (
-    <>
-      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="All in one" lines={port ? ['Finance, staff,', 'banking and reports.'] : ['Finance, staff, banking and reports.']} />
-      <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `scale(${1 - 0.04 * exit})`, transformOrigin: '50% 55%' }}>
-        {MODULES.map(([name, icon, tint], i) => {
-          const a = 0.05 + i * 0.05
-          const pp = E.back(clamp((u - a) / 0.4))
-          const s = snap(i)
-          const [sx, sy, sr] = D.scatter[i]
-          const to = D.slot(i)
-          return (
-            <Abs key={name} x={lerp(sx, to.x, s)} y={lerp(sy, to.y, s)} style={{ transform: `rotate(${sr * (1 - s)}deg) scale(${pp})`, opacity: clamp((u - a) / 0.15), zIndex: 10 }}>
-              <ModuleTile name={name} icon={icon} tint={tint} w={D.tw} h={D.th} />
-            </Abs>
-          )
-        })}
-        <Selection {...D.box} o={sel} label="Modules · Auto layout" size="Hug × Hug" k={port ? 1.4 : 1.2} />
-        {D.gaps.map((g, i) => (
-          <Spacing key={i} x1={g.x1} x2={g.x2} y={g.y} h={D.th} o={gap} value="24" />
-        ))}
-        <Cursor x={lerp(D.cursor.from.x, D.cursor.to.x, cp) + csw.x} y={lerp(D.cursor.from.y, D.cursor.to.y, cp) + csw.y} o={P(u, 0.7, 1.0)} s={port ? 2 : 1.5} />
-      </div>
     </>
   )
 }

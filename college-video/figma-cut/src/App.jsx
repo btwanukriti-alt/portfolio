@@ -1,12 +1,12 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
 import { DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
-import { Flow, Hook, Modules } from './scenes.jsx'
+import { Flow, Hook } from './scenes.jsx'
 import { Backdrop, CanvasFrame, frameInset } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
 // poster frame until the page posts 'showcase:play', looping after that.
 // Outside the selection frame: a plain light canvas.
-const OUTSIDE = '#F4F2FA'
+const OUTSIDE = '#F2F5FC'
 const EMBED = typeof window !== 'undefined' && (window.__EMBED__ || /[?&]embed\b/.test(location.search))
 const STILL = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -112,11 +112,10 @@ export default function App() {
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', fontFamily: UI_FONT, background: OUTSIDE }}>
       <div style={{ position: 'absolute', left: m, top: m, width: iw, height: ih, overflow: 'hidden' }}>
-        <Backdrop t={t} vw={iw} vh={ih} />
+        <Backdrop />
         <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
           <Hook {...props} />
           <Flow {...props} />
-          <Modules {...props} />
         </div>
       </div>
       <CanvasFrame vw={vw} vh={vh} />
