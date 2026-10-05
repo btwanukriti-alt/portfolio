@@ -1,17 +1,100 @@
-// Hook → middle → end, on one background.
-// Hook: a product overview, the dashboard as a hub with the seven modules around it, beside
-// "Every lead. Every member. One place."
-// Middle: one lead (Neha Singh) through the real screens, each shown whole, joined by
-// transitions: a clip reveal, her alert card travelling into her table row, the row growing
-// into the Convert to Member form, and a push into Members.
-// End: the four screens settle into a deck beside the Pulsefit sign-off.
+// Hook → middle → end, with a camera.
+// Hook: product overview. The camera starts close on a module, pulls back to the dashboard hub
+// with all seven modules, then pushes into the hub, which becomes the first screen.
+// Middle: Neha Singh's lead-to-member flow. Each screen opens whole, the camera zooms into the
+// feature being used and back out, and supporting infographic cards pop up beside it. Chapters
+// are joined by match cuts: the camera dives into an element and comes out of the same element
+// in the next screen.
+// End: the screens settle into a deck under the Pulsefit sign-off. Text sits on top only.
 import { Cursor } from './fig.jsx'
-import { PRICE_CARD, PlanPrices } from './infographics.jsx'
-import { C, E, HEAD_FONT, P, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
+import { ContactDays, Expiring, MemberBars, MissedStat, PRICE_CARD, PlanPrices, StatusFlip, StatusFunnel, TotalRing } from './infographics.jsx'
+import { C, CHAPTERS, E, HEAD_FONT, P, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
 import { CV, ConvertFrame, LD, LT, LeadsDash, LeadsTable, MD, Members } from './screens.jsx'
-import { Avatar, Chip, IC, Mark } from './ui.jsx'
+import { IC, Mark } from './ui.jsx'
 
-// The product's modules (sidebar) with a fact from each module's screens.
+const LAY = {
+  land: { V: { x: 100, y: 250, w: 1720, h: 790 }, clip: 214, capY: 64, size: 60, sub: 22, slots: [{ x: 60, y: 600 }, { x: 1860 - 360 * 1.75, y: 560 }], ps: 1.75, cur: 1.5 },
+  port: { V: { x: 30, y: 470, w: 1020, h: 1400 }, clip: 420, capY: 150, size: 80, sub: 30, slots: [{ x: 30, y: 1470 }, { x: 1050 - 360 * 1.36, y: 1470 }], ps: 1.36, cur: 2.1 },
+}
+const CH = Object.fromEntries(CHAPTERS.map((c) => [c.id, c]))
+
+// ------------------------------------------------------------------------------------- camera
+// keys: [[time, rect]] in frame (or world) coordinates; each rect is fitted into V. Zoom is
+// interpolated in log space so pushes and pulls feel even.
+function camera(keys, u, V) {
+  const fitR = (r) => ({ k: Math.min(V.w / r.w, V.h / r.h), x: r.x + r.w / 2, y: r.y + r.h / 2 })
+  let i = 0
+  while (i < keys.length - 2 && u > keys[i + 1][0]) i++
+  const a = fitR(keys[i][1])
+  const b = fitR(keys[i + 1][1])
+  const e = E.inOut(clamp((u - keys[i][0]) / (keys[i + 1][0] - keys[i][0] || 1)))
+  const k = Math.exp(lerp(Math.log(a.k), Math.log(b.k), e))
+  const cx = lerp(a.x, b.x, e)
+  const cy = lerp(a.y, b.y, e)
+  return { k, tx: V.x + V.w / 2 - cx * k, ty: V.y + V.h / 2 - cy * k }
+}
+const whole = (fw, fh) => ({ x: 0, y: 0, w: fw, h: fh })
+const pad = (r, p) => ({ x: r.x - p, y: r.y - p, w: r.w + 2 * p, h: r.h + 2 * p })
+
+// ------------------------------------------------------------------------------------ caption
+function Caption({ L, W, lines, sub, u, out }) {
+  const { capY, size, sub: ss } = LAY[L]
+  let n = 0
+  return (
+    <div style={{ position: 'absolute', left: 0, top: capY, width: W, textAlign: 'center', opacity: 1 - out, transform: `translateY(${-18 * E.inOut(out)}px)`, zIndex: 40 }}>
+      {lines.map((line, li) => (
+        <div key={li} style={{ font: `600 ${size}px/1.06 ${HEAD_FONT}`, letterSpacing: '-0.04em', color: C.ink, whiteSpace: 'nowrap' }}>
+          {line.split(' ').map((w, wi) => {
+            const p = P(u, n * 0.05, n++ * 0.05 + 0.8, E.expo)
+            return (
+              <span key={wi} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'top', padding: '0.04em 0.02em 0.1em', margin: '-0.04em 0 -0.1em' }}>
+                <span style={{ display: 'inline-block', transform: `translateY(${(1 - p) * 105}%)` }}>{w}</span>{' '}
+              </span>
+            )
+          })}
+        </div>
+      ))}
+      {sub && <div style={{ font: `400 ${ss}px/1.4 ${UI_FONT}`, color: '#5B6178', marginTop: L === 'port' ? 18 : 12, opacity: P(u, 0.4, 0.9) }}>{sub}</div>}
+    </div>
+  )
+}
+
+// A supporting card popping up in a slot.
+function Pop({ L, slot, u, until, children }) {
+  if (u < 0 || u > until + 0.5) return null
+  const { slots, ps } = LAY[L]
+  const s = slots[slot]
+  const e = E.back(clamp(u / 0.6))
+  const out = P(u, until, until + 0.45, E.inOut)
+  return (
+    <div style={{ position: 'absolute', left: s.x, top: s.y, transformOrigin: '0 0', transform: `translateY(${(1 - E.out(clamp(u / 0.6))) * 40 + out * 20}px) scale(${ps * (0.86 + 0.14 * e)})`, opacity: clamp(u / 0.25) * (1 - out), zIndex: 30 }}>
+      {children}
+    </div>
+  )
+}
+
+// A screen under the camera: clipped below the caption, rounded corners kept on screen.
+function CamScreen({ L, W, H, fw, fh, cam, o, children, cursor, u }) {
+  const { clip } = LAY[L]
+  let cur = null
+  if (cursor) {
+    const c = kf(u, cursor.track)
+    const sw = sway(u, 2, 3)
+    cur = <Cursor x={cam.tx + c.x * cam.k + sw.x} y={cam.ty + c.y * cam.k + sw.y} o={P(u, cursor.track[0][0], cursor.track[0][0] + 0.3) * (cursor.o ?? 1) * o} pr={Math.max(0, ...cursor.clicks.map((t) => press(u, t)))} rp={Math.max(0, ...cursor.clicks.map((t) => ripple(u, t)))} s={LAY[L].cur} />
+  }
+  return (
+    <>
+      <div style={{ position: 'absolute', left: 0, top: clip, width: W, height: H - clip, overflow: 'hidden', opacity: o, WebkitMaskImage: 'linear-gradient(transparent, #000 48px)', maskImage: 'linear-gradient(transparent, #000 48px)' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, transformOrigin: '0 0', transform: `translate(${cam.tx}px, ${cam.ty - clip}px) scale(${cam.k})`, willChange: 'transform' }}>
+          <div style={{ width: fw, height: fh, borderRadius: 16 / cam.k, overflow: 'hidden', boxShadow: `0 ${50 / cam.k}px ${100 / cam.k}px -${50 / cam.k}px rgba(20,30,80,.45), 0 0 0 ${1 / cam.k}px rgba(20,30,80,.05)` }}>{children}</div>
+        </div>
+      </div>
+      {cur}
+    </>
+  )
+}
+
+// ----------------------------------------------------------------------------------- the hook
 const MODULES = [
   ['Leads', IC.star, '#3B5BDB', '#E5EBFF', '234 new leads'],
   ['Members', IC.users, C.primary, C.pSoft, '234 active members'],
@@ -21,278 +104,214 @@ const MODULES = [
   ['Equipments', IC.dumbbell, C.teal, '#E3F7F4', 'Repair schedules'],
   ['Workouts', IC.heart, C.red, C.rSoft, 'Workout plans'],
 ]
-
-// Layout: captions in a left column (landscape) or on top (portrait); screens in AREA.
-const LAY = {
-  land: { cap: { x: 120, w: 540 }, area: { x: 720, y: 80, w: 1120, h: 920 }, size: 64, cur: 1.5 },
-  port: { cap: { x: 70, w: 940 }, area: { x: 40, y: 600, w: 1000, h: 1240 }, size: 84, cur: 2.1 },
+const HUB = { land: 600, port: 560 }
+const modPos = (L, i) => {
+  if (L === 'port') return [[-165, -480], [165, -480], [-165, -360], [165, -360], [-165, 360], [165, 360], [0, 480]][i]
+  const ang = -Math.PI / 2 + (i * 2 * Math.PI) / MODULES.length
+  return [640 * Math.cos(ang), 380 * Math.sin(ang)]
 }
-const fit = (a, fw, fh) => {
-  const k = Math.min(a.w / fw, a.h / fh)
-  return { k, x: a.x + (a.w - fw * k) / 2, y: a.y + (a.h - fh * k) / 2, w: fw * k, h: fh * k }
-}
-const onScreen = (f, r) => ({ x: f.x + r.x * f.k, y: f.y + r.y * f.k, w: r.w * f.k, h: r.h * f.k })
-const shadow = '0 1px 0 rgba(20,30,80,.05), 0 50px 100px -50px rgba(20,30,80,.45)'
-
-// ------------------------------------------------------------------------------------ caption
-// Lines rise out of a mask one after another; the sub line fades in; out lifts it all away.
-function Caption({ L, y, lines, sub, u, out = 0, size }) {
-  const { cap } = LAY[L]
-  const fs = size || LAY[L].size
-  return (
-    <div style={{ position: 'absolute', left: cap.x, top: y, width: cap.w, opacity: 1 - out, transform: `translateY(${-24 * E.inOut(out)}px)` }}>
-      {lines.map((line, i) => {
-        const p = P(u, i * 0.09, i * 0.09 + 0.9, E.expo)
-        return (
-          <div key={i} style={{ overflow: 'hidden', padding: '0.04em 0 0.1em', marginBottom: '-0.12em' }}>
-            <div style={{ font: `600 ${fs}px/1.04 ${HEAD_FONT}`, letterSpacing: '-0.04em', color: C.ink, transform: `translateY(${(1 - p) * 105}%)`, whiteSpace: 'nowrap' }}>{line}</div>
-          </div>
-        )
-      })}
-      {sub && (
-        <div style={{ font: `400 ${L === 'port' ? 30 : 21}px/1.45 ${UI_FONT}`, color: '#5B6178', marginTop: L === 'port' ? 26 : 22, maxWidth: L === 'port' ? 860 : 440, opacity: P(u, 0.45, 1.0), transform: `translateY(${(1 - P(u, 0.45, 1.1, E.expo)) * 14}px)` }}>{sub}</div>
-      )}
-    </div>
-  )
-}
-
-// A whole screen at f, with optional entrance style and a cursor in frame coordinates.
-function Shot({ f, children, style, cursor, u, L }) {
-  let cur = null
-  if (cursor) {
-    const c = kf(u, cursor.track)
-    const sw = sway(u, 2, 3)
-    cur = <Cursor x={f.x + c.x * f.k + sw.x} y={f.y + c.y * f.k + sw.y} o={P(u, cursor.track[0][0], cursor.track[0][0] + 0.3) * (cursor.o ?? 1)} pr={Math.max(0, ...cursor.clicks.map((t) => press(u, t)))} rp={Math.max(0, ...cursor.clicks.map((t) => ripple(u, t)))} s={LAY[L].cur} />
-  }
+function Hook({ t, L, W, H }) {
+  const port = L === 'port'
+  const { V } = LAY[L]
+  const hw = HUB[L]
+  const hh = (hw * LD.h) / LD.w
+  const hubR = { x: -hw / 2, y: -hh / 2, w: hw, h: hh }
+  const keys = port
+    ? [[0, { x: -340, y: -560, w: 680, h: 240 }], [2.2, { x: -500, y: -560, w: 1000, h: 1120 }], [4.5, { x: -480, y: -540, w: 960, h: 1080 }], [6.0, hubR]]
+    : [[0, { x: -300, y: -470, w: 600, h: 220 }], [2.2, { x: -800, y: -450, w: 1600, h: 900 }], [4.5, { x: -770, y: -430, w: 1540, h: 860 }], [6.0, hubR]]
+  const cam = camera(keys, t, V)
+  const modOut = P(t, 4.6, 5.4, E.inOut)
+  const map = (x, y) => ({ x: cam.tx + x * cam.k, y: cam.ty + y * cam.k })
+  const c = map(0, 0)
   return (
     <>
-      <div style={{ position: 'absolute', left: f.x, top: f.y, width: f.w, height: f.h, borderRadius: 16, overflow: 'hidden', boxShadow: shadow, ...style }}>
-        <div style={{ transform: `scale(${f.k})`, transformOrigin: '0 0' }}>{children}</div>
-      </div>
-      {cur}
-    </>
-  )
-}
-
-// Shared-element ghost: a white card travelling from rect a to rect b.
-function Ghost({ a, b, p, o, children }) {
-  const r = { x: lerp(a.x, b.x, p), y: lerp(a.y, b.y, p), w: lerp(a.w, b.w, p), h: lerp(a.h, b.h, p) }
-  return (
-    <div style={{ position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, borderRadius: lerp(10, 16, p), background: '#fff', opacity: o, boxShadow: `0 ${30 + 30 * Math.sin(Math.PI * p)}px ${80}px -30px rgba(20,30,80,${0.25 + 0.25 * Math.sin(Math.PI * p)})`, overflow: 'hidden', zIndex: 20 }}>
-      {children}
-    </div>
-  )
-}
-
-const CAPS = {
-  follow: { lines: ['Never miss', 'a follow-up.'], sub: 'Stale and missed leads surface on their own, ready to act on.' },
-  convert: { lines: ['Convert a lead', 'in two clicks.'], sub: 'Mark a lead converted straight from the table.' },
-  onboard: { lines: ['Plan and billing', 'in one step.'], sub: 'Pick a plan. Tax and totals work themselves out.' },
-  retain: { lines: ['Keep members', 'coming back.'], sub: 'Expiring plans surface early, so renewals never slip.' },
-}
-
-export function Story({ t, L, W, H }) {
-  const port = L === 'port'
-  const { area } = LAY[L]
-  const capY = (tall) => (port ? 150 : tall ? 220 : 360)
-  const els = []
-  const between = (a, b) => t >= a && t < b
-
-  // ------------------------------------------------------------------------- FOLLOW 5.5–11.5
-  const fDash = fit(area, LD.w, LD.h)
-  const fTable = fit(area, LT.w, LT.h)
-  const fForm = fit(area, CV.w, CV.h)
-  const fMem = fit(area, MD.w, MD.h)
-  // ---------------------------------------------------------------------------- HOOK 0–5.5
-  // Product overview: the Leads Dashboard as a hub with the seven modules around it. The hub
-  // then grows into the first chapter's screen.
-  if (between(0, 5.55)) {
-    const u = t
-    const out = P(u, 4.4, 5.0, E.inOut)
-    const c = port ? { x: 540, y: 1260 } : { x: 1290, y: 545 }
-    const R = port ? { x: 395, y: 500 } : { x: 450, y: 380 }
-    const hw = port ? 440 : 470
-    const hub0 = { x: c.x - hw / 2, y: c.y - (hw * LD.h) / LD.w / 2, w: hw, h: (hw * LD.h) / LD.w }
-    const grow = P(u, 4.6, 5.5, E.inOut)
-    const hub = { x: lerp(hub0.x, fDash.x, grow), y: lerp(hub0.y, fDash.y, grow), w: lerp(hub0.w, fDash.w, grow), h: lerp(hub0.h, fDash.h, grow) }
-    const hin = P(u, 0.2, 1.1, E.expo)
-    const pt = (i) => {
-      const ang = -Math.PI / 2 + (i * 2 * Math.PI) / MODULES.length
-      return { x: c.x + R.x * Math.cos(ang), y: c.y + R.y * Math.sin(ang) }
-    }
-    els.push(
-      <div key="hook">
-        <Caption L={L} y={port ? 170 : 330} lines={['Every lead.', 'Every member.', 'One place.']} sub="Pulsefit runs a gym from first enquiry to renewal." u={u - 0.15} out={P(u, 4.3, 4.8, E.inOut)} size={port ? 104 : 76} />
-        <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width="1" height="1">
-          {MODULES.map((m, i) => {
-            const q = pt(i)
-            const d = P(u, 0.9 + i * 0.1, 1.6 + i * 0.1, E.inOut)
-            return <line key={m[0]} x1={c.x} y1={c.y} x2={lerp(c.x, q.x, d)} y2={lerp(c.y, q.y, d)} stroke="#B8C3E8" strokeWidth={port ? 3 : 2} opacity={1 - out} />
-          })}
-        </svg>
-        <div style={{ position: 'absolute', left: hub.x, top: hub.y, width: hub.w, height: hub.h, borderRadius: 16, overflow: 'hidden', boxShadow: shadow, opacity: clamp(u / 0.4), transform: `scale(${0.9 + 0.1 * hin})`, zIndex: 5 }}>
-          <div style={{ transform: `scale(${hub.w / LD.w})`, transformOrigin: '0 0' }}><LeadsDash /></div>
-        </div>
-        {MODULES.map(([name, icon, tint, bg, note], i) => {
-          const q = pt(i)
-          const a = 1.0 + i * 0.12
-          const pop = E.back(clamp((u - a) / 0.55))
-          const away = { x: (q.x - c.x) * 0.35 * out, y: (q.y - c.y) * 0.35 * out }
-          const cw = port ? 280 : 250
-          return (
-            <div key={name} style={{ position: 'absolute', left: q.x - cw / 2 + away.x, top: q.y - (port ? 50 : 42) + away.y, width: cw, opacity: clamp((u - a) / 0.25) * (1 - out), transform: `scale(${0.7 + 0.3 * pop})`, zIndex: 6 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: port ? 16 : 13, height: port ? 100 : 84, padding: `0 ${port ? 20 : 16}px`, borderRadius: 18, background: '#fff', boxShadow: '0 1px 0 rgba(20,30,80,.05), 0 24px 50px -26px rgba(20,30,80,.4)', fontFamily: UI_FONT }}>
-                <span style={{ width: port ? 54 : 44, height: port ? 54 : 44, borderRadius: 12, background: bg, display: 'grid', placeItems: 'center', flex: 'none' }}>{icon(tint, port ? 26 : 21)}</span>
-                <span style={{ minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: port ? 21 : 16.5, fontWeight: 600, color: C.ink, letterSpacing: '-0.01em' }}>{name}</span>
-                  <span style={{ display: 'block', fontSize: port ? 16 : 13, color: C.sub, marginTop: 2, whiteSpace: 'nowrap' }}>{note}</span>
-                </span>
-              </div>
+      <Caption L={L} W={W} lines={port ? ['Run your whole gym', 'from one place.'] : ['Run your whole gym from one place.']} sub="Leads, members, plans and staff, in one product." u={t - 0.2} out={P(t, 5.2, 5.7, E.inOut)} />
+      <div style={{ position: 'absolute', left: 0, top: LAY[L].clip, width: W, height: H - LAY[L].clip, overflow: 'hidden', WebkitMaskImage: 'linear-gradient(transparent, #000 48px)', maskImage: 'linear-gradient(transparent, #000 48px)' }}>
+        <div style={{ position: 'absolute', left: 0, top: -LAY[L].clip, width: W, height: H }}>
+          <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width="1" height="1">
+            {MODULES.map((m, i) => {
+              const [x, y] = modPos(L, i)
+              const d = P(t, 1.2 + i * 0.08, 2.0 + i * 0.08, E.inOut)
+              const q = map(x * d, y * d)
+              return <line key={m[0]} x1={c.x} y1={c.y} x2={q.x} y2={q.y} stroke="#B8C3E8" strokeWidth={2} opacity={1 - modOut} />
+            })}
+          </svg>
+          <div style={{ position: 'absolute', left: 0, top: 0, transformOrigin: '0 0', transform: `translate(${cam.tx}px, ${cam.ty}px) scale(${cam.k})` }}>
+            <div style={{ position: 'absolute', left: hubR.x, top: hubR.y, width: hw, height: hh, borderRadius: 16 / cam.k, overflow: 'hidden', boxShadow: `0 ${50 / cam.k}px ${100 / cam.k}px -${50 / cam.k}px rgba(20,30,80,.45)`, opacity: P(t, 0.9, 1.6) }}>
+              <div style={{ transform: `scale(${hw / LD.w})`, transformOrigin: '0 0' }}><LeadsDash /></div>
             </div>
-          )
-        })}
-      </div>,
-    )
-  }
-
-  if (between(5.5, 11.6)) {
-    const u = t - 5.5
-    const out = P(u, 4.9, 5.4, E.inOut)
-    els.push(
-      <div key="follow">
-        <Caption L={L} y={capY()} {...CAPS.follow} u={u - 0.3} out={P(u, 5.0, 5.5, E.inOut)} />
-        <Shot f={fDash} u={u} L={L}
-          style={{ opacity: 1 - out }}
-          cursor={{ track: [[1.0, { x: 1250, y: 760 }], [1.9, LD.follow], [4.6, LD.follow]], clicks: [2.1], o: 1 - P(u, 4.4, 4.8) }}>
-          <LeadsDash fpr={press(u, 2.1)} hi={P(u, 2.15, 2.35)} />
-        </Shot>
-      </div>,
-    )
-  }
-  // ghost: Neha's alert card → her row in the Leads Table
-  if (between(10.3, 11.7)) {
-    const p = P(t, 10.4, 11.3, E.inOut)
-    const a = onScreen(fDash, LD.item)
-    const b = onScreen(fTable, LT.row)
-    const k = lerp(fDash.k, fTable.k, p)
-    els.push(
-      <Ghost key="g1" a={a} b={b} p={p} o={1 - P(t, 11.35, 11.6)}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 * k, height: '100%', padding: `0 ${14 * k}px`, font: `500 ${14 * k}px/1 ${UI_FONT}`, color: C.ink }}>
-          <Avatar name="Neha Singh" s={30 * k} />Neha Singh<Chip fg="#D6383F" bg="#FFDCDC" h={22 * k} style={{ fontSize: 11.5 * k, padding: `0 ${8 * k}px` }}>Hot</Chip>
-        </div>
-      </Ghost>,
-    )
-  }
-
-  // ------------------------------------------------------------------------ CONVERT 11.5–17.5
-  if (between(10.9, 17.6)) {
-    const u = t - 11.5
-    const inn = P(t, 10.9, 11.5, E.out)
-    const out = P(u, 4.9, 5.5, E.inOut)
-    els.push(
-      <div key="convert">
-        <Caption L={L} y={capY()} {...CAPS.convert} u={u - 0.1} out={P(u, 5.5, 6.0, E.inOut)} />
-        <Shot f={fTable} u={u} L={L} style={{ opacity: inn * (1 - out) }}
-          cursor={{ track: [[0.4, { x: 1200, y: 700 }], [1.1, LT.dots], [1.4, LT.dots], [2.2, LT.item], [2.6, LT.item], [3.4, { x: 1150, y: 600 }]], clicks: [1.25, 2.55], o: 1 - P(u, 4.4, 4.8) }}>
-          <LeadsTable menu={P(u, 1.35, 1.6) * (1 - P(u, 2.6, 2.8))} hover={P(u, 2.0, 2.1)} conv={P(u, 2.7, 3.1)} rowHi={P(u, 2.7, 3.0)} />
-        </Shot>
-      </div>,
-    )
-  }
-  // ghost: the converted row grows into the Convert to Member modal
-  if (between(16.3, 17.9)) {
-    const p = P(t, 16.4, 17.4, E.inOut)
-    const a = onScreen(fTable, LT.row)
-    const b = onScreen(fForm, { x: CV.mx, y: CV.my, w: 672, h: 1112 })
-    const k = lerp(fTable.k, fForm.k, p)
-    els.push(
-      <Ghost key="g2" a={a} b={b} p={p} o={1 - P(t, 17.5, 17.8)}>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', gap: 10 * k, padding: `0 ${16 * k}px`, font: `500 ${14 * k}px/1 ${UI_FONT}`, color: C.ink, opacity: 1 - P(p, 0, 0.35, (x) => x) }}>
-          <Avatar name="Neha Singh" s={30 * k} />Neha Singh<Chip fg={C.green} bg="#D7F3E3" h={22 * k} style={{ fontSize: 11.5 * k, padding: `0 ${8 * k}px` }}>Converted</Chip>
-        </div>
-        <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 64 * k, display: 'flex', alignItems: 'center', padding: `0 ${24 * k}px`, font: `600 ${20 * k}px/1 ${UI_FONT}`, color: C.ink, borderBottom: `1px solid ${C.line}`, opacity: P(p, 0.6, 1, (x) => x) }}>Convert to Member</div>
-      </Ghost>,
-    )
-  }
-
-  // ------------------------------------------------------------------------ ONBOARD 17.5–25
-  if (between(16.8, 25.1)) {
-    const u = t - 17.5
-    const inn = P(t, 16.8, 17.4, E.out)
-    const push = P(u, 6.9, 7.5, E.inOut)
-    const pa = port ? { x: (W - PRICE_CARD.w * 1.4) / 2, y: 1450, s: 1.4 } : { x: 120, y: 600, s: 1.04 }
-    const pIn = P(u, 4.4, 5.2, E.expo)
-    els.push(
-      <div key="onboard">
-        <Caption L={L} y={capY(true)} {...CAPS.onboard} u={u - 0.1} out={P(u, 6.9, 7.4, E.inOut)} />
-        <Shot f={fForm} u={u} L={L} style={{ opacity: inn * (1 - push), transform: `translateX(${-160 * push}px) scale(${1 - 0.05 * push})` }}
-          cursor={{ track: [[0.6, { x: 940, y: 420 }], [2.5, CV.select], [2.8, CV.select], [3.25, CV.option(1)], [3.6, CV.option(1)], [5.4, { x: 1010, y: 1000 }], [5.9, CV.add], [7.5, CV.add]], clicks: [2.75, 3.6, 6.1], o: 1 - push }}>
-          <ConvertFrame fill={P(u, 0.6, 2.0, (x) => x)} open={P(u, 2.8, 3.0) * (1 - P(u, 3.6, 3.75))} hover={u > 3.2 ? 1 : -1} picked={u > 3.6 ? 1 : 0} p={P(u, 3.9, 4.9)} apr={press(u, 6.1)} />
-        </Shot>
-        {(!port || u < 7.5) && (
-          <div style={{ position: 'absolute', left: pa.x, top: pa.y, width: PRICE_CARD.w * pa.s, height: PRICE_CARD.h * pa.s, opacity: clamp((u - 4.4) / 0.3) * (1 - push), transform: `translateY(${(1 - pIn) * 50}px)`, zIndex: 25 }}>
-            <div style={{ transform: `scale(${pa.s})`, transformOrigin: '0 0' }}><PlanPrices u={u - 4.5} /></div>
-          </div>
-        )}
-      </div>,
-    )
-  }
-
-  // ------------------------------------------------------------------------- RETAIN 25–31
-  if (between(24.4, 31.1)) {
-    const u = t - 25
-    const inn = P(t, 24.5, 25.4, E.expo)
-    const out = P(u, 5.2, 6.0, E.inOut)
-    els.push(
-      <div key="retain">
-        <Caption L={L} y={capY()} {...CAPS.retain} u={u - 0.1} out={P(u, 5.2, 5.7, E.inOut)} />
-        <Shot f={fMem} u={u} L={L} style={{ opacity: clamp(inn * 1.5) * (1 - out), transform: `translateX(${(1 - inn) * 220}px) scale(${1 - 0.08 * out})` }}
-          cursor={{ track: [[0.9, { x: 1150, y: 660 }], [2.0, MD.renew], [4.6, MD.renew]], clicks: [2.3], o: 1 - P(u, 4.4, 4.8) }}>
-          <Members k={P(u, 0.5, 1.6)} rowHi={P(u, 2.3, 2.5)} rpr={press(u, 2.3)} />
-        </Shot>
-      </div>,
-    )
-  }
-
-  // ---------------------------------------------------------------------------- END 31–35.5
-  if (between(31, 35.5)) {
-    const u = t - 31
-    const out = P(u, 3.9, 4.45, E.inOut)
-    const screens = [
-      [<LeadsDash key="d" />, LD.w, LD.h],
-      [<LeadsTable key="t" conv={1} />, LT.w, LT.h],
-      [<ConvertFrame key="f" />, CV.w, CV.h],
-      [<Members key="m" />, MD.w, MD.h],
-    ]
-    const tw = port ? 680 : 700
-    const pos = (i) => (port ? { x: 170 + i * 30, y: 760 + i * 180 } : { x: 760 + i * 110, y: 100 + i * 120 })
-    els.push(
-      <div key="end" style={{ opacity: 1 - out }}>
-        <div style={{ position: 'absolute', inset: 0, perspective: 2600 }}>
-          <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d', transform: `rotateX(${port ? 14 : 10}deg) rotateY(${port ? -10 : -20}deg) rotateZ(${port ? 4 : 3}deg)`, transformOrigin: port ? '55% 70%' : '70% 50%' }}>
-            {screens.map(([el, fw, fh], i) => {
-              const k = tw / fw
-              const a = 0.1 + i * 0.16
-              const p = P(u, a, a + 1.0, E.expo)
-              const q = pos(i)
+            {MODULES.map(([name, icon, tint, bg, note], i) => {
+              const [x, y] = modPos(L, i)
+              const a = i === 0 ? 0.1 : 1.5 + i * 0.1
+              const pop = E.back(clamp((t - a) / 0.55))
               return (
-                <div key={i} style={{ position: 'absolute', left: q.x, top: q.y, width: tw, height: fh * k, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 0 rgba(20,30,80,.05), 0 60px 90px -40px rgba(20,30,80,.5)', opacity: clamp((u - a) / 0.3), transform: `translateY(${(1 - p) * 120}px)` }}>
-                  <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>{el}</div>
+                <div key={name} style={{ position: 'absolute', left: x - 150, top: y - 48, width: 300, height: 96, opacity: clamp((t - a) / 0.25) * (1 - modOut), transform: `scale(${(0.7 + 0.3 * pop) * (1 + 0.2 * modOut)}) translate(${x * 0.3 * modOut}px, ${y * 0.3 * modOut}px)` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, height: '100%', padding: '0 18px', borderRadius: 20, background: '#fff', boxShadow: '0 1px 0 rgba(20,30,80,.05), 0 24px 50px -26px rgba(20,30,80,.4)', fontFamily: UI_FONT, boxSizing: 'border-box' }}>
+                    <span style={{ width: 52, height: 52, borderRadius: 14, background: bg, display: 'grid', placeItems: 'center', flex: 'none' }}>{icon(tint, 24)}</span>
+                    <span>
+                      <span style={{ display: 'block', fontSize: 19, fontWeight: 600, color: C.ink, letterSpacing: '-0.01em' }}>{name}</span>
+                      <span style={{ display: 'block', fontSize: 14, color: C.sub, marginTop: 2 }}>{note}</span>
+                    </span>
+                  </div>
                 </div>
               )
             })}
           </div>
         </div>
-        <div style={{ position: 'absolute', left: LAY[L].cap.x, top: port ? 220 : 400, opacity: P(u, 0.5, 1.1), transform: `translateY(${(1 - P(u, 0.5, 1.4, E.expo)) * 20}px)` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: port ? 22 : 16 }}>
-            <Mark s={port ? 84 : 60} />
-            <span style={{ font: `700 ${port ? 104 : 76}px/1 ${HEAD_FONT}`, letterSpacing: '-0.045em', color: C.ink }}>Pulsefit</span>
-          </div>
-          <div style={{ font: `400 ${port ? 32 : 23}px/1.4 ${UI_FONT}`, color: '#5B6178', marginTop: port ? 24 : 18, opacity: P(u, 0.9, 1.5) }}>From first lead to loyal member.</div>
-        </div>
-      </div>,
+      </div>
+    </>
+  )
+}
+
+// ----------------------------------------------------------------------------- the chapters
+// Feature rects (frame coordinates) the camera visits.
+const R = {
+  dashTasks: { x: 300, y: 70, w: 1100, h: 440 },
+  dashMissed: { x: 660, y: 150, w: 380, h: 350 },
+  dashItem: pad(LD.item, 14),
+  rowDeep: { x: 420, y: 335, w: 620, h: 112 },
+  rowAction: { x: 360, y: 290, w: 720, h: 300 },
+  formName: { x: 410, y: 120, w: 640, h: 170 },
+  formDetails: { x: 384, y: 44, w: 672, h: 420 },
+  formPlan: { x: 384, y: 450, w: 672, h: 380 },
+  formTotal: { x: 384, y: 780, w: 672, h: 380 },
+  formAdd: { x: 870, y: 1088, w: 200, h: 64 },
+  memRow: { x: 340, y: 430, w: 640, h: 82 },
+  memExpiring: { x: 320, y: 290, w: 690, h: 400 },
+}
+const CAPS = {
+  follow: { land: ['Never miss a follow-up.'], port: ['Never miss', 'a follow-up.'], sub: 'Missed and stale leads surface on their own.' },
+  convert: { land: ['Convert a lead in two clicks.'], port: ['Convert a lead', 'in two clicks.'], sub: 'Mark it converted right from the table.' },
+  onboard: { land: ['Plan and billing in one step.'], port: ['Plan and billing', 'in one step.'], sub: 'Pick a plan. Tax and total work themselves out.' },
+  retain: { land: ['Keep members coming back.'], port: ['Keep members', 'coming back.'], sub: 'Expiring plans surface before they lapse.' },
+}
+
+function Chapter({ id, t, L, W, H, fw, fh, keys, screen, cursor, pops }) {
+  const c = CH[id]
+  const u = t - c.a
+  const len = c.b - c.a
+  const port = L === 'port'
+  const cam0 = camera(keys, u, LAY[L].V)
+  // match cut: the next chapter dissolves in on top over 0.22s, pushing in slightly
+  const inn = P(u, -0.22, 0, (x) => x)
+  const push = 1 + 0.06 * (1 - E.out(inn))
+  const V = LAY[L].V
+  const cx = V.x + V.w / 2
+  const cy = V.y + V.h / 2
+  const cam = { k: cam0.k * push, tx: cx + (cam0.tx - cx) * push, ty: cy + (cam0.ty - cy) * push }
+  const o = id === 'retain' ? inn * (1 - P(u, len - 0.6, len, (x) => x)) : inn
+  return (
+    <>
+      <CamScreen L={L} W={W} H={H} fw={fw} fh={fh} cam={cam} o={o} u={u} cursor={cursor}>{screen(u)}</CamScreen>
+      {pops.map((p, i) => (
+        <Pop key={i} L={L} slot={p.slot} u={u - p.at} until={p.until - p.at}>{p.el(u - p.at)}</Pop>
+      ))}
+      <Caption L={L} W={W} lines={port ? CAPS[id].port : CAPS[id].land} sub={CAPS[id].sub} u={u - 0.25} out={P(u, len - 0.6, len - 0.15, E.inOut)} />
+    </>
+  )
+}
+
+export function Story({ t, L, W, H }) {
+  const port = L === 'port'
+  const els = []
+  const near = (id) => t >= CH[id].a - 0.23 && t < CH[id].b + (id === 'retain' ? 0.02 : 0.23)
+
+  if (t < CH.hook.b + 0.02) els.push(<Hook key="hook" t={t} L={L} W={W} H={H} />)
+
+  if (near('follow')) {
+    els.push(
+      <Chapter key="follow" id="follow" t={t} L={L} W={W} H={H} fw={LD.w} fh={LD.h}
+        keys={[[0, whole(LD.w, LD.h)], [0.8, whole(LD.w, LD.h)], [1.8, R.dashTasks], [2.8, R.dashMissed], [5.8, R.dashMissed], [6.9, R.dashItem]]}
+        screen={(u) => <LeadsDash fpr={press(u, 3.6)} hi={P(u, 3.65, 3.85)} />}
+        cursor={{ track: [[2.6, { x: 1010, y: 470 }], [3.4, LD.follow], [5.6, LD.follow]], clicks: [3.6], o: 1 - P(t - CH.follow.a, 5.6, 6.0) }}
+        pops={[
+          { slot: 0, at: 3.0, until: 5.8, el: (u) => <MissedStat u={u} /> },
+          { slot: 1, at: 3.4, until: 5.8, el: (u) => <ContactDays u={u} /> },
+        ]}
+      />,
     )
   }
+  if (near('convert')) {
+    els.push(
+      <Chapter key="convert" id="convert" t={t} L={L} W={W} H={H} fw={LT.w} fh={LT.h}
+        keys={[[0, R.rowDeep], [1.0, R.rowAction], [3.4, R.rowAction], [4.4, whole(LT.w, LT.h)], [6.0, whole(LT.w, LT.h)], [6.95, R.rowDeep]]}
+        screen={(u) => <LeadsTable menu={P(u, 1.5, 1.75) * (1 - P(u, 2.8, 3.0))} hover={P(u, 2.2, 2.3)} conv={P(u, 2.9, 3.3)} rowHi={P(u, 2.9, 3.2)} />}
+        cursor={{ track: [[0.9, { x: 900, y: 560 }], [1.3, LT.dots], [1.6, LT.dots], [2.35, LT.item], [2.8, LT.item], [3.6, { x: 1100, y: 600 }]], clicks: [1.4, 2.75], o: 1 - P(t - CH.convert.a, 4.0, 4.4) }}
+        pops={[
+          { slot: 1, at: 3.1, until: 5.9, el: (u) => <StatusFlip u={u} /> },
+          { slot: 0, at: 4.0, until: 5.9, el: (u) => <StatusFunnel u={u} /> },
+        ]}
+      />,
+    )
+  }
+  if (near('onboard')) {
+    els.push(
+      <Chapter key="onboard" id="onboard" t={t} L={L} W={W} H={H} fw={CV.w} fh={CV.h}
+        keys={[[0, R.formName], [1.6, R.formName], [2.4, R.formDetails], [3.0, R.formPlan], [4.4, R.formPlan], [5.1, R.formTotal], [6.4, R.formTotal], [7.2, whole(CV.w, CV.h)], [7.6, whole(CV.w, CV.h)], [8.45, R.formAdd]]}
+        screen={(u) => <ConvertFrame fill={P(u, 0.2, 1.6, (x) => x)} open={P(u, 3.25, 3.45) * (1 - P(u, 4.05, 4.2))} hover={u > 3.65 ? 1 : -1} picked={u > 4.05 ? 1 : 0} p={P(u, 5.0, 6.0)} apr={press(u, 7.5)} />}
+        cursor={{ track: [[2.6, { x: 900, y: 640 }], [3.0, CV.select], [3.25, CV.select], [3.7, CV.option(1)], [4.05, CV.option(1)], [6.8, { x: 1000, y: 1060 }], [7.35, CV.add], [8.5, CV.add]], clicks: [3.2, 4.0, 7.5] }}
+        pops={[
+          { slot: 0, at: 4.6, until: 7.0, el: (u) => <div style={{ transform: `scale(${360 / PRICE_CARD.w})`, transformOrigin: '0 0', width: 360, height: (PRICE_CARD.h * 360) / PRICE_CARD.w }}><PlanPrices u={u} /></div> },
+          { slot: 1, at: 5.0, until: 7.0, el: (u) => <TotalRing u={u} /> },
+        ]}
+      />,
+    )
+  }
+  if (near('retain')) {
+    const W2 = whole(MD.w, MD.h)
+    els.push(
+      <Chapter key="retain" id="retain" t={t} L={L} W={W} H={H} fw={MD.w} fh={MD.h}
+        keys={[[0, R.memRow], [1.0, R.memExpiring], [2.6, R.memExpiring], [3.6, W2], [5.6, W2], [6.5, pad(W2, 500)]]}
+        screen={(u) => <Members k={u < 2.6 ? 1 : P(u, 3.4, 4.4)} rowHi={P(u, 1.9, 2.1)} rpr={press(u, 1.9)} />}
+        cursor={{ track: [[0.8, { x: 1000, y: 620 }], [1.6, MD.renew], [3.0, MD.renew]], clicks: [1.9], o: 1 - P(t - CH.retain.a, 2.8, 3.2) }}
+        pops={[
+          { slot: 1, at: 1.4, until: 3.2, el: (u) => <Expiring u={u} /> },
+          { slot: 0, at: 3.8, until: 5.9, el: (u) => <MemberBars u={u} /> },
+        ]}
+      />,
+    )
+  }
+  if (t >= CH.end.a - 0.3) els.push(<End key="end" t={t} L={L} W={W} H={H} />)
   return els
 }
 
+// ------------------------------------------------------------------------------------- the end
+function End({ t, L, W }) {
+  const port = L === 'port'
+  const u = t - CH.end.a
+  const out = P(u, 3.9, 4.45, E.inOut)
+  const screens = [
+    [<LeadsDash key="d" />, LD.w, LD.h],
+    [<LeadsTable key="t" conv={1} />, LT.w, LT.h],
+    [<ConvertFrame key="f" />, CV.w, CV.h],
+    [<Members key="m" />, MD.w, MD.h],
+  ]
+  const tw = port ? 640 : 640
+  const pos = (i) => (port ? { x: 170 + i * 40, y: 640 + i * 200 } : { x: 520 + i * 150, y: 330 + i * 110 })
+  return (
+    <div style={{ opacity: 1 - out }}>
+      <div style={{ position: 'absolute', inset: 0, perspective: 2600 }}>
+        <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d', transform: `rotateX(${port ? 16 : 22}deg) rotateZ(${port ? -6 : -8}deg)`, transformOrigin: '50% 60%' }}>
+          {screens.map(([el, fw, fh], i) => {
+            const k = tw / fw
+            const a = 0.05 + i * 0.14
+            const p = P(u, a, a + 1.0, E.expo)
+            const q = pos(i)
+            return (
+              <div key={i} style={{ position: 'absolute', left: q.x, top: q.y, width: tw, height: fh * k, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 0 rgba(20,30,80,.05), 0 60px 90px -40px rgba(20,30,80,.5)', opacity: clamp((u - a) / 0.3), transform: `translateY(${(1 - p) * 160}px)` }}>
+                <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>{el}</div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+      <div style={{ position: 'absolute', left: 0, width: W, top: LAY[L].capY, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: P(u, 0.3, 0.9), transform: `translateY(${(1 - P(u, 0.3, 1.2, E.expo)) * 20}px)` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: port ? 20 : 14 }}>
+          <Mark s={port ? 76 : 56} />
+          <span style={{ font: `700 ${port ? 96 : 68}px/1 ${HEAD_FONT}`, letterSpacing: '-0.045em', color: C.ink }}>Pulsefit</span>
+        </div>
+        <div style={{ font: `400 ${LAY[L].sub}px/1.4 ${UI_FONT}`, color: '#5B6178', marginTop: port ? 20 : 14, opacity: P(u, 0.7, 1.3) }}>From first lead to loyal member.</div>
+      </div>
+    </div>
+  )
+}

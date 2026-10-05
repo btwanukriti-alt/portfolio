@@ -77,20 +77,20 @@ export const C = {
 
 export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 
-// Hook → middle → end. One background; captions sit beside the screens.
+// Hook → middle → end. One background; captions on top; a camera moves over each screen.
 export const BG = '#E6EBFA'
 export const HEAD_FONT = "'Inter Tight', 'Poppins', ui-sans-serif, system-ui, sans-serif"
 export const CHAPTERS = [
-  { id: 'hook', a: 0, b: 5.5 },
-  { id: 'follow', a: 5.5, b: 11.5 },
-  { id: 'convert', a: 11.5, b: 17.5 },
-  { id: 'onboard', a: 17.5, b: 25.0 },
-  { id: 'retain', a: 25.0, b: 31.0 },
-  { id: 'end', a: 31.0, b: 35.5 },
+  { id: 'hook', a: 0, b: 6.0 },
+  { id: 'follow', a: 6.0, b: 13.0 },
+  { id: 'convert', a: 13.0, b: 20.0 },
+  { id: 'onboard', a: 20.0, b: 28.5 },
+  { id: 'retain', a: 28.5, b: 35.0 },
+  { id: 'end', a: 35.0, b: 39.5 },
 ]
-export const DURATION = 35.5
+export const DURATION = 39.5
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 3.6
+export const POSTER = 3.4
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }
