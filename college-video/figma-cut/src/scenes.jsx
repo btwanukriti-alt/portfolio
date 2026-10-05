@@ -1,18 +1,19 @@
-// The four scenes of the 15s cut, each a pure function of the clock `t` and the layout
+// The four scenes of the ~18s cut (slowed by SLOW), each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the college management Figma
 // frames (section 267:97221).
 //   0 · Opening: the five colleges fly into the All Colleges switcher (one workspace).
 //   1 · Dashboard: says what the product does. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
 //   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
-//       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
+//       that pushes the earlier ones back; a breadcrumb trail follows along.
 //   3 · Staff: the staff directory; a card opens the person's profile.
 import { Cursor, Selection } from './fig.jsx'
-import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip, SWITCH, SwitcherPill, SwitcherList, CollegeRow, switchRowY, STAFF, SCARD, StaffCard, DirectoryHeader, PROFILE, StaffProfile } from './ui.jsx'
+import { C, E, FIG, P, SCENES, SLOW, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
+import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, SWITCH, SwitcherPill, SwitcherList, CollegeRow, switchRowY, STAFF, SCARD, StaffCard, DirectoryHeader, PROFILE, StaffProfile } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
-const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
+// Scene-local time, slowed by SLOW (every timing inside a scene is in these local seconds).
+const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? (t - S[id].a) / SLOW : null)
 const Abs = ({ x, y, children, style }) => <div style={{ position: 'absolute', left: x, top: y, ...style }}>{children}</div>
 
 // Eyebrow + title on top of every scene: words rise out of a mask, then lift away.
@@ -177,8 +178,9 @@ const FL = {
   land: { K: 1.3, step: 200, top: 312, crumb: { y: 226, s: 1.2 }, curFrom: { x: 1980, y: 1120 }, curRest: { x: 1720, y: 1010 } },
   port: { K: 1.6, step: 96, area: [500, 1860], crumb: { y: 410, s: 1.3 }, curFrom: { x: 1120, y: 1950 }, curRest: { x: 940, y: 1840 } },
 }
-const CLICKS = [1.05, 2.3, 3.55]
-const levelsOpen = (u) => [1, ...CLICKS.map((c) => P(u, c + 0.08, c + 0.7, E.expo))]
+// Two clicks: college → programme (the programme's fee types). Level 3 stays closed.
+const CLICKS = [1.05, 2.45]
+const levelsOpen = (u) => [1, ...CLICKS.map((c) => P(u, c + 0.08, c + 0.7, E.expo)), 0]
 // Stage rect, scale and dim of every sheet at scene time u.
 function sheetLayout(u, L, W) {
   const D = FL[L]
@@ -201,16 +203,13 @@ function sheetLayout(u, L, W) {
 }
 const rowPoint = (R, K) => ({ x: R.x + R.s * K * (ROW.nameX + 90), y: R.y + R.s * K * (ROW0 + ROW.h / 2) })
 const rowBox = (R, K) => ({ x: R.x + R.s * K * ROW.x, y: R.y + R.s * K * ROW0, w: R.s * K * ROW.w, h: R.s * K * ROW.h })
-// Levels' collected % and pending (₹ Cr) for the floating stat chip.
-const STAT = LEVELS.map((L) => [(L.rec / L.exp) * 100, L.exp - L.rec])
-
 export function Flow({ t, L, W }) {
   const u = local(t, 'flow')
   if (u === null) return null
   const port = L === 'port'
   const D = FL[L]
   const K = D.K
-  const exit = P(u, 4.8, 5.2, E.inOut)
+  const exit = P(u, 3.9, 4.3, E.inOut)
   const S = sheetLayout(u, L, W)
   const p = S.map((r) => r.p)
   const pop0 = E.back(clamp((u - 0.15) / 0.55))
@@ -221,21 +220,10 @@ export function Flow({ t, L, W }) {
   const cur = kf(u, [
     [0.55, D.curFrom], [0.95, at(CLICKS[0])], [CLICKS[0] + 0.2, at(CLICKS[0])],
     [CLICKS[1] - 0.2, at(CLICKS[1])], [CLICKS[1] + 0.2, at(CLICKS[1])],
-    [CLICKS[2] - 0.2, at(CLICKS[2])], [CLICKS[2] + 0.25, at(CLICKS[2])], [4.4, D.curRest],
+    [3.4, D.curRest],
   ])
-  const cs = sway(u, 3, u > 4.4 ? 5 : 0)
-  const hi = (i) => (i < 3 ? clamp(1 - Math.abs(u - CLICKS[i]) / 0.3) * (u < CLICKS[i] + 0.6 ? 1 : 0) : 0)
-  // Stat chip values move between levels as each drawer lands.
-  const lv = (j) => STAT[0][j] + [1, 2, 3].reduce((a, i) => a + p[i] * (STAT[i][j] - STAT[i - 1][j]), 0)
-  const top = S[3].p > 0.5 ? 3 : S[2].p > 0.5 ? 2 : S[1].p > 0.5 ? 1 : 0
-  // The chip hands over from the previous sheet to the new one as it lands.
-  const anchor = (R) => (port ? { x: 70, y: R.y + R.h * R.s - 60 } : { x: R.x + R.w * R.s - 90, y: R.y - 44 })
-  const j = p[3] > 0 ? 3 : p[2] > 0 ? 2 : p[1] > 0 ? 1 : 0
-  const ca = anchor(S[Math.max(0, j - 1)])
-  const cb = anchor(S[j])
-  const hand = j === 0 ? 1 : E.inOut(p[j])
-  const chip = { x: lerp(ca.x, cb.x, hand), y: lerp(ca.y, cb.y, hand) }
-  const chipIn = E.back(clamp((u - 0.7) / 0.5))
+  const cs = sway(u, 3, u > 3.4 ? 5 : 0)
+  const hi = (i) => (i < CLICKS.length ? clamp(1 - Math.abs(u - CLICKS[i]) / 0.3) * (u < CLICKS[i] + 0.6 ? 1 : 0) : 0)
   const sk = port ? 1.35 : 1.1
   return (
     <>
@@ -273,16 +261,14 @@ export function Flow({ t, L, W }) {
         })}
         {/* the sheet on top is selected as it lands */}
         {S.map((R, i) => {
+          if (R.p <= 0.001) return null
           const a = i === 0 ? 0.6 : CLICKS[i - 1] + 0.75
-          const b = i < 3 ? CLICKS[i] - 0.45 : 4.5
+          const b = i < CLICKS.length ? CLICKS[i] - 0.45 : 3.7
           const o = u > a ? P(u, a, a + 0.15) * (1 - P(u, b, b + 0.15)) : 0
           return <Selection key={i} x={R.x} y={R.y} w={R.w * R.s} h={R.h * R.s} o={o} label={i === 0 ? 'Revenue Contribution' : `Drawer · Level ${i}`} comp size={`${SHEET.w} × ${SHEET.h}`} k={sk} />
         })}
-        <Abs x={chip.x} y={chip.y} style={{ zIndex: 25, opacity: clamp((u - 0.7) / 0.2), transform: `scale(${(port ? 1.5 : 1.15) * (0.7 + 0.3 * chipIn)}) rotate(${top % 2 ? 2 : -2}deg)`, transformOrigin: '0 0' }}>
-          <StatChip rate={lv(0) * P(u, 0.7, 1.3)} pending={lv(1) * P(u, 0.7, 1.3)} />
-        </Abs>
       </div>
-      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.55, 0.8) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
+      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.55, 0.8) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1])} s={port ? 2 : 1.5} />
     </>
   )
 }

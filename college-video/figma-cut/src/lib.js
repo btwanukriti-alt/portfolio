@@ -85,15 +85,17 @@ export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 // Scenes and their stage colours. A frame wipe in the next colour opens each scene.
 // One soft blue background for the whole piece.
 export const BG = '#CFDDFF'
-export const SCENES = [
-  { id: 'open', a: 0, b: 2.7 },
-  { id: 'hook', a: 2.7, b: 6.1 },
-  { id: 'flow', a: 6.1, b: 11.3 },
-  { id: 'staff', a: 11.3, b: 15.05 },
-]
-export const DURATION = 15.05
+// Scene lengths are written in scene-local seconds; SLOW stretches every scene uniformly so the
+// piece reads calmly for a first-time viewer (motion and holds both get longer).
+export const SLOW = 1.3
+const LEN = [['open', 2.7], ['hook', 3.4], ['flow', 4.3], ['staff', 3.75]]
+export const SCENES = LEN.reduce((acc, [id, d]) => {
+  const a = acc.length ? acc[acc.length - 1].b : 0
+  return [...acc, { id, a, b: +(a + d * SLOW).toFixed(3) }]
+}, [])
+export const DURATION = SCENES[SCENES.length - 1].b
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 5.5
+export const POSTER = 7.1
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }

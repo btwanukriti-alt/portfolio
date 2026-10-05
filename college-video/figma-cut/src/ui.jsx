@@ -159,27 +159,6 @@ export function Breadcrumb({ vis, scale = 1 }) {
   )
 }
 
-// Floating stat chip (300 × 96): collected ring and pending amount for the current level.
-export function StatChip({ rate, pending }) {
-  const r = 26
-  const Lc = 2 * Math.PI * r
-  return (
-    <div style={card({ width: 300, height: 96, padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16, boxShadow: lift })}>
-      <div style={{ position: 'relative', width: 64, height: 64 }}>
-        <svg width="64" height="64" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r={r} fill="none" stroke={C.gSoft} strokeWidth="8" />
-          <circle cx="32" cy="32" r={r} fill="none" stroke={C.green} strokeWidth="8" strokeLinecap="round" strokeDasharray={Lc} strokeDashoffset={Lc * (1 - rate / 100)} transform="rotate(-90 32 32)" />
-        </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{Math.round(rate)}%</div>
-      </div>
-      <div>
-        <div style={{ fontSize: 13, color: C.sub }}>Pending</div>
-        <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em', color: C.red, fontVariantNumeric: 'tabular-nums' }}>{cr(pending)}</div>
-      </div>
-    </div>
-  )
-}
-
 // ---------- Intro component cards ----------
 const MiniBars = ({ c = C.green, p = 1 }) => (
   <svg width="44" height="30" viewBox="0 0 44 30">
