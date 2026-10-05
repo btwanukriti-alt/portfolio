@@ -54,11 +54,11 @@ const env = (e, s, end, i = 0.6, o = 0.5) => {
 }
 const fmt = (n) => Math.round(n).toLocaleString('en-US')
 
-// ---------- Studio vocabulary (College Management layout on a flat pink canvas) ----------
+// ---------- Studio vocabulary (College Management layout on a flat cream canvas) ----------
 
-// Flat pink canvas, no gradients or shapes.
+// Flat cream canvas, no gradients or shapes.
 function Studio() {
-  return h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden', background: '#FFC2DD' } },
+  return h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden', background: '#FFF1E1' } },
     h('svg', { width: W, height: H, style: { position: 'absolute', inset: 0, opacity: 0.05, mixBlendMode: 'multiply' } },
       h('filter', { id: 'gr' }, h('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.85', numOctaves: '2', seed: '3' })),
       h('rect', { width: W, height: H, filter: 'url(#gr)' })),
