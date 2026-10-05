@@ -12,7 +12,7 @@
 <body>
 <div id="root"></div>
 <script>
-// Fitness app showcase, 30s loop (22s authored timeline played at 1/PACE). Same stage, type, cursor and motion system as the College
+// Fitness app showcase, 31s loop (22.8s authored timeline played at 1/PACE). Same stage, type, cursor and motion system as the College
 // Management cut (public/showcase/college-management.html); the product UI is rebuilt as vector
 // phone screens from the Zync Figma section (393:169642). Every frame is a pure function of t.
 // Workout photography exported from the Zync Figma frames (img/*.jpg), inlined so the page is self-contained.
@@ -20,7 +20,7 @@ const IMG = {"coreplus": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIACgAKAAD/2wB
 const { useState, useEffect, useRef } = React
 const h = React.createElement
 // BASE is the authored timeline; PACE stretches it so every move and hold plays slower.
-const BASE = 22, PACE = 1.36, DURATION = 30, W = 1920, H = 1080
+const BASE = 22.8, PACE = 1.36, DURATION = 31, W = 1920, H = 1080
 const FONT = "'Public Sans', system-ui, sans-serif"
 const APP = "'Poppins', system-ui, sans-serif"
 
@@ -454,46 +454,58 @@ const FoodRow = ({ r: [n, q, c], hi = 0 }) =>
 
 // ---------- Opener / closer: the three daily trackers as live graphs ----------
 
-function GraphCard({ k, x, title, icon, tint, ic, children }) {
-  return h('div', { style: { position: 'absolute', left: x, top: 420, width: 440, height: 400, boxSizing: 'border-box', padding: '26px 28px', borderRadius: 28, background: 'rgba(255,255,255,0.96)', fontFamily: APP, color: Z.ink, boxShadow: '0 40px 80px -24px rgba(11,42,91,0.30), 0 8px 18px rgba(11,42,91,0.06)', opacity: k, transformOrigin: '50% 50%', transform: `translateY(${(1 - k) * 60}px) scale(1.15) perspective(1600px) rotateX(${(1 - k) * 6}deg)` } },
-    h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
-      h('div', { style: { width: 40, height: 40, borderRadius: 20, background: tint, display: 'grid', placeItems: 'center' } }, h(Icon, { n: icon, c: ic, s: 20, w: 2.2 })),
-      h('div', { style: { fontSize: 20, fontWeight: 600 } }, title)),
-    children)
-}
+// Three tracker chips start scattered, glide into a legend column, and the day's progress draws
+// as three nested rings around one centre. A black selection box then closes around the group.
+const TRACKS = [
+  { n: 'Water', icon: 'drop', c: '#4F86EE', tint: '#E1EBFD', r: 196, f: 1600 / 3000, val: (k) => `${fmt(1600 * k)} ml`, goal: 'of 3,000 ml', start: [300, 300] },
+  { n: 'Food', icon: 'food', c: Z.pink, tint: Z.pinkL, r: 150, f: 1385 / 2250, val: (k) => `${fmt(1385 * k)} cal`, goal: 'of 2,250 cal', start: [1480, 300] },
+  { n: 'Sleep', icon: 'moon', c: '#7A3BD6', tint: '#ECE3FB', r: 104, f: 6.5 / 8, val: (k) => `6h ${Math.round(30 * k)}m`, goal: 'of 8h', start: [1500, 870] },
+]
 function Trackers({ t, s0, out, end }) {
-  const T = t - s0, card = (i) => ramp(T, 0.25 + i * 0.22, 0.95 + i * 0.22) * (1 - out)
-  const g = (i) => 1.0 + i * 0.22
-  const water = 1600 * ramp(T, g(0), g(0) + 1.1), wl = water / 3000
-  const food = 1385 * ramp(T, g(1), g(1) + 1.1)
-  const sleepK = ramp(T, g(2), g(2) + 1.1)
-  const R = 92, cy = 175, top = cy - R + (1 - wl) * 2 * R
-  const wave = `M${220 - R - 30},${top} ` + Array.from({ length: 10 }, (_, i) => `q 15 ${i % 2 ? 8 : -8} 30 0`).join(' ') + ` V${cy + R + 20} H${220 - R - 30} Z`
+  const T = t - s0, cx = 730, cy = 640
+  const chip = (i) => ramp(T, 0.2 + i * 0.15, 0.6 + i * 0.15)
+  const glide = (i) => ramp(T, 0.95 + i * 0.12, 1.75 + i * 0.12)
+  const grow = (i) => ramp(T, 1.0 + i * 0.12, 1.7 + i * 0.12)
+  const fill = (i) => ramp(T, 1.6 + i * 0.18, 2.7 + i * 0.18)
+  const sel = ramp(T, 2.75, 3.05)
+  const box = { l: cx - 236, t: cy - 236, r: 1450, b: cy + 236 }
+  const hd = (x, y) => h('div', { key: `${x}-${y}`, style: { position: 'absolute', left: x - 5, top: y - 5, width: 10, height: 10, boxSizing: 'border-box', background: '#fff', border: '1.5px solid #111' } })
   return h('div', { style: { position: 'absolute', inset: 0 } },
-    h(Headline, { t, s: s0 + 0.1, e: end, eyebrow: 'Daily tracking', title: 'Water, food and sleep, every day.' }),
-    h('div', { style: { position: 'absolute', inset: 0, opacity: 1 - out, transform: `translateY(${-out * 30}px)` } },
-      // Hydration
-      h(GraphCard, { k: card(0), x: 205, title: 'Hydration', icon: 'drop', tint: '#E1EBFD', ic: '#3D7BEA' },
-        h('svg', { width: 384, height: 280, style: { position: 'absolute', left: 28, top: 70 } },
-          h('defs', null, h('clipPath', { id: 'twc' }, h('circle', { cx: 192, cy, r: R }))),
-          h('circle', { cx: 192, cy, r: R, fill: '#E3EBFD' }),
-          h('g', { clipPath: 'url(#twc)' }, h('path', { d: wave, fill: '#7FA6F4', transform: `translate(${-((t * 40) % 60) - 28},0)` })),
-          h('circle', { cx: 192, cy, r: 68, fill: '#fff' })),
-        h('div', { style: { position: 'absolute', left: 0, right: 0, top: 220, textAlign: 'center' } }, h('div', { style: { fontSize: 26, fontWeight: 600 } }, fmt(water), ' ml'), h('div', { style: { fontSize: 12, color: Z.sub } }, 'of 3,000 ml'))),
-      // Food
-      h(GraphCard, { k: card(1), x: 740, title: 'Food', icon: 'food', tint: Z.pinkL, ic: Z.pink },
-        h('svg', { width: 384, height: 240, style: { position: 'absolute', left: 28, top: 80 } },
-          h('path', { d: arc(192, 140, 104, -125, 125), fill: 'none', stroke: Z.pinkL, strokeWidth: 16, strokeLinecap: 'round' }),
-          h('path', { d: arc(192, 140, 104, -125, -125 + 250 * (food / 2250) + 0.01), fill: 'none', stroke: Z.pink, strokeWidth: 16, strokeLinecap: 'round' })),
-        h('div', { style: { position: 'absolute', left: 0, right: 0, top: 190, textAlign: 'center' } }, h('div', { style: { fontSize: 28, fontWeight: 600 } }, fmt(food), ' cal'), h('div', { style: { fontSize: 12, color: Z.sub } }, 'of 2,250 cal'))),
-      // Sleep
-      h(GraphCard, { k: card(2), x: 1275, title: 'Sleep', icon: 'moon', tint: '#EBDFFB', ic: '#6A2BC8' },
-        h('svg', { width: 384, height: 280, style: { position: 'absolute', left: 28, top: 70 } },
-          h('defs', null, h('linearGradient', { id: 'tsg', x1: 1, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: 0, stopColor: Z.sleep1 }), h('stop', { offset: 1, stopColor: Z.sleep2 }))),
-          h('circle', { cx: 192, cy, r: 80, fill: 'none', stroke: '#E4E0F0', strokeWidth: 26 }),
-          h('path', { d: arc(192, cy, 80, 0, 292 * sleepK + 0.01), fill: 'none', stroke: 'url(#tsg)', strokeWidth: 26, strokeLinecap: 'round' }),
-          [[150, 120], [222, 108], [244, 160], [138, 196], [176, 238]].map(([x, y], i) => h('circle', { key: i, cx: x, cy: y, r: 1.6, fill: '#fff', opacity: sleepK * (0.5 + 0.5 * Math.sin(t * 3 + i)) }))),
-        h('div', { style: { position: 'absolute', left: 0, right: 0, top: 220, textAlign: 'center' } }, h('div', { style: { fontSize: 26, fontWeight: 600 } }, '6h ', Math.round(30 * sleepK), 'm'), h('div', { style: { fontSize: 12, color: Z.sub } }, 'of 8h'))),
+    h(Headline, { t, s: s0 + 0.1, e: end, eyebrow: 'Daily tracking', title: 'Water, food and sleep in one place.' }),
+    h('div', { style: { position: 'absolute', inset: 0, opacity: 1 - out, transform: `translateY(${-out * 30}px)`, fontFamily: APP, color: Z.ink } },
+      // Rings
+      h('svg', { width: W, height: H, style: { position: 'absolute', inset: 0, overflow: 'visible' } },
+        h('defs', null, h('linearGradient', { id: 'osg', x1: 0, y1: 0, x2: 1, y2: 1 }, h('stop', { offset: 0, stopColor: Z.sleep1 }), h('stop', { offset: 1, stopColor: Z.sleep2 }))),
+        h('circle', { cx, cy, r: 236, fill: 'rgba(255,255,255,0.75)', opacity: grow(0) }),
+        TRACKS.map((k, i) => {
+          const g = grow(i), r = k.r * (0.6 + 0.4 * g)
+          return h('g', { key: k.n, opacity: g },
+            h('circle', { cx, cy, r, fill: 'none', stroke: k.tint, strokeWidth: 30 }),
+            h('path', { d: arc(cx, cy, r, 0, 359.9 * k.f * fill(i) + 0.01), fill: 'none', stroke: i === 2 ? 'url(#osg)' : k.c, strokeWidth: 30, strokeLinecap: 'round' }))
+        })),
+      h('div', { style: { position: 'absolute', left: cx - 70, top: cy - 34, width: 140, textAlign: 'center', opacity: ramp(T, 1.8, 2.3) } },
+        h('div', { style: { fontSize: 13, color: Z.sub } }, 'Today'),
+        h('div', { style: { fontSize: 30, fontWeight: 600, letterSpacing: '-0.02em' } }, '19 Feb')),
+      // Chips → legend rows
+      TRACKS.map((k, i) => {
+        const a = chip(i), m = glide(i)
+        const fx = lerp(k.start[0], 1010, m), fy = lerp(k.start[1], cy - 150 + i * 116, m)
+        return h('div', { key: k.n, style: { position: 'absolute', left: fx, top: fy, width: 420, display: 'flex', alignItems: 'center', gap: 16, opacity: a, transform: `scale(${(0.7 + 0.3 * a) * (1.08 - 0.08 * m)})`, transformOrigin: '0 50%' } },
+          h('div', { style: { width: 64, height: 64, borderRadius: 32, background: '#fff', boxShadow: '0 14px 30px -10px rgba(11,42,91,0.28)', display: 'grid', placeItems: 'center' } },
+            h('div', { style: { width: 48, height: 48, borderRadius: 24, background: k.tint, display: 'grid', placeItems: 'center' } }, h(Icon, { n: k.icon, c: k.c, s: 24, w: 2.2 }))),
+          h('div', null,
+            h('div', { style: { fontSize: 18, fontWeight: 500, color: Z.sub } }, k.n),
+            h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 10, whiteSpace: 'nowrap', opacity: m } },
+              h('span', { style: { fontSize: 36, fontWeight: 600, letterSpacing: '-0.02em' } }, k.val(fill(i))),
+              h('span', { style: { fontSize: 16, color: Z.sub } }, k.goal))),
+          h('div', { style: { marginLeft: 'auto', padding: '6px 12px', borderRadius: 10, background: k.tint, color: k.c, fontSize: 16, fontWeight: 600, opacity: ramp(T, 2.2 + i * 0.18, 2.6 + i * 0.18) } }, Math.round(k.f * 100), '%'))
+      }),
+      // Selection around the group
+      h('div', { style: { position: 'absolute', left: box.l - 24, top: box.t - 24, width: box.r - box.l + 48, height: box.b - box.t + 48, opacity: sel * (1 - out) } },
+        h('div', { style: { position: 'absolute', inset: 0, border: '1.5px solid #111', clipPath: `inset(0 ${(1 - sel) * 100}% 0 0)` } }),
+        h('div', { style: { position: 'absolute', left: 0, bottom: '100%', marginBottom: 8, fontFamily: FONT, fontSize: 14, fontWeight: 500, color: '#3D3A5C' } }, 'Daily summary'),
+        hd(0, 0), hd(box.r - box.l + 48, 0), hd(0, box.b - box.t + 48), hd(box.r - box.l + 48, box.b - box.t + 48),
+        h('div', { style: { position: 'absolute', left: '50%', top: '100%', marginTop: 10, transform: 'translateX(-50%)', padding: '3px 8px', borderRadius: 4, background: '#111', color: '#fff', fontFamily: FONT, fontSize: 12, fontWeight: 500 } }, 'Hug × Hug')),
     ),
   )
 }
@@ -605,25 +617,26 @@ function GymScene({ t }) {
   )
 }
 
-// Scenes 02 and 03 keep their own clocks; the longer daily-log scene pushes them back by SHIFT.
-const SHIFT = 1.4
-function Intro({ t }) { return h(Trackers, { t, s0: 0, end: 3.7, out: ramp(t, 3.15, 3.7) }) }
-function Outro({ t }) { return h(Trackers, { t, s0: 18.4, end: 22, out: ramp(t, 21.5, 22) }) }
+// Each scene keeps its own clock: IN is the extra hold on the opener, SHIFT also covers the
+// longer daily-log scene.
+const IN = 0.8, SHIFT = 1.4 + IN
+function Intro({ t }) { return h(Trackers, { t, s0: 0, end: 4.5, out: ramp(t, 3.95, 4.5) }) }
+function Outro({ t }) { return h(Trackers, { t, s0: 18.4 + IN, end: BASE, out: ramp(t, BASE - 0.5, BASE) }) }
 
 function Frame({ t }) {
   return h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden' } },
     h(Studio, { t }),
-    t < 3.8 && h(Intro, { t }),
-    t > 3.5 && t < 9.6 && h(LogScene, { t }),
-    t > 9.3 && t < 13 + SHIFT && h(WorkoutScene, { t: t - SHIFT }),
+    t < 4.6 && h(Intro, { t }),
+    t > 3.5 + IN && t < 9.6 + IN && h(LogScene, { t: t - IN }),
+    t > 9.3 + IN && t < 13 + SHIFT && h(WorkoutScene, { t: t - SHIFT }),
     t > 12.4 + SHIFT && t < 17.4 + SHIFT && h(GymScene, { t: t - SHIFT }),
-    t > 18.3 && h(Outro, { t }),
+    t > 18.3 + IN && h(Outro, { t }),
   )
 }
 
 // ---------- Player (same controls and window.__zync API as the other cuts) ----------
 
-const SCENE_TICKS = [3.6, 9.4, 14, 18.6].map((k) => k * PACE)
+const SCENE_TICKS = [4.4, 10.2, 14.8, 19.4].map((k) => k * PACE)
 const btn = { width: 36, height: 36, borderRadius: 18, border: '1px solid #39445a', background: '#151b26', color: '#fff', cursor: 'pointer', fontSize: 13 }
 function Player() {
   const [t, setT] = useState(0), [playing, setPlaying] = useState(true), [bare, setBare] = useState(false), [s, setS] = useState(1)
