@@ -6,16 +6,18 @@ The Jaadu 2.0 card video in the Selected Work boxes and the case-study hero (`pu
 - Quant Lab Research (735:3056 empty state, 810:4672 with results);
 - Alert: Price (508:3393);
 - Window / Notifications (2802:183748);
-- Quantlab: Overnight Discoveries (1413:27912).
+- Quantlab: Overnight Discoveries (1413:27912);
+- Quantlab: Library (817:8467).
 
-**Length:** a 19.9s loop of four scenes (`SLOW` = 1.3). The dashboard and opening scenes were removed in feedback; the video now opens on the Quant Lab prompt.
+**Length:** a 22.6s loop of five scenes (`SLOW` = 1.2). The video opens on a close-up of the Quant Lab prompt.
 
 | Time | Scene | Copy | Visual |
 |---|---|---|---|
-| 0:00–0:05.9 | **Quant lab research** | AI TRADING PLATFORM / **Ask the lab. Get the analysis.** | Only the prompt box (Research / Build tabs, input, disclaimer) is on the canvas. The cursor clicks it and *Distribution of funding rate before 5%+ drops on BTC 4h, last year.* types in. The cursor clicks send (hotspot "On click → Run research"). The box drops to the bottom while the results rise above it: the question, the *Distribution* card (histogram bars grow, median +0.041%, 90th percentile +0.118%, the insight line) and the *Output table* (three rows). The Distribution card is selected. |
-| 0:05.9–0:10.0 | **Create an alert** | ALERTS / **Set an alert on any price.** | The *Create Alert* form appears on its own. The cursor clicks the condition value and types **116,000**, then clicks **Create Alert** (hotspot "On click → Create alert"), and the button turns green, "Created". |
-| 0:10.0–0:13.9 | **Notifications** (a separate scene) | NOTIFICATIONS / **Know the moment it triggers.** | The Notifications panel appears with three earlier alerts. The triggered alert *BTC / USDT crossed $116,000 · now $116,040* pops in as a toast beside the panel, then flies in and docks as the top row; the list makes room, and the badge goes 2 → 3. The cursor rests on the new row, which is selected as *Notification*. |
-| 0:13.9–0:19.9 | **Overnight discoveries** | OVERNIGHT DISCOVERIES / **642 strategies tested overnight. 3 survived.** | The *Falsification funnel* and *Discoveries per night* cards appear side by side (stacked in portrait), each drawn whole inside its card. The funnel draws as its stages count 642 → 128 → 31 → 3, and the 30 nightly bars grow, with last night's 3 highlighted. The cursor clicks "642 → 3 survived" (hotspot "On click → View survivors"); both cards step back and the three surviving strategy cards pop in with their equity curves drawing. |
+| 0:00–0:06.0 | **Quant lab research** | AI TRADING PLATFORM / **Ask the lab. Get the analysis.** | A close-up of the prompt box (Research / Build tabs, input, disclaimer), nearly the width of the canvas. The cursor clicks it and *Distribution of funding rate before 5%+ drops on BTC 4h, last year.* types in. The cursor clicks send (hotspot "On click → Run research"). The view pulls back: the box shrinks into its place at the bottom of the full Quant Lab *Research* screen (rail, Quantlab sidebar with tools and history, page header), which fades in around it. The results fill in above the prompt: the question, the *Distribution* card (bars grow, median +0.041%, 90th percentile +0.118%, insight line) and the *Output table*. The screen is selected (1440 × 820). |
+| 0:06.0–0:09.8 | **Create an alert** | ALERTS / **Set an alert on any price.** | The *Create Alert* form on its own. The cursor clicks the condition value and types **116,000**, then clicks **Create Alert** (hotspot "On click → Create alert"); the button turns green, "Created". |
+| 0:09.8–0:13.4 | **Notifications** | NOTIFICATIONS / **Know the moment it triggers.** | The Notifications panel. The triggered alert *BTC / USDT crossed $116,000 · now $116,040* pops in as a toast, then docks as the top row; the badge goes 2 → 3, and the row is selected. |
+| 0:13.4–0:18.6 | **Overnight discoveries** | OVERNIGHT DISCOVERIES / **642 strategies tested overnight. 3 survived.** | The *Falsification funnel* and *Discoveries per night* cards appear side by side (stacked in portrait), drawn whole. The cursor clicks "642 → 3 survived" (hotspot "On click → View survivors"); the cards step back and the three survivors pop in. The cursor clicks **Save to Library** on MeanRev-VAL (hotspot "On click → Save to Library"), which turns to "Saved". |
+| 0:18.6–0:22.6 | **Library** | LIBRARY / **Saved strategies, sorted by regime.** | The Quant Lab *Library* screen (header with Compare, regime filter chips, a grid of saved strategies) appears with the first slot empty. The saved MeanRev-VAL card flies in and lands there with a green glow and a "Saved just now" tag, and it is selected. |
 
 ## UI refinements and data notes
 - **Removed:** the logo and wordmark.
@@ -39,6 +41,11 @@ The Jaadu 2.0 card video in the Selected Work boxes and the case-study hero (`pu
   - **MeanRev-VAL** keeps the design's values, tagged Sideways instead of Breakout, which suits a mean-reversion strategy.
   - **ReversalFade-4h** (54%, −9.8%, PF 1.52, Sharpe 1.86) and **Absorption-Put** (61%, −14.2%, PF 1.91, Sharpe 2.31) are invented. Their names come from the design's Library.
   - The labels "MAX DO" and "PROFT FACTOR" are fixed to **Max DD** and **Profit factor**.
+- **Library:**
+  - The design repeats MeanRev-VAL and other cards with the same 58% win rate. The grid now holds six distinct strategies: the saved MeanRev-VAL (with its backtest), FundingSkew-1h and TurboMOVE-vol (names from the design), and VAH-Breakout, FundingDrop-4h and RegimeCorr-ETH (named after the design's history items). Their win rates and backtest values are invented; two show "Not run yet" as in the design.
+  - The filter chip "Breakdown" is now **Breakout**, matching the regime tags.
+  - "shadow-mode" in the subtitle is now "shadow mode".
+- **Quant Lab shell:** the logo is left out of the top bar ("Quant Lab" in its place). The portrait layout drops the Quantlab sidebar so the results stay readable.
 - **Coin icons:** plain lettered discs in each coin's colour, not brand artwork.
 
 **Build:** `cd figma-cut && npm install && npm run embed` → `public/showcase/jaadu-2.html`.

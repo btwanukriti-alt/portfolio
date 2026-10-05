@@ -1,16 +1,18 @@
-// The four scenes of the ~20s cut (slowed by SLOW), each a pure function of the clock `t` and
+// The five scenes of the ~22s cut (slowed by SLOW), each a pure function of the clock `t` and
 // the layout (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the trading platform
 // Figma frames ("Desktop" section 2804:259012), made into one consistent data set.
-//   0 · Research: only the Quant Lab prompt box shows. A question is typed and sent; the box
-//       drops to the bottom and the agent's analysis (distribution + output table) rises above.
+//   0 · Research: a close-up of the Quant Lab prompt box. A question is typed and sent; the
+//       camera pulls back to the full Research screen, the prompt docks at the bottom and the
+//       agent's analysis (distribution + output table) fills in above it.
 //   1 · Alert: the Create Alert form on its own. The value is typed and Create Alert is clicked.
 //   2 · Notifications: a separate screen. The triggered alert pops in as a toast and docks as
 //       the top row of the Notifications panel.
 //   3 · Overnight discoveries: the falsification funnel and discoveries-per-night chart side by
-//       side; clicking "3 survived" brings up the three surviving strategies.
+//       side; clicking "3 survived" brings up the three survivors; one is saved to the library.
+//   4 · Library: the Library screen; the saved strategy flies into its first slot.
 import { Cursor, Selection } from './fig.jsx'
 import { E, FIG, P, SCENES, SLOW, UI_FONT, C, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertForm, CREATE, FCHIP, FORM, FUNNEL, FunnelCard, NOTE, NightsCard, NoteRow, Notifications, PROMPT, PromptBox, ResearchResults, SCARD, SEND, STRATS, StrategyCard, VALUE, resH } from './ui.jsx'
+import { AlertForm, CREATE, FCHIP, FORM, FUNNEL, FunnelCard, IC, LIB, LIBS, LibCard, LibraryHead, NOTE, NightsCard, NoteRow, Notifications, PROMPT, PageHead, PromptBox, ResearchResults, SAVE, SCARD, SEND, SHELL, STRATS, Shell, StrategyCard, VALUE, libCW, libCols } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 // Scene-local time, slowed by SLOW (every timing inside a scene is in these local seconds).
@@ -52,51 +54,67 @@ function Hotspot({ b, o, label, k = 1 }) {
 
 
 // =====================================================================================
-// 0 · RESEARCH: prompt box alone → typed → it drops down and the analysis rises above it
+// 0 · RESEARCH: a close-up of the prompt box → typed, sent → the camera pulls back to the
+//     full Quant Lab Research screen, where the prompt docks at the bottom and results fill in
 // =====================================================================================
-const RS = {
-  land: { K: 1.2, w: 900, x: 420, y0: 571, res: 250, gap: 36, curFrom: { x: 1980, y: 1120 }, curRest: { x: 1700, y: 1020 } },
-  port: { K: 1.3, w: 760, x: 46, y0: 1064, res: 659, gap: 40, curFrom: { x: 1150, y: 1950 }, curRest: { x: 940, y: 1850 } },
-}
-export function Research({ t, L, W }) {
+// The window (Shell) sits at WIN[L] scaled by k; the prompt starts zoomed at scale Z.
+export const WIN = { land: { x: 276, y: 256, k: 0.95 }, port: { x: 40, y: 650, k: 1.0 } }
+const RZ = { land: { Z: 1.85, curFrom: { x: 1980, y: 1120 }, curRest: { x: 1720, y: 1030 } }, port: { Z: 1.15, curFrom: { x: 1150, y: 1950 }, curRest: { x: 960, y: 1860 } } }
+export function Research({ t, L, W, H }) {
   const u = local(t, 'research')
   if (u === null) return null
   const port = L === 'port'
-  const D = RS[L]
-  const K = D.K
-  const exit = P(u, 4.1, 4.5, E.inOut)
+  const G = SHELL[L]
+  const Wn = WIN[L]
+  const k = Wn.k
+  const Z = RZ[L].Z
+  const exit = P(u, 4.6, 5.0, E.inOut)
   const tc1 = 0.95
   const tc2 = 2.4
   const pop = E.back(clamp((u - 0.1) / 0.5))
-  const drop = P(u, 2.45, 3.05, E.inOut)
-  const y1 = D.res + K * resH(port) + D.gap
-  const py = lerp(D.y0, y1, drop)
-  const input = { x: D.x + K * 260, y: D.y0 + K * 80 }
-  const send = { x: D.x + K * (D.w - 12 - SEND.s / 2), y: D.y0 + K * SEND.top }
-  const cur = kf(u, [[0.4, D.curFrom], [0.85, input], [tc1 + 0.2, input], [2.05, input], [2.3, send], [tc2 + 0.15, send], [3.1, D.curRest]])
-  const cs = sway(u, 2, u > 3.1 ? 5 : 0)
-  const rp = P(u, 2.6, 3.9, (x) => x)
-  const sel = u > 3.55 ? P(u, 3.55, 3.7) * (1 - P(u, 3.85, 3.98)) : 0
-  const distY = D.res + K * 66
+  // Prompt's final top-left (stage) inside the window, and its zoomed start position.
+  const pf = { x: Wn.x + k * G.x, y: Wn.y + k * (G.h - PROMPT.h - 22) }
+  const ps = { x: (W - Z * G.mw) / 2, y: (port ? 1150 : 650) - (Z * PROMPT.h) / 2 }
+  const z = P(u, 2.5, 3.3, E.inOut)
+  const input = { x: ps.x + Z * 320, y: ps.y + Z * 80 }
+  const send = { x: ps.x + Z * (G.mw - 12 - SEND.s / 2), y: ps.y + Z * SEND.top }
+  const cur = kf(u, [[0.4, RZ[L].curFrom], [0.85, input], [tc1 + 0.2, input], [2.05, input], [2.3, send], [tc2 + 0.12, send], [3.2, RZ[L].curRest]])
+  const cs = sway(u, 2, u > 3.2 ? 5 : 0)
+  const rp = P(u, 3.05, 4.2, (x) => x)
+  const win = clamp((z - 0.15) / 0.6)
+  const sel = u > 0.45 ? P(u, 0.45, 0.6) * (1 - P(u, 0.8, 0.95)) : 0
+  const winSel = u > 3.35 ? P(u, 3.35, 3.5) * (1 - P(u, 3.9, 4.05)) : 0
   return (
     <>
       <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="AI trading platform" lines={port ? ['Ask the lab.', 'Get the analysis.'] : ['Ask the lab. Get the analysis.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        {rp > 0 && (
-          <Abs x={D.x} y={D.res} style={{ zIndex: 9 }}>
-            <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-              <ResearchResults w={D.w} narrow={port} p={rp} />
+        {win > 0 && (
+          <Abs x={Wn.x} y={Wn.y} style={{ opacity: win, zIndex: 8, transform: `scale(${lerp(1.06, 1, E.out(win))})`, transformOrigin: '50% 100%', boxShadow: `0 50px 100px -40px rgba(20,20,90,${0.7 * win})`, borderRadius: 16 * k }}>
+            <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>
+              <Shell L={L} active="research">
+                <div style={{ position: 'absolute', left: G.x, top: 92, width: G.mw, opacity: clamp((u - 2.9) / 0.3) }}>
+                  <PageHead icon={IC.search} title="Research" sub="Sandboxed Python analysis · the agent writes and runs code to answer ad-hoc questions" />
+                </div>
+                {rp > 0 && (
+                  <div style={{ position: 'absolute', left: G.x, top: 160 }}>
+                    <ResearchResults w={G.mw} narrow={port} p={rp} gap={12} />
+                  </div>
+                )}
+              </Shell>
             </div>
           </Abs>
         )}
-        <Abs x={D.x} y={py} style={{ opacity: clamp((u - 0.1) / 0.2), transform: `translateY(${(1 - pop) * 24}px) scale(${0.94 + 0.06 * pop})`, transformOrigin: '50% 50%', zIndex: 12 }}>
-          <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-            <PromptBox w={D.w} typed={P(u, 1.05, 2.05, (x) => x)} focus={P(u, tc1, tc1 + 0.15) * (1 - P(u, 2.45, 2.6))} pr={press(u, tc2)} sent={u > tc2 + 0.05 ? 1 : 0} />
+        <Abs x={lerp(ps.x, pf.x, z)} y={lerp(ps.y, pf.y, z)} style={{ opacity: clamp((u - 0.1) / 0.2), zIndex: 12 }}>
+          <div style={{ transform: `scale(${lerp(Z, k, z)})`, transformOrigin: '0 0' }}>
+            <div style={{ transform: `scale(${0.94 + 0.06 * pop})`, transformOrigin: '50% 50%' }}>
+              <PromptBox w={G.mw} typed={P(u, 1.05, 2.05, (x) => x)} focus={P(u, tc1, tc1 + 0.15) * (1 - P(u, 2.45, 2.6))} pr={press(u, tc2)} sent={u > tc2 + 0.05 ? 1 : 0} />
+            </div>
           </div>
         </Abs>
-        <Selection x={D.x} y={D.y0} w={K * D.w} h={K * PROMPT.h} o={u > 0.45 ? P(u, 0.45, 0.6) * (1 - P(u, 0.8, 0.95)) : 0} label="Prompt" comp size={`${D.w} × ${PROMPT.h}`} k={port ? 1.35 : 1.1} />
-        <Hotspot b={{ x: send.x - K * 20, y: send.y - K * 20, w: K * 40, h: K * 40 }} o={clamp((u - 2.05) / 0.2) * (1 - clamp((u - tc2 - 0.05) / 0.15))} label="On click → Run research" k={port ? 1.3 : 1} />
-        <Selection x={D.x} y={distY} w={K * D.w} h={K * (port ? 372 : 240)} o={sel} label="Distribution" comp k={port ? 1.35 : 1.1} />
+        {win > 0.5 && <div style={{ position: 'absolute', left: Wn.x, top: Wn.y - 32, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * clamp((win - 0.5) * 2) }}>Quant Lab · Research</div>}
+        <Selection x={ps.x} y={ps.y} w={Z * G.mw} h={Z * PROMPT.h} o={sel} label="Prompt" comp size={`${G.mw} × ${PROMPT.h}`} k={port ? 1.35 : 1.2} />
+        <Hotspot b={{ x: send.x - Z * 20, y: send.y - Z * 20, w: Z * 40, h: Z * 40 }} o={clamp((u - 2.05) / 0.2) * (1 - clamp((u - tc2 - 0.05) / 0.15))} label="On click → Run research" k={port ? 1.3 : 1.1} />
+        <Selection x={Wn.x} y={Wn.y} w={k * G.w} h={k * G.h} o={winSel} size={`${G.w} × ${G.h}`} k={port ? 1.35 : 1.1} />
       </div>
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.4, 0.65) * (1 - exit)} pr={press(u, tc1) + press(u, tc2)} rp={ripple(u, tc1) + ripple(u, tc2)} s={port ? 2 : 1.5} />
     </>
@@ -204,8 +222,9 @@ export function Discoveries({ t, L, W }) {
   const port = L === 'port'
   const D = DS[L]
   const K = D.K
-  const exit = P(u, 4.2, 4.6, E.inOut)
+  const exit = P(u, 3.9, 4.3, E.inOut)
   const tc = 2.1
+  const tc2 = 3.2
   const fpop = E.back(clamp((u - 0.1) / 0.55))
   const npop = E.back(clamp((u - 0.25) / 0.55))
   const recede = P(u, tc + 0.05, tc + 0.5, E.inOut)
@@ -213,8 +232,6 @@ export function Discoveries({ t, L, W }) {
   const ny = D.stack ? D.y + K * (FUNNEL.h + D.gap) : D.y
   const chip = { x: D.x + K * (D.fw - 28 - FCHIP.w), y: D.y + K * FCHIP.y, w: K * FCHIP.w, h: K * FCHIP.h }
   const target = { x: chip.x + chip.w * 0.55, y: chip.y + chip.h * 0.6 }
-  const cur = kf(u, [[1.4, D.curFrom], [1.95, target], [tc + 0.2, target], [2.9, D.curRest]])
-  const cs = sway(u, 5, u > 2.9 ? 5 : 0)
   const cw = SCARD.w * D.cK
   const ch = SCARD.h * D.cK
   const slot = (i) => {
@@ -223,9 +240,14 @@ export function Discoveries({ t, L, W }) {
     const x0 = (W - (inRow * cw + (inRow - 1) * D.cgap)) / 2
     return { x: x0 + (i % D.cols) * (cw + D.cgap), y: D.cy + r * (ch + D.cgap) }
   }
+  const c0 = slot(0)
+  const save = { x: c0.x + D.cK * SAVE.x, y: c0.y + D.cK * SAVE.y, w: D.cK * SAVE.w, h: D.cK * SAVE.h }
+  const saveAt = { x: save.x + save.w * 0.45, y: save.y + save.h * 0.6 }
+  const cur = kf(u, [[1.4, D.curFrom], [1.95, target], [tc + 0.2, target], [2.95, saveAt], [tc2 + 0.15, saveAt], [3.8, D.curRest]])
+  const cs = sway(u, 5, u > 3.8 ? 5 : 0)
   const back = { opacity: 1 - recede, transform: `translateY(${-40 * recede}px) scale(${1 - 0.05 * recede})`, transformOrigin: '50% 0' }
   const selF = u > 0.55 ? P(u, 0.55, 0.7) * (1 - P(u, 1.1, 1.25)) : 0
-  const selC = u > 3.3 ? P(u, 3.3, 3.45) * (1 - P(u, 3.65, 3.8)) : 0
+  const selC = u > 2.6 ? P(u, 2.6, 2.75) * (1 - P(u, 2.95, 3.1)) : 0
   const sk = port ? 1.35 : 1.1
   return (
     <>
@@ -255,14 +277,79 @@ export function Discoveries({ t, L, W }) {
           return (
             <Abs key={i} x={s0.x} y={s0.y} style={{ opacity: clamp((u - a) / 0.15), transform: `translateY(${(1 - pp) * 60}px) scale(${0.86 + 0.14 * pp})`, transformOrigin: '50% 50%', zIndex: 11 }}>
               <div style={{ transform: `scale(${D.cK})`, transformOrigin: '0 0' }}>
-                <StrategyCard i={i} p={P(u, a + 0.2, a + 1.0)} />
+                <StrategyCard i={i} p={P(u, a + 0.2, a + 1.0)} saved={i === 0 && u > tc2 + 0.08 ? 1 : 0} pr={i === 0 ? press(u, tc2) : 0} hover={i === 0 ? P(u, 2.6, 2.8) : 0} />
               </div>
               <Selection x={0} y={0} w={cw} h={ch} o={i === 0 ? selC : 0} label="Strategy Card" comp size={`${SCARD.w} × ${SCARD.h}`} k={sk} />
             </Abs>
           )
         })}
       </div>
-      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 1.4, 1.65) * (1 - exit)} pr={press(u, tc)} rp={ripple(u, tc)} s={port ? 2 : 1.5} />
+        <Hotspot b={save} o={clamp((u - 2.95) / 0.2) * (1 - clamp((u - tc2 - 0.1) / 0.15))} label="On click → Save to Library" k={port ? 1.3 : 1} />
+      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 1.4, 1.65) * (1 - exit)} pr={press(u, tc) + press(u, tc2)} rp={ripple(u, tc) + ripple(u, tc2)} s={port ? 2 : 1.5} />
+    </>
+  )
+}
+
+// =====================================================================================
+// 4 · LIBRARY: the Library screen; the strategy just saved flies into the first slot
+// =====================================================================================
+const LB = { land: { from: { x: 700, y: 420 }, fs: 1.5, curFrom: { x: 1980, y: 1120 }, curRest: { x: 1720, y: 1030 } }, port: { from: { x: 200, y: 900 }, fs: 1.6, curFrom: { x: 1150, y: 1950 }, curRest: { x: 960, y: 1860 } } }
+export function Library({ t, L, W }) {
+  const u = local(t, 'library')
+  if (u === null) return null
+  const port = L === 'port'
+  const G = SHELL[L]
+  const Wn = WIN[L]
+  const k = Wn.k
+  const D = LB[L]
+  const exit = P(u, 2.9, 3.3, E.inOut)
+  const pop = E.back(clamp((u - 0.1) / 0.55))
+  const cols = libCols(L)
+  const cw = libCW(L)
+  const slot = (i) => ({ x: G.x + (i % cols) * (cw + LIB.gap), y: LIB.top + Math.floor(i / cols) * (LIB.ch + LIB.gap) })
+  const s0 = slot(0)
+  const to = { x: Wn.x + k * s0.x, y: Wn.y + k * s0.y }
+  const fly = P(u, 0.55, 1.25, E.inOut)
+  const fx = lerp(D.from.x, to.x, fly)
+  const fy = lerp(D.from.y, to.y, fly)
+  const fs = k * lerp(D.fs, 1, fly)
+  const glow = P(u, 1.2, 1.45) * (1 - 0.5 * P(u, 2.4, 2.8))
+  const sel = u > 1.45 ? P(u, 1.45, 1.6) * (1 - P(u, 2.2, 2.35)) : 0
+  const cur = kf(u, [[1.3, D.curFrom], [1.8, { x: to.x + k * cw * 0.6, y: to.y + k * LIB.ch * 0.45 }], [2.6, D.curRest]])
+  return (
+    <>
+      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="Library" lines={port ? ['Saved strategies,', 'sorted by regime.'] : ['Saved strategies, sorted by regime.']} />
+      <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
+        <Abs x={Wn.x} y={Wn.y} style={{ opacity: clamp((u - 0.1) / 0.2), transform: `translateY(${(1 - pop) * 30}px) scale(${0.96 + 0.04 * pop})`, transformOrigin: '50% 50%', zIndex: 8, boxShadow: '0 50px 100px -40px rgba(20,20,90,.7)', borderRadius: 16 * k }}>
+          <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>
+            <Shell L={L} active="library">
+              <div style={{ position: 'absolute', left: G.x, top: 92, width: G.mw, opacity: clamp((u - 0.25) / 0.25) }}>
+                <LibraryHead chips={clamp((u - 0.35) / 0.25)} />
+              </div>
+              {LIBS.map((_, i) => {
+                if (i === 0) return null
+                const a = 0.45 + i * 0.07
+                const pp = E.back(clamp((u - a) / 0.45))
+                const sl = slot(i)
+                return (
+                  <div key={i} style={{ position: 'absolute', left: sl.x, top: sl.y, opacity: clamp((u - a) / 0.15), transform: `translateY(${(1 - pp) * 30}px) scale(${0.92 + 0.08 * pp})`, transformOrigin: '50% 50%' }}>
+                    <LibCard i={i} w={cw} />
+                  </div>
+                )
+              })}
+              <div style={{ position: 'absolute', left: s0.x, top: s0.y, width: cw, height: LIB.ch, borderRadius: 16, border: `1.5px dashed ${C.line}`, opacity: 1 - fly }} />
+            </Shell>
+          </div>
+        </Abs>
+        {u > 0.5 && (
+          <Abs x={fx} y={fy} style={{ opacity: clamp((u - 0.5) / 0.15), transform: `rotate(${-4 * (1 - fly)}deg) scale(${fs})`, transformOrigin: '0 0', zIndex: 14 }}>
+            <LibCard i={0} w={cw} glow={glow} />
+          </Abs>
+        )}
+        <Selection x={to.x} y={to.y} w={k * cw} h={k * LIB.ch} o={sel} label="Strategy Card · saved" comp k={port ? 1.35 : 1.1} />
+        {u > 0.3 && <div style={{ position: 'absolute', left: Wn.x, top: Wn.y - 32, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * clamp((u - 0.3) / 0.3) }}>Quant Lab · Library</div>}
+      </div>
+      <Cursor x={cur.x} y={cur.y} o={P(u, 1.3, 1.55) * (1 - exit)} s={port ? 2 : 1.5} />
     </>
   )
 }

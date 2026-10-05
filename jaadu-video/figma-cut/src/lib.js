@@ -90,15 +90,15 @@ export const MONO = "'Geist Mono', ui-monospace, monospace"
 export const BG = '#CFDDFF'
 // Scene lengths are written in scene-local seconds; SLOW stretches every scene uniformly so the
 // piece reads calmly for a first-time viewer (motion and holds both get longer).
-export const SLOW = 1.3
-const LEN = [['research', 4.5], ['alert', 3.2], ['notify', 3.0], ['disc', 4.6]]
+export const SLOW = 1.2
+const LEN = [['research', 5.0], ['alert', 3.2], ['notify', 3.0], ['disc', 4.3], ['library', 3.3]]
 export const SCENES = LEN.reduce((acc, [id, d]) => {
   const a = acc.length ? acc[acc.length - 1].b : 0
   return [...acc, { id, a, b: +(a + d * SLOW).toFixed(3) }]
 }, [])
 export const DURATION = SCENES[SCENES.length - 1].b
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 4.8
+export const POSTER = 5.2
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }

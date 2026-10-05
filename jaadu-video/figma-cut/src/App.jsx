@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
 import { DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
-import { Alert, Discoveries, Notify, Research } from './scenes.jsx'
+import { Alert, Discoveries, Library, Notify, Research } from './scenes.jsx'
 import { Backdrop, CanvasFrame, frameInset } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
@@ -118,6 +118,7 @@ export default function App() {
           <Alert {...props} />
           <Notify {...props} />
           <Discoveries {...props} />
+          <Library {...props} />
         </div>
       </div>
       <CanvasFrame vw={vw} vh={vh} />

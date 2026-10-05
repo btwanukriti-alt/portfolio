@@ -32,6 +32,12 @@ export const IC = {
   chart: (c, s) => <Ic c={c} s={s} d="M4 19.5h16M6 15l4-4 3 3 5-6" />,
   send: (c, s) => <svg width={s} height={s} viewBox="0 0 24 24" style={{ display: 'block', flex: 'none' }}><path d="M3.5 4.5l17 7.5-17 7.5 2.5-7.5z" fill={c} /></svg>,
   up: (c, s) => <Ic c={c} s={s} w={2.4} d="M12 19V5M6 11l6-6 6 6" />,
+  search: (c = C.sub, s = 16) => <Ic c={c} s={s}><circle cx="11" cy="11" r="6" /><path d="M20 20l-4.5-4.5" /></Ic>,
+  shelf: (c, s) => <Ic c={c} s={s}><path d="M5 4v16M9 4v16M13.5 5l4.5 14.5" /></Ic>,
+  paper: (c, s) => <Ic c={c} s={s}><path d="M4 19.5h16M7 16l3-4 3 2 4-6" /></Ic>,
+  history: (c, s) => <Ic c={c} s={s}><path d="M4 12a8 8 0 108-8 8.5 8.5 0 00-6 2.5L4 8.5M4 4v4.5h4.5M12 8v4l3 2" /></Ic>,
+  trash: (c, s) => <Ic c={c} s={s}><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13" /></Ic>,
+  share: (c, s) => <Ic c={c} s={s}><path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5" /></Ic>,
   check: (c, s) => <Ic c={c} s={s} w={2.6} d="M5 12.5l4.5 4.5L19 7.5" />,
   fork: (c, s) => <Ic c={c} s={s}><circle cx="7" cy="5.5" r="2" /><circle cx="17" cy="5.5" r="2" /><circle cx="12" cy="18.5" r="2" /><path d="M7 7.5v1.5a3 3 0 003 3h4a3 3 0 003-3V7.5M12 12v4.5" /></Ic>,
   bulb: (c, s) => <Ic c={c} s={s}><path d="M9.5 18.5h5M10 21h4M12 3.5a6 6 0 00-3.5 10.9V16h7v-1.6A6 6 0 0012 3.5z" /></Ic>,
@@ -276,7 +282,7 @@ const ROWS = [['14-11-2025', '−6.2', '+0.108%', '94', '+3.1%'], ['02-09-2025',
 // Heights of the stacked results (native): question line, distribution card, output table.
 export const RES = { q: 40, gap: 26, dist: { land: 240, port: 372 }, table: 156 }
 export const resH = (narrow) => RES.q + RES.dist[narrow ? 'port' : 'land'] + RES.table + RES.gap * 2
-export function ResearchResults({ w = 900, narrow = false, p = 1 }) {
+export function ResearchResults({ w = 900, narrow = false, p = 1, gap = RES.gap }) {
   const step = (a) => clamp((p - a) / 0.3)
   const enter = (a) => ({ opacity: step(a), transform: `translateY(${(1 - E2(step(a))) * 26}px)` })
   const bars = clamp((p - 0.3) / 0.45)
@@ -289,10 +295,10 @@ export function ResearchResults({ w = 900, narrow = false, p = 1 }) {
     </div>
   )
   return (
-    <div style={{ width: w, display: 'flex', flexDirection: 'column', gap: RES.gap, fontFamily: APP_FONT, color: C.ink }}>
+    <div style={{ width: w, display: 'flex', flexDirection: 'column', gap, fontFamily: APP_FONT, color: C.ink }}>
       <div style={{ height: RES.q, display: 'flex', alignItems: 'center', gap: 12, ...enter(0) }}>
         <span style={{ width: 30, height: 30, borderRadius: 15, background: C.primary, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 600 }}>A</span>
-        <span style={{ fontSize: 15, fontWeight: 500, color: C.title }}>{QUESTION}</span>
+        <span style={{ fontSize: 15, fontWeight: 500, color: C.ink }}>{QUESTION}</span>
       </div>
       <div style={card({ position: 'relative', height: RES.dist[narrow ? 'port' : 'land'], padding: '18px 24px', ...enter(0.12) })}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -375,5 +381,120 @@ export function StrategyCard({ i, p = 1, hover = 0, saved = 0, pr = 0 }) {
         </span>
       </div>
     </div>
+  )
+}
+
+// =====================================================================================
+// Quant Lab app shell (the real screen around research results and the library)
+// =====================================================================================
+// Landscape: full screen 1440 × 820 with the Quantlab sidebar. Portrait (compact): 1000 wide,
+// rail + main area only. Main content starts at MAIN.y; MAIN.x / MAIN.w by layout.
+export const SHELL = { land: { w: 1440, h: 820, x: 492, mw: 892 }, port: { w: 1000, h: 1000, x: 96, mw: 864 }, top: 70 }
+const HISTORY = ['Correlate BTC regime shifts…', 'Funding rate before 5%+ drop…', 'Breakout start above VAH…', 'Mean-reversion BTC', 'Correlate BTC regime shifts…', 'Funding rate before 5%+ drop…', 'Mean-reversion BTC']
+export function Shell({ L = 'land', h, active = 'research', children }) {
+  const G = SHELL[L]
+  const H = h || G.h
+  const compact = L === 'port'
+  const tools = [['Overnight Discoveries', IC.bulb, 'disc'], ['Library', IC.shelf, 'library'], ['Paper Trade', IC.paper, 'paper'], ['Deja Vu', IC.history, 'deja']]
+  return (
+    <div style={{ position: 'relative', width: G.w, height: H, background: `radial-gradient(50% 40% at 60% 0%, #16207C 0%, transparent 70%), ${C.app}`, fontFamily: APP_FONT, color: C.ink, overflow: 'hidden', borderRadius: 16 }}>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: SHELL.top, borderBottom: `1px solid ${C.line}`, display: 'flex', alignItems: 'center', gap: 14, padding: '0 24px 0 96px' }}>
+        <span style={{ fontSize: 15, color: C.t2 }}>Quant Lab</span>
+        <span style={{ flex: 1 }} />
+        {!compact && <span style={{ width: 392, height: 34, borderRadius: 8, border: `1px solid ${C.line}`, background: C.field, display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0 12px', fontSize: 13, color: C.faint }}>{IC.search(C.sub, 15)}Search strategies…</span>}
+        <span style={{ flex: compact ? 0 : 1 }} />
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 34, padding: '0 14px', borderRadius: 8, border: `1px solid ${C.line}`, fontSize: 14 }}>{IC.share(C.t2, 15)}States</span>
+        {IC.bell(C.t2, 20)}
+      </div>
+      <div style={{ position: 'absolute', left: 0, top: SHELL.top, bottom: 0, width: 70, borderRight: `1px solid ${C.line}` }}>
+        {[IC.grid, IC.chat, IC.book, IC.lab, IC.alarm].map((f, i) => (
+          <div key={i} style={{ position: 'absolute', left: 13, top: 22 + i * 60, width: 44, height: 44, borderRadius: 10, display: 'grid', placeItems: 'center', background: i === 3 ? C.pSoft : 'transparent', border: i === 3 ? `1px solid ${C.line}` : 'none' }}>{f(i === 3 ? C.link : C.sub, 21)}</div>
+        ))}
+      </div>
+      {!compact && (
+        <div style={{ position: 'absolute', left: 118, top: 100, width: 318, height: H - 130, borderRadius: 16, border: `1px solid ${C.line}`, background: `linear-gradient(180deg, #0E1452, ${C.panel} 40%)`, padding: '22px 16px', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, fontWeight: 600, padding: '0 10px 18px', borderBottom: `1px solid ${C.line}` }}>{IC.lab(C.link, 24)}Quantlab</div>
+          <div style={{ marginTop: 16, height: 38, borderRadius: 8, background: C.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 13.5 }}>{IC.plus('#fff', 15)}New Lab Session</div>
+          <div style={{ fontSize: 12, color: C.faint, margin: '18px 0 8px' }}>Tools</div>
+          {tools.map(([n, ic, id]) => (
+            <div key={n} style={{ height: 38, borderRadius: 8, border: `1px solid ${id === active ? 'rgba(76,125,255,.5)' : C.line}`, background: id === active ? C.pSoft : 'transparent', display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', fontSize: 14, marginBottom: 10, color: id === active ? C.link : C.ink }}>{ic(id === active ? C.link : C.t2, 17)}{n}</div>
+          ))}
+          <div style={{ fontSize: 12, color: C.faint, margin: '16px 0 6px' }}>History</div>
+          {HISTORY.map((n, i) => (
+            <div key={i} style={{ height: 32, display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px', fontSize: 13.5, color: i === 1 && active === 'research' ? C.ink : C.t2, borderRadius: 6, background: i === 1 && active === 'research' ? C.panel2 : 'transparent' }}>{IC.history(C.sub, 15)}{n}</div>
+          ))}
+        </div>
+      )}
+      {children}
+    </div>
+  )
+}
+// Page header inside the main area (icon tile, title, subtitle, optional action).
+export function PageHead({ icon, title, sub, action }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, height: 46 }}>
+      <div style={{ width: 42, height: 42, borderRadius: 10, border: `1px solid ${C.line}`, background: C.panel, display: 'grid', placeItems: 'center' }}>{icon(C.link, 20)}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 17, fontWeight: 600 }}>{title}</div>
+        <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3, whiteSpace: 'nowrap' }}>{sub}</div>
+      </div>
+      {action}
+    </div>
+  )
+}
+
+// =====================================================================================
+// Library: saved strategies (the one just saved lands first)
+// =====================================================================================
+export const LIBS = [
+  { name: 'MeanRev-VAL', regime: 'Sideways', rc: C.primary, kind: 'Long spot', win: 58, bt: ['−12.6%', '1.74', '2.14'] },
+  { name: 'FundingSkew-1h', regime: 'Breakout', rc: C.red, kind: 'Long spot', win: 52, bt: ['−10.4%', '1.41', '1.62'] },
+  { name: 'TurboMOVE-vol', regime: 'Volatile', rc: C.amber, kind: 'Short spot', win: 49, bt: null },
+  { name: 'VAH-Breakout', regime: 'Breakout', rc: C.red, kind: 'Long perp', win: 55, bt: ['−8.7%', '1.58', '1.77'] },
+  { name: 'FundingDrop-4h', regime: 'Reversal', rc: C.violet, kind: 'Short perp', win: 51, bt: null },
+  { name: 'RegimeCorr-ETH', regime: 'Sideways', rc: C.primary, kind: 'Long spot', win: 53, bt: ['−11.2%', '1.36', '1.48'] },
+]
+export const LIB = { top: 222, ch: 196, gap: 16 }
+export const libCols = (L) => (L === 'port' ? 2 : 3)
+export const libCW = (L) => (SHELL[L].mw - (libCols(L) - 1) * LIB.gap) / libCols(L)
+export function LibCard({ i, w, glow = 0 }) {
+  const S = LIBS[i]
+  return (
+    <div style={card({ position: 'relative', width: w, height: LIB.ch, padding: '16px 18px', boxShadow: glow ? `0 0 0 2px rgba(43,217,160,${0.8 * glow}), 0 0 ${40 * glow}px rgba(43,217,160,${0.35 * glow})` : 'none' })}>
+      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 600, whiteSpace: 'nowrap' }}><span style={{ width: 8, height: 8, borderRadius: 4, background: S.rc }} />{S.name}</div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 9 }}><Chip h={23} bg={`${S.rc}2A`} fg={C.ink}>{S.regime}</Chip><Chip h={23}>{S.kind}</Chip></div>
+        </div>
+        <div style={{ textAlign: 'right' }}><div style={{ fontSize: 17, fontWeight: 600, ...num }}>{S.win}%</div><div style={{ fontSize: 10.5, color: C.sub }}>Win rate</div></div>
+      </div>
+      <div style={{ marginTop: 12, height: 62, borderRadius: 10, border: `1px solid ${C.line}`, background: 'rgba(5,7,48,.5)', padding: '8px 12px', boxSizing: 'border-box' }}>
+        <div style={{ fontSize: 10.5, color: C.sub }}>Backtest results</div>
+        {S.bt ? (
+          <div style={{ display: 'flex', gap: 18, marginTop: 5 }}>
+            {['Max DD', 'Profit factor', 'Sharpe'].map((l, j) => <div key={l}><div style={{ fontSize: 9.5, color: C.faint, textTransform: 'uppercase' }}>{l}</div><div style={{ fontSize: 13.5, fontWeight: 600, ...num }}>{S.bt[j]}</div></div>)}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 12.5 }}><span style={{ color: C.t2 }}>Not run yet</span><span style={{ color: C.link }}>Run backtest</span></div>
+        )}
+      </div>
+      <div style={{ position: 'absolute', left: 18, right: 18, bottom: 14, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
+        <span style={{ width: 28, height: 28, borderRadius: 6, background: C.rSoft, display: 'grid', placeItems: 'center' }}>{IC.trash(C.red, 14)}</span>
+        {glow > 0.5 && <Chip h={24} fg={C.green} bg={C.gSoft}>{IC.check(C.green, 12)}Saved just now</Chip>}
+        <span style={{ flex: 1 }} />
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, height: 28, padding: '0 10px', borderRadius: 6, border: `1px solid ${C.line}` }}>{IC.paper(C.t2, 13)}Paper trade</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, height: 28, padding: '0 10px', borderRadius: 6, border: `1px solid ${C.line}` }}>{IC.fork(C.t2, 13)}Fork</span>
+      </div>
+    </div>
+  )
+}
+export function LibraryHead({ chips = 1 }) {
+  return (
+    <>
+      <PageHead icon={IC.shelf} title="Library" sub="Regime-aware specialist routing · Delta Exchange testnet shadow mode" action={<span style={{ height: 38, padding: '0 20px', borderRadius: 8, background: C.primary, display: 'grid', placeItems: 'center', fontSize: 14 }}>Compare</span>} />
+      <div style={{ display: 'flex', gap: 8, marginTop: 24, opacity: chips }}>
+        {['All', 'Sideways', 'Reversal', 'Breakout', 'Volatile'].map((n, i) => <span key={n} style={{ height: 34, padding: '0 16px', borderRadius: 17, display: 'grid', placeItems: 'center', fontSize: 14, background: i === 0 ? C.primary : C.panel2, border: `1px solid ${i ? C.line : 'transparent'}` }}>{n}</span>)}
+      </div>
+    </>
   )
 }
