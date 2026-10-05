@@ -88,9 +88,8 @@ export const BG = '#CFDDFF'
 export const SCENES = [
   { id: 'hook', a: 0, b: 3.4 },
   { id: 'flow', a: 3.4, b: 8.6 },
-  { id: 'end', a: 8.6, b: 12.85 },
 ]
-export const DURATION = 12.85
+export const DURATION = 8.6
 // Paused poster frame (embed before it first plays, and reduced motion).
 export const POSTER = 2.8
 

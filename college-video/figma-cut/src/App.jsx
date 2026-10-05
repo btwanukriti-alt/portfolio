@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
 import { DURATION, POSTER, SCENES, STAGES, UI_FONT } from './lib.js'
-import { Conclusion, Flow, Hook } from './scenes.jsx'
+import { Flow, Hook } from './scenes.jsx'
 import { Backdrop, CanvasFrame, frameInset } from './stage.jsx'
 
 // Embed mode (the portfolio's work cards and case-study hero): no controls, paused on the
@@ -116,7 +116,6 @@ export default function App() {
         <div style={{ position: 'absolute', left: st.ox, top: st.oy, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
           <Hook {...props} />
           <Flow {...props} />
-          <Conclusion {...props} />
         </div>
       </div>
       <CanvasFrame vw={vw} vh={vh} />

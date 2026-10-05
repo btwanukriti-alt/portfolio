@@ -1,14 +1,13 @@
-// The three scenes of the 12.8s cut, each a pure function of the clock `t` and the layout
+// The two scenes of the 8.6s cut, each a pure function of the clock `t` and the layout
 // (`land` 1920 × 1080 or `port` 1080 × 1920). Values come from the college management Figma
 // frames (section 267:97221).
 //   1 · Intro: says what the product is. A frame is drawn on the canvas and fills with the
 //       Financial Overview dashboard; product components land around it.
 //   2 · Flow: drill down through stacked drawers. Each click opens the next level as a sheet
 //       that pushes the earlier ones back; a breadcrumb trail and a stat chip follow along.
-//   3 · Conclusion: the hierarchy filter. College → Programme → Apply opens the filtered result.
-import { Cursor, Noodle, Selection } from './fig.jsx'
+import { Cursor, Selection } from './fig.jsx'
 import { C, E, FIG, P, SCENES, UI_FONT, clamp, kf, lerp, press, ripple, sway } from './lib.js'
-import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip, FILTER, FilterPanel, FilterResult, RESULT, fieldAt, optionAt } from './ui.jsx'
+import { AlertCard, KpiCard, LeaveCard, MWIN, OverviewWindow, Breadcrumb, LEVELS, ROW, ROW0, SHEET, SheetCard, StatChip } from './ui.jsx'
 
 const S = Object.fromEntries(SCENES.map((s) => [s.id, s]))
 const local = (t, id) => (t >= S[id].a - 0.02 && t < S[id].b + 0.02 ? t - S[id].a : null)
@@ -37,17 +36,17 @@ function Title({ L, W, u, out, eyebrow, lines }) {
 // 1 · INTRO
 // =====================================================================================
 // The drawn frame holds the Financial Overview dashboard (1440 × 664) at k = frame width / 1440.
-export const HOOK_FRAME = { land: { x: 440, y: 370, w: 1040, h: 480 }, port: { x: 70, y: 660, w: 940, h: 433 } }
+export const HOOK_FRAME = { land: { x: 290, y: 300, w: 1340, h: 618 }, port: { x: 30, y: 620, w: 1020, h: 470 } }
 const CS = 1.2
 const CARDS = {
   land: [
-    { kind: 'alert', label: 'Alert Card', w: 320, h: 152, to: { x: 70, y: 420 }, from: { x: -520, y: 320 }, rot: -6 },
-    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 1500, y: 360 }, from: { x: 2100, y: 260 }, rot: 5 },
-    { kind: 'leave', label: 'Leave Type', w: 300, h: 178, to: { x: 1480, y: 650 }, from: { x: 2100, y: 940 }, rot: -4 },
+    { kind: 'alert', label: 'Alert Card', w: 320, h: 152, to: { x: 40, y: 700 }, from: { x: -520, y: 800 }, rot: -6 },
+    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 1500, y: 290 }, from: { x: 2100, y: 200 }, rot: 5 },
+    { kind: 'leave', label: 'Leave Type', w: 300, h: 178, to: { x: 1500, y: 720 }, from: { x: 2100, y: 960 }, rot: -4 },
   ],
   port: [
-    { kind: 'alert', label: 'Alert Card', w: 320, h: 152, to: { x: 60, y: 1200 }, from: { x: -520, y: 1290 }, rot: -5 },
-    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 620, y: 1240 }, from: { x: 1300, y: 1340 }, rot: 5 },
+    { kind: 'alert', label: 'Alert Card', w: 320, h: 152, to: { x: 50, y: 1180 }, from: { x: -520, y: 1290 }, rot: -5 },
+    { kind: 'kpi', label: 'KPI Card', w: 300, h: 128, to: { x: 640, y: 1220 }, from: { x: 1300, y: 1340 }, rot: 5 },
     { kind: 'leave', label: 'Leave Type', w: 300, h: 178, to: { x: 330, y: 1480 }, from: { x: 330, y: 2100 }, rot: -3 },
   ],
 }
@@ -215,72 +214,6 @@ export function Flow({ t, L, W }) {
         </Abs>
       </div>
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.55, 0.8) * (1 - exit)} pr={press(u, CLICKS[0]) + press(u, CLICKS[1]) + press(u, CLICKS[2])} rp={ripple(u, CLICKS[0]) + ripple(u, CLICKS[1]) + ripple(u, CLICKS[2])} s={port ? 2 : 1.5} />
-    </>
-  )
-}
-
-// =====================================================================================
-// 3 · CONCLUSION: the hierarchy filter. The cursor picks a college, which unlocks the
-// programme; picks B.Tech, clicks Apply, and a prototype connector opens the filtered result.
-// =====================================================================================
-const FLT = {
-  land: { K: 1.55, panel: { x: 200, y: 336 }, center: 635, res: { x: 1004, y: 336 }, vertical: false, curFrom: { x: 2000, y: 1120 }, curRest: { x: 1720, y: 1010 } },
-  port: { K: 1.6, panel: { x: 204, y: 480 }, center: 204, res: { x: 172, y: 1230 }, vertical: true, curFrom: { x: 1150, y: 1950 }, curRest: { x: 200, y: 1800 } },
-}
-// Click times (scene-local): open College, pick Engineering, open Programme, pick B.Tech, Apply.
-const FC = [0.75, 1.15, 1.6, 2.0, 2.45]
-export function Conclusion({ t, L, W }) {
-  const u = local(t, 'end')
-  if (u === null) return null
-  const port = L === 'port'
-  const D = FLT[L]
-  const K = D.K
-  const exit = P(u, 3.85, 4.25, E.inOut)
-  // The panel sits centred until Apply, then slides aside to make room for the result.
-  const px = lerp(D.center, D.panel.x, P(u, FC[4] + 0.05, FC[4] + 0.6, E.inOut))
-  const at = (q) => ({ x: px + K * q.x, y: D.panel.y + K * q.y })
-  const atC = (q) => ({ x: D.center + K * q.x, y: D.panel.y + K * q.y })
-  const pts = [atC(fieldAt(0)), atC(optionAt(0, 0)), atC(fieldAt(1)), atC(optionAt(1, 0)), atC({ x: FILTER.apply.x + FILTER.apply.w / 2, y: FILTER.apply.y + FILTER.apply.h / 2 })]
-  const cur = kf(u, [[0.35, D.curFrom], ...FC.flatMap((c, i) => [[c - 0.2, pts[i]], [c + 0.08, pts[i]]]), [3.2, D.curRest]])
-  const cs = sway(u, 4, u > 3.2 ? 5 : 0)
-  const sel = [u > FC[1] ? 0 : -1, u > FC[3] ? 0 : -1, -1]
-  const openC = u > FC[0] && u < FC[1] + 0.15 ? clamp((u - FC[0]) / 0.15) * (1 - clamp((u - FC[1] - 0.04) / 0.08)) : 0
-  const openP = u > FC[2] && u < FC[3] + 0.15 ? clamp((u - FC[2]) / 0.15) * (1 - clamp((u - FC[3] - 0.04) / 0.08)) : 0
-  const open = openC > 0 ? [0, openC, u > FC[1] - 0.3 ? 0 : -1] : openP > 0 ? [1, openP, u > FC[3] - 0.3 ? 0 : -1] : [-1, 0, -1]
-  const pop = E.back(clamp((u - 0.1) / 0.55))
-  const rIn = FC[4] + 0.35
-  const rpop = E.back(clamp((u - rIn) / 0.55))
-  const rw = RESULT.w * K
-  const rh = RESULT.h * K
-  const ap = at({ x: 0, y: FILTER.apply.y + FILTER.apply.h / 2 })
-  const n1 = D.vertical ? { x: px + K * (FILTER.apply.x + FILTER.apply.w / 2), y: D.panel.y + K * FILTER.h + 14 } : { x: px + K * FILTER.w + 14, y: ap.y }
-  const n2 = D.vertical ? { x: D.res.x + rw / 2, y: D.res.y - 16 } : { x: D.res.x - 16, y: D.res.y + rh / 2 }
-  const sk = port ? 1.35 : 1.15
-  const selP = u > 0.5 ? P(u, 0.5, 0.65) * (1 - P(u, FC[0] - 0.15, FC[0])) : 0
-  const selR = u > rIn + 0.45 ? P(u, rIn + 0.45, rIn + 0.6) * (1 - P(u, 3.6, 3.75)) : 0
-  const clicks = FC.reduce((a, c) => a + press(u, c), 0)
-  const rips = FC.reduce((a, c) => a + ripple(u, c), 0)
-  return (
-    <>
-      <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="Filters" lines={port ? ['Filter by college,', 'programme and batch.'] : ['Filter by college, programme and batch.']} />
-      <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        <Noodle x1={n1.x} y1={n1.y} x2={n2.x} y2={n2.y} u={P(u, FC[4] + 0.05, FC[4] + 0.5, E.inOut)} vertical={D.vertical} label="On click" />
-        <Abs x={px} y={D.panel.y} style={{ width: FILTER.w * K, height: FILTER.h * K, opacity: clamp((u - 0.1) / 0.2), transform: `scale(${0.88 + 0.12 * pop})`, transformOrigin: '50% 40%', zIndex: 12 }}>
-          <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-            <FilterPanel sel={sel} open={open} applyPr={press(u, FC[4])} applied={P(u, FC[4] + 0.05, FC[4] + 0.3)} />
-          </div>
-          <Selection x={0} y={0} w={FILTER.w * K} h={FILTER.h * K} o={selP} label="Filters" comp size={`${FILTER.w} × ${FILTER.h}`} k={sk} />
-        </Abs>
-        {u > rIn && (
-          <Abs x={D.res.x} y={D.res.y} style={{ width: rw, height: rh, opacity: clamp((u - rIn) / 0.2), transform: `scale(${0.85 + 0.15 * rpop})`, transformOrigin: port ? '50% 0' : '0 50%', zIndex: 10 }}>
-            <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-              <FilterResult k={P(u, rIn + 0.15, rIn + 0.85)} rows={P(u, rIn + 0.2, rIn + 0.7)} />
-            </div>
-            <Selection x={0} y={0} w={rw} h={rh} o={selR} label="Filtered Result" comp size={`${RESULT.w} × ${RESULT.h}`} k={sk} />
-          </Abs>
-        )}
-      </div>
-      <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.35, 0.6) * (1 - exit)} pr={clicks} rp={rips} s={port ? 2 : 1.5} />
     </>
   )
 }
