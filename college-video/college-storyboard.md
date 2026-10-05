@@ -4,7 +4,7 @@ The College Management card video in the Selected Work boxes and the case-study 
 
 **Source:** Figma `Portfolio`, section "Dhondi" (267:97221): Finance Dashboard (267:97222), Staff Dashboard (267:98194), Attendance (267:104429), Revenue Contribution (267:102038) and the stacked college drawers (Drawer_College frames, e.g. 267:102278, 267:103274, 267:103813, 267:103606).
 
-**Length:** an 8.6s loop of two scenes: intro and drill-down. There is no conclusion scene. There is no modules scene. The drill-down fades out and the intro starts again on the same blue.
+**Length:** an 8.6s loop of two scenes: intro and drill-down. There is no conclusion or modules scene. The drill-down fades out and the intro starts again on the same blue.
 
 | Time | Scene | Copy | Visual |
 |---|---|---|---|
