@@ -1,6 +1,7 @@
 // clihub: 18.7s product-flow cut (loop). How the app is used, step by step, on the real screens
 // from the clihub Figma file: a dragged selection box opens the window, then 1 Add a host,
-// 2 Connect, 3 Monitor (all five dashboard tabs), 4 Run commands, 5 Move files, tracked by a step rail. Grey canvas, no
+// 2 Connect, 3 Monitor (all five dashboard tabs), 4 Run commands, 5 Move files. Each step has a
+// headline and one plain line beneath it. Grey canvas, no
 // drop shadows. One clock t; <Stage t sw sh /> renders the frame.
 import newhost from "./assets/newhost.png";
 import perf from "./assets/perf.png";
@@ -129,16 +130,16 @@ const pressedAt = (u, clicks) => clicks.some(([ct]) => u > ct && u < ct + 0.14);
 
 // ================= layout =================
 const INK = "#0E1424", SUB = "#4A5468", BLUE = "#0D99FF";
-// The app window: 1280 x 832 screens at FK, centred at (960, 574).
-const FK = 0.8125, FW = 1280 * FK, FH = 832 * FK, FX = 960 - FW / 2, FY = 574 - FH / 2;
+// The app window: 1280 x 832 screens at FK, centred at (960, 610).
+const FK = 0.8125, FW = 1280 * FK, FH = 832 * FK, FX = 960 - FW / 2, FY = 610 - FH / 2;
 const onWin = (p) => ({ x: FX + p.x * FK, y: FY + p.y * FK });
 
 const STEPS = [
-  { a: 1.4, label: "Add a host", title: "Add a host in seconds." },
-  { a: 4.6, label: "Connect", title: "Connect in one click." },
-  { a: 7.4, label: "Monitor", title: "Watch it live." },
-  { a: 13.0, label: "Run commands", title: "Run commands, with AI to help." },
-  { a: 15.7, label: "Move files", title: "Move files across, side by side." },
+  { a: 1.4, title: "Add a host in seconds.", line: "Enter its address, give it a label and save." },
+  { a: 4.6, title: "Connect in one click.", line: "The key is verified and a secure SSH session opens." },
+  { a: 7.4, title: "Watch it live.", line: "Uptime, CPU, storage, network and processes, one tab each." },
+  { a: 13.0, title: "Run commands, with AI to help.", line: "Ask in plain words and get the command back." },
+  { a: 15.7, title: "Move files across, side by side.", line: "Pick a folder on your computer and send it to the server." },
 ];
 const FLOW_END = 18.1;
 // Monitor: the five dashboard tabs, clicked in turn (Overview is open on arrival).
@@ -169,11 +170,7 @@ function Headline({ t }) {
   const e = prog(t, a, a + 0.45);
   const words = s.title.split(" ");
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, top: 54, textAlign: "center" }}>
-      <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "6px 16px 6px 8px", borderRadius: 999, border: "1px solid rgba(255,255,255,.8)", background: "rgba(255,255,255,.45)", opacity: e * (1 - out), marginBottom: 14 }}>
-        <span style={{ width: 24, height: 24, borderRadius: 12, background: INK, color: "#fff", fontSize: 14, fontWeight: 600, display: "grid", placeItems: "center" }}>{i + 1}</span>
-        <span style={{ fontSize: 17, fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase", color: SUB }}>Step {i + 1} of 5</span>
-      </div>
+    <div style={{ position: "absolute", left: 0, right: 0, top: 64, textAlign: "center" }}>
       <div style={{ fontSize: 58, fontWeight: 600, letterSpacing: "-0.035em", color: INK, lineHeight: 1.15, whiteSpace: "nowrap" }}>
         {words.map((w, k) => {
           const p = prog(t, a + 0.08 + k * 0.06, a + 0.7 + k * 0.06);
@@ -184,32 +181,7 @@ function Headline({ t }) {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-// Step rail under the window: done steps get a check, the current one is filled.
-function StepRail({ t }) {
-  const o = prog(t, 1.3, 1.8) * (1 - prog(t, FLOW_END, FLOW_END + 0.4));
-  if (o <= 0.001) return null;
-  const cur = stepAt(t);
-  return (
-    <div style={{ position: "absolute", left: 0, right: 0, top: FY + FH + 30, display: "flex", justifyContent: "center", alignItems: "center", opacity: o }}>
-      {STEPS.map((s, i) => {
-        const done = i < cur, on = i === cur;
-        const fill = on ? prog(t, s.a, s.a + 0.35) : done ? 1 : 0;
-        return (
-          <div key={i} style={{ display: "flex", alignItems: "center" }}>
-            {i > 0 && <div style={{ width: 46, height: 2, background: "rgba(14,20,36,.15)", position: "relative" }}><div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${100 * (i <= cur ? (i === cur ? fill : 1) : 0)}%`, background: INK }} /></div>}
-            <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 16px 8px 8px", borderRadius: 999, background: on ? INK : "rgba(255,255,255,.5)", border: `1px solid ${on ? INK : "rgba(255,255,255,.85)"}`, color: on ? "#fff" : done ? INK : SUB, fontSize: 18, fontWeight: 500, whiteSpace: "nowrap" }}>
-              <span style={{ width: 24, height: 24, borderRadius: 12, display: "grid", placeItems: "center", fontSize: 13, fontWeight: 600, background: on ? "#fff" : done ? INK : "rgba(14,20,36,.08)", color: on ? INK : done ? "#fff" : SUB }}>
-                {done ? <svg width="12" height="10" viewBox="0 0 12 10"><path d="M1 5l3.5 3.5L11 1.5" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg> : i + 1}
-              </span>
-              {s.label}
-            </div>
-          </div>
-        );
-      })}
+      <div style={{ marginTop: 6, fontSize: 24, fontWeight: 400, color: SUB, letterSpacing: "-0.005em", opacity: prog(t, a + 0.35, a + 0.85) * (1 - out), transform: `translateY(${(1 - prog(t, a + 0.35, a + 0.85)) * 10}px)` }}>{s.line}</div>
     </div>
   );
 }
@@ -331,12 +303,12 @@ const camAt = (t) => {
 // Stage px of a window point, through the camera.
 const project = (c, p) => {
   const S = onWin(p), Fp = onWin(c);
-  return { x: 960 + (S.x - Fp.x) * c.z, y: 574 + (S.y - Fp.y) * c.z };
+  return { x: 960 + (S.x - Fp.x) * c.z, y: 610 + (S.y - Fp.y) * c.z };
 };
 function Camera({ t, children }) {
   const c = camAt(t);
   const Fp = onWin(c);
-  return <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "0 0", transform: `translate(${960 - Fp.x * c.z}px, ${574 - Fp.y * c.z}px) scale(${c.z})` }}>{children}</div>;
+  return <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "0 0", transform: `translate(${960 - Fp.x * c.z}px, ${610 - Fp.y * c.z}px) scale(${c.z})` }}>{children}</div>;
 }
 
 // ================= infographic callouts =================
@@ -529,7 +501,6 @@ export function Stage({ t, sw = 1920, sh = 1080 }) {
           <Selection t={t} />
           {t < 1.45 && <StageCursor t={t} />}
           <Callouts t={t} />
-          <StepRail t={t} />
         </Shot>
         <Headline t={t} />
       </div>

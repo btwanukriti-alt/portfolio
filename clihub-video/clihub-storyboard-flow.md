@@ -2,7 +2,7 @@
 
 Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/clihub.html`). Real screens from Figma *Portfolio* (section 250:32492) are shown as a working prototype.
 
-**Brief (Anu, rounds 6–11):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
+**Brief (Anu, rounds 6–12):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with more infographics. (Zooms were tried in rounds 8–10 and removed in round 11.)
 
 **Camera (round 11):** no zoom anywhere. The screen stays at full view for the whole cut; the motion comes from the cursor, screen changes, callouts and the loop transition.
 
@@ -17,7 +17,12 @@ Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/cli
 - **Ask AI:** the question types out and an answer chip appears (`find . -name "*.txt"`).
 - **Transfer:** a computer → server diagram with a moving file, a progress bar and "Uploaded". Kept from earlier rounds: the selection-drag intro, grey background only, no drop shadows.
 
-The headline pill reads "Step N of 5". A step rail under the window fills the current step and checks off the finished ones.
+**Text (round 12):** there are no step indicators (no "Step N of 5" pill and no step rail). Each step has its headline and one plain line beneath it:
+1. Enter its address, give it a label and save.
+2. The key is verified and a secure SSH session opens.
+3. Uptime, CPU, storage, network and processes, one tab each.
+4. Ask in plain words and get the command back.
+5. Pick a folder on your computer and send it to the server.
 
 | Time | Step | Headline | Screen and action |
 |---|---|---|---|
