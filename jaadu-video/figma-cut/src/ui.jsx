@@ -4,7 +4,12 @@
 // radius, 8px controls, Geist type. The product's logo and wordmark are left out. Fixed sizes
 // are explicit so the scenes can aim the cursor and noodle. One consistent data set: BTC/USDT
 // trades at 116,280.6 everywhere (chart, ticker, watchlist, alert, notification).
-import { APP_FONT, C, MONO, clamp, fmt, lerp } from './lib.js'
+import { APP_FONT, C, clamp, fmt } from './lib.js'
+
+const rnd = (i) => {
+  const t = Math.sin(i * 127.1 + 311.7) * 43758.5453
+  return t - Math.floor(t)
+}
 
 const Ic = ({ s = 18, c = 'currentColor', w = 1.8, children, d }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none', display: 'block' }}>
@@ -26,6 +31,7 @@ export const IC = {
   plus: (c = C.t2, s = 16) => <Ic c={c} s={s} w={2.2} d="M12 5v14M5 12h14" />,
   chart: (c, s) => <Ic c={c} s={s} d="M4 19.5h16M6 15l4-4 3 3 5-6" />,
   send: (c, s) => <svg width={s} height={s} viewBox="0 0 24 24" style={{ display: 'block', flex: 'none' }}><path d="M3.5 4.5l17 7.5-17 7.5 2.5-7.5z" fill={c} /></svg>,
+  up: (c, s) => <Ic c={c} s={s} w={2.4} d="M12 19V5M6 11l6-6 6 6" />,
   check: (c, s) => <Ic c={c} s={s} w={2.6} d="M5 12.5l4.5 4.5L19 7.5" />,
   fork: (c, s) => <Ic c={c} s={s}><circle cx="7" cy="5.5" r="2" /><circle cx="17" cy="5.5" r="2" /><circle cx="12" cy="18.5" r="2" /><path d="M7 7.5v1.5a3 3 0 003 3h4a3 3 0 003-3V7.5M12 12v4.5" /></Ic>,
   bulb: (c, s) => <Ic c={c} s={s}><path d="M9.5 18.5h5M10 21h4M12 3.5a6 6 0 00-3.5 10.9V16h7v-1.6A6 6 0 0012 3.5z" /></Ic>,
@@ -50,337 +56,6 @@ export const Chip = ({ children, fg = C.t2, bg = C.panel2, h = 26, style }) => (
 const lift = '0 1px 0 rgba(255,255,255,.06) inset, 0 34px 70px -30px rgba(8,10,60,.75)'
 const card = (extra) => ({ background: `linear-gradient(180deg, #0E1452 0%, ${C.panel} 60%)`, border: `1px solid ${C.line}`, borderRadius: 16, boxSizing: 'border-box', fontFamily: APP_FONT, color: C.ink, boxShadow: lift, ...extra })
 const num = { fontVariantNumeric: 'tabular-nums' }
-
-// =====================================================================================
-// Market regime (one data set: Sideways 40 · Breakout 35 · Volatile 13 · Reversal 12 = 100)
-// =====================================================================================
-export const REGIMES = [
-  ['Sideways', 40, C.primary],
-  ['Breakout', 35, C.red],
-  ['Volatile', 13, C.amber],
-  ['Reversal', 12, C.violet],
-]
-const polar = (cx, cy, r, a) => [cx + r * Math.cos((a * Math.PI) / 180), cy + r * Math.sin((a * Math.PI) / 180)]
-const arc = (cx, cy, r, a0, a1) => {
-  const [x0, y0] = polar(cx, cy, r, a0)
-  const [x1, y1] = polar(cx, cy, r, a1)
-  return `M${x0} ${y0} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1} ${y1}`
-}
-// Gauge arc: 240° open at the bottom. seg[i] (0..1) draws segment i.
-function GaugeArc({ size = 300, seg = [1, 1, 1, 1], sw = 18 }) {
-  const cx = size / 2
-  const cy = size / 2
-  const r = size / 2 - sw
-  const A0 = 150
-  const SW = 240
-  const gap = 4
-  let acc = 0
-  return (
-    <svg width={size} height={size * 0.8} viewBox={`0 0 ${size} ${size * 0.8}`} style={{ display: 'block', overflow: 'visible' }}>
-      <path d={arc(cx, cy, r, A0, A0 + SW)} fill="none" stroke="rgba(132,150,255,.12)" strokeWidth={sw} strokeLinecap="round" />
-      {REGIMES.map(([n, v, c], i) => {
-        const a0 = A0 + (acc / 100) * SW + gap / 2
-        acc += v
-        const a1 = A0 + (acc / 100) * SW - gap / 2
-        const p = clamp(seg[i])
-        if (p <= 0.001) return null
-        return <path key={n} d={arc(cx, cy, r, a0, a0 + (a1 - a0) * p)} fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" style={{ filter: `drop-shadow(0 0 8px ${c}66)` }} />
-      })}
-    </svg>
-  )
-}
-// One regime as a legend chip (188 × 40); used scattered in the opening and docked in the gauge.
-export const RCHIP = { w: 188, h: 40 }
-export function RegimeChip({ i, p = 1, float = 0 }) {
-  const [n, v, c] = REGIMES[i]
-  return (
-    <div style={{ width: RCHIP.w, height: RCHIP.h, borderRadius: 10, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px', background: C.panel2, border: `1px solid ${C.line}`, fontFamily: APP_FONT, color: C.ink, boxShadow: float ? `0 ${18 * float}px ${36 * float}px -16px rgba(8,10,60,.6)` : 'none' }}>
-      <span style={{ width: 10, height: 10, borderRadius: 5, background: c, boxShadow: `0 0 10px ${c}` }} />
-      <span style={{ flex: 1, fontSize: 15, fontWeight: 500 }}>{n}</span>
-      <span style={{ fontSize: 15, fontWeight: 600, color: C.t2, ...num }}>{Math.round(v * p)}%</span>
-    </div>
-  )
-}
-// Regime gauge card (440 × 368). Legend slots LEG[i] are where the chips dock.
-export const GAUGE = { w: 440, h: 368 }
-export const LEG = [{ x: 24, y: 256 }, { x: 228, y: 256 }, { x: 24, y: 306 }, { x: 228, y: 306 }]
-export function RegimeGauge({ seg = [1, 1, 1, 1], k = 1, pr = 0 }) {
-  return (
-    <div style={card({ position: 'relative', width: GAUGE.w, height: GAUGE.h, padding: '20px 24px', transform: `scale(${1 - 0.02 * pr})` })}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: 17, fontWeight: 600 }}>Market regime</div>
-        <Chip h={28}><Coin sym="BTC" s={16} />BTC/USDT · 4H</Chip>
-      </div>
-      <div style={{ position: 'absolute', left: (GAUGE.w - 260) / 2, top: 66 }}>
-        <GaugeArc size={260} seg={seg} sw={16} />
-        <div style={{ position: 'absolute', left: 0, right: 0, top: 78, textAlign: 'center' }}>
-          <div style={{ fontSize: 44, fontWeight: 600, letterSpacing: '-0.03em', ...num }}>{Math.round(40 * k)}%</div>
-          <div style={{ fontSize: 16, color: C.t2, marginTop: 2 }}>Sideways</div>
-          <div style={{ fontSize: 11, color: C.faint, letterSpacing: '0.14em', marginTop: 4 }}>REGIME</div>
-        </div>
-      </div>
-      {LEG.map((l, i) => (
-        <div key={i} style={{ position: 'absolute', left: l.x, top: l.y, width: RCHIP.w, height: RCHIP.h, borderRadius: 10, border: `1px dashed ${C.line}` }} />
-      ))}
-    </div>
-  )
-}
-
-// =====================================================================================
-// Trading terminal (1440 × 664 native, scaled into the drawn frame)
-// =====================================================================================
-const rnd = (i) => {
-  const t = Math.sin(i * 127.1 + 311.7) * 43758.5453
-  return t - Math.floor(t)
-}
-// 64 candles: a sideways dip, then the breakout run up to the last close of 116,280.56.
-export const LAST = 116280.56
-const CANDLES = (() => {
-  const n = 64
-  const out = []
-  let prev = 106200
-  for (let i = 0; i < n; i++) {
-    const base = i < 30 ? 106400 - 2100 * Math.sin((i / 30) * Math.PI) : 104600 + Math.pow((i - 30) / 33, 1.1) * 11400
-    let c = base + (rnd(i) - 0.5) * 1400
-    if (i === n - 1) c = LAST
-    const o = prev
-    const h = Math.max(o, c) + rnd(i + 99) * 700
-    const l = Math.min(o, c) - rnd(i + 199) * 700
-    out.push([o, h, l, c])
-    prev = c
-  }
-  return out
-})()
-const PMIN = 101250
-const PMAX = 118750
-export function Chart({ w, h, k = 1 }) {
-  const y = (v) => h - ((v - PMIN) / (PMAX - PMIN)) * h
-  const cw = w / CANDLES.length
-  const shown = k * CANDLES.length
-  return (
-    <svg width={w} height={h} style={{ display: 'block', overflow: 'visible' }}>
-      {[0, 1, 2, 3, 4, 5, 6].map((i) => <line key={i} x1="0" x2={w} y1={(h / 7) * (i + 0.5)} y2={(h / 7) * (i + 0.5)} stroke="rgba(132,150,255,.08)" />)}
-      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => <line key={i} y1="0" y2={h} x1={(w / 10) * (i + 0.5)} x2={(w / 10) * (i + 0.5)} stroke="rgba(132,150,255,.06)" />)}
-      {CANDLES.map(([o, hi, lo, c], i) => {
-        const v = clamp(shown - i)
-        if (v <= 0) return null
-        const up = c >= o
-        const col = up ? C.green : C.red
-        const x = i * cw + cw / 2
-        const top = y(Math.max(o, c))
-        const bh = Math.max(2, Math.abs(y(o) - y(c)))
-        return (
-          <g key={i} opacity={v}>
-            <line x1={x} x2={x} y1={y(hi)} y2={y(lo)} stroke={col} strokeWidth="1.4" />
-            <rect x={x - cw * 0.32} y={top} width={cw * 0.64} height={bh} rx="1" fill={col} />
-          </g>
-        )
-      })}
-      {k > 0.98 && <line x1="0" x2={w} y1={y(LAST)} y2={y(LAST)} stroke={C.primary} strokeDasharray="4 5" opacity=".7" />}
-    </svg>
-  )
-}
-const priceY = (v, h) => h - ((v - PMIN) / (PMAX - PMIN)) * h
-
-export const TICKER = { w: 300, h: 222 }
-export function TickerCard({ w = TICKER.w, k = 1, plain = false }) {
-  const rows = [['Mark price', '116,274.20'], ['Index price', '116,268.90'], ['Open interest', '84,215.6 BTC'], ['24h volume (USDT)', '6,167,144,953.95']]
-  return (
-    <div style={card({ width: w, height: TICKER.h, padding: '16px 18px', boxShadow: plain ? 'none' : lift })}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Coin sym="BTC" s={32} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 17, fontWeight: 600 }}>BTC</div>
-          <div style={{ fontSize: 11.5, color: C.sub }}>Bitcoin / Tether</div>
-        </div>
-        <Chip fg={C.green} bg={C.gSoft} h={26}>+2.18%</Chip>
-      </div>
-      <div style={{ height: 1, background: C.line, margin: '12px 0 8px' }} />
-      {rows.map(([l, v]) => (
-        <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, height: 22, alignItems: 'center' }}>
-          <span style={{ color: C.sub, textTransform: 'uppercase', fontSize: 10.5, letterSpacing: '.04em' }}>{l}</span>
-          <span style={{ ...num, opacity: k }}>{v}</span>
-        </div>
-      ))}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, height: 22, alignItems: 'center' }}>
-        <span style={{ color: C.sub, textTransform: 'uppercase', fontSize: 10.5, letterSpacing: '.04em' }}>Funding (8h)</span>
-        <span style={{ color: C.red, ...num }}>−0.00064% <span style={{ color: C.faint }}>· 00:54:02</span></span>
-      </div>
-    </div>
-  )
-}
-const WATCH = [['BTC', '116,280.6', '+2.18%', true], ['ETH', '4,486.20', '+1.42%', true], ['SOL', '212.84', '−0.86%', false], ['AVAX', '31.07', '−3.12%', false]]
-function Spark({ up, w = 54, h = 18, seed = 1 }) {
-  const pts = Array.from({ length: 12 }, (_, i) => [i * (w / 11), h - (up ? i / 11 : 1 - i / 11) * h * 0.7 - rnd(i + seed * 13) * h * 0.3])
-  return <svg width={w} height={h} style={{ display: 'block' }}><polyline points={pts.map((p) => p.join(',')).join(' ')} fill="none" stroke={up ? C.green : C.red} strokeWidth="1.6" /></svg>
-}
-function Watchlist({ w }) {
-  return (
-    <div style={card({ width: w, height: 196, padding: '14px 18px', boxShadow: 'none' })}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>Watchlist</span>{IC.plus(C.t2, 16)}
-      </div>
-      {WATCH.map(([s, p, ch, up], i) => (
-        <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 36, fontSize: 13 }}>
-          <Coin sym={s} s={20} />
-          <span style={{ width: 48, fontWeight: 500 }}>{s}</span>
-          <span style={{ flex: 1, ...num }}>{p}</span>
-          <Spark up={up} seed={i + 1} />
-          <span style={{ width: 58, textAlign: 'right', color: up ? C.green : C.red, fontFamily: MONO, fontSize: 12 }}>{ch}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-function MiniRegime({ w, k = 1 }) {
-  return (
-    <div style={card({ width: w, height: 166, padding: '12px 18px', boxShadow: 'none', position: 'relative' })}>
-      <div style={{ position: 'absolute', left: (w - 170) / 2, top: 6 }}>
-        <GaugeArc size={170} seg={[k, k, k, k]} sw={11} />
-        <div style={{ position: 'absolute', left: 0, right: 0, top: 50, textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 600, ...num }}>{Math.round(40 * k)}%</div>
-          <div style={{ fontSize: 12, color: C.t2 }}>Sideways</div>
-        </div>
-      </div>
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 14, display: 'flex', justifyContent: 'center', gap: 12, fontSize: 11.5, color: C.t2 }}>
-        {REGIMES.slice(1).map(([n, v, c]) => <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 7, height: 7, borderRadius: 4, background: c }} />{n} {v}%</span>)}
-      </div>
-    </div>
-  )
-}
-export const TERM = { w: 1440, h: 664 }
-export function Terminal({ k = 1 }) {
-  const CH = { x: 140, y: 196, w: 820, h: 400 }
-  const tag = priceY(LAST, CH.h)
-  return (
-    <div style={{ position: 'relative', width: TERM.w, height: TERM.h, background: `radial-gradient(60% 50% at 45% 0%, #172080 0%, transparent 70%), ${C.app}`, fontFamily: APP_FONT, color: C.ink, overflow: 'hidden' }}>
-      {/* top bar */}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 56, borderBottom: `1px solid ${C.line}`, display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px 0 84px' }}>
-        <span style={{ fontSize: 14, color: C.sub }}>Trading terminal</span>
-        <span style={{ flex: 1 }} />
-        {IC.bell(C.t2, 20)}
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 34, padding: '0 14px', borderRadius: 8, border: `1px solid ${C.line}`, fontSize: 13.5 }}>{IC.alarm(C.ink, 16)}Add Alert</span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 34, padding: '0 14px', borderRadius: 8, border: `1px solid ${C.line}`, background: C.panel2, fontSize: 13.5 }}>{IC.sun(C.amber, 16)}Morning Brief</span>
-      </div>
-      {/* left rail */}
-      <div style={{ position: 'absolute', left: 0, top: 56, bottom: 0, width: 64, borderRight: `1px solid ${C.line}` }}>
-        {[IC.grid, IC.chat, IC.book, IC.lab, IC.alarm].map((f, i) => (
-          <div key={i} style={{ position: 'absolute', left: 12, top: 16 + i * 52, width: 40, height: 40, borderRadius: 10, display: 'grid', placeItems: 'center', background: i === 0 ? C.pSoft : 'transparent', border: i === 0 ? `1px solid ${C.line}` : 'none' }}>{f(i === 0 ? C.link : C.sub, 20)}</div>
-        ))}
-      </div>
-      {/* pair header */}
-      <div style={{ position: 'absolute', left: 84, top: 70, width: 972, height: 48, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <Coin sym="BTC" s={34} />
-        <span style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}>BTCUSDT</span>{IC.chev(C.sub, 16)}
-        <div style={{ marginLeft: 28 }}>
-          <div style={{ fontSize: 24, fontWeight: 600, ...num }}>{fmt(lerp(113797, 116280.6, k), 1)}</div>
-          <div style={{ fontSize: 13, color: C.green, ...num }}>+2,483.6 &nbsp;+2.18%</div>
-        </div>
-        <span style={{ flex: 1 }} />
-        {[['24h High', '116,912.0'], ['24h Low', '113,402.5'], ['24h Vol', '61,344.8']].map(([l, v]) => (
-          <div key={l} style={{ textAlign: 'right', marginLeft: 26 }}><div style={{ fontSize: 12, color: C.sub }}>{l}</div><div style={{ fontSize: 15, fontWeight: 500, marginTop: 3, ...num }}>{v}</div></div>
-        ))}
-      </div>
-      {/* toolbar */}
-      <div style={{ position: 'absolute', left: 140, top: 132, width: 916, height: 44, borderRadius: 10, border: `1px solid ${C.line}`, background: C.panel, display: 'flex', alignItems: 'center', gap: 16, padding: '0 14px', boxSizing: 'border-box', fontSize: 14 }}>
-        {['TL', '15m', '30m', '1H', '4H', '1D', '1W'].map((t) => <span key={t} style={{ padding: '3px 6px', borderRadius: 5, background: t === '15m' ? C.primary : 'transparent', color: t === '15m' ? '#fff' : C.t2 }}>{t}</span>)}
-        <span style={{ flex: 1 }} />
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 30, padding: '0 12px', borderRadius: 7, border: `1px solid ${C.line}`, fontSize: 13 }}>{IC.chart(C.t2, 15)}Indicators</span>
-        <span style={{ display: 'inline-flex', height: 30, borderRadius: 7, border: `1px solid ${C.line}`, overflow: 'hidden', fontSize: 13 }}>
-          <span style={{ padding: '0 18px', display: 'grid', placeItems: 'center', background: C.primary }}>OHLC</span>
-          <span style={{ padding: '0 18px', display: 'grid', placeItems: 'center', color: C.t2 }}>Footprint</span>
-        </span>
-        {IC.gear(C.t2, 18)}
-      </div>
-      {/* tool column */}
-      <div style={{ position: 'absolute', left: 84, top: 132, width: 44, height: 516, borderRadius: 10, border: `1px solid ${C.line}`, background: C.panel, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, paddingTop: 14, boxSizing: 'border-box' }}>
-        {[IC.cross, IC.draw, IC.curve, IC.text, IC.zoom, IC.lock].map((f, i) => <span key={i}>{f(C.t2, 18)}</span>)}
-      </div>
-      {/* chart */}
-      <div style={{ position: 'absolute', left: CH.x, top: CH.y, width: CH.w, height: CH.h }}>
-        <Chart w={CH.w} h={CH.h} k={k} />
-        <div style={{ position: 'absolute', left: 8, top: 4, fontFamily: MONO, fontSize: 11, color: C.t2, padding: '3px 8px', borderRadius: 5, background: 'rgba(14,21,80,.8)' }}>O 116,012.4 · H 116,512.0 · L 115,940.2 · C 116,280.6 · Vol 55.4M</div>
-        <div style={{ position: 'absolute', right: 10, top: 4, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, opacity: clamp((k - 0.6) / 0.4) }}>
-          <Chip h={28} bg="rgba(14,21,80,.92)" style={{ border: `1px solid ${C.line}` }}>Doji · Shooting Star · Hammer</Chip>
-          <Chip h={28} bg="rgba(14,21,80,.92)" style={{ border: `1px solid ${C.line}` }}><span style={{ width: 7, height: 7, borderRadius: 4, background: C.primary }} />Breakout: 35%</Chip>
-        </div>
-      </div>
-      {/* price axis */}
-      <div style={{ position: 'absolute', left: 970, top: CH.y, width: 86, height: CH.h, fontSize: 11.5, color: C.faint, ...num }}>
-        {[117500, 115000, 112500, 110000, 107500, 105000, 102500].map((v) => <div key={v} style={{ position: 'absolute', top: priceY(v, CH.h) - 7 }}>{fmt(v, 0)}</div>)}
-        {k > 0.98 && <div style={{ position: 'absolute', left: -4, top: tag - 12, padding: '4px 6px', borderRadius: 4, background: C.primary, color: '#fff', fontSize: 11 }}>116,280.56</div>}
-      </div>
-      <div style={{ position: 'absolute', left: CH.x, top: 612, width: CH.w, display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: C.faint }}>
-        {['13:00', '15:00', '17:00', '19:00', '21:00', '23:00', '01:00', '03:00', '05:00', '07:00', '09:00', '11:00'].map((t) => <span key={t}>{t}</span>)}
-      </div>
-      {/* right panel */}
-      <div style={{ position: 'absolute', left: 1072, top: 70 }}><TickerCard w={352} k={1} plain /></div>
-      <div style={{ position: 'absolute', left: 1072, top: 302 }}><MiniRegime w={352} k={k} /></div>
-      <div style={{ position: 'absolute', left: 1072, top: 480 }}>
-        <div style={{ height: 172, overflow: 'hidden', borderRadius: 16 }}><Watchlist w={352} /></div>
-      </div>
-    </div>
-  )
-}
-
-// ---------- Dashboard component cards ----------
-// Pattern detection (330 × 150), from the chart overlays.
-export function PatternCard({ p = 1 }) {
-  return (
-    <div style={card({ width: 330, height: 150, padding: '16px 18px' })}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>Patterns detected</span>
-        <Chip h={24}>BTCUSDT · 15m</Chip>
-      </div>
-      <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
-        {['Doji', 'Shooting Star', 'Hammer'].map((n, i) => <Chip key={n} h={28} bg={C.pSoft} fg={C.ink} style={{ opacity: clamp(p * 3 - i) }}>{n}</Chip>)}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: C.sub, marginTop: 14 }}>
-        <span>Breakout probability</span><span style={{ color: C.ink, fontWeight: 600, ...num }}>{Math.round(35 * p)}%</span>
-      </div>
-      <div style={{ height: 6, borderRadius: 3, background: 'rgba(132,150,255,.14)', marginTop: 7, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${35 * p}%`, borderRadius: 3, background: `linear-gradient(90deg, ${C.primary}, ${C.cyan})` }} />
-      </div>
-    </div>
-  )
-}
-// Recent trades (300 × 196).
-const TRADES = [['116,280.6', '0.352', '19:15:44', true], ['116,278.1', '0.120', '19:15:43', false], ['116,279.4', '1.064', '19:15:41', true], ['116,276.0', '0.048', '19:15:40', false], ['116,277.5', '0.415', '19:15:38', true]]
-export function TradesCard({ p = 1 }) {
-  return (
-    <div style={card({ width: 300, height: 196, padding: '14px 18px' })}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: 15, fontWeight: 600 }}>Trades</span>{IC.sliders(C.sub, 16)}</div>
-      <div style={{ display: 'flex', fontSize: 11, color: C.faint, marginTop: 10 }}><span style={{ flex: 1 }}>Price</span><span style={{ width: 70, textAlign: 'right' }}>Size</span><span style={{ width: 80, textAlign: 'right' }}>Time</span></div>
-      {TRADES.map(([pr, sz, t, up], i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', height: 25, fontFamily: MONO, fontSize: 12.5, opacity: clamp(p * 5 - i), transform: `translateY(${(1 - clamp(p * 5 - i)) * 8}px)` }}>
-          <span style={{ flex: 1, color: up ? C.green : C.red }}>{pr}</span>
-          <span style={{ width: 70, textAlign: 'right', color: C.t2 }}>{sz}</span>
-          <span style={{ width: 80, textAlign: 'right', color: C.faint }}>{t}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-// AI analyst prompt (340 × 188), from the chatbot.
-export function AnalystCard({ p = 1 }) {
-  const q = "Break down this week's ETH movement"
-  return (
-    <div style={card({ width: 340, height: 188, padding: '16px 18px' })}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 30, height: 30, borderRadius: 15, background: `conic-gradient(from 0deg, ${C.cyan}, ${C.primary}, ${C.violet}, ${C.cyan})`, display: 'grid', placeItems: 'center' }}><div style={{ width: 22, height: 22, borderRadius: 11, background: C.panel }} /></div>
-        <span style={{ fontSize: 15, fontWeight: 600, color: C.link }}>Ask anything. Trade smarter.</span>
-      </div>
-      <div style={{ marginTop: 12, padding: '9px 12px', borderRadius: 10, border: `1px solid ${C.line}`, background: C.field }}>
-        <div style={{ fontSize: 11.5, color: C.link }}>Thesis</div>
-        <div style={{ fontSize: 13, marginTop: 2 }}>{q.slice(0, Math.round(q.length * clamp(p)))}</div>
-      </div>
-      <div style={{ marginTop: 10, height: 40, borderRadius: 20, border: `1.5px solid ${C.primary}`, display: 'flex', alignItems: 'center', gap: 8, padding: '0 6px 0 14px', fontSize: 13, color: C.faint }}>
-        <span style={{ flex: 1 }}>Ask anything…</span>
-        <span style={{ width: 30, height: 30, borderRadius: 15, background: C.primary, display: 'grid', placeItems: 'center' }}>{IC.send('#fff', 15)}</span>
-      </div>
-    </div>
-  )
-}
 
 // =====================================================================================
 // Alerts flow: the Create Alert form and the Notifications panel
@@ -440,7 +115,7 @@ const NOTES = [
   ['SOL', 'SOL / USDT entered Breakout', 'Regime alert · sustained 2h', '1h', true],
   ['AVAX', 'AVAX / USDT RSI below 30', 'Indicator alert · RSI(14) 28.4', '3h', false],
 ]
-function NoteRow({ sym, title, sub, time, unread, glow = 0 }) {
+export function NoteRow({ sym, title, sub, time, unread, glow = 0 }) {
   return (
     <div style={{ height: 58, borderRadius: 10, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12, padding: '0 12px', background: unread ? `rgba(20,32,110,${0.7 + 0.3 * glow})` : 'transparent', border: `1px solid ${unread ? (glow ? `rgba(76,125,255,${0.3 + 0.6 * glow})` : C.line) : 'transparent'}`, boxShadow: glow ? `0 0 ${24 * glow}px rgba(76,125,255,${0.35 * glow})` : 'none' }}>
       <Coin sym={sym} s={30} />
@@ -456,7 +131,7 @@ function NoteRow({ sym, title, sub, time, unread, glow = 0 }) {
   )
 }
 // `arrive` (0..1) slides the new BTC alert in at the top and pushes the list down.
-export function Notifications({ arrive = 0 }) {
+export function Notifications({ arrive = 0, docked = 1 }) {
   const a = clamp(arrive)
   const unread = a > 0.5 ? 3 : 2
   return (
@@ -472,8 +147,8 @@ export function Notifications({ arrive = 0 }) {
       </div>
       <div style={{ fontSize: 11.5, color: C.sub, letterSpacing: '.08em', marginTop: 18 }}>TODAY</div>
       <div style={{ position: 'absolute', left: 20, right: 20, top: NOTE.row0 }}>
-        <div style={{ height: NOTE.rowH * E2(a), overflow: 'hidden', opacity: clamp((a - 0.2) / 0.5), transform: `translateX(${(1 - E2(a)) * 40}px)` }}>
-          <NoteRow sym="BTC" title="BTC / USDT crossed $116,000" sub="Price alert · now $116,040" time="now" unread glow={a > 0.3 ? 1 - clamp((a - 0.75) / 0.25) * 0.6 : 0} />
+        <div style={{ height: NOTE.rowH * E2(a), overflow: 'hidden', opacity: docked }}>
+          <NoteRow sym="BTC" title="BTC / USDT crossed $116,000" sub="Price alert · now $116,040" time="now" unread glow={a > 0.3 ? 0.4 + 0.6 * docked : 0} />
         </div>
         {NOTES.map(([s, t, sb, tm, u]) => <div key={s} style={{ height: NOTE.rowH }}><NoteRow sym={s} title={t} sub={sb} time={tm} unread={u} /></div>)}
       </div>
@@ -486,53 +161,175 @@ export function Notifications({ arrive = 0 }) {
 const E2 = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
 
 // =====================================================================================
-// Quant lab: Overnight Discoveries (falsification funnel + surviving strategies)
+// Quant lab: Overnight Discoveries (falsification funnel, discoveries per night)
 // =====================================================================================
-export const FUNNEL = { w: 1004, h: 236 }
 const STAGES = [['Generated', 642], ['Passed fast filter', 128], ['Passed regime test', 31], ['Passed CPCV + PBO + DSR', 3]]
-export function FunnelCard({ p = 1, banner = 1 }) {
-  const W = 940
-  const H = 120
-  const hs = [120, 76, 40, 8, 4]
+export const FUNNEL = { w: 760, h: 340 }
+// The "642 → 3 survived" chip in the header (native, from the card's top-left): the click target.
+export const FCHIP = { w: 196, h: 34, y: 22 }
+const funnelPath = (W, H, hs) => {
   const xs = [0, 0.25, 0.5, 0.75, 1].map((f) => f * W)
   const mid = H / 2
-  let top = `M0 ${mid - hs[0] / 2}`
-  for (let i = 0; i < 4; i++) top += ` C${xs[i] + 90} ${mid - hs[i] / 2} ${xs[i + 1] - 90} ${mid - hs[i + 1] / 2} ${xs[i + 1]} ${mid - hs[i + 1] / 2}`
-  let bot = ` L${W} ${mid + hs[4] / 2}`
-  for (let i = 4; i > 0; i--) bot += ` C${xs[i] - 90} ${mid + hs[i] / 2} ${xs[i - 1] + 90} ${mid + hs[i - 1] / 2} ${xs[i - 1]} ${mid + hs[i - 1] / 2}`
+  const k = W / 10
+  let d = `M0 ${mid - hs[0] / 2}`
+  for (let i = 0; i < 4; i++) d += ` C${xs[i] + k} ${mid - hs[i] / 2} ${xs[i + 1] - k} ${mid - hs[i + 1] / 2} ${xs[i + 1]} ${mid - hs[i + 1] / 2}`
+  d += ` L${W} ${mid + hs[4] / 2}`
+  for (let i = 4; i > 0; i--) d += ` C${xs[i] - k} ${mid + hs[i] / 2} ${xs[i - 1] + k} ${mid + hs[i - 1] / 2} ${xs[i - 1]} ${mid + hs[i - 1] / 2}`
+  return d + ' Z'
+}
+export function FunnelCard({ w = FUNNEL.w, p = 1, chip = 1, hi = 0, pr = 0 }) {
+  const PAD = 28
+  const W = w - PAD * 2
+  const H = 150
+  const hs = [H, 0.6 * H, 0.32 * H, 0.1 * H, 0.06 * H]
   return (
-    <div style={card({ position: 'relative', width: FUNNEL.w, height: FUNNEL.h, padding: '18px 24px' })}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={card({ position: 'relative', width: w, height: FUNNEL.h, padding: `22px ${PAD}px` })}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, height: FCHIP.h }}>
         <div style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${C.line}`, display: 'grid', placeItems: 'center' }}>{IC.bulb(C.link, 18)}</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 600 }}>Overnight discoveries</div>
-          <div style={{ fontSize: 12, color: C.sub, marginTop: 2 }}>Falsification funnel · last night</div>
+          <div style={{ fontSize: 16, fontWeight: 600 }}>Falsification funnel</div>
+          <div style={{ fontSize: 12, color: C.sub, marginTop: 2 }}>Last night · three-stage falsification</div>
         </div>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 32, padding: '0 12px', borderRadius: 8, border: `1px solid rgba(76,125,255,.5)`, background: C.pSoft, fontSize: 13, opacity: banner }}>
-          {fmt(642)} candidates <span style={{ color: C.sub }}>→</span> <b style={{ color: C.link, fontWeight: 600 }}>3 survived</b>
-        </span>
       </div>
-      <div style={{ position: 'absolute', left: 32, top: 72, width: W, display: 'flex' }}>
-        {STAGES.map(([l, n], i) => (
-          <div key={l} style={{ width: W / 4, opacity: clamp(p * 4 - i + 0.4) }}>
-            <div style={{ fontSize: 11.5, color: C.sub }}>{l}</div>
-            <div style={{ fontSize: 18, fontWeight: 600, marginTop: 2, color: i === 3 ? C.link : C.ink, ...num }}>{Math.round(n * clamp(p * 4 - i + 0.4))}</div>
-          </div>
-        ))}
+      <span style={{ position: 'absolute', right: PAD, top: FCHIP.y, width: FCHIP.w, height: FCHIP.h, boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 8, border: `1px solid rgba(76,125,255,${0.5 + 0.5 * hi})`, background: `rgba(76,125,255,${0.16 + 0.2 * hi})`, fontSize: 13, opacity: chip, transform: `scale(${1 - 0.05 * pr})` }}>
+        {fmt(642)} <span style={{ color: C.sub }}>→</span> <b style={{ color: C.link, fontWeight: 600 }}>3 survived</b>{IC.chevR(C.link, 14)}
+      </span>
+      <div style={{ position: 'absolute', left: PAD, top: 82, width: W, display: 'flex' }}>
+        {STAGES.map(([l, n], i) => {
+          const v = clamp(p * 4 - i + 0.3)
+          return (
+            <div key={l} style={{ width: W / 4, paddingLeft: i ? 10 : 0, boxSizing: 'border-box', opacity: v }}>
+              <div style={{ fontSize: 11.5, color: C.sub, whiteSpace: 'nowrap' }}>{l}</div>
+              <div style={{ fontSize: 20, fontWeight: 600, marginTop: 3, color: i === 3 ? C.link : C.ink, ...num }}>{Math.round(n * v)}</div>
+            </div>
+          )
+        })}
       </div>
-      <svg width={W} height={H} style={{ position: 'absolute', left: 32, top: 114, overflow: 'visible' }}>
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: 'absolute', left: PAD, top: 150, display: 'block' }}>
         <defs>
           <linearGradient id="fg" x1="0" x2="1">
-            <stop offset="0" stopColor="#2A4FD8" /><stop offset=".55" stopColor="#5C8BFF" /><stop offset=".74" stopColor="#8CB0FF" /><stop offset=".76" stopColor={C.red} /><stop offset="1" stopColor={C.violet} />
+            <stop offset="0" stopColor="#2A4FD8" /><stop offset=".5" stopColor="#5C8BFF" /><stop offset=".74" stopColor="#9CB8FF" /><stop offset=".76" stopColor={C.red} /><stop offset="1" stopColor={C.violet} />
           </linearGradient>
-          <clipPath id="fc"><rect x="0" y="-10" width={W * clamp(p)} height={H + 20} /></clipPath>
+          <clipPath id="fc"><rect x="0" y="0" width={W * clamp(p)} height={H} /></clipPath>
         </defs>
-        {[1, 2, 3].map((i) => <line key={i} x1={xs[i]} x2={xs[i]} y1="-46" y2={H} stroke="rgba(132,150,255,.22)" strokeDasharray="3 4" />)}
-        <path d={top + bot + ' Z'} fill="url(#fg)" clipPath="url(#fc)" opacity=".95" />
+        {[1, 2, 3].map((i) => <line key={i} x1={(W / 4) * i} x2={(W / 4) * i} y1="0" y2={H} stroke="rgba(132,150,255,.22)" strokeDasharray="3 4" />)}
+        <path d={funnelPath(W, H, hs)} fill="url(#fg)" clipPath="url(#fc)" />
       </svg>
     </div>
   )
 }
+// Survivors per night over the last 30 nights; last night (3) is the brightest.
+const NIGHTS = [1, 0, 2, 1, 1, 0, 2, 1, 0, 1, 2, 1, 1, 0, 1, 2, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0, 2, 1, 3]
+export function NightsCard({ w = 440, h = FUNNEL.h, p = 1 }) {
+  const PAD = 24
+  const W = w - PAD * 2
+  const CH = h - 150
+  const bw = W / NIGHTS.length
+  return (
+    <div style={card({ position: 'relative', width: w, height: h, padding: `22px ${PAD}px` })}>
+      <div style={{ fontSize: 16, fontWeight: 600, lineHeight: '20px' }}>Discoveries per night</div>
+      <div style={{ fontSize: 12, color: C.sub, marginTop: 2 }}>Last 30 nights</div>
+      <svg width={W} height={CH} viewBox={`0 0 ${W} ${CH}`} style={{ position: 'absolute', left: PAD, top: 92, display: 'block' }}>
+        {[1, 2, 3].map((v) => <line key={v} x1="0" x2={W} y1={CH - (v / 3) * (CH - 6)} y2={CH - (v / 3) * (CH - 6)} stroke="rgba(132,150,255,.1)" />)}
+        {NIGHTS.map((n, i) => {
+          const g = clamp(p * NIGHTS.length * 0.9 - i * 0.8 + 1)
+          const bh = Math.max(3, (n / 3) * (CH - 6)) * g
+          const last = i === NIGHTS.length - 1
+          return <rect key={i} x={i * bw + bw * 0.18} y={CH - bh} width={bw * 0.64} height={bh} rx="2" fill={last ? C.primary : '#2238A8'} />
+        })}
+      </svg>
+      <div style={{ position: 'absolute', left: PAD, right: PAD, bottom: 20, display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.sub }}>
+        <span>Survivors per night · most nights yield 0–2</span><span style={{ color: C.link }}>Last night: 3</span>
+      </div>
+    </div>
+  )
+}
+
+// =====================================================================================
+// Quant lab: Research (prompt box, then the agent's analysis)
+// =====================================================================================
+export const PROMPT = { h: 132 }
+export const SEND = { s: 40, top: 58 }
+export const QUESTION = 'Distribution of funding rate before 5%+ drops on BTC 4h, last year.'
+export function PromptBox({ w = 900, typed = 0, focus = 0, pr = 0, sent = 0 }) {
+  const text = QUESTION.slice(0, Math.round(QUESTION.length * clamp(typed)))
+  const live = typed > 0 && sent < 0.5
+  return (
+    <div style={{ width: w, height: PROMPT.h, fontFamily: APP_FONT, color: C.ink, position: 'relative' }}>
+      <div style={{ display: 'inline-flex', height: 36, padding: 3, borderRadius: 9, border: `1px solid ${C.line}`, background: C.panel, boxSizing: 'border-box', fontSize: 13 }}>
+        <span style={{ width: 82, display: 'grid', placeItems: 'center', borderRadius: 6, background: '#2148D8' }}>Research</span>
+        <span style={{ width: 82, display: 'grid', placeItems: 'center', color: C.t2 }}>Build</span>
+      </div>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 46, height: 64, borderRadius: 14, boxSizing: 'border-box', background: C.panel, border: `1px solid ${focus ? `rgba(76,125,255,${0.4 + 0.6 * focus})` : C.line}`, boxShadow: `0 0 0 ${4 * focus}px rgba(76,125,255,.2), 0 30px 60px -30px rgba(8,10,60,.8)`, display: 'flex', alignItems: 'center', padding: '0 12px 0 18px', fontSize: 15 }}>
+        <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', color: live ? C.ink : C.faint }}>
+          {live ? text : 'Ask the lab anything: describe a strategy, request research or run a backtest…'}
+          {live && typed < 1 && <span style={{ display: 'inline-block', width: 1.5, height: 18, background: C.ink, marginLeft: 1, verticalAlign: -3 }} />}
+        </span>
+        <span style={{ width: SEND.s, height: SEND.s, borderRadius: 10, background: C.primary, display: 'grid', placeItems: 'center', transform: `scale(${1 - 0.1 * pr})`, opacity: 0.55 + 0.45 * clamp(typed * 3) }}>{IC.up('#fff', 20)}</span>
+      </div>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 118, textAlign: 'center', fontSize: 11.5, color: C.sub }}>Quantlab can make mistakes. Verify before trading.</div>
+    </div>
+  )
+}
+const HIST = [5, 14, 20, 40, 42, 62, 100, 70, 80, 54, 36, 26]
+const ROWS = [['14-11-2025', '−6.2', '+0.108%', '94', '+3.1%'], ['02-09-2025', '−5.4', '+0.071%', '81', '+1.8%'], ['19-06-2025', '−7.1', '+0.133%', '97', '+4.6%']]
+// Heights of the stacked results (native): question line, distribution card, output table.
+export const RES = { q: 40, gap: 26, dist: { land: 240, port: 372 }, table: 156 }
+export const resH = (narrow) => RES.q + RES.dist[narrow ? 'port' : 'land'] + RES.table + RES.gap * 2
+export function ResearchResults({ w = 900, narrow = false, p = 1 }) {
+  const step = (a) => clamp((p - a) / 0.3)
+  const enter = (a) => ({ opacity: step(a), transform: `translateY(${(1 - E2(step(a))) * 26}px)` })
+  const bars = clamp((p - 0.3) / 0.45)
+  const CW = narrow ? w - 48 : w - 48 - 260 - 20
+  const CHh = narrow ? 150 : 118
+  const stat = (l, v) => (
+    <div key={l} style={{ flex: 1, height: 52, borderRadius: 10, border: `1px solid ${C.line}`, background: C.field, padding: '8px 12px', boxSizing: 'border-box' }}>
+      <div style={{ fontSize: 11, color: C.sub }}>{l}</div>
+      <div style={{ fontSize: 16, fontWeight: 600, marginTop: 2, ...num }}>{v}</div>
+    </div>
+  )
+  return (
+    <div style={{ width: w, display: 'flex', flexDirection: 'column', gap: RES.gap, fontFamily: APP_FONT, color: C.ink }}>
+      <div style={{ height: RES.q, display: 'flex', alignItems: 'center', gap: 12, ...enter(0) }}>
+        <span style={{ width: 30, height: 30, borderRadius: 15, background: C.primary, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 600 }}>A</span>
+        <span style={{ fontSize: 15, fontWeight: 500, color: C.title }}>{QUESTION}</span>
+      </div>
+      <div style={card({ position: 'relative', height: RES.dist[narrow ? 'port' : 'land'], padding: '18px 24px', ...enter(0.12) })}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 16, fontWeight: 600 }}>Distribution</span>
+          <Chip h={24}>Funding rate · 14 pre-drop windows</Chip>
+        </div>
+        <svg width={CW} height={CHh} viewBox={`0 0 ${CW} ${CHh}`} style={{ position: 'absolute', left: 24, top: 56, display: 'block' }}>
+          {HIST.map((v, i) => {
+            const bw = CW / HIST.length
+            const g = clamp(bars * 1.6 - i * 0.05)
+            const bh = (v / 100) * (CHh - 4) * g
+            return <rect key={i} x={i * bw + 3} y={CHh - bh} width={bw - 6} height={bh} rx="2" fill={i === 6 || i === 7 ? '#5C8BFF' : '#1E35A3'} />
+          })}
+        </svg>
+        <div style={{ position: 'absolute', ...(narrow ? { left: 24, right: 24, top: 222, flexDirection: 'row' } : { right: 24, top: 56, width: 260, flexDirection: 'column' }), display: 'flex', gap: 10, opacity: clamp((p - 0.45) / 0.2) }}>
+          {stat('Median funding', '+0.041%')}{stat('90th percentile', '+0.118%')}
+        </div>
+        <div style={{ position: 'absolute', left: 24, right: 24, bottom: 16, display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 14px', borderRadius: 10, border: `1px solid ${C.line}`, background: 'rgba(76,125,255,.08)', fontSize: 12.5, lineHeight: 1.45, color: C.t2, opacity: clamp((p - 0.55) / 0.2) }}>
+          <span style={{ color: C.link, fontSize: 15, lineHeight: 1 }}>✦</span>
+          <span>Funding ran rich (above the 85th percentile) in 11 of the 14 pre-drop windows. The sample is small, so treat it as a prior, not a signal.</span>
+        </div>
+      </div>
+      <div style={card({ height: RES.table, padding: '16px 24px', ...enter(0.3) })}>
+        <div style={{ fontSize: 16, fontWeight: 600 }}>Output table</div>
+        <div style={{ display: 'flex', fontSize: 10.5, color: C.faint, letterSpacing: '.06em', marginTop: 12, paddingBottom: 6, borderBottom: `1px solid ${C.line}` }}>
+          {['DATE', 'DROP %', 'FUNDING', 'PCTILE', 'OI Δ'].map((h, i) => <span key={h} style={{ flex: 1, textAlign: i ? 'right' : 'left' }}>{h}</span>)}
+        </div>
+        {ROWS.map((r, j) => (
+          <div key={j} style={{ display: 'flex', fontSize: 13, height: 26, alignItems: 'center', ...num, opacity: clamp((p - 0.5 - j * 0.08) / 0.15) }}>
+            {r.map((c, i) => <span key={i} style={{ flex: 1, textAlign: i ? 'right' : 'left', color: i === 1 ? C.red : C.ink }}>{c}</span>)}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export const SCARD = { w: 320, h: 300 }
 export const SAVE = { x: 178, y: 252, w: 122, h: 32 }
 export const STRATS = [
@@ -563,7 +360,7 @@ export function StrategyCard({ i, p = 1, hover = 0, saved = 0, pr = 0 }) {
       </div>
       <div style={{ marginTop: 14, height: 76, borderRadius: 10, border: `1px solid ${C.line2}`, background: 'rgba(5,7,48,.5)', padding: '8px 10px', boxSizing: 'border-box', position: 'relative' }}>
         <div style={{ fontSize: 10.5, color: C.sub }}>Equity curve</div>
-        <svg width={W - 20} height="48" viewBox={`0 0 ${W} 60`} preserveAspectRatio="none" style={{ position: 'absolute', left: 10, bottom: 4 }}>
+        <svg width={W - 20} height="48" viewBox={`0 0 ${W} 60`} preserveAspectRatio="none" style={{ position: 'absolute', left: 10, bottom: 6, overflow: 'visible' }}>
           <defs><clipPath id={`ec${i}`}><rect width={W * clamp(p)} height="60" /></clipPath></defs>
           <g clipPath={`url(#ec${i})`}>
             <polygon points={`0,60 ${line} ${W},60`} fill="rgba(34,211,238,.12)" />
