@@ -123,7 +123,7 @@ const NOTES = [
 ]
 export function NoteRow({ sym, title, sub, time, unread, glow = 0 }) {
   return (
-    <div style={{ height: 58, borderRadius: 10, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12, padding: '0 12px', background: unread ? `rgba(20,32,110,${0.7 + 0.3 * glow})` : 'transparent', border: `1px solid ${unread ? (glow ? `rgba(76,125,255,${0.3 + 0.6 * glow})` : C.line) : 'transparent'}`, boxShadow: glow ? `0 0 ${24 * glow}px rgba(76,125,255,${0.35 * glow})` : 'none' }}>
+    <div style={{ height: 58, borderRadius: 10, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12, padding: '0 12px', color: C.ink, fontFamily: APP_FONT, background: unread ? `rgba(20,32,110,${0.7 + 0.3 * glow})` : 'transparent', border: `1px solid ${unread ? (glow ? `rgba(76,125,255,${0.3 + 0.6 * glow})` : C.line) : 'transparent'}`, boxShadow: glow ? `0 0 ${24 * glow}px rgba(76,125,255,${0.35 * glow})` : 'none' }}>
       <Coin sym={sym} s={30} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13.5, fontWeight: 500, whiteSpace: 'nowrap' }}>{title}</div>

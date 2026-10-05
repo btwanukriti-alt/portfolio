@@ -38,21 +38,6 @@ function Title({ L, W, u, out, eyebrow, lines }) {
   )
 }
 
-// Prototype hotspot: the clicked control outlines in blue with an "On click → …" pill.
-function Hotspot({ b, o, label, k = 1 }) {
-  if (o <= 0) return null
-  return (
-    <div style={{ position: 'absolute', left: b.x, top: b.y, width: b.w, height: b.h, opacity: o, zIndex: 30, pointerEvents: 'none' }}>
-      <div style={{ position: 'absolute', inset: -4, border: `2.5px solid ${FIG.proto}`, borderRadius: 12 }} />
-      <div style={{ position: 'absolute', right: 0, bottom: '100%', marginBottom: 12, transform: `scale(${k})`, transformOrigin: '100% 100%', display: 'flex', alignItems: 'center', gap: 6, background: FIG.proto, color: '#fff', font: `600 15px/1 ${UI_FONT}`, padding: '8px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11V5.5a2 2 0 014 0V11M13 9.5a2 2 0 014 0V12M17 11a2 2 0 014 0v3.5a6.5 6.5 0 01-6.5 6.5H13a6 6 0 01-4.6-2.2L5 14.5a2 2 0 013-2.6L9 13" /></svg>
-        {label}
-      </div>
-    </div>
-  )
-}
-
-
 // =====================================================================================
 // 0 · RESEARCH: a close-up of the prompt box → typed, sent → the camera pulls back to the
 //     full Quant Lab Research screen, where the prompt docks at the bottom and results fill in
@@ -89,7 +74,7 @@ export function Research({ t, L, W, H }) {
       <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="AI trading platform" lines={port ? ['Ask the lab.', 'Get the analysis.'] : ['Ask the lab. Get the analysis.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
         {win > 0 && (
-          <Abs x={Wn.x} y={Wn.y} style={{ opacity: win, zIndex: 8, transform: `scale(${lerp(1.06, 1, E.out(win))})`, transformOrigin: '50% 100%', boxShadow: `0 50px 100px -40px rgba(20,20,90,${0.7 * win})`, borderRadius: 16 * k }}>
+          <Abs x={Wn.x} y={Wn.y} style={{ width: k * G.w, height: k * G.h, opacity: win, zIndex: 8, transform: `scale(${lerp(1.06, 1, E.out(win))})`, transformOrigin: '50% 100%', boxShadow: `0 50px 100px -40px rgba(20,20,90,${0.7 * win})`, borderRadius: 16 * k }}>
             <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>
               <Shell L={L} active="research">
                 <div style={{ position: 'absolute', left: G.x, top: 92, width: G.mw, opacity: clamp((u - 2.9) / 0.3) }}>
@@ -113,7 +98,6 @@ export function Research({ t, L, W, H }) {
         </Abs>
         {win > 0.5 && <div style={{ position: 'absolute', left: Wn.x, top: Wn.y - 32, font: `500 ${port ? 22 : 16}px/1 ${UI_FONT}`, color: '#3D3A5C', opacity: 0.8 * clamp((win - 0.5) * 2) }}>Quant Lab · Research</div>}
         <Selection x={ps.x} y={ps.y} w={Z * G.mw} h={Z * PROMPT.h} o={sel} label="Prompt" comp size={`${G.mw} × ${PROMPT.h}`} k={port ? 1.35 : 1.2} />
-        <Hotspot b={{ x: send.x - Z * 20, y: send.y - Z * 20, w: Z * 40, h: Z * 40 }} o={clamp((u - 2.05) / 0.2) * (1 - clamp((u - tc2 - 0.05) / 0.15))} label="On click → Run research" k={port ? 1.3 : 1.1} />
         <Selection x={Wn.x} y={Wn.y} w={k * G.w} h={k * G.h} o={winSel} size={`${G.w} × ${G.h}`} k={port ? 1.35 : 1.1} />
       </div>
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.4, 0.65) * (1 - exit)} pr={press(u, tc1) + press(u, tc2)} rp={ripple(u, tc1) + ripple(u, tc2)} s={port ? 2 : 1.5} />
@@ -154,7 +138,6 @@ export function Alert({ t, L, W }) {
           </div>
         </Abs>
         <Selection x={D.x} y={D.y} w={K * FORM.w} h={K * FORM.h} o={u > 0.4 ? P(u, 0.4, 0.55) * (1 - P(u, 0.75, 0.9)) : 0} label="Create Alert" comp size={`${FORM.w} × ${FORM.h}`} k={sk} />
-        <Hotspot b={btn} o={clamp((u - 1.85) / 0.2) * (1 - clamp((u - tc2 - 0.1) / 0.15))} label="On click → Create alert" k={port ? 1.3 : 1} />
       </div>
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 0.45, 0.7) * (1 - exit)} pr={press(u, tc1) + press(u, tc2)} rp={ripple(u, tc1) + ripple(u, tc2)} s={port ? 2 : 1.5} />
     </>
@@ -257,7 +240,7 @@ export function Discoveries({ t, L, W }) {
           <div style={{ position: 'absolute', inset: 0, ...back }}>
             <Abs x={D.x} y={D.y} style={{ opacity: clamp((u - 0.1) / 0.2), transform: `translateY(${(1 - fpop) * 30}px) scale(${0.94 + 0.06 * fpop})`, transformOrigin: '50% 50%', zIndex: 10 }}>
               <div style={{ transform: `scale(${K})`, transformOrigin: '0 0' }}>
-                <FunnelCard w={D.fw} p={P(u, 0.35, 1.45, E.inOut)} chip={P(u, 1.3, 1.55)} hi={P(u, 1.85, 2.0)} pr={press(u, tc)} />
+                <FunnelCard w={D.fw} p={P(u, 0.35, 1.45, E.inOut)} chip={P(u, 1.3, 1.55)} pr={press(u, tc)} />
               </div>
             </Abs>
             <Abs x={nx} y={ny} style={{ opacity: clamp((u - 0.25) / 0.2), transform: `translateY(${(1 - npop) * 30}px) scale(${0.94 + 0.06 * npop})`, transformOrigin: '50% 50%', zIndex: 10 }}>
@@ -266,7 +249,6 @@ export function Discoveries({ t, L, W }) {
               </div>
             </Abs>
             <Selection x={D.x} y={D.y} w={K * D.fw} h={K * FUNNEL.h} o={selF} label="Falsification Funnel" comp size={`${D.fw} × ${FUNNEL.h}`} k={sk} />
-            <Hotspot b={chip} o={clamp((u - 1.75) / 0.2) * (1 - clamp((u - tc - 0.05) / 0.15))} label="On click → View survivors" k={port ? 1.3 : 1} />
           </div>
         )}
         {STRATS.map((_, i) => {
@@ -277,14 +259,13 @@ export function Discoveries({ t, L, W }) {
           return (
             <Abs key={i} x={s0.x} y={s0.y} style={{ opacity: clamp((u - a) / 0.15), transform: `translateY(${(1 - pp) * 60}px) scale(${0.86 + 0.14 * pp})`, transformOrigin: '50% 50%', zIndex: 11 }}>
               <div style={{ transform: `scale(${D.cK})`, transformOrigin: '0 0' }}>
-                <StrategyCard i={i} p={P(u, a + 0.2, a + 1.0)} saved={i === 0 && u > tc2 + 0.08 ? 1 : 0} pr={i === 0 ? press(u, tc2) : 0} hover={i === 0 ? P(u, 2.6, 2.8) : 0} />
+                <StrategyCard i={i} p={P(u, a + 0.2, a + 1.0)} saved={i === 0 && u > tc2 + 0.08 ? 1 : 0} pr={i === 0 ? press(u, tc2) : 0} />
               </div>
               <Selection x={0} y={0} w={cw} h={ch} o={i === 0 ? selC : 0} label="Strategy Card" comp size={`${SCARD.w} × ${SCARD.h}`} k={sk} />
             </Abs>
           )
         })}
       </div>
-        <Hotspot b={save} o={clamp((u - 2.95) / 0.2) * (1 - clamp((u - tc2 - 0.1) / 0.15))} label="On click → Save to Library" k={port ? 1.3 : 1} />
       <Cursor x={cur.x + cs.x} y={cur.y + cs.y} o={P(u, 1.4, 1.65) * (1 - exit)} pr={press(u, tc) + press(u, tc2)} rp={ripple(u, tc) + ripple(u, tc2)} s={port ? 2 : 1.5} />
     </>
   )
@@ -320,7 +301,7 @@ export function Library({ t, L, W }) {
     <>
       <Title L={L} W={W} u={u - 0.05} out={exit} eyebrow="Library" lines={port ? ['Saved strategies,', 'sorted by regime.'] : ['Saved strategies, sorted by regime.']} />
       <div style={{ position: 'absolute', inset: 0, opacity: 1 - exit, transform: `translateY(${-30 * E.inOut(exit)}px)` }}>
-        <Abs x={Wn.x} y={Wn.y} style={{ opacity: clamp((u - 0.1) / 0.2), transform: `translateY(${(1 - pop) * 30}px) scale(${0.96 + 0.04 * pop})`, transformOrigin: '50% 50%', zIndex: 8, boxShadow: '0 50px 100px -40px rgba(20,20,90,.7)', borderRadius: 16 * k }}>
+        <Abs x={Wn.x} y={Wn.y} style={{ width: k * G.w, height: k * G.h, opacity: clamp((u - 0.1) / 0.2), transform: `translateY(${(1 - pop) * 30}px) scale(${0.96 + 0.04 * pop})`, transformOrigin: '50% 50%', zIndex: 8, boxShadow: '0 50px 100px -40px rgba(20,20,90,.7)', borderRadius: 16 * k }}>
           <div style={{ transform: `scale(${k})`, transformOrigin: '0 0' }}>
             <Shell L={L} active="library">
               <div style={{ position: 'absolute', left: G.x, top: 92, width: G.mw, opacity: clamp((u - 0.25) / 0.25) }}>
