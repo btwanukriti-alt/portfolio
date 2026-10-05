@@ -86,7 +86,7 @@ export class Field {
       this.dustY[i] = rand()
       this.dustSpeed[i] = 0.3 + rand() * 1.2
       const h = rand()
-      this.dustHue[i] = h < 0.86 ? 0 : h < 0.95 ? 1 : 2
+      this.dustHue[i] = h < 0.9 ? 0 : h < 0.96 ? 1 : 2
     }
     this.px = new Float32Array(n)
     this.py = new Float32Array(n)
@@ -135,10 +135,9 @@ export class Field {
    * @param q   story position: integer = resting on that beat, fraction = mid-morph
    * @param t   seconds since start
    * @param dt  seconds since last frame
-   * @param scroll page scroll in px (stardust parallax)
    * @param intro 0..1 ramp while the first constellation gathers
    */
-  frame(q: number, t: number, dt: number, scroll: number, intro: number) {
+  frame(q: number, t: number, dt: number, intro: number) {
     const { ctx, w, h, count: n } = this
     const last = this.beats.length - 1
     const a = Math.max(0, Math.min(last, Math.floor(q)))
@@ -184,12 +183,10 @@ export class Field {
         ow = c.w[i]
         oh = c.hue[i]
       } else {
-        // Stardust: rises slowly and drifts with the scroll, wrapping at the edges.
+        // Spare dots settle into the page texture: tiny, faint, barely breathing.
         const sp = this.dustSpeed[i]
-        let yy = (this.dustY[i] - t * 0.004 * sp - (scroll / h) * 0.06 * sp) % 1
-        if (yy < 0) yy += 1
-        ox = this.dustX[i] * w + Math.sin(t * 0.05 * sp + this.phase[i]) * 24
-        oy = yy * (h + 40) - 20
+        ox = this.dustX[i] * w + Math.sin(t * 0.08 * sp + this.phase[i]) * 1.5
+        oy = this.dustY[i] * h + Math.cos(t * 0.07 * sp + this.phase[i]) * 1.5
         oz = 0
         ow = 0
         oh = this.dustHue[i]
@@ -232,24 +229,24 @@ export class Field {
       }
 
       if (!this.placed) {
-        // First frame: start scattered as stardust so the planet gathers itself.
+        // First frame: start as texture so the planet gathers itself out of the page.
         this.px[i] = this.dustX[i] * w
         this.py[i] = this.dustY[i] * h
       }
-      // Dust wrapping off one edge jumps straight to the other instead of streaking across.
-      if (wt === 0 && Math.abs(y - this.py[i]) > h * 0.5) this.py[i] = y
       this.px[i] += (x - this.px[i]) * follow
       this.py[i] += (y - this.py[i]) * follow
 
       const tw = live ? 0.78 + 0.22 * Math.sin(t * this.twinkle[i] + this.phase[i]) : 1
       const depth = 0.62 + 0.38 * clamp01(z + 0.55)
-      const alpha = (0.2 + 0.85 * wt) * depth * tw
+      const alpha = (0.24 + 0.82 * wt) * depth * tw
       const level = Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))
       const k = hue * LEVELS + level
       this.bucket[k][this.bucketLen[k]++] = i
       this.sx[i] = this.px[i]
       this.sy[i] = this.py[i]
-      this.sr[i] = baseR * (0.6 + 0.4 * wt) * (0.85 + z * 0.4) * this.size[i]
+      // Texture dots are a fraction of a pixel; they swell to full size as they join an illustration.
+      const full = baseR * (0.6 + 0.4 * wt) * (0.85 + z * 0.4) * this.size[i]
+      this.sr[i] = 0.42 + (full - 0.42) * clamp01(wt / 0.55)
     }
     this.placed = true
 

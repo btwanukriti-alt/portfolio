@@ -23,13 +23,13 @@ export type Beat = {
 }
 
 const TAU = Math.PI * 2
-const SERIF = (px: number) => `italic 400 ${px}px "Instrument Serif", Georgia, serif`
+const DISPLAY = (px: number) => `800 ${px}px "Manrope", system-ui, sans-serif`
 
-// Illustrations sit beside the copy on desktop and above it on phones.
-const aside = (scale = 1) => (w: number, h: number, mobile: boolean): Layout =>
+// Illustrations are centred, with their copy centred directly beneath.
+const centred = (scale = 1) => (w: number, h: number, mobile: boolean): Layout =>
   mobile
-    ? { cx: w * 0.5, cy: h * 0.33, s: Math.min(w * 0.94, h * 0.5) * scale }
-    : { cx: w * 0.66, cy: h * 0.52, s: Math.min(w * 0.44, h * 0.76) * scale }
+    ? { cx: w * 0.5, cy: h * 0.34, s: Math.min(w * 0.9, h * 0.44) * scale }
+    : { cx: w * 0.5, cy: h * 0.37, s: Math.min(w * 0.5, h * 0.5) * scale }
 
 export const ORB_CENTRES: [number, number][] = [
   [-0.36, 0.06],
@@ -64,7 +64,7 @@ export const BEATS: Beat[] = [
     key: 'hello',
     chart: 1,
     motion: { tilt: 0.42, spin: 0.22, roll: -0.32 },
-    layout: aside(0.92),
+    layout: centred(0.95),
     build(b, rand, budget) {
       sphere(b, Math.round(budget * 0.5), 0.25)
       ring(b, rand, Math.round(budget * 0.38), 0.33, 0.47, INK, 0.55)
@@ -89,15 +89,15 @@ export const BEATS: Beat[] = [
     chart: 0,
     motion: { tilt: 0, spin: 0, sway: true },
     layout: (w, h, mobile) =>
-      mobile ? { cx: w * 0.5, cy: h * 0.44, s: w * 0.98 } : { cx: w * 0.5, cy: h * 0.6, s: Math.min(w * 0.84, h * 1.3) },
+      mobile ? { cx: w * 0.5, cy: h * 0.46, s: w * 0.94 } : { cx: w * 0.5, cy: h * 0.56, s: Math.min(w * 0.76, h * 1.15) },
     build(b, rand, budget) {
       stipple(b, rand, budget, (ctx, px) => {
         ctx.globalAlpha = 0.5
         ctx.fillStyle = PEN.tone
-        fitText(ctx, 'designer.', SERIF, 0, -0.02, 0.94)
+        fitText(ctx, 'designer.', DISPLAY, 0, -0.02, 0.94)
         ctx.globalAlpha = 1
         ctx.strokeStyle = PEN.line
-        fitText(ctx, 'designer.', SERIF, 0, -0.02, 0.94, 'stroke', 2.6)
+        fitText(ctx, 'designer.', DISPLAY, 0, -0.02, 0.94, 'stroke', 2.6)
         // A gold swash underneath.
         ctx.strokeStyle = PEN.gold
         ctx.lineWidth = px(2.4)
@@ -114,7 +114,7 @@ export const BEATS: Beat[] = [
     chart: 0.6,
     motion: { tilt: 0.35, spin: 0.35 },
     layout: (w, h, mobile) =>
-      mobile ? { cx: w * 0.5, cy: h * 0.34, s: w * 0.84 } : { cx: w * 0.67, cy: h * 0.5, s: Math.min(w * 0.5, h * 0.9) },
+      mobile ? { cx: w * 0.5, cy: h * 0.33, s: w * 0.84 } : { cx: w * 0.5, cy: h * 0.36, s: Math.min(w * 0.56, h * 0.62) },
     build(b, rand, budget) {
       const hues = [INK, VIOLET, INK] as const
       ORB_CENTRES.forEach(([x, y], i) => {
@@ -130,7 +130,7 @@ export const BEATS: Beat[] = [
     key: 'ux',
     chart: 1,
     motion: { tilt: 0, spin: 0, sway: true },
-    layout: aside(),
+    layout: centred(),
     build(b, rand, budget) {
       stipple(b, rand, budget, (ctx, px) => {
         ctx.lineWidth = px(2.4)
@@ -236,7 +236,7 @@ export const BEATS: Beat[] = [
     key: 'brand',
     chart: 1,
     motion: { tilt: 0, spin: 0, sway: true },
-    layout: aside(),
+    layout: centred(),
     build(b, rand, budget) {
       stipple(b, rand, budget, (ctx, px) => {
         const cx = -0.05
@@ -259,10 +259,10 @@ export const BEATS: Beat[] = [
 
         ctx.fillStyle = PEN.tone
         ctx.globalAlpha = 0.55
-        fitText(ctx, 'A', SERIF, cx - 0.01, 0.035, 0.34)
+        fitText(ctx, 'A', DISPLAY, cx - 0.01, 0.035, 0.34)
         ctx.globalAlpha = 1
         ctx.strokeStyle = PEN.line
-        fitText(ctx, 'A', SERIF, cx - 0.01, 0.035, 0.34, 'stroke', 2.6)
+        fitText(ctx, 'A', DISPLAY, cx - 0.01, 0.035, 0.34, 'stroke', 2.6)
 
         // Four-point spark
         const sx = 0.3
@@ -300,7 +300,7 @@ export const BEATS: Beat[] = [
     key: 'ui',
     chart: 1,
     motion: { tilt: 0, spin: 0, sway: true },
-    layout: aside(),
+    layout: centred(),
     build(b, rand, budget) {
       stipple(b, rand, budget, (ctx, px) => {
         ctx.lineWidth = px(2.4)
@@ -411,7 +411,7 @@ export const BEATS: Beat[] = [
     chart: 0,
     motion: { tilt: 0.5, spin: 0.06, roll: 0.12 },
     layout: (w, h, mobile) =>
-      mobile ? { cx: w * 0.5, cy: h * 0.46, s: w * 1.35 } : { cx: w * 0.5, cy: h * 0.53, s: Math.min(w * 0.95, h * 1.5) },
+      mobile ? { cx: w * 0.5, cy: h * 0.48, s: w * 1.35 } : { cx: w * 0.5, cy: h * 0.5, s: Math.min(w * 0.95, h * 1.5) },
     build(b, rand, budget) {
       const gauss = () => (rand() + rand() + rand() - 1.5) / 1.5
       const arms = Math.round(budget * 0.86)

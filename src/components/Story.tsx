@@ -6,7 +6,7 @@ import styles from './Story.module.css'
 
 type Copy = {
   chapter: string
-  place: 'side' | 'top' | 'centre'
+  place: 'below' | 'top' | 'centre'
   eyebrow?: string
   lines: ReactNode[]
   body?: string
@@ -18,7 +18,7 @@ type Copy = {
 const COPY: Copy[] = [
   {
     chapter: 'Hello',
-    place: 'side',
+    place: 'below',
     heading: 'h1',
     eyebrow: 'Anukriti Mishra · Portfolio 2026',
     lines: [
@@ -36,13 +36,13 @@ const COPY: Copy[] = [
   },
   {
     chapter: 'Crafts',
-    place: 'side',
+    place: 'below',
     eyebrow: 'Look a little closer',
     lines: ['Up close, a designer', 'is three crafts', <em key="e">in orbit.</em>],
   },
   {
     chapter: 'UX',
-    place: 'side',
+    place: 'below',
     eyebrow: '01 · UX & Product',
     lines: [
       'I map the messy paths',
@@ -55,7 +55,7 @@ const COPY: Copy[] = [
   },
   {
     chapter: 'Brand',
-    place: 'side',
+    place: 'below',
     eyebrow: '02 · Branding & Identity',
     lines: [
       'Marks, voices and',
@@ -68,7 +68,7 @@ const COPY: Copy[] = [
   },
   {
     chapter: 'UI',
-    place: 'side',
+    place: 'below',
     eyebrow: '03 · UI & Visual',
     lines: [
       'Interfaces with rhythm,',
@@ -164,7 +164,7 @@ export default function Story() {
       if (Math.abs(target - q) < 1e-4) q = target
 
       const intro = clamp01(t / 2.4)
-      field.frame(q, t, dt, window.scrollY, intro)
+      field.frame(q, t, dt, intro)
 
       COPY.forEach((_, i) => {
         const el = blocks.current[i]
@@ -199,9 +199,9 @@ export default function Story() {
       }
     }
 
-    // The stippled type needs Instrument Serif loaded before it is drawn into dots.
+    // The stippled type needs Manrope loaded before it is drawn into dots.
     const fonts = Promise.race([
-      Promise.all([document.fonts.load('italic 200px "Instrument Serif"'), document.fonts.ready]),
+      Promise.all([document.fonts.load('800 200px "Manrope"'), document.fonts.ready]),
       new Promise((r) => setTimeout(r, 2500)),
     ])
     fonts.then(() => {
@@ -315,10 +315,6 @@ export default function Story() {
           ))}
         </nav>
 
-        <p className={styles.cue} aria-hidden="true">
-          <span>Scroll to drift in</span>
-          <span className={styles.cueLine} />
-        </p>
       </div>
     </section>
   )

@@ -2,6 +2,10 @@
 
 React + Vite + TypeScript. Light, celestial, scroll-told portfolio.
 
+Design: everything sits on one centre axis. Headlines are set in Doto (round-dot setting, `ROND` 100)
+so the type is made of the same dots as the illustrations; Manrope for body and labels. The page
+background is a fine dot texture painted in `src/texture.ts`; spare particles settle into it.
+
 Run: `npm install`, then `npm run dev` (or `npm run build && npm run preview`).
 
 ## Structure

@@ -16,15 +16,15 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <a href="#top" className={styles.brand} onClick={(e) => go(e)}>
-        <span className={styles.mark} aria-hidden="true">
-          ✦
-        </span>
-        Anukriti Mishra
-      </a>
       <nav className={styles.nav} aria-label="Primary">
+        <a href="#top" className={styles.brand} onClick={(e) => go(e)}>
+          <span className={styles.mark} aria-hidden="true">
+            ✦
+          </span>
+          Anukriti
+        </a>
         {LINKS.map((link) => (
-          <a key={link.id} href={`#${link.id}`} onClick={(e) => go(e, link.id)}>
+          <a key={link.id} href={`#${link.id}`} className={styles.link} onClick={(e) => go(e, link.id)}>
             {link.label}
           </a>
         ))}
