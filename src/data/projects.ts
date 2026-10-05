@@ -54,13 +54,13 @@ export const PROJECTS: Project[] = [
     hero: caseStudyImage('bosch-customer-experience'),
     showcase: '/showcase/bosch-customer-experience.html',
   },
-  // The clihub 20s cut is a React project, built by scripts/clihub-embed into its own folder.
+  // The clihub cut is the 10s Figma-style loop in clihub-video/figma-cut (npm run embed there).
   {
     slug: 'clihub',
     title: 'CLIHUB',
     card: '/work/project-4.jpg',
     hero: caseStudyImage('clihub'),
-    showcase: '/showcase/clihub/index.html',
+    showcase: '/showcase/clihub.html',
   },
   {
     slug: 'college-management',

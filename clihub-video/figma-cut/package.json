@@ -1,0 +1,10 @@
+{
+  "name": "clihub-figma-cut",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "embed": "node embed.mjs"
+  }
+}
