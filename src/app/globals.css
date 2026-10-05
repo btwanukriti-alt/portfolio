@@ -96,23 +96,6 @@
   margin-bottom: -0.12em;
 }
 
-/* Sound toggle equaliser bars (dot-eyes hero). */
-@keyframes eq-bar {
-  0%,
-  100% {
-    height: 3px;
-  }
-  25% {
-    height: 11px;
-  }
-  50% {
-    height: 4px;
-  }
-  75% {
-    height: 9px;
-  }
-}
-
 /* Hero text caret. */
 @keyframes caret-blink {
   0%,

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { caseStudyHref } from '@/data/projects'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 import { getLenis } from '../SmoothScroll'
-import { HeroSound } from './heroSound'
 import {
   EMERGE,
   Spring,
@@ -126,7 +125,7 @@ function TypedLine({ text, lineRef }: { text: string; lineRef: RefObject<HTMLDiv
   )
 }
 
-function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<HTMLElement | null> }) {
+function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
   const stage = useRef<HTMLDivElement>(null)
   const tiles = useRef<(HTMLAnchorElement | null)[]>([])
   const intro = useRef<HTMLDivElement>(null)
@@ -306,7 +305,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
     engine.current = {
       hover(index, on) {
         hover[index].target = on ? 1 : 0
-        if (on) sound.hover(0)
       },
     }
 
@@ -331,7 +329,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
       return (n: number) => {
         const count = Math.round(n)
         if (count === shown) return
-        if (count > shown && shown >= 0) sound.key()
         shown = count
         el.textContent = text.slice(0, count)
       }
@@ -435,7 +432,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
         .to(cur, { autoAlpha: 1, duration: 0.3, ease: 'power1.out' }, cursorIn)
         .to(pointer, { x: textBox.x, y: textBox.y, duration: 0.8, ease: 'power3.inOut', onUpdate: drawCursor }, cursorIn)
         .to(pointer, { s: 0.88, duration: 0.08, ease: 'power2.out', onUpdate: drawCursor }, press)
-        .call(() => sound.click(), [], press)
         .set(caret1, { visibility: 'hidden' }, press)
         .call(
           () => {
@@ -450,7 +446,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
         .to(box, { w: textBox.w, h: textBox.h, duration: DRAG, ease: 'power2.inOut', onUpdate: followCorner }, drag)
         // ...releases: handles, size tag; the guide goes; the caret lands in the new box...
         .to(pointer, { s: 1, duration: 0.12, ease: 'power2.out', onUpdate: drawCursor }, release)
-        .call(() => sound.click(), [], release)
         .to(guideEl, { autoAlpha: 0, duration: 0.25, ease: 'power1.out' }, release + 0.1)
         .to(selFill, { autoAlpha: 0, duration: 0.2, ease: 'power1.out' }, release)
         .to(selHandles, { scale: 1, duration: 0.28, ease: 'back.out(2.2)', stagger: 0.015 }, release)
@@ -468,7 +463,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
         .to(l1, { autoAlpha: 0, y: -10, duration: 0.55, ease: 'power2.out' }, reshapeAt - 0.45)
         .to(pointer, { x: textBox.x + textBox.w, y: textBox.y + textBox.h, duration: 0.45, ease: 'power3.inOut', onUpdate: drawCursor }, reshapeAt - 0.5)
         .to(pointer, { s: 0.88, duration: 0.08, ease: 'power2.out', onUpdate: drawCursor }, reshapeAt - 0.06)
-        .call(() => sound.click(), [], reshapeAt - 0.06)
         .to(l2, { autoAlpha: 0, scale: 0.96, duration: 0.35, ease: 'power2.in' }, reshapeAt)
         .to(box, { ...frame, duration: RESHAPE, ease: springEase, onUpdate: followCorner }, reshapeAt)
         .to(selLabel, { autoAlpha: 1, duration: 0.3, ease: 'power1.out' }, reshapeAt + 0.3)
@@ -486,7 +480,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
           () => {
             origin = { x: fcx, y: fcy, s: fw / L.tileW }
             st.show = 1
-            sound.whoosh({ from: 0, to: -0.8, dur: 2.4, f0: 300, f1: 2600, gain: 0.22 })
           },
           [],
           handoff,
@@ -503,7 +496,6 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
         .to(bar, { autoAlpha: 0, y: 16, duration: 0.6, ease: 'power2.in' }, settleAt + 0.6)
 
         // 5. Once the screens have settled: the call to action.
-        .call(() => sound.chime(), [], settleAt + 1.2)
         .fromTo(finaleEl, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out' }, settleAt + 1.2)
         .to(st, { hint: 1, duration: 1, ease: 'power1.out' }, settleAt + 1.9)
     })
@@ -517,7 +509,7 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
       window.removeEventListener('pointermove', onPointer)
       engine.current = null
     }
-  }, [sound, scrollRoot])
+  }, [scrollRoot])
 
   const words = (text: string) => text.split(' ')
 
@@ -719,37 +711,10 @@ function Scene({ sound, scrollRoot }: { sound: HeroSound; scrollRoot: RefObject<
   )
 }
 
-function SoundToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={on}
-      className={`inline-flex items-center gap-2.5 ${pill} ${on ? 'text-ink' : 'text-muted'}`}
-    >
-      <span className="flex h-[11px] items-end gap-[2px]" aria-hidden>
-        {[0, 1, 2, 3].map((i) => (
-          <i
-            key={i}
-            className="block h-[3px] w-[2px] rounded-[1px] bg-current transition-[height] duration-300 motion-reduce:animate-none"
-            style={on ? { animation: `eq-bar 1.1s ease-in-out ${i * 0.13}s infinite` } : undefined}
-          />
-        ))}
-      </span>
-      <span className="hidden sm:inline">Sound {on ? 'on' : 'off'}</span>
-    </button>
-  )
-}
-
 export default function IntroHero() {
-  const [sound] = useState(() => new HeroSound())
-  const [soundOn, setSoundOn] = useState(false)
   const [run, setRun] = useState(0)
   const section = useRef<HTMLElement>(null)
   const header = useRef<HTMLElement>(null)
-  const nudge = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => () => sound.dispose(), [sound])
 
   useGSAP(() => {
     gsap.fromTo(
@@ -758,40 +723,6 @@ export default function IntroHero() {
       { autoAlpha: 1, y: 0, duration: reducedMotion() ? 0 : 1, delay: 0.4, ease: 'expo.out' },
     )
   })
-
-  // Once the visitor starts scrolling, the nudge steps aside for the screenshots.
-  const [scrolled, setScrolled] = useState(false)
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  // "Play with sound" nudge: drops in after a moment, leaves when sound is on.
-  const showNudge = !soundOn && !scrolled
-  useGSAP(
-    () => {
-      gsap.to(nudge.current, {
-        autoAlpha: showNudge ? 1 : 0,
-        y: showNudge ? 0 : -6,
-        duration: reducedMotion() ? 0 : 0.8,
-        delay: showNudge ? 0.8 : 0,
-        ease: 'expo.out',
-      })
-    },
-    { dependencies: [showNudge] },
-  )
-
-  const toggleSound = async () => {
-    if (soundOn) {
-      sound.disable()
-      setSoundOn(false)
-    } else {
-      await sound.enable()
-      setSoundOn(true)
-    }
-  }
 
   // Replay from the top.
   const replay = () => {
@@ -825,25 +756,10 @@ export default function IntroHero() {
             <button type="button" onClick={replay} className={`${pill} text-muted`}>
               Replay
             </button>
-            <SoundToggle on={soundOn} onToggle={toggleSound} />
           </div>
         </header>
 
-        <button
-          ref={nudge}
-          type="button"
-          tabIndex={showNudge ? 0 : -1}
-          style={{ transform: 'translateY(-6px)' }}
-          onClick={async () => {
-            await toggleSound()
-            replay()
-          }}
-          className="invisible absolute top-[76px] left-1/2 z-[500] -translate-x-1/2 rounded-full border border-[#0d0d0c1f] bg-white/70 px-3.5 py-2 font-hero-mono text-[11px] tracking-[0.06em] text-muted opacity-0 backdrop-blur-md hover:text-ink"
-        >
-          ♪ Play with sound
-        </button>
-
-        <Scene key={run} sound={sound} scrollRoot={section} />
+        <Scene key={run} scrollRoot={section} />
       </div>
     </section>
   )
