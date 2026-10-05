@@ -412,3 +412,171 @@ export function OverviewWindow({ k = 1 }) {
     </div>
   )
 }
+
+// ---------- Opening: the college switcher ----------
+// Switcher pill (native SWITCH.w × 64) as in the sidebar, and its dropdown. College rows are
+// drawn separately (CollegeRow) so they can fly in from the canvas and dock in the list.
+export const SWITCH = { w: 420, pill: 64, gap: 10, pad: 8, all: 56, row: 52, step: 58 }
+SWITCH.list = SWITCH.pad + SWITCH.all + 10 + 5 * SWITCH.step - 6 + SWITCH.pad
+export const switchRowY = (i) => SWITCH.pill + SWITCH.gap + SWITCH.pad + SWITCH.all + 10 + i * SWITCH.step
+export function SwitcherPill({ open = 0, pr = 0 }) {
+  return (
+    <div style={card({ width: SWITCH.w, height: SWITCH.pill, padding: '0 16px', display: 'flex', alignItems: 'center', gap: 12, borderRadius: 16, boxShadow: `inset 0 0 0 ${open > 0 ? 2 : 0}px ${C.primary}, ${lift}`, transform: `scale(${1 - 0.04 * pr})` })}>
+      <IconTile icon={IC.bank} s={40} i={21} r={11} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 17, fontWeight: 600 }}>All Colleges</div>
+        <div style={{ fontSize: 12.5, color: C.sub }}>Workspace · 5 colleges</div>
+      </div>
+      <span style={{ transform: `rotate(${180 * open}deg)` }}>{IC.chev(C.sub, 18)}</span>
+    </div>
+  )
+}
+// Dropdown body with the "All colleges" row; o: 0..1 opening; check: 0..1.
+export function SwitcherList({ o = 1, check = 0, hi = 0 }) {
+  const rate = (94.3 / 114.8) * 100
+  return (
+    <div style={card({ width: SWITCH.w, height: SWITCH.list, padding: SWITCH.pad, borderRadius: 18, boxShadow: '0 0 0 1px rgba(15,23,42,.05), 0 40px 70px -30px rgba(10,20,60,.5)', opacity: clamp(o * 2), transform: `scaleY(${0.6 + 0.4 * o})`, transformOrigin: '50% 0' })}>
+      <div style={{ height: SWITCH.all, borderRadius: 12, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 12, background: `rgba(232,238,252,${0.4 + 0.6 * hi})` }}>
+        <IconTile icon={IC.grid} tint="#fff" bg={C.navy} s={34} i={18} r={9} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: C.navy }}>All colleges</div>
+          <div style={{ fontSize: 12, color: C.sub }}>{cr(94.3)} received · {fmt(rate, 1)}%</div>
+        </div>
+        <span style={{ width: 22, height: 22, borderRadius: 11, background: C.green, display: 'grid', placeItems: 'center', transform: `scale(${check})` }}><Ic c="#fff" s={13} w={3} d="M5 12.5l4.5 4.5L19 7.5" /></span>
+      </div>
+      <div style={{ height: 1, background: C.line, margin: '4px 6px 5px' }} />
+    </div>
+  )
+}
+// One college as a row (native (SWITCH.w - 2·pad) × row). `lift` 0..1 adds the floating card look.
+export function CollegeRow({ i, p = 1, float = 1 }) {
+  const [n, rec, exp] = COLLEGES[i]
+  const pct = (rec / exp) * 100
+  const good = pct >= 85
+  return (
+    <div style={{ width: SWITCH.w - 2 * SWITCH.pad, height: SWITCH.row, borderRadius: 12, padding: '0 12px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12, background: '#fff', fontFamily: UI_FONT, color: C.ink, boxShadow: `0 0 0 1px rgba(15,23,42,${0.06 * float}), 0 ${24 * float}px ${44 * float}px -${20 * float}px rgba(10,20,60,${0.45 * float})` }}>
+      <IconTile icon={IC.bank} s={34} i={18} r={9} />
+      <span style={{ flex: 1, fontSize: 14.5, fontWeight: 500, color: C.link, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{n}</span>
+      <div style={{ width: 70 }}><Bar f={(pct / 100) * p} h={6} fill={good ? C.green : C.amber} /></div>
+      <span style={{ width: 46, textAlign: 'right', fontSize: 12.5, fontWeight: 600, color: good ? C.green : '#B26A00', fontVariantNumeric: 'tabular-nums' }}>{fmt(pct * p, 1)}%</span>
+    </div>
+  )
+}
+
+// ---------- Staff directory ----------
+// Staff Directory (Figma 267:104636) with distinct people, initials avatars, roles, departments
+// and today's status in place of the repeated placeholder card.
+export const STAFF = [
+  ['Meera Iyer', 'Professor', 'Computer Science', 'Dean', 'EMP-1001', 'present', 330],
+  ['Rajesh Kumar', 'Professor', 'Mechanical', 'HOD', 'EMP-1014', 'present', 25],
+  ['Ananya Rao', 'Assistant Professor', 'Electronics', '', 'EMP-1102', 'present', 200],
+  ['Vikram Singh', 'Associate Professor', 'Civil', '', 'EMP-1087', 'leave', 150],
+  ['Priya Nair', 'Lab Instructor', 'Computer Science', '', 'EMP-1240', 'present', 280],
+  ['Arjun Mehta', 'Assistant Professor', 'Computer Science', '', 'EMP-1131', 'present', 100],
+]
+export const SCARD = { w: 300, h: 214 }
+const BADGE = { Dean: ['#B26A00', C.aSoft], HOD: [C.primary, C.pSoft] }
+export function StaffCard({ i, hover = 0 }) {
+  const [n, role, dept, badge, id, st, h] = STAFF[i]
+  const present = st === 'present'
+  return (
+    <div style={card({ width: SCARD.w, height: SCARD.h, padding: 20, boxShadow: `0 0 0 ${2 * hover}px ${C.primary}, ${lift}`, display: 'flex', flexDirection: 'column' })}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+        <div style={{ position: 'relative' }}>
+          <Avatar name={n} s={56} h={h} />
+          <span style={{ position: 'absolute', right: 0, bottom: 0, width: 14, height: 14, borderRadius: 7, background: present ? C.green : C.amber, boxShadow: '0 0 0 3px #fff' }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>{n}</div>
+          <div style={{ fontSize: 13, color: C.sub, marginTop: 2, whiteSpace: 'nowrap' }}>{role}</div>
+        </div>
+        {badge && <Chip fg={BADGE[badge][0]} bg={BADGE[badge][1]} h={24}>{badge}</Chip>}
+      </div>
+      <div style={{ marginTop: 14 }}><Chip fg={C.t2} bg={C.page} h={28}>{IC.cap(C.sub, 14)}{dept}</Chip></div>
+      <div style={{ marginTop: 'auto', paddingTop: 14, borderTop: `1px solid ${C.line2}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12.5 }}>
+        <div><div style={{ color: C.faint }}>Employee ID</div><div style={{ fontWeight: 600, marginTop: 2 }}>{id}</div></div>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 500, color: present ? C.green : '#B26A00' }}><i style={{ width: 8, height: 8, borderRadius: 4, background: present ? C.green : C.amber }} />{present ? 'Present today' : 'On leave'}</span>
+      </div>
+    </div>
+  )
+}
+// Directory header (native w × h): title, total, search and filters. narrow stacks in two rows.
+export function DirectoryHeader({ w, narrow = false, k = 1 }) {
+  const box = (txt, ic, flex) => (
+    <div style={{ flex, height: 44, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', borderRadius: 10, boxShadow: `inset 0 0 0 1px ${C.line}`, fontSize: 13.5, color: ic ? C.faint : C.t2, fontWeight: ic ? 400 : 500, whiteSpace: 'nowrap', minWidth: 0 }}>
+      {ic}{<span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{txt}</span>}{!ic && IC.chev(C.sub, 14)}
+    </div>
+  )
+  const title = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 'none' }}>
+      <span style={{ fontSize: 21, fontWeight: 600, letterSpacing: '-0.02em' }}>Staff Directory</span>
+      <Chip fg={C.primary} bg={C.pSoft} h={26}>{fmt(1250 * k)} staff</Chip>
+    </div>
+  )
+  return (
+    <div style={card({ width: w, padding: '14px 18px', boxShadow: lift, display: 'flex', flexDirection: narrow ? 'column' : 'row', alignItems: narrow ? 'stretch' : 'center', gap: 12 })}>
+      {title}
+      <div style={{ display: 'flex', gap: 10, flex: 1 }}>
+        {box('Search by name or ID', IC.search(C.faint, 16), 1.4)}
+        {box('Engineering College', null, 1)}
+        {box('All departments', null, 1)}
+      </div>
+    </div>
+  )
+}
+// Profile panel (native 440 × PROFILE.h): opened from a staff card. Counts with k.
+export const PROFILE = { w: 440, h: 560 }
+export function StaffProfile({ k = 1, narrow = false }) {
+  const [n, role, dept, badge, id, , h] = STAFF[0]
+  const r = 34
+  const L = 2 * Math.PI * r
+  const att = 21 / 22
+  const Stat = ({ v, l }) => (
+    <div style={{ flex: 1, padding: '14px 16px', borderRadius: 14, background: C.page }}>
+      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>{v}</div>
+      <div style={{ fontSize: 12.5, color: C.sub, marginTop: 2 }}>{l}</div>
+    </div>
+  )
+  return (
+    <div style={card({ width: narrow ? 620 : PROFILE.w, height: PROFILE.h, padding: 26, boxShadow: '-30px 0 60px -30px rgba(10,20,60,.5), 0 40px 80px -36px rgba(10,20,60,.55)', display: 'flex', flexDirection: 'column' })}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.sub, letterSpacing: '0.08em' }}>STAFF PROFILE</span>
+        <Ic c={C.t2} s={20} w={2} d="M6 6l12 12M18 6L6 18" />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 18 }}>
+        <Avatar name={n} s={76} h={h} />
+        <div>
+          <div style={{ fontSize: 23, fontWeight: 600, letterSpacing: '-0.02em' }}>Dr. {n}</div>
+          <div style={{ fontSize: 14, color: C.sub, marginTop: 2 }}>{role} · {dept}</div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 8 }}><Chip fg={BADGE[badge][0]} bg={BADGE[badge][1]} h={24}>{badge}</Chip><Chip fg={C.t2} bg={C.page} h={24}>{id}</Chip></div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 22, padding: '16px 18px', borderRadius: 16, background: `linear-gradient(115deg, ${C.navy} 0%, #0F2C5C 60%, #12396F 100%)`, color: '#fff' }}>
+        <div style={{ position: 'relative', width: 80, height: 80, flex: 'none' }}>
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r={r} fill="none" stroke="rgba(255,255,255,.14)" strokeWidth="9" />
+            <circle cx="40" cy="40" r={r} fill="none" stroke="#5EE0A1" strokeWidth="9" strokeLinecap="round" strokeDasharray={L} strokeDashoffset={L * (1 - att * k)} transform="rotate(-90 40 40)" />
+          </svg>
+          <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 17, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{Math.round(att * 100 * k)}%</div>
+        </div>
+        <div>
+          <div style={{ fontSize: 13, opacity: 0.7 }}>Attendance this month</div>
+          <div style={{ fontSize: 20, fontWeight: 600, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>{Math.round(21 * k)} of 22 days</div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 12, marginTop: 14 }}>
+        <Stat v={`${Math.round(28 * k)} yrs`} l="Experience" />
+        <Stat v={Math.round(12 * k)} l="Publications" />
+      </div>
+      <div style={{ marginTop: 16, fontSize: 12.5, color: C.sub }}>Teaches</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+        {['Data Structures', 'Machine Learning', 'Algorithms'].map((x) => <Chip key={x} fg={C.navy} bg={C.pSoft} h={28}>{x}</Chip>)}
+      </div>
+      <div style={{ marginTop: 'auto', display: 'grid', gap: 8, fontSize: 13.5, color: C.t2 }}>
+        {[['Phone', '+91 98450 12034'], ['Email', 'meera.iyer@college.edu']].map(([l, v]) => (
+          <div key={l} style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: `1px solid ${C.line2}` }}><span style={{ color: C.sub }}>{l}</span><span style={{ fontWeight: 500 }}>{v}</span></div>
+        ))}
+      </div>
+    </div>
+  )
+}

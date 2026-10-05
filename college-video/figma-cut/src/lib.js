@@ -86,12 +86,14 @@ export const UI_FONT = "'Poppins', ui-sans-serif, system-ui, sans-serif"
 // One soft blue background for the whole piece.
 export const BG = '#CFDDFF'
 export const SCENES = [
-  { id: 'hook', a: 0, b: 3.4 },
-  { id: 'flow', a: 3.4, b: 8.6 },
+  { id: 'open', a: 0, b: 2.7 },
+  { id: 'hook', a: 2.7, b: 6.1 },
+  { id: 'flow', a: 6.1, b: 11.3 },
+  { id: 'staff', a: 11.3, b: 15.05 },
 ]
-export const DURATION = 8.6
+export const DURATION = 15.05
 // Paused poster frame (embed before it first plays, and reduced motion).
-export const POSTER = 2.8
+export const POSTER = 5.5
 
 // Stage sizes: landscape and portrait compositions, each scaled to fit the viewport.
 export const STAGES = { land: { W: 1920, H: 1080 }, port: { W: 1080, H: 1920 } }
