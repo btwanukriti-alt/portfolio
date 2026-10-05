@@ -2,7 +2,26 @@
 
 Build: `clihub-video/prototype-cut` (`npm run embed` writes `public/showcase/clihub.html`). Real screens from Figma *Portfolio* (section 250:32492) are shown as a working prototype.
 
-**Brief (Anu, rounds 6–7):** show the flow of how the product is used; in Monitor, show all five dashboard tabs. Kept from earlier rounds: the selection-drag intro, grey background only, no drop shadows.
+**Brief (Anu, rounds 6–8):** show the flow of how the product is used; in Monitor, show all five dashboard tabs; make it more engaging with zoom in / zoom out and more infographics.
+
+**Camera (round 8):** the window frame stays fixed and the screen zooms inside it, clamped so it always fills the frame.
+- **Step 1:** pushes in on the New Host form as the fields are typed, and follows down to Create Host.
+- **Step 2:** pushes in on the connection ring.
+- **Step 3:** breathes for each tab — out for the click, in on the content after it.
+- **Step 4:** pushes in on the Ask AI panel.
+- **Step 5:** pushes in on the Backups row, then moves to Quick Connect and the recent connections.
+- **Between steps:** pulls back out.
+
+**Infographic callouts (round 8):** dark cards beside the frame, each tied to its spot in the UI by a dashed leader line and a pulsing target dot that follow the camera.
+- **New host:** a checklist (Address / Port / Label).
+- **SSH handshake:** a 3-segment progress bar, then Connected.
+- **Uptime:** a counter plus a 15-day bar.
+- **CPU:** a donut to 45%, plus a sparkline of the day traced from the CPU chart.
+- **Disk:** a used/free stacked bar with a legend.
+- **Eth0:** live download/upload bars.
+- **Processes:** proportional bars.
+- **Ask AI:** the question types out and an answer chip appears (`find . -name "*.txt"`).
+- **Transfer:** a computer → server diagram with a moving file, a progress bar and "Uploaded". Kept from earlier rounds: the selection-drag intro, grey background only, no drop shadows.
 
 The headline pill reads "Step N of 5". A step rail under the window fills the current step and checks off the finished ones.
 

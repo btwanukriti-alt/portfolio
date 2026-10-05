@@ -318,31 +318,156 @@ function Screens({ t }) {
   });
 }
 
-// Small dark callouts beside the window (no shadow), one or two per step.
+// ================= camera =================
+// Focus point in window px and zoom; it pushes in on what each step is about and pulls back
+// out between beats (and for every dashboard tab click).
+const CAM = (() => {
+  const F = { x: 640, y: 416, z: 1 };
+  const k = [[0, F], [1.6, F], [2.1, { x: 1060, y: 400, z: 1.45 }], [3.85, { x: 1060, y: 520, z: 1.45 }], [4.25, { x: 1090, y: 690, z: 1.3 }], [4.7, F],
+    [5.0, F], [6.6, { x: 640, y: 390, z: 1.28 }], [7.25, F]];
+  // Monitor: out for each tab click, in on the content after it.
+  TAB_AT.forEach((ct, i) => { if (i > 0) k.push([ct - 0.15, F]); k.push([ct + 0.6, { x: 672, y: 500, z: 1.22 }]); });
+  k.push([12.9, F], [13.4, F], [14.2, { x: 1080, y: 430, z: 1.4 }], [15.35, { x: 1080, y: 430, z: 1.4 }], [15.75, F],
+    [16.0, F], [16.35, { x: 330, y: 390, z: 1.45 }], [16.75, { x: 330, y: 390, z: 1.45 }], [17.1, { x: 830, y: 430, z: 1.3 }], [17.85, { x: 830, y: 430, z: 1.3 }], [18.15, F]);
+  return k;
+})();
+// Clamped so the zoomed screen always covers the frame (no empty edge inside it).
+const camAt = (t) => {
+  const c = kf(t, CAM);
+  const hx = 640 / c.z, hy = 416 / c.z;
+  return { x: clamp(c.x, hx, 1280 - hx), y: clamp(c.y, hy, 832 - hy), z: c.z };
+};
+// Stage px of a window point, through the camera.
+const project = (c, p) => {
+  const S = onWin(p), Fp = onWin(c);
+  return { x: 960 + (S.x - Fp.x) * c.z, y: 574 + (S.y - Fp.y) * c.z };
+};
+function Camera({ t, children }) {
+  const c = camAt(t);
+  const Fp = onWin(c);
+  return <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transformOrigin: "0 0", transform: `translate(${960 - Fp.x * c.z}px, ${574 - Fp.y * c.z}px) scale(${c.z})` }}>{children}</div>;
+}
+
+// ================= infographic callouts =================
+// Dark cards fixed beside the frame, each tied to its spot in the UI by a leader line and a
+// pulsing target dot that follow the camera. No shadows.
+const G = { card: "#15151D", line: "#2B2B33", text: "#E4E4E4", sub: "#909090", green: "#4FD1A5", ok: "#71F0C0", cyan: "#51AFD4", violet: "#C6B8FF", red: "#D9485F", purple: "#7D28FE" };
+const Lbl = ({ children }) => <div style={{ fontSize: 14, color: G.sub, marginBottom: 10, letterSpacing: "0.02em" }}>{children}</div>;
+const Donut = ({ p, v, color, size = 84 }) => (
+  <svg width={size} height={size} viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke={G.line} strokeWidth="9" /><circle cx="42" cy="42" r="34" fill="none" stroke={color} strokeWidth="9" strokeLinecap="round" pathLength="100" strokeDasharray={`${v * p} 100`} transform="rotate(-90 42 42)" /></svg>
+);
+// CPU usage over the day, traced from the Performance chart (values in %).
+const CPU_DAY = [52, 44, 35, 27, 31, 38, 46, 58, 72, 61, 50, 49, 56, 47, 38, 41, 52, 63, 66, 65, 62];
+const Spark = ({ p, data, color, w = 230, h = 54 }) => {
+  const n = data.length, pts = data.map((v, i) => [(i / (n - 1)) * w, h - (v / 80) * h]);
+  const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
+  return (
+    <svg width={w} height={h} style={{ display: "block", overflow: "visible" }}>
+      <defs><clipPath id="sparkclip"><rect x="0" y="-4" width={w * p} height={h + 8} /></clipPath></defs>
+      <g clipPath="url(#sparkclip)"><path d={`${d}L${w} ${h}L0 ${h}Z`} fill={color} opacity=".18" /><path d={d} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" /></g>
+    </svg>
+  );
+};
+const Bars = ({ t, color, seed, n = 14, w = 120, h = 34 }) => (
+  <svg width={w} height={h}>{Array.from({ length: n }, (_, k) => { const bh = 5 + (h - 6) * Math.abs(Math.sin(k * 1.7 + seed + t * 2.4)); return <rect key={k} x={k * (w / n)} y={h - bh} width={w / n - 3} height={bh} rx="1.5" fill={color} />; })}</svg>
+);
+const Check = ({ on }) => (
+  <span style={{ width: 20, height: 20, borderRadius: 10, display: "inline-grid", placeItems: "center", background: on ? "#1E3B33" : G.line, flex: "none" }}>
+    <svg width="11" height="9" viewBox="0 0 12 10" style={{ opacity: on ? 1 : 0.25 }}><path d="M1 5l3.5 3.5L11 1.5" stroke={G.ok} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  </span>
+);
+
+const CALLOUTS = [
+  { a: 3.7, b: 4.62, side: "right", top: 330, at: { x: 1050, y: 460 }, body: (p) => (<>
+    <Lbl>New host</Lbl>
+    {[["Address", "192.168.1.100"], ["Port", "22"], ["Label", "API Gateway"]].map(([k, v], i) => (
+      <div key={k} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", fontSize: 16 }}><Check on={p > 0.2 + i * 0.25} /><span style={{ color: G.sub, width: 70 }}>{k}</span><span>{v}</span></div>))}
+  </>) },
+  { a: 6.55, b: 7.4, side: "right", top: 360, at: { x: 640, y: 390 }, body: (p) => (<>
+    <Lbl>SSH handshake</Lbl>
+    <div style={{ display: "flex", gap: 6 }}>{[0, 1, 2].map((i) => <div key={i} style={{ flex: 1, height: 8, borderRadius: 4, background: p > (i + 0.5) / 3 ? G.green : G.line }} />)}</div>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14, fontSize: 24, fontWeight: 500, color: G.ok }}><span style={{ width: 10, height: 10, borderRadius: 5, background: "#4FA084" }} />Connected</div>
+  </>) },
+  { a: 7.65, b: 8.5, side: "right", top: 380, at: { x: 783, y: 483 }, body: (p) => (<>
+    <Lbl>Uptime</Lbl>
+    <div style={{ fontSize: 28, fontWeight: 500, color: G.green }}>{Math.round(15 * p)} days, {Math.round(6 * p)} hours</div>
+    <div style={{ display: "flex", gap: 4, marginTop: 12 }}>{Array.from({ length: 15 }, (_, i) => <div key={i} style={{ flex: 1, height: 18, borderRadius: 3, background: i < 15 * p ? "#2E6B57" : G.line }} />)}</div>
+  </>) },
+  { a: 8.75, b: 9.6, side: "left", top: 360, at: { x: 290, y: 521 }, body: (p) => (<>
+    <Lbl>Total CPU usage</Lbl>
+    <div style={{ display: "flex", alignItems: "center", gap: 16 }}><Donut p={p} v={45} color={G.cyan} size={74} /><div><div style={{ fontSize: 34, fontWeight: 500 }}>{Math.round(45 * p)}%</div><div style={{ fontSize: 13, color: G.sub }}>Intel Xeon E5-2676 v3</div></div></div>
+    <div style={{ marginTop: 12 }}><Spark p={p} data={CPU_DAY} color={G.cyan} /></div>
+  </>) },
+  { a: 9.85, b: 10.7, side: "right", top: 380, at: { x: 492, y: 350 }, body: (p) => (<>
+    <Lbl>Disk storage</Lbl>
+    <div style={{ fontSize: 28, fontWeight: 500 }}>{Math.round(184 * p)} GB <span style={{ fontSize: 16, color: G.sub }}>of 200 GB</span></div>
+    <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden", background: G.line, marginTop: 12 }}><div style={{ width: `${92 * p}%`, background: G.red }} /><div style={{ width: `${8 * p}%`, background: G.green }} /></div>
+    <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 13, color: G.sub }}><span><span style={{ color: G.red }}>■</span> Used 184 GB</span><span><span style={{ color: G.green }}>■</span> Free 16 GB</span></div>
+  </>) },
+  { a: 10.95, b: 11.8, side: "left", top: 400, at: { x: 340, y: 540 }, body: () => (<>
+    <Lbl>Eth0 · live</Lbl>
+    {[["Download", "1.1", G.violet, 0], ["Upload", "1.6", G.green, 2]].map(([n, v, c, sd]) => (
+      <div key={n} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 10, marginTop: 8 }}>
+        <div><div style={{ fontSize: 13, color: G.sub }}>{n}</div><div style={{ fontSize: 24, fontWeight: 500, color: c }}>{v}<span style={{ fontSize: 13, color: G.sub }}> MB/s</span></div></div><Bars t={t0} color={c} seed={sd} />
+      </div>))}
+  </>) },
+  { a: 12.05, b: 12.9, side: "right", top: 380, at: { x: 252, y: 320 }, body: (p) => (<>
+    <Lbl>Processes</Lbl>
+    {[["Sleeping", 240, "#6C7BD9"], ["Total", 187, G.violet], ["Running", 3, G.green]].map(([n, v, c]) => (
+      <div key={n} style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 7, fontSize: 15 }}>
+        <span style={{ width: 66, color: G.sub }}>{n}</span><div style={{ flex: 1, height: 10, borderRadius: 5, background: G.line }}><div style={{ width: `${Math.max(3, (v / 240) * 100) * p}%`, height: 10, borderRadius: 5, background: c }} /></div><span style={{ width: 34, textAlign: "right", fontWeight: 500 }}>{Math.round(v * p)}</span>
+      </div>))}
+  </>) },
+  { a: 14.15, b: 15.45, side: "left", top: 380, at: { x: 1100, y: 170 }, body: (p) => { const q = "How do I find all .txt files in a directory?"; return (<>
+    <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 15, marginBottom: 10 }}><span style={{ color: "#8B5CF6" }}>✦</span>Ask AI</div>
+    <div style={{ background: G.line, borderRadius: 10, padding: "10px 12px", fontSize: 15, minHeight: 42, lineHeight: 1.35 }}>{q.slice(0, Math.round(q.length * clamp(p * 1.4)))}</div>
+    <div style={{ marginTop: 10, padding: "9px 12px", borderRadius: 10, background: "#0B0B10", border: `1px solid ${G.line}`, fontFamily: "'Fira Code', ui-monospace, monospace", fontSize: 15, color: G.ok, opacity: clamp((p - 0.72) * 4) }}>find . -name "*.txt"</div>
+  </>); } },
+  { a: 16.85, b: 18.0, side: "right", top: 360, at: { x: 833, y: 385 }, body: (p) => {
+    const f = clamp(p * 1.15);
+    return (<>
+      <Lbl>Backups → API Gateway</Lbl>
+      <div style={{ position: "relative", height: 70, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        {[["This computer", "M3 5h18v11H3zM8 20h8M12 16v4"], ["Server", "M4 4h16v6H4zM4 14h16v6H4z"]].map(([n, d]) => (
+          <div key={n} style={{ textAlign: "center", width: 80, zIndex: 1 }}><div style={{ width: 44, height: 44, margin: "0 auto", borderRadius: 12, background: G.line, display: "grid", placeItems: "center" }}><svg width="22" height="22" viewBox="0 0 24 24"><path d={d} fill="none" stroke={G.text} strokeWidth="1.8" strokeLinejoin="round" /></svg></div><div style={{ fontSize: 12, color: G.sub, marginTop: 4 }}>{n}</div></div>))}
+        <div style={{ position: "absolute", left: 66, right: 66, top: 22, borderTop: `2px dashed ${G.line}` }} />
+        {f < 1 && <div style={{ position: "absolute", top: 13, left: 66 + (260 - 132 - 18) * ((t0 * 1.6) % 1), width: 18, height: 18, borderRadius: 4, background: G.purple }} />}
+      </div>
+      <div style={{ height: 8, borderRadius: 4, background: G.line, marginTop: 6 }}><div style={{ height: 8, borderRadius: 4, width: `${100 * f}%`, background: f < 1 ? G.purple : "#4FA084" }} /></div>
+      <div style={{ fontSize: 14, color: f < 1 ? G.text : G.ok, marginTop: 8 }}>{f < 1 ? `Uploading ${Math.round(100 * f)}%` : "✓ Uploaded"}</div>
+    </>); } },
+];
+let t0 = 0; // current time for live bars inside callout bodies
+
 function Callouts({ t }) {
-  const box = (a, b, side, top, child) => {
-    const e = inOut(t, a, b, 0.35, 0.3);
-    if (e <= 0.001) return null;
-    return (
-      <div style={{ position: "absolute", top, [side]: side === "left" ? FX - 150 : 1920 - FX - FW - 150, width: 300, padding: "18px 20px", borderRadius: 16, background: "#15151D", border: "1px solid #2B2B33", color: "#E4E4E4", fontFamily: FONT, boxSizing: "border-box", opacity: e, transform: `translateX(${(side === "left" ? -24 : 24) * (1 - e)}px)` }}>{child(prog(t, a + 0.1, a + 0.8))}</div>
-    );
-  };
-  const lbl = (s) => <div style={{ fontSize: 14, color: "#909090", marginBottom: 8 }}>{s}</div>;
+  t0 = t;
+  const c = camAt(t);
   return (
     <>
-      {box(4.3, 4.75, "right", 640, () => (<div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 18 }}><span style={{ color: "#71F0C0" }}>✓</span>Host created</div>))}
-      {box(6.75, 7.5, "right", 420, () => (<>{lbl("Status")}<div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 26, fontWeight: 500, color: "#71F0C0" }}><span style={{ width: 10, height: 10, borderRadius: 5, background: "#4FA084" }} />Connected</div></>))}
-      {box(7.6, 8.55, "right", 470, (p) => (<>{lbl("Uptime")}<div style={{ fontSize: 26, fontWeight: 500, color: "#4FD1A5" }}>{Math.round(15 * p)} days, {Math.round(6 * p)} hours</div><div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 15 }}><span style={{ width: 9, height: 9, borderRadius: 5, background: "#4FA084" }} />Connected</div></>))}
-      {box(8.75, 9.65, "left", 430, (p) => (<>{lbl("Total CPU Usage")}<div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <svg width="76" height="76" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="#2B2B33" strokeWidth="8" /><circle cx="42" cy="42" r="34" fill="none" stroke="#51AFD4" strokeWidth="8" strokeLinecap="round" pathLength="100" strokeDasharray={`${45 * p} 100`} transform="rotate(-90 42 42)" /></svg>
-        <div><div style={{ fontSize: 36, fontWeight: 500 }}>{Math.round(45 * p)}%</div><div style={{ fontSize: 13, color: "#909090" }}>Intel Xeon E5-2676 v3</div></div></div></>))}
-      {box(9.85, 10.75, "right", 470, (p) => (<>{lbl("Used Storage")}<div style={{ fontSize: 28, fontWeight: 500 }}>{Math.round(184 * p)} GB <span style={{ fontSize: 16, color: "#909090" }}>of 200 GB</span></div><div style={{ height: 8, borderRadius: 4, background: "#2B2B33", marginTop: 12 }}><div style={{ height: 8, borderRadius: 4, width: `${92 * p}%`, background: "#D9485F" }} /></div></>))}
-      {box(10.95, 11.85, "left", 470, () => (<>{lbl("Eth0")}{[["Download", "1.1", "#C6B8FF", 0], ["Upload", "1.6", "#4FD1A5", 2]].map(([n, v, c, sd]) => (
-        <div key={n} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, marginTop: 6 }}><div><div style={{ fontSize: 13, color: "#909090" }}>{n}</div><div style={{ fontSize: 24, fontWeight: 500, color: c }}>{v}<span style={{ fontSize: 13, color: "#909090" }}> MB/s</span></div></div>
-          <svg width="100" height="28" viewBox="0 0 100 28">{Array.from({ length: 12 }, (_, k) => { const h = 5 + 20 * Math.abs(Math.sin(k * 1.7 + sd + t * 2.2)); return <rect key={k} x={k * 8.4} y={28 - h} width="5" height={h} rx="1.5" fill={c} />; })}</svg></div>))}</>))}
-      {box(12.05, 12.95, "right", 470, (p) => (<>{lbl("Processes")}<div style={{ display: "flex", gap: 22 }}>{[["Total", 187], ["Running", 3], ["Sleeping", 240]].map(([n, v]) => (<div key={n}><div style={{ fontSize: 28, fontWeight: 500 }}>{Math.round(v * p)}</div><div style={{ fontSize: 13, color: "#909090" }}>{n}</div></div>))}</div></>))}
-      {box(14.2, 15.5, "left", 520, (p) => { const q = "How do I find all .txt files in a directory?"; return (<><div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 15, marginBottom: 10 }}><span style={{ color: "#8B5CF6" }}>✦</span>Ask AI</div><div style={{ background: "#2B2B33", borderRadius: 10, padding: "10px 12px", fontSize: 15, minHeight: 42, lineHeight: 1.35 }}>{q.slice(0, Math.round(q.length * p))}</div></>); })}
-      {box(17.15, 18.0, "right", 600, (p) => (<>{lbl("Backups → API Gateway")}<div style={{ height: 8, borderRadius: 4, background: "#2B2B33" }}><div style={{ height: 8, borderRadius: 4, width: `${100 * p}%`, background: p < 1 ? "#7D28FE" : "#4FA084" }} /></div><div style={{ fontSize: 14, color: p < 1 ? "#E4E4E4" : "#71F0C0", marginTop: 8 }}>{p < 1 ? `Uploading ${Math.round(100 * p)}%` : "Uploaded"}</div></>))}
+      {CALLOUTS.map((k, i) => {
+        const e = inOut(t, k.a, k.b, 0.35, 0.3);
+        if (e <= 0.001) return null;
+        const p = prog(t, k.a + 0.1, k.a + 0.85);
+        const W = 320, X = k.side === "left" ? 90 : 1920 - 90 - W;
+        const anchor = { x: k.side === "left" ? X + W : X, y: k.top + 34 };
+        const pr = project(c, k.at);
+        const tgt = { x: clamp(pr.x, FX + 18, FX + FW - 18), y: clamp(pr.y, FY + 18, FY + FH - 18) };
+        const ln = prog(t, k.a + 0.15, k.a + 0.55);
+        const lx = anchor.x + (tgt.x - anchor.x) * ln, ly = anchor.y + (tgt.y - anchor.y) * ln;
+        const pulse = ((t - k.a) * 1.4) % 1;
+        return (
+          <div key={i} style={{ position: "absolute", inset: 0, opacity: e, pointerEvents: "none" }}>
+            <svg width="1920" height="1080" style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+              <line x1={anchor.x} y1={anchor.y} x2={lx} y2={ly} stroke="#0E1424" strokeOpacity=".55" strokeWidth="1.5" strokeDasharray="5 5" />
+              {ln >= 1 && <>
+                <circle cx={tgt.x} cy={tgt.y} r={8 + 16 * pulse} fill="none" stroke="#fff" strokeWidth="2" opacity={1 - pulse} />
+                <circle cx={tgt.x} cy={tgt.y} r="7" fill="#0E1424" stroke="#fff" strokeWidth="2.5" />
+              </>}
+            </svg>
+            <div style={{ position: "absolute", left: X, top: k.top, width: W, padding: "18px 20px", borderRadius: 16, background: G.card, border: `1px solid ${G.line}`, color: G.text, fontFamily: FONT, boxSizing: "border-box", transform: `translateX(${(k.side === "left" ? -24 : 24) * (1 - e)}px) scale(${0.96 + 0.04 * e})` }}>{k.body(p)}</div>
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -350,7 +475,7 @@ function Callouts({ t }) {
 function AppWindow({ t }) {
   const fill = prog(t, 1.0, 1.45);
   return (
-    <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, borderRadius: 16, overflow: "hidden", outline: "1px solid rgba(255,255,255,.55)", background: "#111119", opacity: fill, transform: `scale(${0.985 + 0.015 * fill})` }}>
+    <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, borderRadius: 16, overflow: "hidden", background: "#111119", opacity: fill, transform: `scale(${0.985 + 0.015 * fill})` }}>
       <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 832, transform: `scale(${FK})`, transformOrigin: "0 0" }}>
         <Screens t={t} />
       </div>
@@ -400,11 +525,20 @@ export function Stage({ t, sw = 1920, sh = 1080 }) {
       <Backdrop t={t} w={sw} h={sh} />
       <div style={{ position: "absolute", left: (sw - 1920) / 2, top: (sh - 1080) / 2, width: 1920, height: 1080 }}>
         <Shot t={t}>
-          <AppWindow t={t} />
-          <Callouts t={t} />
+          {/* The frame stays put; the camera zooms the screen inside it. */}
+          <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, borderRadius: 16, overflow: "hidden" }}>
+            <div style={{ position: "absolute", left: -FX, top: -FY, width: 1920, height: 1080 }}>
+              <Camera t={t}>
+                <AppWindow t={t} />
+                {t >= 1.45 && <StageCursor t={t} />}
+              </Camera>
+            </div>
+          </div>
+          <div style={{ position: "absolute", left: FX, top: FY, width: FW, height: FH, borderRadius: 16, outline: "1px solid rgba(255,255,255,.55)", opacity: prog(t, 1.0, 1.45), pointerEvents: "none" }} />
           <Selection t={t} />
+          {t < 1.45 && <StageCursor t={t} />}
+          <Callouts t={t} />
           <StepRail t={t} />
-          <StageCursor t={t} />
         </Shot>
         <Headline t={t} />
       </div>
