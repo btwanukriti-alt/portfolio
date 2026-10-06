@@ -14,7 +14,12 @@ const IMG = {"coreplus": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIACgAKAAD/2wB
 const { useState, useEffect, useRef } = React
 const h = React.createElement
 // BASE is the authored timeline; PACE stretches it so every move and hold plays slower.
-const BASE = 22.8, PACE = 1.36, DURATION = 31, W = 1920, H = 1080
+// A frame taller than wide gets the portrait cut: the same scenes re-laid on a 1080 x 1920 stage
+// (P(landscape, portrait) picks each position). Turning the frame the other way reloads the page.
+const PORTRAIT = innerHeight > innerWidth
+const P = (land, port) => (PORTRAIT ? port : land)
+addEventListener('resize', () => { if ((innerHeight > innerWidth) !== PORTRAIT) location.reload() })
+const BASE = 22.8, PACE = 1.36, DURATION = 31, W = P(1920, 1080), H = P(1080, 1920)
 const FONT = "'Public Sans', system-ui, sans-serif"
 const APP = "'Poppins', system-ui, sans-serif"
 
@@ -61,9 +66,9 @@ function Studio() {
 
 function Headline({ t, s, e, eyebrow, title }) {
   const a = ramp(t, s, s + 0.6), b = ramp(t, s + 0.12, s + 0.75), o = ramp(t, e - 0.45, e)
-  return h('div', { style: { position: 'absolute', top: 70, left: 0, right: 0, textAlign: 'center', fontFamily: FONT } },
+  return h('div', { style: { position: 'absolute', top: P(70, 250), left: P(0, 70), right: P(0, 70), textAlign: 'center', fontFamily: FONT } },
     h('div', { style: { fontSize: 20, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600, color: C.sub, opacity: a * (1 - o), transform: `translateY(${(1 - a) * 20 - o * 16}px)` } }, eyebrow),
-    h('div', { style: { marginTop: 14, fontSize: 60, fontWeight: 600, letterSpacing: '-0.03em', color: '#0B1B33', opacity: b * (1 - o), transform: `translateY(${(1 - b) * 30 - o * 20}px)` } }, title),
+    h('div', { style: { marginTop: 14, fontSize: P(60, 68), lineHeight: 1.08, textWrap: 'balance', fontWeight: 600, letterSpacing: '-0.03em', color: '#0B1B33', opacity: b * (1 - o), transform: `translateY(${(1 - b) * 30 - o * 20}px)` } }, title),
   )
 }
 
@@ -444,12 +449,12 @@ const FoodRow = ({ r: [n, q, c], hi = 0 }) =>
 // Three tracker chips start scattered, glide into a legend column, and the day's progress draws
 // as three nested rings around one centre.
 const TRACKS = [
-  { n: 'Water', icon: 'drop', c: '#4F86EE', tint: '#E1EBFD', r: 196, f: 1600 / 3000, val: (k) => `${fmt(1600 * k)} ml`, goal: 'of 3,000 ml', start: [300, 300] },
-  { n: 'Food', icon: 'food', c: Z.pink, tint: Z.pinkL, r: 150, f: 1385 / 2250, val: (k) => `${fmt(1385 * k)} cal`, goal: 'of 2,250 cal', start: [1480, 300] },
-  { n: 'Sleep', icon: 'moon', c: '#7A3BD6', tint: '#ECE3FB', r: 104, f: 6.5 / 8, val: (k) => `6h ${Math.round(30 * k)}m`, goal: 'of 8h', start: [1500, 870] },
+  { n: 'Water', icon: 'drop', c: '#4F86EE', tint: '#E1EBFD', r: 196, f: 1600 / 3000, val: (k) => `${fmt(1600 * k)} ml`, goal: 'of 3,000 ml', start: P([300, 300], [110, 560]) },
+  { n: 'Food', icon: 'food', c: Z.pink, tint: Z.pinkL, r: 150, f: 1385 / 2250, val: (k) => `${fmt(1385 * k)} cal`, goal: 'of 2,250 cal', start: P([1480, 300], [640, 600]) },
+  { n: 'Sleep', icon: 'moon', c: '#7A3BD6', tint: '#ECE3FB', r: 104, f: 6.5 / 8, val: (k) => `6h ${Math.round(30 * k)}m`, goal: 'of 8h', start: P([1500, 870], [600, 1560]) },
 ]
 function Trackers({ t, s0, out, end }) {
-  const T = t - s0, cx = 730, cy = 640
+  const T = t - s0, cx = P(730, 540), cy = P(640, 860)
   const chip = (i) => ramp(T, 0.2 + i * 0.15, 0.6 + i * 0.15)
   const glide = (i) => ramp(T, 0.95 + i * 0.12, 1.75 + i * 0.12)
   const grow = (i) => ramp(T, 1.0 + i * 0.12, 1.7 + i * 0.12)
@@ -473,7 +478,7 @@ function Trackers({ t, s0, out, end }) {
       // Chips → legend rows
       TRACKS.map((k, i) => {
         const a = chip(i), m = glide(i)
-        const fx = lerp(k.start[0], 1010, m), fy = lerp(k.start[1], cy - 150 + i * 116, m)
+        const fx = lerp(k.start[0], P(1010, 330), m), fy = lerp(k.start[1], P(cy - 150 + i * 116, 1180 + i * 116), m)
         return h('div', { key: k.n, style: { position: 'absolute', left: fx, top: fy, width: 420, display: 'flex', alignItems: 'center', gap: 16, opacity: a, transform: `scale(${(0.7 + 0.3 * a) * (1.08 - 0.08 * m)})`, transformOrigin: '0 50%' } },
           h('div', { style: { width: 64, height: 64, borderRadius: 32, background: '#fff', boxShadow: '0 14px 30px -10px rgba(11,42,91,0.28)', display: 'grid', placeItems: 'center' } },
             h('div', { style: { width: 48, height: 48, borderRadius: 24, background: k.tint, display: 'grid', placeItems: 'center' } }, h(Icon, { n: k.icon, c: k.c, s: 24, w: 2.2 }))),
@@ -494,7 +499,7 @@ function Trackers({ t, s0, out, end }) {
 function LogScene({ t }) {
   const END = 9.5
   const A = env(t, 3.75, END, 0.65, 0.5), B = env(t, 5.85, END, 0.65, 0.5)
-  const ax = lerp(785, 520, ramp(t, 5.45, 6.1)), bx = 1040, py = 238
+  const ax = lerp(P(785, 368), P(520, 175), ramp(t, 5.45, 6.1)), bx = P(1040, 562), py = P(238, 540)
   const sheet = ramp(t, 4.75, 5.2), link = ramp(t, 5.6, 6.1)
   const waterTap = ramp(t, 5.45, 5.6) * (1 - ramp(t, 6.6, 6.8)), foodTap = ramp(t, 6.75, 6.9)
   const swap = ramp(t, 6.9, 7.35), add = ramp(t, 7.95, 8.4)
@@ -506,20 +511,20 @@ function LogScene({ t }) {
     h(Phone, { x: bx, y: py, op: B.op, dy: B.y, tilt: B.tilt, name: swap > 0.5 ? 'Food Log' : 'Hydration Log' },
       h('div', { style: { position: 'absolute', inset: 0, transform: `translateX(${-swap * 390}px)` } }, h(WaterScreen, { t, fill: ramp(t, 6.0, 7.0) })),
       h('div', { style: { position: 'absolute', inset: 0, background: Z.bg, transform: `translateX(${(1 - swap) * 390}px)` } }, h(FoodScreen, { t, add }))),
-    h(Callout, { t, s: 7.6, e: END, x: 1470, y: 330, w: 300, side: 'right' },
+    h(Callout, { t, s: 7.6, e: END, x: P(1470, 600), y: P(330, 1370), w: 300, side: 'right' },
       h('div', { style: { display: 'flex', alignItems: 'center', gap: 16 } },
         h('svg', { width: 76, height: 76 },
           h('defs', null, h('linearGradient', { id: 'sg', x1: 0, y1: 0, x2: 1, y2: 1 }, h('stop', { offset: 0, stopColor: Z.sleep1 }), h('stop', { offset: 1, stopColor: Z.sleep2 }))),
           h('circle', { cx: 38, cy: 38, r: 30, fill: 'none', stroke: '#E4E0F0', strokeWidth: 10 }),
           h('path', { d: arc(38, 38, 30, 0, 292 * ramp(t, 7.8, 8.5) + 0.01), fill: 'none', stroke: 'url(#sg)', strokeWidth: 10, strokeLinecap: 'round' })),
         h('div', null, h('div', { style: { fontSize: 13, color: Z.sub } }, 'Sleep'), h('div', { style: { fontSize: 24, fontWeight: 600 } }, '6h 30m'), h('div', { style: { fontSize: 12, color: Z.sub } }, 'of 8h · 12:35 – 07:05')))),
-    h(Callout, { t, s: 6.2, e: END, x: 150, y: 600, w: 300, side: 'left' },
+    h(Callout, { t, s: 6.2, e: END, x: P(150, 180), y: P(600, 1370), w: 300, side: 'left' },
       h('div', { style: { display: 'flex', alignItems: 'center', gap: 10 } },
         h('div', { style: { width: 34, height: 34, borderRadius: 17, background: '#E1EBFD', display: 'grid', placeItems: 'center' } }, h(Icon, { n: 'glass', c: '#3D7BEA', s: 18, w: 2 })),
         h('div', null, h('div', { style: { fontSize: 15, fontWeight: 600 } }, '+250 ml'), h('div', { style: { fontSize: 12, color: Z.sub } }, '1 glass · goal 12 glasses'))),
       h('div', { style: { display: 'flex', gap: 6, marginTop: 14 } }, Array.from({ length: 12 }, (_, i) => h('div', { key: i, style: { flex: 1, height: 22, borderRadius: 5, background: i < Math.round(6.4 * ramp(t, 6.3, 7.0)) ? Z.water : '#E4ECFD' } })))),
     h(Cursor, { t, show: ramp(t, 4.15, 4.4) * (1 - ramp(t, 8.9, 9.2)), clicks: [4.65, 5.45, 6.8, 7.95],
-      keys: [[4.15, 760, 980], [4.55, logBtn[0], logBtn[1]], [4.9, logBtn[0] + 10, logBtn[1] - 30], [5.35, water[0], water[1]], [6.1, water[0] + 10, water[1] + 30], [6.7, food[0], food[1]], [7.3, food[0] + 140, food[1] + 60], [7.85, plus[0], plus[1]], [8.6, plus[0] + 20, plus[1] + 50], [9.2, plus[0] + 30, plus[1] + 70]] }),
+      keys: [[4.15, P(760, 540), P(980, 1560)], [4.55, logBtn[0], logBtn[1]], [4.9, logBtn[0] + 10, logBtn[1] - 30], [5.35, water[0], water[1]], [6.1, water[0] + 10, water[1] + 30], [6.7, food[0], food[1]], [7.3, food[0] + 140, food[1] + 60], [7.85, plus[0], plus[1]], [8.6, plus[0] + 20, plus[1] + 50], [9.2, plus[0] + 30, plus[1] + 70]] }),
   )
 }
 
@@ -527,7 +532,7 @@ function LogScene({ t }) {
 function WorkoutScene({ t }) {
   const END = 12.9
   const A = env(t, 8.2, END, 0.65, 0.5), B = env(t, 9.45, END, 0.65, 0.5)
-  const ax = lerp(785, 560, ramp(t, 9.1, 9.75)), bx = 1000, py = 238
+  const ax = lerp(P(785, 368), P(560, 175), ramp(t, 9.1, 9.75)), bx = P(1000, 562), py = P(238, 540)
   const pick = ramp(t, 9.0, 9.15) * (1 - ramp(t, 9.3, 9.5)), link = ramp(t, 9.2, 9.7)
   const card = pt(ax, py, 110, 545), start = pt(bx, py, 195, 770)
   const press = ramp(t, 11.25, 12.4)
@@ -536,7 +541,7 @@ function WorkoutScene({ t }) {
     h(Phone, { x: ax, y: py, op: A.op, dy: A.y, tilt: A.tilt, name: 'Workout' }, h(ExploreScreen, { t, pick })),
     h(Link, { k: link, op: A.op, from: [ax + PW - 6, card[1]], to: [bx + 4, pt(bx, py, 0, 130)[1]], bend: 60 }),
     h(Phone, { x: bx, y: py, op: B.op, dy: B.y, tilt: B.tilt, z: 11, name: 'Workout Details' }, h(DetailScreen, { t, s0: 9.85, press })),
-    h(Callout, { t, s: 10.3, e: END, x: 1440, y: 300, w: 360, side: 'right', pad: '20px 22px' },
+    h(Callout, { t, s: 10.3, e: END, x: P(1440, 560), y: P(300, 1350), w: 360, side: 'right', pad: '20px 22px' },
       h('div', { style: { fontSize: 15, fontWeight: 600, marginBottom: 12 } }, 'Weekly plan'),
       ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((d, i) => {
         const k = ramp(t, 10.5 + i * 0.1, 10.9 + i * 0.1)
@@ -545,12 +550,12 @@ function WorkoutScene({ t }) {
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: Z.sub } }, h(Icon, { n: 'clock', c: Z.sub, s: 13 }), '30m'),
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: Z.sub, marginLeft: 6 } }, h(Icon, { n: 'dumbbell', c: Z.sub, s: 13 }), h('span', { style: { whiteSpace: 'nowrap' } }, '10 Exercises')))
       })),
-    h(Callout, { t, s: 10.7, e: END, x: 190, y: 640, w: 300, side: 'left' },
+    h(Callout, { t, s: 10.7, e: END, x: P(190, 160), y: P(640, 1370), w: 300, side: 'left' },
       h('div', { style: { fontSize: 13, color: Z.sub } }, 'Recovery plans'),
       h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 2 } }, h('div', { style: { fontSize: 30, fontWeight: 600 } }, '5 weeks'), h('div', { style: { fontSize: 15, color: Z.sub } }, '· 60 Mins')),
       h('div', { style: { display: 'flex', gap: 6, marginTop: 10 } }, h(Tag, { c: '#1F8A5B', bg: '#DCF7EC', fs: 12 }, 'Beginner'), h(Tag, { c: '#3D6BD8', bg: '#DFE8FD', fs: 12 }, 'Strength'), h(Tag, { c: '#B03CA8', bg: '#FADDF6', fs: 12 }, 'Cardio'))),
     h(Cursor, { t, show: ramp(t, 8.6, 8.85) * (1 - ramp(t, 12.2, 12.5)), clicks: [9.1, 11.25],
-      keys: [[8.6, 900, 960], [9.0, card[0], card[1]], [9.6, card[0] + 40, card[1] + 40], [10.9, start[0] - 20, start[1] + 10], [11.15, start[0], start[1]], [12.5, start[0] + 40, start[1] + 50]] }),
+      keys: [[8.6, P(900, 540), P(960, 1560)], [9.0, card[0], card[1]], [9.6, card[0] + 40, card[1] + 40], [10.9, start[0] - 20, start[1] + 10], [11.15, start[0], start[1]], [12.5, start[0] + 40, start[1] + 50]] }),
   )
 }
 
@@ -558,13 +563,13 @@ function WorkoutScene({ t }) {
 function GymScene({ t }) {
   const END = 17.3
   const A = env(t, 12.65, END, 0.65, 0.5)
-  const ax = 760, py = 238
+  const ax = P(760, 368), py = P(238, 470)
   const checked = ramp(t, 14.15, 14.5), btn = pt(ax, py, 285, 292), link = ramp(t, 14.4, 14.9)
   return h('div', { style: { position: 'absolute', inset: 0, fontFamily: FONT } },
     h(Headline, { t, s: 12.6, e: END, eyebrow: '03 — Gym', title: 'Check in and see the day’s classes.' }),
     h(Phone, { x: ax, y: py, op: A.op, dy: A.y, tilt: A.tilt, name: 'Gym' }, h(GymScreen, { t, checked })),
-    h(Link, { k: link, op: A.op, from: [btn[0] + 70, btn[1]], to: [1250, 400], bend: 80 }),
-    h(Callout, { t, s: 14.55, e: END, x: 1250, y: 330, w: 420, side: 'right', pad: 0 },
+    h(Link, { k: link, op: A.op, from: [btn[0] + 70, btn[1]], to: P([1250, 400], [930, 1300]), bend: 80 }),
+    h(Callout, { t, s: 14.55, e: END, x: P(1250, 90), y: P(330, 1290), w: 420, side: 'right', pad: 0 },
       h('div', { style: { borderRadius: 20, overflow: 'hidden', background: 'linear-gradient(120deg,#8E78F0,#7559E3)', color: '#fff', padding: '22px 24px', position: 'relative' } },
         h('div', { style: { position: 'absolute', right: -60, top: -40, width: 220, height: 220, borderRadius: 110, border: '20px solid rgba(255,255,255,0.10)' } }),
         h('div', { style: { fontSize: 18, fontWeight: 600 } }, 'Daily Fitness Attendance'),
@@ -573,7 +578,7 @@ function GymScene({ t }) {
           h('div', { style: { fontSize: 14, opacity: 0.92, lineHeight: 1.35 } }, 'Record your workout', h('br'), 'and stay consistent.'),
           h('div', { style: { marginLeft: 'auto', padding: '8px 14px', borderRadius: 10, background: '#fff', color: Z.ink, fontSize: 14, fontWeight: 600, display: 'flex', gap: 6, alignItems: 'center' } }, 'Done',
             h('span', { style: { transform: `scale(${ramp(t, 15.0, 15.3)})` } }, h(Icon, { n: 'check', c: Z.green, s: 15, w: 3 })))))),
-    h(Callout, { t, s: 14.9, e: END, x: 1250, y: 530, w: 420, side: 'right' },
+    h(Callout, { t, s: 14.9, e: END, x: P(1250, 570), y: P(530, 1290), w: 420, side: 'right' },
       h('div', { style: { display: 'flex', alignItems: 'center', gap: 18 } },
         h('svg', { width: 96, height: 96 },
           h('circle', { cx: 48, cy: 48, r: 40, fill: 'none', stroke: '#DADAE2', strokeWidth: 4 }),
@@ -582,7 +587,7 @@ function GymScene({ t }) {
           h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: Z.sub } }, h('span', null, 'Burned'), h('span', null, 'Consumed')),
           h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 22, fontWeight: 600 } }, h('span', null, fmt(882 * ramp(t, 15.1, 15.9)), ' kcal'), h('span', null, fmt(1385 * ramp(t, 15.1, 15.9)))),
           h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 11, color: Z.mute, marginTop: 4 } }, h('span', null, h('span', { style: { color: Z.green } }, '2%↑'), ' vs last week'), h('span', null, h('span', { style: { color: '#E5484D' } }, '5%↓'), ' vs last week'))))),
-    h(Callout, { t, s: 13.6, e: END, x: 300, y: 520, w: 330, side: 'left' },
+    h(Callout, { t, s: 13.6, e: END, x: P(300, 375), y: P(520, 1520), w: 330, side: 'left' },
       h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } }, h(GymBadge, { s: 44 }),
         h('div', null, h('div', { style: { fontSize: 16, fontWeight: 600 } }, 'Fitzone'), h('div', { style: { fontSize: 13, color: Z.sub, display: 'flex', alignItems: 'center', gap: 4 } }, h(Icon, { n: 'pin', c: Z.sub, s: 13 }), 'Bangalore'))),
       h('div', { style: { height: 1, background: Z.line, margin: '14px 0' } }),
@@ -591,7 +596,7 @@ function GymScene({ t }) {
         h('div', { style: { fontSize: 15, fontWeight: 500 } }, 'Membership Card'),
         h('span', { style: { marginLeft: 'auto' } }, h(Icon, { n: 'qr', c: Z.purple, s: 20, w: 2 })))),
     h(Cursor, { t, show: ramp(t, 13.35, 13.6) * (1 - ramp(t, 16.6, 16.9)), clicks: [14.1],
-      keys: [[13.35, 1000, 900], [13.95, btn[0], btn[1]], [14.6, btn[0] + 30, btn[1] + 60], [16.9, btn[0] + 50, btn[1] + 90]] }),
+      keys: [[13.35, P(1000, 540), P(900, 1560)], [13.95, btn[0], btn[1]], [14.6, btn[0] + 30, btn[1] + 60], [16.9, btn[0] + 50, btn[1] + 90]] }),
   )
 }
 

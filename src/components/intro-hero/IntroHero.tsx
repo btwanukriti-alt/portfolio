@@ -657,7 +657,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           <p data-fade="0" className="m-0 mb-5 font-hero-mono text-[11px] tracking-[0.12em] text-muted uppercase opacity-0">
             Anukriti Mishra · UI/UX Designer
           </p>
-          <p className="m-0 font-hero text-[clamp(28px,3.9vw,58px)] leading-[1.06] font-medium tracking-[-0.035em] text-ink">
+          <p className="m-0 font-hero text-[clamp(28px,3.9vw,58px)] leading-[1.06] [@media(max-height:500px)]:text-[26px] font-medium tracking-[-0.035em] text-ink">
             {words(HEADLINE).map((w, i) => (
               <span key={i} className="inline-block overflow-hidden pb-[0.1em] align-bottom -mb-[0.1em]">
                 <span data-word className="inline-block will-change-transform" style={{ transform: 'translateY(110%)' }}>
@@ -667,7 +667,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               </span>
             ))}
           </p>
-          <div data-fade="0.55" className="mt-8 flex flex-wrap items-center justify-center gap-2.5 opacity-0">
+          <div data-fade="0.55" className="mt-8 [@media(max-height:500px)]:mt-5 flex flex-wrap items-center justify-center gap-2.5 opacity-0">
             <a
               href="#work"
               className="rounded-full bg-ink px-5 py-3 font-hero text-[14px] leading-none font-medium text-white transition-colors hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -683,11 +683,11 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           </div>
         </div>
 
-        <div ref={about} className="invisible absolute max-w-[min(720px,52vw)] text-center max-[719px]:max-w-[86vw]">
+        <div ref={about} className="invisible absolute max-w-[min(720px,52vw)] text-center max-[719px]:max-w-[86vw] [@media(max-height:500px)]:max-w-[62vw]">
           <p data-fade className="m-0 mb-5 font-hero-mono text-[11px] tracking-[0.12em] text-muted uppercase">
             About
           </p>
-          <p className="m-0 font-hero text-[clamp(20px,2.1vw,32px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink">
+          <p className="m-0 font-hero text-[clamp(20px,2.1vw,32px)] leading-[1.3] [@media(max-height:500px)]:text-[17px] font-medium tracking-[-0.02em] text-ink">
             {words(ABOUT).map((w, i) => (
               <span key={i} data-word className="opacity-[0.16]">
                 {w}{' '}
@@ -735,7 +735,7 @@ export default function IntroHero() {
   return (
     <section ref={section} id="welcome" aria-label="Introduction" className="relative h-[330svh] bg-paper">
       <h1 className="sr-only">Anukriti Mishra, UI/UX designer</h1>
-      <div className="sticky top-0 h-svh min-h-[560px] overflow-hidden">
+      <div className="sticky top-0 h-svh min-h-[320px] overflow-hidden">
         <header
           ref={header}
           className="invisible absolute inset-x-0 top-0 z-[500] grid grid-cols-[1fr_auto] items-center px-4 py-5 font-hero text-[13px] text-ink sm:px-10 md:grid-cols-[1fr_auto_1fr]"

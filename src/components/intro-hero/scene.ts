@@ -125,12 +125,35 @@ export function orbitPose(L: Layout, theta: number, amp: number, origin?: Origin
   }
 }
 
-// Even ellipse around the centre of the screen, slowly turning.
+// Even ellipse around the centre of the screen, slowly turning. Where the headline would collide
+// with it, the ring leaves gaps and the tiles run along two arcs, fading out at an arc's end and
+// back in across the gap: on a portrait screen (headline nearly full width) the gaps are at the
+// sides; on a short landscape one (a phone on its side) they're above and below.
+const GAP = 0.6 // radians kept clear either side of each gap's axis
 export function ringPose(L: Layout, i: number, n: number, turn: number): Pose {
-  const a = -Math.PI / 2 + (i / n) * Math.PI * 2 + turn
-  const rx = L.mobile ? L.w * 0.39 : Math.min(L.w * 0.3, L.h * 0.52)
-  const ry = L.mobile ? L.h * 0.31 : L.h * 0.33
-  return { x: L.cx + Math.cos(a) * rx, y: L.h / 2 + Math.sin(a) * ry, s: L.mobile ? 0.62 : 0.66, o: 1, blur: 0, z: 0 }
+  const tall = L.h > L.w
+  const short = !tall && L.h < 560
+  const u = (((i / n + turn / (Math.PI * 2)) % 1) + 1) % 1
+  let a = -Math.PI / 2 + u * Math.PI * 2
+  let o = 1
+  if (tall || short) {
+    const first = u < 0.5
+    const k = (first ? u : u - 0.5) / 0.5
+    const axis = tall ? 0 : -Math.PI / 2
+    a = axis + (first ? Math.PI : 0) + GAP + k * (Math.PI - 2 * GAP)
+    o = smooth(Math.min(k, 1 - k) / 0.08)
+  }
+  // Wide enough that tiles passing the headline's ends clear it (it's up to 560 px or 64vw wide).
+  const tileHalf = (L.tileW * 0.66) / 2
+  const clearOfHeadline = Math.min(560, L.w * 0.64) / 2 + tileHalf + 16
+  const rx =
+    tall || short
+      ? L.w * (short ? 0.43 : 0.4)
+      : L.mobile
+        ? L.w * 0.39
+        : Math.min(Math.max(Math.min(L.w * 0.3, L.h * 0.52), clearOfHeadline), L.w / 2 - tileHalf - 12)
+  const ry = short ? L.h * 0.4 : L.mobile ? L.h * 0.31 : L.h * 0.33
+  return { x: L.cx + Math.cos(a) * rx, y: L.h / 2 + Math.sin(a) * ry, s: L.mobile ? 0.62 : 0.66, o, blur: 0, z: 0 }
 }
 
 export type Spot = { x: number; y: number; d: number; seed: number }

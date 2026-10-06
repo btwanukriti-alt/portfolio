@@ -46,11 +46,12 @@ export default function CaseStudy({ project, slides }: { project: Project; slide
           </Reveal>
         </div>
 
-        {/* The project's showcase video is the hero, full window width at its own 16:9;
-            projects without one show their still. */}
+        {/* The project's showcase video is the hero, full window width at its own 16:9; on a
+            portrait screen it's 9:16 (the showcase switches to its portrait cut), as wide as fits
+            within 86% of the screen height, centred. Projects without one show their still. */}
         {project.showcase ? (
           <Reveal
-            className="relative isolate mx-[calc(50%-50vw)] mt-[clamp(48px,8vh,88px)] aspect-video w-screen overflow-hidden bg-soft"
+            className="relative isolate mx-[calc(50%-50vw)] mt-[clamp(48px,8vh,88px)] aspect-video w-screen overflow-hidden bg-soft portrait:mx-[calc(50%-min(50vw,24.1875svh))] portrait:aspect-[9/16] portrait:w-[min(100vw,48.375svh)]"
             delay={200}
           >
             <ShowcaseVideo

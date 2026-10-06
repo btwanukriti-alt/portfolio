@@ -50,6 +50,7 @@ const pct = (x: number) => `${(x / TRACK) * 100}%`
 
 export default function About() {
   const timeline = useRef<HTMLDivElement>(null)
+  const column = useRef<HTMLDivElement>(null)
 
   // The track draws in from the left, segment by segment, and each stop appears as the line
   // reaches it.
@@ -78,6 +79,27 @@ export default function About() {
     { scope: timeline },
   )
 
+  // Narrow screens: the vertical line draws down, and each stop rises in as it's reached.
+  useGSAP(
+    () => {
+      const line = column.current?.querySelector<HTMLElement>('[data-vline]')
+      const stops = gsap.utils.toArray<HTMLElement>('[data-vstop]')
+      if (reducedMotion()) {
+        gsap.set(line ?? [], { scaleY: 1 })
+        gsap.set(stops, { autoAlpha: 1, y: 0 })
+        return
+      }
+      const scrollTrigger = { trigger: column.current, start: 'top 85%', once: true }
+      if (line) gsap.to(line, { scaleY: 1, duration: 1.6, ease: 'power2.inOut', scrollTrigger })
+      gsap.fromTo(
+        stops,
+        { autoAlpha: 0, y: 14 },
+        { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out', stagger: 0.28, delay: 0.15, scrollTrigger },
+      )
+    },
+    { scope: column },
+  )
+
   return (
     <section
       id="about"
@@ -97,12 +119,12 @@ export default function About() {
         />
       </div>
 
-      {/* Timeline: a 1180-wide track, scrolls sideways on narrow screens. */}
-      <div className="-mx-[var(--gutter)] overflow-x-auto px-[var(--gutter)] [scrollbar-width:none] min-[901px]:m-0 min-[901px]:overflow-visible min-[901px]:p-0">
+      {/* Timeline: a 1180-wide track on wide screens; on narrower ones it runs down the page. */}
+      <div className="hidden min-[901px]:block">
         <div
           ref={timeline}
-          // Inset from the right on desktop so the last stop's label stays inside the column.
-          className="relative mx-[90px] h-[180px] min-w-[960px] [--line-y:62px] min-[901px]:mr-16 min-[901px]:ml-0 min-[901px]:min-w-0"
+          // Inset from the right so the last stop's label stays inside the column.
+          className="relative mr-16 h-[180px] [--line-y:62px]"
         >
           <span className="absolute top-0 left-0 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">
             Studying
@@ -166,6 +188,63 @@ export default function About() {
             })}
           </ol>
         </div>
+      </div>
+
+      {/* The same timeline, vertical: the line draws down and each stop follows. */}
+      <div ref={column} className="relative min-[901px]:hidden">
+        <span className="mb-6 block text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">
+          Studying
+        </span>
+        <ol className="relative m-0 list-none p-0 pl-8" aria-label="Career timeline">
+          <span
+            data-vline
+            aria-hidden="true"
+            className="absolute top-1 bottom-3 left-[6px] w-px origin-top bg-faint [transform:scaleY(0)] motion-reduce:[transform:none]"
+          />
+          {STOPS.map((stop) => {
+            const current = stop.state === 'current'
+            return (
+              <li
+                key={stop.x}
+                data-vstop
+                aria-current={current ? 'step' : undefined}
+                className="invisible relative pb-8 last:pb-0"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`absolute top-[3px] rounded-full ${
+                    current
+                      ? '-left-[33px] h-[15px] w-[15px] bg-ink shadow-[0_0_0_5px_rgba(11,11,12,0.1)]'
+                      : stop.state === 'next'
+                        ? '-left-[31px] h-[11px] w-[11px] border-[1.5px] border-ink bg-white'
+                        : '-left-[31px] h-[11px] w-[11px] bg-faint'
+                  }`}
+                />
+                <span
+                  className={`inline-block leading-none tabular-nums ${
+                    current
+                      ? 'rounded-full bg-ink px-[10px] py-1 text-[12px] font-semibold text-white'
+                      : 'text-[13px] font-medium text-muted'
+                  }`}
+                >
+                  {stop.year}
+                </span>
+                {stop.role ? (
+                  <>
+                    <span className="mt-3 block text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">
+                      {stop.role}
+                    </span>
+                    <span className="mt-1 block text-[14px] leading-[1.25] font-normal text-muted">{stop.company}</span>
+                  </>
+                ) : (
+                  <span className="mt-3 block w-fit rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold text-ink">
+                    You can be here next! :D
+                  </span>
+                )}
+              </li>
+            )
+          })}
+        </ol>
       </div>
 
       <ol className="m-0 grid list-none grid-cols-1 gap-x-16 gap-y-8 p-0 min-[901px]:grid-cols-2">

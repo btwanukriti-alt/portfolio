@@ -37,18 +37,43 @@ const WORK_TITLE = "Products I've designed, end to end."
 const N = PROJECTS.length
 // Scrolling per project, as a share of the window height.
 const SEGMENT = 0.7
+// While a scroll keeps going, the next project after this long.
+const REPEAT_MS = 650
 
-// Row geometry for a window size: strip width, auto-layout gap, and the fill card's 16:9 size.
-type Row = { strip: number; gap: number; fillW: number; h: number; w: number }
+// The showcases' stage sizes. A landscape window gets 16:9 cards; a portrait one (phones,
+// tablets held upright) gets 9:16 cards, and the showcases inside switch to their portrait cut.
+const isPortrait = () => window.innerHeight > window.innerWidth
+const stageSize = (portrait: boolean) => (portrait ? { w: 1080, h: 1920 } : { w: 1920, h: 1080 })
+
+// Row geometry for a window size: strip thickness, auto-layout gap, the fill card's size and the
+// frame's. On a phone held upright the auto layout is vertical: the fill card spans the width,
+// and the strips are thin bars stacked above and below it.
+type Row = {
+  strip: number
+  gap: number
+  fillW: number
+  fillH: number
+  w: number
+  h: number
+  portrait: boolean
+  vertical: boolean
+}
 function rowFor(vw: number, vh: number): Row {
-  const mobile = vw < 720
-  const strip = mobile ? 10 : Math.min(26, Math.max(16, vw * 0.015))
-  const gap = mobile ? 4 : 8
+  const portrait = vh > vw
+  const vertical = portrait && vw < 720
+  const ratio = portrait ? 9 / 16 : 16 / 9 // fill card width / height
+  const small = vw < 720
+  const strip = small ? 10 : Math.min(26, Math.max(16, vw * 0.015))
+  const gap = small ? 4 : 8
   const padX = Math.min(96, Math.max(16, vw * 0.06))
-  const padY = Math.min(140, Math.max(84, vh * 0.14))
+  const padY = Math.min(140, Math.max(84, vh * (portrait ? 0.1 : 0.14)))
   const rest = (N - 1) * (strip + gap)
-  const fillW = Math.max(160, Math.min(vw - 2 * padX - rest, ((vh - 2 * padY) * 16) / 9))
-  return { strip, gap, fillW, h: (fillW * 9) / 16, w: fillW + rest }
+  if (vertical) {
+    const fillH = Math.max(200, Math.min(vh - 2 * padY - rest, (vw - 2 * padX) / ratio))
+    return { strip, gap, fillW: fillH * ratio, fillH, w: fillH * ratio, h: fillH + rest, portrait, vertical }
+  }
+  const fillW = Math.max(120, Math.min(vw - 2 * padX - rest, (vh - 2 * padY) * ratio))
+  return { strip, gap, fillW, fillH: fillW / ratio, w: fillW + rest, h: fillW / ratio, portrait, vertical }
 }
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
@@ -136,15 +161,18 @@ function drawFrame(f: HTMLElement, onDrawn?: () => void) {
   const { box, content, size, cursor, handles, fades } = parts(f)
   const W = f.offsetWidth
   const H = f.offsetHeight
-  // The frame's size in the showcase's units (the fill card is 1920 wide).
-  const fill = f.querySelector<HTMLElement>('[data-card]')?.offsetWidth || W
-  const fw = Math.round((1920 * W) / fill)
+  // The frame's size in the showcase's units (the fill card is one stage across).
+  const stage = stageSize(isPortrait())
+  const first = f.querySelector<HTMLElement>('[data-card]')
+  const vertical = f.dataset.vertical === 'true'
+  const fw = vertical ? stage.w : Math.round((stage.w * W) / (first?.offsetWidth || W))
+  const fh = vertical ? Math.round((stage.h * H) / (first?.offsetHeight || H)) : stage.h
   const p = { w: 0, h: 0 }
   const render = () => {
     box.style.width = `${p.w * 100}%`
     box.style.height = `${p.h * 100}%`
     content.style.clipPath = `inset(0 ${(1 - p.w) * 100}% ${(1 - p.h) * 100}% 0)`
-    size.textContent = `${Math.round(fw * p.w)} × ${Math.round(1080 * p.h)}`
+    size.textContent = `${Math.round(fw * p.w)} × ${Math.round(fh * p.h)}`
     gsap.set(cursor, { x: p.w * W, y: p.h * H })
   }
   const press = 0.65
@@ -182,6 +210,7 @@ export default function Work() {
   const playing = useRef<boolean[]>([])
   const activeRef = useRef(0)
   const openBtn = useRef<HTMLAnchorElement>(null)
+  const caption = useRef<HTMLDivElement>(null)
   const cursor = useRef<HTMLDivElement>(null)
   const hovered = useRef(-1)
   const follow = useRef<{ x: (v: number) => void; y: (v: number) => void } | null>(null)
@@ -249,7 +278,9 @@ export default function Work() {
         f.style.width = `${row.w}px`
         f.style.height = `${row.h}px`
         f.style.setProperty('--fill-w', `${row.fillW}px`)
+        f.style.setProperty('--fill-h', `${row.fillH}px`)
         f.style.setProperty('--gap', `${row.gap}px`)
+        f.dataset.vertical = String(row.vertical)
       }
 
       // The fill's position along the row (0 = first project filling). It isn't scrubbed by the
@@ -265,12 +296,20 @@ export default function Work() {
           if (!card) return
           // How much this card fills: 1 for the fill card, 0 for a strip, in between mid-move.
           const fill = clamp01(1 - Math.abs(shown.pos - i))
-          const width = row.strip + fill * (row.fillW - row.strip)
-          card.style.width = `${width}px`
+          const full = row.vertical ? row.fillH : row.fillW
+          const extent = row.strip + fill * (full - row.strip)
+          card.style.width = row.vertical ? '100%' : `${extent}px`
+          card.style.height = row.vertical ? `${extent}px` : '100%'
           card.style.setProperty('--strip', String(clamp01((1 - fill) * 1.8)))
           card.style.setProperty('--sel', String(clamp01((fill - 0.7) / 0.3)))
           const size = card.querySelector<HTMLElement>('[data-size]')
-          if (size) size.textContent = `${fill > 0.99 ? 1920 : Math.round((1920 * width) / row.fillW)} × 1080`
+          if (size) {
+            const stage = stageSize(row.portrait)
+            const grown = fill > 0.99 ? 1 : extent / full
+            size.textContent = row.vertical
+              ? `${stage.w} × ${Math.round(stage.h * grown)}`
+              : `${Math.round(stage.w * grown)} × ${stage.h}`
+          }
 
           const video = videos.current[i]
           // Only the settled fill card plays: the one leaving pauses at once, the one arriving
@@ -293,6 +332,11 @@ export default function Work() {
           btn.setAttribute('aria-label', `Open project: ${p.title}`)
         }
         cards.current.forEach((card, j) => card?.setAttribute('data-active', String(j === i)))
+        const cap = caption.current
+        if (cap) {
+          cap.querySelector('[data-cap-num]')!.textContent = String(i + 1).padStart(2, '0')
+          cap.querySelector('[data-cap-title]')!.textContent = p.title
+        }
       }
       setOpen(0)
 
@@ -323,6 +367,11 @@ export default function Work() {
         // Scroll progress in projects (0 = the first project's stretch).
         const pos = -r.top / (SEGMENT * vh)
         onScreen = r.bottom > 0 && r.top < vh
+        // The pointer can be left "over" a card that has scrolled away: drop the Open label.
+        if (!onScreen && hovered.current >= 0) {
+          hovered.current = -1
+          setCursor(false)
+        }
 
         // Each project owns a stretch of scroll (one scroll gesture moves one stretch, below);
         // the fill moves over on its own.
@@ -398,6 +447,10 @@ export default function Work() {
 
         lastEvent = now
         if (newGesture) stepped = false
+        // Scrolling that keeps going (a spinning wheel, a long trackpad drag) carries on through
+        // the projects, one every REPEAT_MS, and out the far end, so passing through never feels
+        // stuck. A single flick's fading momentum (small deltas) still moves just one.
+        if (stepped && now - lastStep > REPEAT_MS && Math.abs(deltaY) > 25) stepped = false
         if (stepped) {
           if (event.cancelable) event.preventDefault()
           return false
@@ -442,8 +495,8 @@ export default function Work() {
       >
         <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full items-center justify-center overflow-hidden">
           {/* The auto-layout frame (sized by layout()). */}
-          <div ref={frame} className="relative">
-            <div data-draw-content className="flex h-full w-full gap-[var(--gap)]">
+          <div ref={frame} className="group/row relative">
+            <div data-draw-content className="flex h-full w-full gap-[var(--gap)] group-data-[vertical=true]/row:flex-col">
               {PROJECTS.map((project, i) => (
                 <div
                   key={project.slug}
@@ -451,7 +504,7 @@ export default function Work() {
                     cards.current[i] = el
                   }}
                   data-card
-                  className="relative h-full flex-none [contain:layout_style] [--fill:0] [--sel:0] [--strip:1]"
+                  className="relative flex-none [contain:layout_style] [--fill:0] [--sel:0] [--strip:1]"
                 >
                   <Link
                     href={caseStudyHref(project.slug)}
@@ -470,7 +523,7 @@ export default function Work() {
                         ref={(el) => {
                           videos.current[i] = el
                         }}
-                        className="pointer-events-none absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 border-0"
+                        className="pointer-events-none absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 group-data-[vertical=true]/row:top-1/2 group-data-[vertical=true]/row:left-0 group-data-[vertical=true]/row:h-[var(--fill-h)] group-data-[vertical=true]/row:w-full group-data-[vertical=true]/row:translate-x-0 group-data-[vertical=true]/row:-translate-y-1/2 border-0"
                         src={project.showcase}
                         title={`${project.title} showcase`}
                         loading="lazy"
@@ -479,7 +532,7 @@ export default function Work() {
                       />
                     ) : (
                       <img
-                        className="absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 object-cover"
+                        className="absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 group-data-[vertical=true]/row:top-1/2 group-data-[vertical=true]/row:left-0 group-data-[vertical=true]/row:h-[var(--fill-h)] group-data-[vertical=true]/row:w-full group-data-[vertical=true]/row:translate-x-0 group-data-[vertical=true]/row:-translate-y-1/2 object-cover"
                         src={project.card}
                         alt=""
                         loading="lazy"
@@ -491,7 +544,7 @@ export default function Work() {
 
                   {/* The fill card's selection: name above, black border, handles, live size. */}
                   <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[var(--sel)]">
-                    <div className="absolute bottom-full left-0 mb-2 flex items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink">
+                    <div className="absolute bottom-full left-0 mb-2 flex items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink group-data-[vertical=true]/row:hidden">
                       <span className="text-faint tabular-nums">{String(i + 1).padStart(2, '0')}</span>
                       <span>{project.title}</span>
                       <span className="rounded-[3px] bg-[#7B61FF]/10 px-[5px] py-[3px] text-[10px] text-[#7B61FF]">Fill</span>
@@ -506,7 +559,7 @@ export default function Work() {
                     ))}
                     <span
                       data-size
-                      className="absolute top-full left-1/2 mt-2.5 -translate-x-1/2 rounded-[4px] bg-ink px-[6px] py-[3px] font-hero text-[11px] leading-none font-medium whitespace-nowrap text-white tabular-nums"
+                      className="absolute top-full left-1/2 mt-2.5 -translate-x-1/2 rounded-[4px] group-data-[vertical=true]/row:hidden bg-ink px-[6px] py-[3px] font-hero text-[11px] leading-none font-medium whitespace-nowrap text-white tabular-nums"
                     >
                       1920 × 1080
                     </span>
@@ -553,6 +606,21 @@ export default function Work() {
               >
                 Anukriti
               </span>
+            </div>
+
+            {/* Vertical rows: the fill card's name sits under the row (strips are above and below
+                the card, so there's no room for it on the card itself). */}
+            <div
+              ref={caption}
+              data-fade
+              aria-hidden="true"
+              className="absolute top-full left-0 mt-2.5 hidden h-[29px] max-w-[calc(100%-136px)] items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink group-data-[vertical=true]/row:flex"
+            >
+              <span data-cap-num className="text-faint tabular-nums">
+                01
+              </span>
+              <span data-cap-title className="min-w-0 truncate">{PROJECTS[0].title}</span>
+              <span className="flex-none rounded-[3px] bg-[#7B61FF]/10 px-[5px] py-[3px] text-[10px] text-[#7B61FF]">Fill</span>
             </div>
 
             {/* "Open project" for the fill card, under the row's bottom-right corner (also for

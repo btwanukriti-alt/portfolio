@@ -50,7 +50,7 @@ export const PROJECTS: Project[] = [
     title: 'Fitness Tracker App',
     card: '/work/project-2.jpg',
     hero: caseStudyImage('fitness-tracker'),
-    showcase: '/showcase/fitness-tracker.html?v=3',
+    showcase: '/showcase/fitness-tracker.html?v=4',
     color: '#FFE8EE',
   },
   {
@@ -66,7 +66,7 @@ export const PROJECTS: Project[] = [
     title: 'CLIHUB',
     card: '/work/project-4.jpg',
     hero: caseStudyImage('clihub'),
-    showcase: '/showcase/clihub.html?embed&v=3',
+    showcase: '/showcase/clihub.html?embed&v=4',
     color: '#B9C7DB',
   },
   {
