@@ -4,13 +4,13 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
 import { gsap, ScrollTrigger, useGSAP, reducedMotion } from '@/lib/gsap'
-import { getLenis } from './SmoothScroll'
+import { getLenis, setScrollInterceptor } from './SmoothScroll'
 
 // Work: the projects as a Figma auto-layout row. One card is set to "fill" and takes the room;
 // the others are thin strips of solid colour (each showcase's background) on either side. The
-// section pins for a stretch of scrolling per project. The page scrolls freely (no snapping); on
-// reaching the next project's stretch, the fill moves over on its own: the next card widens to
-// fill while the one before compacts back to a strip. The fill card carries the black selection
+// section pins for a stretch of scrolling per project, and each scroll gesture moves one project:
+// the fill moves over on its own, the next card widening to fill while the one before compacts
+// back to a strip. The fill card carries the black selection
 // (border, handles, live size), plays its looping showcase, and over it the pointer becomes a
 // black "Open" label; clicking a strip scrolls to that project.
 //
@@ -82,6 +82,17 @@ function lockScroll(on: boolean) {
   document.documentElement.style.overflow = on ? 'hidden' : ''
   if (on) lenis?.stop()
   else lenis?.start()
+}
+
+// Puts the page at project i's stretch of the pinned section, instantly (stopping any momentum):
+// the stage doesn't move, so only the fill animates. With glide, the page eases there instead
+// (for arriving from just outside the section, where the move can be seen).
+function jumpTo(track: HTMLElement, i: number, glide = false) {
+  const y = track.getBoundingClientRect().top + window.scrollY + i * SEGMENT * window.innerHeight
+  const lenis = getLenis()
+  if (lenis && glide) lenis.scrollTo(y, { duration: 0.6, easing: (x) => 1 - Math.pow(1 - x, 3), force: true })
+  else if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
+  else window.scrollTo({ top: y, behavior: 'instant' })
 }
 
 // The section intro: the heading types in at the centre of the screen, lifts away, and the cursor
@@ -220,10 +231,7 @@ export default function Work() {
   const goTo = (e: React.MouseEvent, i: number) => {
     if (i === activeRef.current || !track.current) return
     e.preventDefault()
-    const y = track.current.getBoundingClientRect().top + window.scrollY + (i + 0.1) * SEGMENT * window.innerHeight
-    const lenis = getLenis()
-    if (lenis) lenis.scrollTo(y, { duration: 0.9, easing: (x) => 1 - Math.pow(1 - x, 3) })
-    else window.scrollTo({ top: y, behavior: 'instant' })
+    jumpTo(track.current, i)
   }
 
   // Driven by ScrollTrigger (in step with the smooth scroll): the fill passes along the row with
@@ -288,22 +296,36 @@ export default function Work() {
       }
       setOpen(0)
 
-      const update = () => {
+      let prevTop = Infinity
+
+      const update = (): void => {
         const t = track.current
         if (!t) return
-        const r = t.getBoundingClientRect()
+        let r = t.getBoundingClientRect()
         const vh = window.innerHeight
-        // Scroll progress in projects (0 = the first project's stretch).
-        const pos = -r.top / (SEGMENT * vh)
-        onScreen = r.bottom > 0 && r.top < vh
 
         if (!drawn && stage.current && frame.current && r.top < vh * 0.4 && r.bottom > vh) {
           drawn = true
           intro(stage.current, frame.current, r.top + window.scrollY)
         }
 
-        // Each project owns a stretch of scroll; a third of the way into the next stretch, the
-        // fill moves over on its own. The page itself just keeps scrolling (no snapping).
+        // Arriving with momentum (a flick from above or below) lands on the first or last
+        // project instead of sailing past the ones in between. The stage is pinned throughout,
+        // so the correction can't be seen. (Read the position again after a jump: this runs
+        // inside ScrollTrigger's update, so the jump doesn't call it back.)
+        const span = (N - 1) * SEGMENT * vh
+        const pinned = r.top <= 0 && -r.top <= span
+        // (A couple of pixels of slack: positions land on sub-pixels.)
+        if (pinned && prevTop > 2 && -r.top > 2) jumpTo(t, 0)
+        else if (pinned && prevTop < -span - 2 && -r.top < span - 2) jumpTo(t, N - 1)
+        r = t.getBoundingClientRect()
+        prevTop = r.top
+        // Scroll progress in projects (0 = the first project's stretch).
+        const pos = -r.top / (SEGMENT * vh)
+        onScreen = r.bottom > 0 && r.top < vh
+
+        // Each project owns a stretch of scroll (one scroll gesture moves one stretch, below);
+        // the fill moves over on its own.
         const next = Math.min(N - 1, Math.max(0, Math.floor(pos + 0.65)))
         if (next !== activeRef.current) {
           activeRef.current = next
@@ -340,7 +362,57 @@ export default function Work() {
         onToggle: update,
         onRefresh: onResize,
       })
+
+      // One scroll, one project. While the stage is pinned, each wheel or swipe gesture moves
+      // the fill exactly one project (the page jumps straight to that project's stretch, so the
+      // cards answer at once) and the rest of the gesture, trackpad momentum included, is
+      // swallowed. Past the first or last project, the page scrolls on as usual.
+      let lastEvent = 0
+      let lastStep = -Infinity
+      let stepped = false
+      const releaseInterceptor = setScrollInterceptor(({ event, deltaY }) => {
+        const t = track.current
+        if (!t) return true
+        // Held still by the intro.
+        if (document.documentElement.style.overflow === 'hidden') return false
+        if (event.type !== 'wheel' && event.type !== 'touchmove') return true
+        const top = t.getBoundingClientRect().top
+        const vh = window.innerHeight
+        const span = (N - 1) * SEGMENT * vh
+        const dir = Math.sign(deltaY)
+        const now = event.timeStamp
+        const newGesture = now - lastEvent > 200
+        const step = (i: number, glide = false) => {
+          if (event.cancelable) event.preventDefault()
+          lastEvent = now
+          stepped = true
+          lastStep = now
+          jumpTo(t, i, glide)
+          return false
+        }
+
+        // Scrolling back in from just outside glides onto the nearest end project in one go.
+        if (newGesture && drawn && dir > 0 && top > 2 && top < vh * 0.6) return step(0, true)
+        if (newGesture && dir < 0 && -top > span + 2 && -top < span + vh * 0.6) return step(N - 1, true)
+        if (top > 2 || -top > span + 2) return true
+
+        lastEvent = now
+        if (newGesture) stepped = false
+        if (stepped) {
+          if (event.cancelable) event.preventDefault()
+          return false
+        }
+        const target = activeRef.current + dir
+        if (!dir || target < 0 || target > N - 1) return true
+        if (now - lastStep < 550) {
+          if (event.cancelable) event.preventDefault()
+          return false
+        }
+        return step(target)
+      })
+
       return () => {
+        releaseInterceptor()
         window.removeEventListener('resize', onResize)
         lockScroll(false)
       }
