@@ -16,7 +16,7 @@ export default function SiteHeader({ afterHero = false }: { afterHero?: boolean 
   const links = [
     { href: `${base}#work`, label: 'Work' },
     { href: `${base}#about`, label: 'About' },
-    { href: `${base}#resume`, label: 'Resume' },
+    { href: '/resume.pdf', label: 'Resume' },
   ]
 
   useEffect(() => {
@@ -63,16 +63,21 @@ export default function SiteHeader({ afterHero = false }: { afterHero?: boolean 
           Anukriti Mishra
         </Link>
         <nav className="flex items-center gap-1" aria-label="Primary">
-          {links.map(({ href, label }) => (
-            <Link
+          {links.map(({ href, label }) => {
+            // The resume is a static file: a plain link, opened in a new tab.
+            const Tag = href.endsWith('.pdf') ? 'a' : Link
+            return (
+            <Tag
               key={href}
               href={href}
+              {...(Tag === 'a' && { target: '_blank', rel: 'noopener noreferrer' })}
               // Underline draws in from the left on hover.
               className="relative px-[14px] py-[10px] font-body text-[15px] leading-none font-medium text-ink no-underline after:absolute after:right-[14px] after:bottom-1 after:left-[14px] after:h-px after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-[450ms] after:ease-[var(--ease-out-expo)] hover:after:origin-left hover:after:scale-x-100 focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:after:transition-none max-[640px]:hidden max-[640px]:first:block"
             >
               {label}
-            </Link>
-          ))}
+            </Tag>
+            )
+          })}
           <Link
             href={`${base}#reach-out`}
             className="ml-[10px] rounded-full bg-ink px-5 py-3 font-body text-[15px] leading-none font-medium whitespace-nowrap text-white no-underline [transition:translate_300ms_var(--ease-out-expo),background-color_200ms_ease] hover:-translate-y-px hover:bg-[#2a2a2d] focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:transition-none max-[640px]:px-4 max-[640px]:py-[10px]"

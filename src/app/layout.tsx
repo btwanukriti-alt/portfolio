@@ -15,18 +15,18 @@ const poppins = Poppins({ subsets: ['latin'], weight: '500', variable: '--font-p
 const interTight = Inter_Tight({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-inter-tight' })
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], weight: '400', variable: '--font-jetbrains' })
 
-const DESCRIPTION = "Anukriti Mishra, UI/UX designer in Bangalore. I spot what's confusing and design it clear."
+const DESCRIPTION = 'Anukriti Mishra, experience designer for SaaS. The app. The website. The brand. The motion. One designer.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: 'Anukriti Mishra — UI/UX Designer', template: '%s — Anukriti Mishra' },
+  title: { default: 'Anukriti Mishra | Experience Designer', template: '%s | Anukriti Mishra' },
   description: DESCRIPTION,
   icons: { icon: '/favicon.svg' },
   openGraph: {
     type: 'website',
     url: '/',
     siteName: 'Anukriti Mishra',
-    title: 'Anukriti Mishra — UI/UX Designer',
+    title: 'Anukriti Mishra | Experience Designer',
     description: DESCRIPTION,
     images: [{ url: '/work/project-1.jpg' }],
   },

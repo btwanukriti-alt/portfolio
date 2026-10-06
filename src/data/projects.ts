@@ -1,17 +1,6 @@
 // Project data shared by the work cards and the case-study pages. Images live in public/;
 // presentation slides are listed at build time by src/lib/slides.ts.
 
-// Placeholder copy from the Figma layouts (work cards 156:14295, case study 125:2),
-// shared by every project until the real write-ups exist.
-const PLACEHOLDER = {
-  description:
-    'Combined orders, returns, and support history into a single view, making it easier for teams to continue conversations without missing context',
-  role: 'UX Designer',
-  timeline: '3 months',
-  problem:
-    "The problem wasn't visual, it was cognitive. Users couldn't answer three basic questions: what am I covered for, what do I do next, and how do I know this is real. Insurance products usually answer these in a policy document nobody opens. So the work was to move those answers into the interface itself, into onboarding, the dashboard, and the moment a claim begins.",
-}
-
 export type Project = {
   slug: string
   title: string
@@ -40,6 +29,12 @@ export const PROJECTS: Project[] = [
   {
     slug: 'jaadu-2',
     title: 'Jaadu 2.0',
+    description:
+      "Charts, alerts, backtesting and an AI strategy lab for active traders, in one terminal.",
+    role: 'Sole Designer',
+    timeline: '2 months',
+    problem:
+      "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
     card: '/work/project-1.jpg',
     hero: caseStudyImage('jaadu-2'),
     showcase: '/showcase/jaadu-2.html?embed&v=3',
@@ -48,6 +43,12 @@ export const PROJECTS: Project[] = [
   {
     slug: 'fitness-tracker',
     title: 'Fitness Tracker App',
+    description:
+      "Book a class, log the workout, track calories. A fitness app for gym members.",
+    role: 'Sole Designer',
+    timeline: '2 months',
+    problem:
+      "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
     card: '/work/project-2.jpg',
     hero: caseStudyImage('fitness-tracker'),
     showcase: '/showcase/fitness-tracker.html?v=4',
@@ -55,7 +56,13 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'bosch-customer-experience',
-    title: 'BOSCH Customer Experience',
+    title: 'Gym Management CRM',
+    description:
+      "Leads, members, payments and follow-ups for gym owners and staff, in one dashboard.",
+    role: 'Sole Designer',
+    timeline: '3 months',
+    problem:
+      "The front desk handles calls, walk-ins and messages all day. Leads written on paper got lost. I designed a CRM that keeps every lead in view until it becomes a member.",
     card: '/work/project-3.jpg',
     hero: caseStudyImage('bosch-customer-experience'),
     showcase: '/showcase/bosch-customer-experience.html?embed&v=3',
@@ -64,6 +71,12 @@ export const PROJECTS: Project[] = [
   {
     slug: 'clihub',
     title: 'CLIHUB',
+    description:
+      "A multi-platform SSH client with saved commands, live server stats and an AI terminal assistant.",
+    role: 'Sole Designer',
+    timeline: '3 months',
+    problem:
+      "A sysadmin managing 40 servers shouldn't need to remember 400 commands. I designed CLIHUB to remember them, and to write the next one on request.",
     card: '/work/project-4.jpg',
     hero: caseStudyImage('clihub'),
     showcase: '/showcase/clihub.html?embed&v=4',
@@ -72,12 +85,18 @@ export const PROJECTS: Project[] = [
   {
     slug: 'college-management',
     title: 'College Management',
+    description:
+      "A group-level ERP for college trusts and admin staff, with one dashboard and role-based access.",
+    role: 'Sole Designer',
+    timeline: '3 months',
+    problem:
+      "A college group had no way to see all its colleges at once. Dhondi puts them on one dashboard, with access set by role.",
     card: caseStudyImage('college-management'),
     hero: caseStudyImage('college-management'),
     showcase: '/showcase/college-management.html?embed&v=3',
     color: '#CFDDFF',
   },
-].map((p) => ({ ...PLACEHOLDER, ...p }))
+]
 
 export const projectBySlug = (slug: string) => PROJECTS.find((p) => p.slug === slug)
 

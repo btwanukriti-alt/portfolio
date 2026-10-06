@@ -32,7 +32,7 @@ const HANDLES = [
 // The multiplayer cursor that draws the frame (same as the hero's).
 const DRAW_CURSOR = '#7B61FF'
 
-const WORK_TITLE = "Products I've designed, end to end."
+const WORK_TITLE = "What I've designed."
 
 const N = PROJECTS.length
 // Scrolling per project, as a share of the window height.

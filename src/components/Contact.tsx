@@ -1,9 +1,9 @@
 import { Reveal, SplitReveal } from './Reveal'
 
-// Contact footer (Figma "Contact — Paper (New)", 156:14595). Email and phone are still the
-// design's placeholders.
-const EMAIL = 'your@email.com'
-const PHONE = 'phone number'
+// Contact footer (Figma "Contact — Paper (New)", 156:14595). Email only, no phone.
+const EMAIL = 'hey@anukritimishra.xyz'
+// TODO: add the LinkedIn profile URL; the link shows once this is set.
+const LINKEDIN = ''
 
 export default function Contact() {
   return (
@@ -19,7 +19,7 @@ export default function Contact() {
         as="h2"
         id="contact-heading"
         className="mt-6 mb-0 max-w-[14ch] text-[clamp(44px,7.4vw,124px)] leading-[0.98] font-medium tracking-[-0.045em] text-ink"
-        text="Let's make something clear together."
+        text="Let's design yours next."
       />
 
       <Reveal
@@ -42,7 +42,16 @@ export default function Contact() {
             <path d="M3 11L11 3M5 3h6v6" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />
           </svg>
         </a>
-        <span className="text-[18px] leading-none font-normal text-muted">{PHONE}</span>
+        {LINKEDIN && (
+          <a
+            href={LINKEDIN}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[18px] leading-none font-normal text-muted no-underline hover:text-ink focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          >
+            LinkedIn
+          </a>
+        )}
       </Reveal>
 
       <div className="mt-[clamp(64px,12vh,140px)] flex justify-between gap-4 text-[14px] leading-none font-normal text-faint">

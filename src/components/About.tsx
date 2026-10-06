@@ -21,7 +21,7 @@ const STOPS: Stop[] = [
   { x: 40, year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', state: 'past' },
   { x: 325, year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', state: 'past' },
   { x: 610, year: '2025', role: 'UI/UX Intern', company: 'Gamalabs', state: 'past' },
-  { x: 895, year: '2026', role: 'B.A. Visual Communication', company: "St Joseph's University", state: 'current' },
+  { x: 895, year: '2026', role: 'Visual Communication Graduate', company: "St Joseph's University", state: 'current' },
   { x: 1140, year: '20??', state: 'next' },
 ]
 
@@ -115,7 +115,7 @@ export default function About() {
           as="h2"
           id="about-heading"
           className="m-0 max-w-[18ch] text-[clamp(36px,5vw,76px)] leading-[1.02] font-medium tracking-[-0.04em] text-ink"
-          text="I design calm, usable software for messy, high-stakes work."
+          text="I design products and everything around them."
         />
       </div>
 
@@ -127,7 +127,7 @@ export default function About() {
           className="relative mr-16 h-[180px] [--line-y:62px]"
         >
           <span className="absolute top-0 left-0 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">
-            Studying
+            So far
           </span>
           {SEGMENTS.map((s) => (
             <span
@@ -180,7 +180,7 @@ export default function About() {
                     </>
                   ) : (
                     <span className="absolute top-[84px] left-1/2 -translate-x-1/2 rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold whitespace-nowrap text-ink">
-                      You can be here next! :D
+                      This spot is open.
                     </span>
                   )}
                 </li>
@@ -193,7 +193,7 @@ export default function About() {
       {/* The same timeline, vertical: the line draws down and each stop follows. */}
       <div ref={column} className="relative min-[901px]:hidden">
         <span className="mb-6 block text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">
-          Studying
+          So far
         </span>
         <ol className="relative m-0 list-none p-0 pl-8" aria-label="Career timeline">
           <span
@@ -238,7 +238,7 @@ export default function About() {
                   </>
                 ) : (
                   <span className="mt-3 block w-fit rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold text-ink">
-                    You can be here next! :D
+                    This spot is open.
                   </span>
                 )}
               </li>
