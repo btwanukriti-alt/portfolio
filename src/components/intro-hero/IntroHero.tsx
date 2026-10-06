@@ -539,7 +539,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         .to(deck[2], { x: slots[2].x, y: slots[2].y, duration: 0.5, ease: 'expo.out' }, dupAt + 0.09)
         .to(chip, { autoAlpha: 0, duration: 0.22, ease: 'power1.out' }, dupAt + 0.42)
         .to(names, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.05 }, dupAt + 0.3)
-        .to(rings, { autoAlpha: 0, duration: 0.35, ease: 'power1.out' }, dupAt + 0.55)
         .add(art.paused(false), drawAt)
         .call(() => setTool('move'), [], dupAt + 0.4)
         .to(pointer, { x: '+=150', y: '+=120', duration: 0.8, ease: 'power2.in', onUpdate: drawCursor }, dupAt + 0.5)
@@ -548,7 +547,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         // 5. The cards lift off into a 3D ring: the left one first, each turning over to its
         //    screenshot in flight and landing on the ring's front, while the rest of the ring
         //    appears around and behind them and starts to turn.
-        .to(names, { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, liftAt - 0.15)
+        .to([...names, ...rings], { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, liftAt - 0.15)
         .call(
           () => {
             cardSlot = slots.map((sl) => ({ x: sl.x, y: sl.y, w: cw, h: ch }))
@@ -679,7 +678,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
                   <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="block h-full w-full">
                     <Art />
                   </svg>
-                  <div data-ring className="absolute inset-0 border" style={{ borderColor: INK }} />
                 </div>
                 <div
                   data-back
@@ -687,6 +685,17 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
                 >
                   <img src={TILES[k].src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
                 </div>
+              </div>
+              {/* Selected: a black border and handles, kept until the card lifts off. */}
+              <div data-ring className="pointer-events-none absolute inset-0">
+                <div className="absolute inset-0 border" style={{ borderColor: INK }} />
+                {HANDLES.map(([x, y]) => (
+                  <span
+                    key={`${x}-${y}`}
+                    className="absolute size-[7px] -translate-x-1/2 -translate-y-1/2 border bg-white"
+                    style={{ left: `${x}%`, top: `${y}%`, borderColor: INK }}
+                  />
+                ))}
               </div>
             </div>
           ))}
