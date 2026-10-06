@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import { Reveal, SplitReveal } from './Reveal'
+import Disciplines from './Disciplines'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
 // About + career timeline (content from Figma "About Me + Timeline", 156:14540, and the resume).
@@ -118,6 +119,9 @@ export default function About() {
           text="I design products and everything around them."
         />
       </div>
+
+      {/* What "everything around them" means: UX, branding and motion, drawn in line. */}
+      <Disciplines />
 
       {/* Timeline: a 1180-wide track on wide screens; on narrower ones it runs down the page. */}
       <div className="hidden min-[901px]:block">
