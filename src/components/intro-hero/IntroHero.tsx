@@ -40,7 +40,7 @@ const NAV = [
 ]
 
 const LINE_1 = 'Hello, I am Anukriti.'
-const LINE_2 = 'Experienced Designer'
+const LINE_2 = 'Experience Designer'
 const HEADLINE = "I spot what's confusing and design it clear."
 const ABOUT =
   "I'm Anukriti, a UI/UX designer in Bengaluru. I design end‑to‑end digital products — consumer apps, dashboards and enterprise tools — taking each one from first sketch to a polished, shipped interface."
@@ -360,7 +360,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       const r2 = rel(l2)
       const padX = L.mobile ? 10 : 14
       const padY = L.mobile ? 4 : 6
-      // The text box: drawn around "Experienced Designer" only, below the first line.
+      // The text box: drawn around "Experience Designer" only, below the first line.
       const textBox = { x: r2.x - padX, y: r2.y - padY, w: r2.w + padX * 2, h: r2.h + padY * 2 }
       // The frame it becomes: screen-shaped, centred where the text box was.
       const fw = L.mobile ? L.w * 0.64 : Math.min(L.w * 0.3, 440)
@@ -451,7 +451,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         .to(selHandles, { scale: 1, duration: 0.28, ease: 'back.out(2.2)', stagger: 0.015 }, release)
         .to(selSize, { autoAlpha: 1, duration: 0.2, ease: 'power1.out' }, release + 0.05)
         .set(caret2, { visibility: 'visible', animation: 'none' }, release + 0.05)
-        // ...and types "Experienced Designer", while the cursor eases out of the way.
+        // ...and types "Experience Designer", while the cursor eases out of the way.
         .to(pointer, { x: textBox.x - 30, y: textBox.y + textBox.h + 34, duration: 0.7, ease: 'power2.out', onUpdate: drawCursor }, release + 0.12)
         .to(chars, { b: LINE_2.length, duration: LINE_2.length * keyRate2, ease: 'none', onUpdate: () => type2(chars.b) }, type2Start)
         .set(caret2, { animation: '' }, type2End)
@@ -518,7 +518,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       <div ref={stage} className="absolute inset-0 isolate">
         {/* Intro text layers and the closing button. Under the screens that pass in front. */}
         <div ref={centre} className="pointer-events-none absolute inset-0" style={{ zIndex: 199 }}>
-          {/* "Experienced Designer" sits at the centre of the screen (so the frame it becomes does
+          {/* "Experience Designer" sits at the centre of the screen (so the frame it becomes does
               too); the greeting sits above it. */}
           <div className="absolute inset-0 flex items-center justify-center px-4">
             <div className="relative text-[clamp(34px,4.8vw,72px)] max-[719px]:text-[7.6vw]">
@@ -530,7 +530,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           </div>
           <div ref={finale} className="invisible absolute inset-0 flex flex-col items-center justify-center gap-5 opacity-0">
             <p className="m-0 font-hero-mono text-[11px] tracking-[0.14em] text-muted uppercase">
-              Anukriti Mishra · Experienced Designer
+              Anukriti Mishra · Experience Designer
             </p>
             <a
               href={EMAIL}
