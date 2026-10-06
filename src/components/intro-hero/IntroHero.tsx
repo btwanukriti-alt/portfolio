@@ -31,7 +31,7 @@ import { TILES } from './tiles'
 // Scrolling (the hero stays pinned) gathers the screens into a ring around the headline, then
 // scatters them at different depths around a short About paragraph.
 
-const EMAIL = 'mailto:designwithanukriti@gmail.com'
+const EMAIL = 'mailto:hey@anukritimishra.xyz'
 
 const NAV = [
   { label: 'Work', href: '#work' },
@@ -41,9 +41,9 @@ const NAV = [
 
 const LINE_1 = 'Hello, I am Anukriti.'
 const LINE_2 = 'Experience Designer'
-const HEADLINE = "I spot what's confusing and design it clear."
+const HEADLINE = 'The app. The website. The brand. The motion. One designer.'
 const ABOUT =
-  "I'm Anukriti, a UI/UX designer in Bengaluru. I design end‑to‑end digital products — consumer apps, dashboards and enterprise tools — taking each one from first sketch to a polished, shipped interface."
+  "I'm Anukriti, an experience designer for SaaS. I've designed products for traders, gyms, colleges and engineers, and everything users see around them."
 
 // Canvas colours: a black selection system, a violet collaborator, Figma's pink spacing guides,
 // and the logo's purple-coral-yellow for the frame.
@@ -655,7 +655,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       <div className="pointer-events-none absolute inset-0 z-[400] flex items-center justify-center px-6">
         <div ref={intro} className="invisible absolute flex max-w-[min(560px,64vw)] flex-col items-center text-center max-[719px]:max-w-[72vw]">
           <p data-fade="0" className="m-0 mb-5 font-hero-mono text-[11px] tracking-[0.12em] text-muted uppercase opacity-0">
-            Anukriti Mishra · UI/UX Designer
+            Anukriti Mishra · Experience Designer
           </p>
           <p className="m-0 font-hero text-[clamp(28px,3.9vw,58px)] leading-[1.06] [@media(max-height:500px)]:text-[26px] font-medium tracking-[-0.035em] text-ink">
             {words(HEADLINE).map((w, i) => (
@@ -672,13 +672,13 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               href="#work"
               className="rounded-full bg-ink px-5 py-3 font-hero text-[14px] leading-none font-medium text-white transition-colors hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              View work
+              See my work
             </a>
             <a
               href={EMAIL}
               className="rounded-full border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              Get in touch
+              Email me
             </a>
           </div>
         </div>
@@ -734,7 +734,7 @@ export default function IntroHero() {
 
   return (
     <section ref={section} id="welcome" aria-label="Introduction" className="relative h-[330svh] bg-paper">
-      <h1 className="sr-only">Anukriti Mishra, UI/UX designer</h1>
+      <h1 className="sr-only">Anukriti Mishra, experience designer</h1>
       <div className="sticky top-0 h-svh min-h-[320px] overflow-hidden">
         <header
           ref={header}
