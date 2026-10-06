@@ -16,18 +16,21 @@ import {
   scatterPose,
   scatterSpots,
   smooth,
+  lerp,
   type Layout,
   type Origin,
   type Spot,
 } from './scene'
 import { TILES } from './tiles'
+import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 
 // The hero, staged like a Figma canvas. "Hello, I am Anukriti." is typed in; Anukriti's
-// multiplayer cursor draws a text box below it (with a spacing guide) and types "Experienced
-// Designer" into it. The first line fades, and the text box reshapes in place, with a spring, into
-// a frame; a UI screen appears inside it, and the screens deal out of the frame in a chain onto a
-// 3D circle and settle. Then "Let's build something" fades in. A floating Figma toolbar follows
-// along (Text, Frame, Move).
+// multiplayer cursor draws a text box below it (with a spacing guide) and types "Experience
+// Designer" into it. The first line fades, and the cursor drags the text box, in place, into a
+// card; two quick duplicates (⌘D) snap out either side of it (above and below on a phone held
+// upright). The three cards draw UX, branding and motion, then lift off in 3D, turning over to UI
+// screenshots as they fly, onto the front of a 3D ring of screenshots that appears around them;
+// the ring turns and settles. Then "Let's build something" fades in. A floating Figma toolbar follows along (Text, Frame, Move).
 // Scrolling (the hero stays pinned) gathers the screens into a ring around the headline, then
 // scatters them at different depths around a short About paragraph.
 
@@ -45,12 +48,17 @@ const HEADLINE = 'The app. The website. The brand. The motion. One designer.'
 const ABOUT =
   "I'm Anukriti, an experience designer for SaaS. I've designed products for traders, gyms, colleges and engineers, and everything users see around them."
 
-// Canvas colours: a black selection system, a violet collaborator, Figma's pink spacing guides,
-// and the logo's purple-coral-yellow for the frame.
+// Canvas colours: a black selection system, a violet collaborator, Figma's pink spacing guides.
 const INK = '#111111'
 const CURSOR = '#7B61FF'
 const GUIDE = '#FF2D78'
-const FRAME_FILL = 'linear-gradient(135deg, #A259FF 0%, #FF7262 55%, #FFC700 100%)'
+
+// The discipline cards, left to right (top to bottom when stacked): UX, branding, motion. The
+// middle one is the card the text box becomes. Each lifts into the ring as screenshot k: the three
+// land side by side on its front, the left one leading, with the rest of the ring behind them.
+const LIFT = 1.35 // seconds each card takes to fly into the ring
+// The card drawings play at this speed (1 = as authored, 2.8s).
+const ART_SPEED = 0.85
 
 // Screenshot orbit (unchanged from the previous hero).
 const N = TILES.length
@@ -140,6 +148,8 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
   const cursor = useRef<HTMLDivElement>(null)
   const toolbar = useRef<HTMLDivElement>(null)
   const chrome = useRef<HTMLDivElement>(null)
+  const cards = useRef<(HTMLDivElement | null)[]>([])
+  const shortcut = useRef<HTMLSpanElement>(null)
   const engine = useRef<Engine | null>(null)
 
   useEffect(() => {
@@ -157,9 +167,11 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const cur = cursor.current
     const bar = toolbar.current
     const chromeEl = chrome.current
+    const chip = shortcut.current
+    const deck = cards.current.filter((c): c is HTMLDivElement => !!c)
     if (
       !root || !space || !introEl || !aboutEl || !hintEl || !centreEl || !l1 || !l2 || !finaleEl ||
-      !sel || !guideEl || !cur || !bar || !chromeEl
+      !sel || !guideEl || !cur || !bar || !chromeEl || !chip || deck.length !== 3
     )
       return
     const reduce = reducedMotion()
@@ -173,8 +185,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const caret2 = l2.querySelector<HTMLElement>('[data-caret]')!
     const selFill = sel.querySelector<HTMLElement>('[data-fill]')!
     const selFrame = sel.querySelector<HTMLElement>('[data-frame]')!
-    const selShot = sel.querySelector<HTMLElement>('[data-shot]')!
-    const selBorder = sel.querySelector<HTMLElement>('[data-border]')!
     const selLabel = sel.querySelector<HTMLElement>('[data-label]')!
     const selSize = sel.querySelector<HTMLElement>('[data-size]')!
     const selHandles = [...sel.querySelectorAll<HTMLElement>('[data-handle]')]
@@ -183,10 +193,14 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
 
     // Animated values: the intro timeline tweens these; the ticker reads them every frame.
     // show: the orbit's screenshots stay hidden until the frame hands over.
-    const st = { omega: 0, gap: CHAIN_GAP, amp: 1, hint: 0, show: 0 }
-    // The leader starts just inside the frame, so the first screen is there at the handoff.
-    let lastAngle = -(N - 1) * CHAIN_GAP - EMERGE * 0.88
+    const st = { omega: 0, gap: CHAIN_GAP, amp: 1, hint: 0, show: 0, front: 0 }
+    // Set at the handoff so the leader starts exactly on its card.
+    let lastAngle = -(N - 1) * CHAIN_GAP - EMERGE
     let origin: Origin | undefined
+    // The cards' flight into the ring: 0 on the canvas, 1 landed (the screenshot takes over).
+    const flight = [{ v: 0 }, { v: 0 }, { v: 0 }]
+    let flying = false
+    let cardSlot: { x: number; y: number; w: number; h: number }[] = []
     const hover = TILES.map(() => new Spring(0, 0, 220, 22))
     let layout: Layout | null = null
     let spots: Spot[] = []
@@ -283,7 +297,13 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         if (!el) return
         const theta = lastAngle + (N - 1 - i) * st.gap
         const orbit = orbitPose(L, theta, st.amp, origin)
-        orbit.o *= st.show
+        // The first three screens are the cards: each shows once its card has landed. The rest of
+        // the ring builds from the back forward, so nothing appears half-faded in front of the
+        // cards while they fly.
+        // The near side waits until the cards have landed, then follows quickly.
+        const near = (Math.sin(theta) + 1) / 2
+        const reveal = lerp(clamp(st.show * 1.8 - near * 0.8), st.front, smooth((near - 0.5) / 0.2))
+        orbit.o *= i < 3 && flying ? (flight[i].v >= 1 ? 1 : 0) : reveal
         const ring = ringPose(L, i, N, ringTurn)
         ring.x += mouse.x * 10
         ring.y += mouse.y * 8
@@ -297,6 +317,28 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         el.style.pointerEvents = p.o > 0.3 ? '' : 'none'
         el.tabIndex = p.o > 0.3 ? 0 : -1
       })
+
+      // The cards in flight: from their place on the canvas to screenshot k's place in the
+      // moving ring, scaling to its size, turning over (with a little tilt) to the screenshot on
+      // their back, and stacking by depth among the screens.
+      if (flying) {
+        deck.forEach((card, k) => {
+          const f = flight[k].v
+          if (f >= 1) {
+            card.style.visibility = 'hidden'
+            return
+          }
+          const c = cardSlot[k]
+          const to = orbitPose(L, lastAngle + (N - 1 - k) * st.gap, st.amp)
+          const from = { x: c.x + c.w / 2, y: c.y + c.h / 2, s: c.w / L.tileW, o: 1, blur: 0, z: 0 }
+          const m = mixPose(from, to, f)
+          const scale = (m.s * L.tileW) / c.w
+          card.style.transform = `translate3d(${m.x - c.w / 2}px,${m.y - c.h / 2}px,0) scale(${scale})`
+          card.style.zIndex = String(Math.round(200 + (to.z * f) / 8 + 1))
+          const flip = card.firstElementChild?.nextElementSibling as HTMLElement | null
+          if (flip) flip.style.transform = `rotateY(${180 * f}deg) rotateX(${Math.sin(Math.PI * f) * 14}deg)`
+        })
+      }
 
       renderText(a, b, st.hint * (1 - smooth(scroll * 5)))
     }
@@ -342,14 +384,16 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     let tl: gsap.core.Timeline | null = null
     let alive = true
 
-    // Layout depends on the font, so wait for it before measuring.
-    document.fonts.ready.then(() => {
+    // Layout depends on the font, so wait for it before measuring, and for the hero to have a real
+    // size (an embedded preview can report none while it loads).
+    const begin = () => {
       if (!alive || !layout) return
+      if (layout.w < 200 || layout.h < 200) return void setTimeout(begin, 100)
       const L = layout
 
       if (reduce) {
         // Reduced motion: the finished state, screens waiting around the centre.
-        Object.assign(st, { omega: 0, gap: SPREAD_GAP, amp: 0.42, hint: 1, show: 1 })
+        Object.assign(st, { omega: 0, gap: SPREAD_GAP, amp: 0.42, hint: 1, show: 1, front: 1 })
         lastAngle = 0
         gsap.set([l1, l2], { autoAlpha: 0 })
         gsap.set(finaleEl, { autoAlpha: 1 })
@@ -362,14 +406,26 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       const padY = L.mobile ? 4 : 6
       // The text box: drawn around "Experience Designer" only, below the first line.
       const textBox = { x: r2.x - padX, y: r2.y - padY, w: r2.w + padX * 2, h: r2.h + padY * 2 }
-      // The frame it becomes: screen-shaped, centred where the text box was.
-      const fw = L.mobile ? L.w * 0.64 : Math.min(L.w * 0.3, 440)
-      const fh = fw / 1.5
+      // The card it becomes: screen-shaped (3:2), centred where the text box was, with room for a
+      // copy either side of it, or above and below it on a portrait screen.
       const fcx = textBox.x + textBox.w / 2
       const fcy = textBox.y + textBox.h / 2
-      const frame = { x: fcx - fw / 2, y: fcy - fh / 2, w: fw, h: fh }
-      // Round the frame like the screenshots that fill it (8px at tile size, scaled up).
-      selFrame.style.borderRadius = `${(8 * fw) / L.tileW}px`
+      const stacked = L.h > L.w
+      const gapC = stacked ? 34 : Math.max(18, L.w * 0.02)
+      let cw = stacked ? Math.min(L.w * 0.8, 420) : Math.min((L.w * 0.86 - 2 * gapC) / 3, 420)
+      let ch = cw / 1.5
+      const maxH = stacked ? (L.h * 0.74 - 2 * gapC) / 3 : L.h * 0.6
+      if (ch > maxH) {
+        ch = maxH
+        cw = ch * 1.5
+      }
+      const frame = { x: fcx - cw / 2, y: fcy - ch / 2, w: cw, h: ch }
+      const step = stacked ? { x: 0, y: ch + gapC } : { x: cw + gapC, y: 0 }
+      const slots = [-1, 0, 1].map((d) => ({ x: frame.x + d * step.x, y: frame.y + d * step.y }))
+      const names = deck.map((c) => c.querySelector<HTMLElement>('[data-card-name]')!)
+      const rings = deck.map((c) => c.querySelector<HTMLElement>('[data-ring]')!)
+      // The backs are rounded like the screenshots they hand over (8px at tile size, scaled up).
+      for (const c of deck) c.querySelector<HTMLElement>('[data-back]')!.style.borderRadius = `${(8 * cw) / L.tileW}px`
 
       const type1 = typeInto(typed1, LINE_1)
       const type2 = typeInto(typed2, LINE_2)
@@ -388,11 +444,12 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       const type2Start = release + 0.18
       const type2End = type2Start + LINE_2.length * keyRate2
       const reshapeAt = type2End + 0.55
-      const RESHAPE = 1.1
-      const shotIn = reshapeAt + RESHAPE - 0.35 // the first UI screen appears in the frame
-      const handoff = shotIn + 0.6 // ...and the screens deal out
-      const spreadAt = handoff + 0.25 + ((N - 1) * CHAIN_GAP + EMERGE * 0.88) / ORBIT_SPEED
-      const settleAt = spreadAt + Math.PI / 2 / ORBIT_SPEED
+      const RESHAPE = 0.95
+      const dupAt = reshapeAt + RESHAPE - 0.2 // ⌘D: the copies snap out
+      const drawAt = dupAt + 0.25 // the cards draw their disciplines
+      const liftAt = drawAt + 2.8 / ART_SPEED + 0.7 // ...hold, then lift into the ring
+      const landed = liftAt + 0.2 + LIFT // the last card lands
+      const settleAt = landed + 1.1
 
       const followCorner = () => {
         drawBox()
@@ -403,7 +460,12 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
 
       gsap.set(sel, { autoAlpha: 0, zIndex: 300 })
       gsap.set(selHandles, { scale: 0 })
-      gsap.set([selSize, selLabel, selFrame, selShot, guideEl], { autoAlpha: 0 })
+      gsap.set([selSize, selLabel, selFrame, guideEl], { autoAlpha: 0 })
+      // The cards wait, stacked on the middle slot, hidden; their drawings are built hidden too.
+      gsap.set(deck, { autoAlpha: 0, x: frame.x, y: frame.y, width: cw, height: ch })
+      gsap.set(names, { autoAlpha: 0, y: 4 })
+      gsap.set(chip, { autoAlpha: 0 })
+      const art = disciplinesTimeline(chromeEl).timeScale(ART_SPEED)
       gsap.set(bar, { autoAlpha: 0, y: 16 })
       setTool('text')
       pointer.x = L.w * (L.mobile ? 0.82 : 0.72)
@@ -456,49 +518,67 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         .to(chars, { b: LINE_2.length, duration: LINE_2.length * keyRate2, ease: 'none', onUpdate: () => type2(chars.b) }, type2Start)
         .set(caret2, { animation: '' }, type2End)
 
-        // 3. Frame tool. The first line fades; the cursor grabs the corner and the text box
-        //    springs, in place, into a frame.
+        // 3. Frame tool. The first line fades; the cursor grabs the corner and drags the text box,
+        //    in place, into a card.
         .call(() => setTool('frame'), [], reshapeAt - 0.6)
         .set(caret2, { visibility: 'hidden' }, reshapeAt - 0.3)
         .to(l1, { autoAlpha: 0, y: -10, duration: 0.55, ease: 'power2.out' }, reshapeAt - 0.45)
         .to(pointer, { x: textBox.x + textBox.w, y: textBox.y + textBox.h, duration: 0.45, ease: 'power3.inOut', onUpdate: drawCursor }, reshapeAt - 0.5)
         .to(pointer, { s: 0.88, duration: 0.08, ease: 'power2.out', onUpdate: drawCursor }, reshapeAt - 0.06)
-        .to(l2, { autoAlpha: 0, scale: 0.96, duration: 0.35, ease: 'power2.in' }, reshapeAt)
+        .to(l2, { autoAlpha: 0, scale: 0.96, duration: 0.3, ease: 'power2.in' }, reshapeAt)
         .to(box, { ...frame, duration: RESHAPE, ease: springEase, onUpdate: followCorner }, reshapeAt)
-        .to(selLabel, { autoAlpha: 1, duration: 0.3, ease: 'power1.out' }, reshapeAt + 0.3)
-        .to(selFrame, { autoAlpha: 1, duration: 0.4, ease: 'power2.out' }, reshapeAt + 0.45)
-        .set(sel, { zIndex: 198 }, reshapeAt + 0.5) // under the screens from here on
-        .to(pointer, { s: 1, duration: 0.12, ease: 'power2.out', onUpdate: drawCursor }, reshapeAt + RESHAPE - 0.15)
+        .to(selFrame, { autoAlpha: 1, duration: 0.3, ease: 'power2.out' }, reshapeAt + 0.2)
 
-        // 4. Your UI comes into the picture inside the frame...
-        .fromTo(selShot, { autoAlpha: 0, scale: 1.04 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, shotIn)
-        .call(() => setTool('move'), [], shotIn + 0.2)
-        .to(pointer, { x: '+=150', y: '+=120', duration: 0.8, ease: 'power2.in', onUpdate: drawCursor }, shotIn + 0.2)
-        .to(cur, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, shotIn + 0.45)
-        // ...and the screens deal out of it into the chain (orbit unchanged from here).
+        // 4. ⌘D, twice: copies of the card snap out either side of it, and the three cards draw
+        //    UX, branding and motion.
+        .fromTo(chip, { autoAlpha: 0, scale: 0.85, x: frame.x + cw + 12, y: frame.y + ch - 34 }, { autoAlpha: 1, scale: 1, duration: 0.16, ease: 'back.out(2.5)' }, dupAt - 0.14)
+        .to(pointer, { s: 1, duration: 0.12, ease: 'power2.out', onUpdate: drawCursor }, dupAt - 0.1)
+        .set(deck, { autoAlpha: 1 }, dupAt)
+        .set(sel, { autoAlpha: 0 }, dupAt)
+        .to(deck[0], { x: slots[0].x, y: slots[0].y, duration: 0.5, ease: 'expo.out' }, dupAt)
+        .to(deck[2], { x: slots[2].x, y: slots[2].y, duration: 0.5, ease: 'expo.out' }, dupAt + 0.09)
+        .to(chip, { autoAlpha: 0, duration: 0.22, ease: 'power1.out' }, dupAt + 0.42)
+        .to(names, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.05 }, dupAt + 0.3)
+        .to(rings, { autoAlpha: 0, duration: 0.35, ease: 'power1.out' }, dupAt + 0.55)
+        .add(art.paused(false), drawAt)
+        .call(() => setTool('move'), [], dupAt + 0.4)
+        .to(pointer, { x: '+=150', y: '+=120', duration: 0.8, ease: 'power2.in', onUpdate: drawCursor }, dupAt + 0.5)
+        .to(cur, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, dupAt + 0.75)
+
+        // 5. The cards lift off into a 3D ring: the left one first, each turning over to its
+        //    screenshot in flight and landing on the ring's front, while the rest of the ring
+        //    appears around and behind them and starts to turn.
+        .to(names, { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, liftAt - 0.15)
         .call(
           () => {
-            origin = { x: fcx, y: fcy, s: fw / L.tileW }
-            st.show = 1
+            cardSlot = slots.map((sl) => ({ x: sl.x, y: sl.y, w: cw, h: ch }))
+            origin = undefined
+            st.gap = SPREAD_GAP
+            st.amp = 1
+            // Screenshot 1 (the middle card) faces the viewer; 0 and 2 sit either side of it.
+            // A whole number of turns ahead keeps every angle positive (no emerging from a frame).
+            lastAngle = Math.PI / 2 - (N - 2) * SPREAD_GAP + Math.PI * 4
+            flying = true
           },
           [],
-          handoff,
+          liftAt,
         )
-        .set(selShot, { autoAlpha: 0 }, handoff + 0.02)
-        .to([selBorder, selLabel, selSize, ...selHandles], { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, handoff + 0.1)
-        .to(selFrame, { autoAlpha: 0, duration: 0.5, ease: 'power1.inOut' }, handoff + 0.9)
-        // The chain sets off...
-        .to(st, { omega: ORBIT_SPEED, duration: 0.5, ease: 'power2.out' }, handoff)
-        // ...loosens into an even circle once it's all out...
-        .to(st, { gap: SPREAD_GAP, duration: 2.4, ease: 'power2.inOut' }, spreadAt)
-        // ...and as the last one passes in front, the orbit calms down.
+        .to(flight[0], { v: 1, duration: LIFT, ease: 'power3.inOut' }, liftAt)
+        .to(flight[1], { v: 1, duration: LIFT, ease: 'power3.inOut' }, liftAt + 0.1)
+        .to(flight[2], { v: 1, duration: LIFT, ease: 'power3.inOut' }, liftAt + 0.2)
+        .to(st, { show: 1, duration: 1.4, ease: 'power2.inOut' }, liftAt + 0.25)
+        .to(st, { front: 1, duration: 0.45, ease: 'power2.out' }, landed)
+        // The ring sets off as they lift, turns once briskly...
+        .to(st, { omega: ORBIT_SPEED * 0.7, duration: 1.4, ease: 'power2.in' }, liftAt + 0.1)
+        // ...and calms down.
         .to(st, { omega: IDLE_SPEED, amp: 0.42, duration: 2.8, ease: 'power2.out' }, settleAt - 0.2)
         .to(bar, { autoAlpha: 0, y: 16, duration: 0.6, ease: 'power2.in' }, settleAt + 0.6)
 
         // 5. Once the screens have settled: the call to action.
         .fromTo(finaleEl, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out' }, settleAt + 1.2)
         .to(st, { hint: 1, duration: 1, ease: 'power1.out' }, settleAt + 1.9)
-    })
+    }
+    document.fonts.ready.then(begin)
 
     return () => {
       alive = false
@@ -552,9 +632,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           {/* Selection: marquee while drawing, then handles and a size tag; reshapes into the frame. */}
           <div ref={selection} aria-hidden className="pointer-events-none invisible absolute top-0 left-0 opacity-0">
             <div data-fill className="absolute inset-0 bg-[#1111110d]" />
-            <div data-frame className="absolute inset-0 overflow-hidden rounded-[3px]" style={{ background: FRAME_FILL }}>
-              <img data-shot src={TILES[0].src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
-            </div>
+            <div data-frame className="absolute inset-0 border border-line bg-paper" />
             <div data-border className="absolute inset-0 border" style={{ borderColor: INK }} />
             {HANDLES.map(([x, y]) => (
               <span
@@ -577,6 +655,51 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               style={{ background: INK }}
             />
           </div>
+
+          {/* The three discipline cards (placed by the intro). Front: the drawing; back: the
+              screenshot it hands to the chain. */}
+          {DISCIPLINES.map(({ id, name, Art }, k) => (
+            <div
+              key={id}
+              ref={(el) => {
+                cards.current[k] = el
+              }}
+              aria-hidden
+              className="invisible absolute top-0 left-0 opacity-0 [perspective:1600px]"
+              style={{ zIndex: 198 }}
+            >
+              <span
+                data-card-name
+                className="absolute bottom-full left-0 mb-1.5 font-hero-mono text-[10.5px] leading-none tracking-[0.08em] whitespace-nowrap text-muted uppercase"
+              >
+                {name}
+              </span>
+              <div data-flip className="relative h-full w-full [transform-style:preserve-3d]">
+                <div data-front className="absolute inset-0 overflow-hidden border border-line bg-paper [backface-visibility:hidden]">
+                  <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="block h-full w-full">
+                    <Art />
+                  </svg>
+                  <div data-ring className="absolute inset-0 border" style={{ borderColor: INK }} />
+                </div>
+                <div
+                  data-back
+                  className="absolute inset-0 overflow-hidden bg-soft shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
+                >
+                  <img src={TILES[k].src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* The duplicate shortcut, flashed by the cursor as the copies snap out. */}
+          <span
+            ref={shortcut}
+            aria-hidden
+            className="invisible absolute top-0 left-0 rounded-[6px] px-2 py-[5px] font-hero-mono text-[11px] leading-none whitespace-nowrap text-white opacity-0"
+            style={{ background: INK, zIndex: 451 }}
+          >
+            ⌘ D
+          </span>
 
           {/* Spacing guide between the layers (positioned by the intro). */}
           <div ref={guide} aria-hidden className="invisible absolute w-px opacity-0" style={{ background: GUIDE, zIndex: 310 }}>

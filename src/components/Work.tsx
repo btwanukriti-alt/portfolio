@@ -347,6 +347,7 @@ export default function Work() {
         if (!t) return
         let r = t.getBoundingClientRect()
         const vh = window.innerHeight
+        if (!vh) return // a window with no height yet (an embedded preview while it loads)
 
         if (!drawn && stage.current && frame.current && r.top < vh * 0.4 && r.bottom > vh) {
           drawn = true
