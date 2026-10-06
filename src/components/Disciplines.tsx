@@ -5,7 +5,7 @@ import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
 // UX, branding and motion as three flat, greyscale product illustrations that run off the edges of
 // their frames, built in front of the viewer the first time they scroll into view. Everything has
-// landed by 2.8s.
+// landed by 2s: the timeline below is written over 2.8s and played 1.4x.
 // - UX: a dashboard window forms, then its sidebar and cards, then the charts move.
 // - Branding: rulers are drawn, then guides and concentric rings, then the circular mark forms.
 // - Motion: a motion path with keyframes and handles, then a circle travels it on an ease while a
@@ -353,6 +353,9 @@ export default function Disciplines({ className = '' }: { className?: string }) 
       tl.to(mover ?? {}, { autoAlpha: 1, duration: 0.25 }, 1.2)
       const run = { t: 0 }
       tl.to(run, { t: 1, duration: 1.3, ease: 'none', onUpdate: () => motionAt(run.t) }, 1.5)
+
+      // Authored over 2.8s; played 1.4x so everything has landed by 2s.
+      tl.timeScale(1.4)
 
       return () => tl.scrollTrigger?.kill()
     },
