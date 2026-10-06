@@ -27,6 +27,8 @@ export type Project = {
   // these files for a day (next.config.ts), so bump v= when one changes. Falls back to the
   // card / hero stills.
   showcase?: string
+  // The showcase's background colour: a collapsed work card is a solid strip of it.
+  color: string
 }
 
 const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
@@ -41,6 +43,7 @@ export const PROJECTS: Project[] = [
     card: '/work/project-1.jpg',
     hero: caseStudyImage('jaadu-2'),
     showcase: '/showcase/jaadu-2.html?embed&v=3',
+    color: '#CFDDFF',
   },
   {
     slug: 'fitness-tracker',
@@ -48,6 +51,7 @@ export const PROJECTS: Project[] = [
     card: '/work/project-2.jpg',
     hero: caseStudyImage('fitness-tracker'),
     showcase: '/showcase/fitness-tracker.html?v=3',
+    color: '#FFE8EE',
   },
   {
     slug: 'bosch-customer-experience',
@@ -55,6 +59,7 @@ export const PROJECTS: Project[] = [
     card: '/work/project-3.jpg',
     hero: caseStudyImage('bosch-customer-experience'),
     showcase: '/showcase/bosch-customer-experience.html?embed&v=3',
+    color: '#DCCFFF',
   },
   {
     slug: 'clihub',
@@ -62,6 +67,7 @@ export const PROJECTS: Project[] = [
     card: '/work/project-4.jpg',
     hero: caseStudyImage('clihub'),
     showcase: '/showcase/clihub.html?embed&v=3',
+    color: '#B9C7DB',
   },
   {
     slug: 'college-management',
@@ -69,6 +75,7 @@ export const PROJECTS: Project[] = [
     card: caseStudyImage('college-management'),
     hero: caseStudyImage('college-management'),
     showcase: '/showcase/college-management.html?embed&v=3',
+    color: '#CFDDFF',
   },
 ].map((p) => ({ ...PLACEHOLDER, ...p }))
 
