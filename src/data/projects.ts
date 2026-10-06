@@ -21,8 +21,10 @@ export type Project = {
   problem: string
   card: string
   hero: string
-  // Looping animated showcase (public/showcase/, built by scripts/build-showcases.mjs from the
-  // Claude showcase artifacts): the work card's video and the case-study hero. Falls back to the
+  // Looping animated showcase (public/showcase/, the Claude showcase artifacts): the work card's
+  // video and the case-study hero. The bundled players go chromeless with ?embed; the fitness
+  // one is wrapped by scripts/build-showcases.mjs. All play/pause on postMessage. Browsers cache
+  // these files for a day (next.config.ts), so bump v= when one changes. Falls back to the
   // card / hero stills.
   showcase?: string
 }
@@ -38,36 +40,35 @@ export const PROJECTS: Project[] = [
     title: 'Jaadu 2.0',
     card: '/work/project-1.jpg',
     hero: caseStudyImage('jaadu-2'),
-    showcase: '/showcase/jaadu-2.html',
+    showcase: '/showcase/jaadu-2.html?embed&v=3',
   },
   {
     slug: 'fitness-tracker',
     title: 'Fitness Tracker App',
     card: '/work/project-2.jpg',
     hero: caseStudyImage('fitness-tracker'),
-    showcase: '/showcase/fitness-tracker.html',
+    showcase: '/showcase/fitness-tracker.html?v=3',
   },
   {
     slug: 'bosch-customer-experience',
     title: 'BOSCH Customer Experience',
     card: '/work/project-3.jpg',
     hero: caseStudyImage('bosch-customer-experience'),
-    showcase: '/showcase/bosch-customer-experience.html',
+    showcase: '/showcase/bosch-customer-experience.html?embed&v=3',
   },
-  // The clihub 20s cut is a React project, built by scripts/clihub-embed into its own folder.
   {
     slug: 'clihub',
     title: 'CLIHUB',
     card: '/work/project-4.jpg',
     hero: caseStudyImage('clihub'),
-    showcase: '/showcase/clihub/index.html',
+    showcase: '/showcase/clihub.html?embed&v=3',
   },
   {
     slug: 'college-management',
     title: 'College Management',
     card: caseStudyImage('college-management'),
     hero: caseStudyImage('college-management'),
-    showcase: '/showcase/college-management.html',
+    showcase: '/showcase/college-management.html?embed&v=3',
   },
 ].map((p) => ({ ...PLACEHOLDER, ...p }))
 
