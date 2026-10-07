@@ -59,6 +59,9 @@ const MOTION_TONE: Tone = {
   pop: '#FFD2C4',
 }
 const LIGHTS = ['#FF5F57', '#FEBC2E', '#28C840']
+// Green, where it means something: growth in the dashboard, and the palette's third colour.
+const GREEN = '#17A35B'
+const GREEN_SOFT = '#DCF5E7'
 /** The card's ground, behind everything (bleeds past the 3:2 crop). */
 const Ground = ({ c }: { c: string }) => <rect x="-60" y="-60" width="520" height="420" fill={c} />
 const HERO = { fontFamily: 'var(--font-hero)' }
@@ -117,8 +120,13 @@ function UxArt() {
         <text x="287" y="123" fontSize="9" fill={c.label} style={HERO}>
           Active users
         </text>
+        {/* growth, in green */}
+        <rect x="344" y="114" width="32" height="13" rx="6.5" fill={GREEN_SOFT} />
+        <text x="360" y="123.5" textAnchor="middle" fontSize="7.5" fontWeight="600" fill={GREEN} style={HERO}>
+          +12%
+        </text>
       </g>
-      <path data-draw="ux-chart" d={`M${spark}`} stroke={c.strong} strokeWidth="1.4" {...draw} />
+      <path data-draw="ux-chart" d={`M${spark}`} stroke={GREEN} strokeWidth="1.5" {...draw} />
       <g data-rise="ux-card">
         <rect x="164" y="172" width="270" height="150" rx="8" fill={c.fill} />
         <text x="176" y="191" fontSize="9" fill={c.label} style={HERO}>
@@ -180,6 +188,11 @@ function BrandArt() {
           104
         </text>
       </g>
+
+      {/* The palette, in the corner: the mark's violet and coral, and a green. */}
+      {[c.strong, c.pop, GREEN].map((fill, k) => (
+        <circle key={fill} data-pop="br-swatch" cx={330 + k * 20} cy="262" r="7" fill={fill} stroke="#FFFFFF" strokeWidth="2" />
+      ))}
     </>
   )
 }
@@ -376,6 +389,7 @@ export function disciplinesTimeline(root: HTMLElement) {
   pop('br-disc', 1.75)
   tl.to(cut ?? {}, { attr: { r: 22 }, duration: 0.5, ease: 'power3.inOut' }, 1.95)
   pop('br-dot', 2.3)
+  pop('br-swatch', 2.35, 0.08)
   rise('br-dim', 2.1)
 
   // Motion: path, keyframes and handles, then the circle travels while the playhead runs. 0 – 2.8s
