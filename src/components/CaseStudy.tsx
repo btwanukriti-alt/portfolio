@@ -5,10 +5,14 @@ import SlideCarousel from './SlideCarousel'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
 import { Reveal, SplitReveal } from './Reveal'
+import CollegeGallery from './CollegeGallery'
+import { COLLEGE_INFO } from '@/data/collegeGallery'
+import { caseStudyByKey } from '@/data/caseStudies'
 
 // Case study page (content layout from Figma 125:2): title block, the project's showcase video
 // as the hero (or its still), the problem, then the presentation slides.
 export default function CaseStudy({ project, slides }: { project: Project; slides: string[] }) {
+  if (project.slug === 'college-management') return <CollegeCaseStudy />
   return (
     // overflow-x clip: the full-width video hero spans 100vw, which includes the scrollbar.
     <div className="min-h-screen overflow-x-clip bg-paper">
@@ -83,6 +87,58 @@ export default function CaseStudy({ project, slides }: { project: Project; slide
         )}
       </main>
 
+      <Contact />
+    </div>
+  )
+}
+
+// Visual-first layout: the description at the top, the mockup gallery below (mockup-showcase skill).
+function CollegeCaseStudy() {
+  const cs = caseStudyByKey('college-erp')!
+  return (
+    <div className="min-h-screen overflow-x-clip bg-paper">
+      <SiteHeader />
+      <main className="mx-auto max-w-[var(--max)] px-[var(--gutter)] pt-[120px] pb-[clamp(80px,12vh,140px)]">
+        <Link
+          href="/#work"
+          className="inline-block text-[15px] leading-none font-medium text-muted no-underline transition-colors duration-200 ease-[ease] hover:text-ink focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          ← All work
+        </Link>
+
+        <div className="mt-[clamp(32px,6vh,64px)] grid grid-cols-1 gap-x-16 gap-y-8 min-[901px]:grid-cols-[3fr_2fr]">
+          <div className="flex flex-col gap-6">
+            <SplitReveal
+              as="h1"
+              className="m-0 max-w-[12ch] text-[clamp(44px,6.6vw,112px)] leading-[0.98] font-medium tracking-[-0.045em] text-ink"
+              text={cs.title ?? ''}
+            />
+            <Reveal as="p" className="m-0 max-w-[40ch] text-[clamp(20px,1.8vw,28px)] leading-[1.35] font-medium tracking-[-0.01em] text-ink" delay={150}>
+              {cs.hook}
+            </Reveal>
+          </div>
+          <Reveal delay={250} className="flex flex-col gap-8 min-[901px]:pt-4">
+            <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-5">
+              {COLLEGE_INFO.map(([term, value]) => (
+                <div key={term} className="flex flex-col gap-[6px]">
+                  <dt className="text-[13px] leading-none font-medium text-faint">{term}</dt>
+                  <dd className="m-0 text-[17px] leading-[1.25] font-medium text-ink">{value}</dd>
+                </div>
+              ))}
+            </dl>
+            {cs.paragraphs.map((t) => (
+              <p key={t} className="m-0 max-w-[52ch] text-[clamp(16px,1.2vw,18px)] leading-[1.6] text-muted">{t}</p>
+            ))}
+          </Reveal>
+        </div>
+
+        <Reveal className="mt-[clamp(40px,6vh,72px)] grid grid-cols-1 gap-4 border-t border-line pt-7 min-[901px]:grid-cols-[minmax(160px,1fr)_3fr]">
+          <p className="m-0 text-[15px] leading-[1.4] font-medium text-muted">The standout idea</p>
+          <p className="m-0 max-w-[30ch] text-[clamp(22px,2.4vw,36px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink">{cs.standout}</p>
+        </Reveal>
+
+        <CollegeGallery />
+      </main>
       <Contact />
     </div>
   )
