@@ -23,7 +23,7 @@ body{margin:0;background:#fff}
 <div id="root"></div>
 <script>
 const R='real/'
-const arcs=(cx,top,d)=>`<div class="arc halo" style="left:${cx-d/2}px;top:${top}px;width:${d}px;height:${d}px"></div><div class="arc ring" style="left:${cx-d/2}px;top:${top}px;width:${d}px;height:${d}px"></div>`
+const arcs=()=>""
 const M=(id,h,inner,cls='')=>`<div class="m ${cls}" id="${id}" style="height:${h}px">${inner}</div>`
 const frame=(src,w,l,t,crop='')=>`<div class="frame" style="left:${l}px;top:${t}px"><img src="${R}${src}" style="width:${w}px;${crop}"></div>`
 const card=(src,w,l,t,r=28)=>`<div class="card" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px"><img src="${R}${src}"></div>`
@@ -33,7 +33,7 @@ const phone=(src,k,l,t)=>`<div class="dev" style="left:${l}px;top:${t}px;transfo
 // 1 footprint desktop
 S.push(M('m1',1000,frame('s-footprint.png',1400,88,96)))
 // 2 regime gauge
-S.push(M('m2',860,arcs(800,560,2600)+card('c-regime.png',980,310,150,44),'b'))
+S.push(M('m2',700,card('c-regime.png',980,310,122,44),'b'))
 // 3 overnight discoveries on a MacBook Pro
 S.push(M('m3',1000,`<div class="shadow" style="left:220px;top:860px;width:1160px;height:90px"></div>`+dev('device-macbook-pro device-spacegray','s-overnight.png',1.9,97,90)+`<div class="floor"></div>`,'b'))
 // 4 multi-condition alert, zoomed crop
