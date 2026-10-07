@@ -70,25 +70,25 @@ function cmp(html,k,l,t,{drop=true}={}){const h=document.createElement('div');h.
 window.build=()=>{
 // 1 HERO: laptop with the full drawer screen, enlarged header crop, title block
 {const m=mod('m-spines',820);
- const A=plate(m,40,40,940,740);A.appendChild(lap('#s-d3',0.72,24,84,576));
- const B=plate(m,1000,40,560,440);const c=cardc(B,28,28,504,384);
- const e=q('#s-d3 .app').cloneNode(true);e.style.cssText='position:absolute;left:-135px;top:-26px;transform:scale(1.35);transform-origin:0 0;width:1200px;height:800px;margin:0';c.appendChild(e);
- const bk=document.createElement('div');bk.className='block sm';bk.style.cssText='left:1000px;top:500px;width:560px;height:280px';bk.innerHTML='<h3>Every level stays in view</h3><p>Group, college and programme stay on screen as spines while the next drawer opens.</p>';m.appendChild(bk);}
+ const A=plate(m,40,40,1040,740);A.appendChild(lap('#s-d3',0.8,26,70,600));
+ const B=plate(m,1100,40,460,440);const c=cardc(B,24,24,412,392);
+ const e=q('#s-d3 .app').cloneNode(true);e.style.cssText='position:absolute;left:-125px;top:-24px;transform:scale(1.3);transform-origin:0 0;width:1200px;height:800px;margin:0';c.appendChild(e);
+ const bk=document.createElement('div');bk.className='block sm';bk.style.cssText='left:1100px;top:500px;width:460px;height:280px;padding:40px 44px';bk.innerHTML='<h3 style="font-size:40px">Every level stays in view</h3><p style="font-size:20px">Group, college and programme stay on screen as spines while the next drawer opens.</p>';m.appendChild(bk);}
 // 2 DARK: target at a glance
 {const m=mod('m-target',860);const p=dark(m,40,40,1520,780);
  dtxt(p,80,90,'Collected against target, at a glance','One bar and one marker show how far the group is from 80%.');
- const hero=z('#s-fin .hero',0.72,80,430,{drop:true});p.appendChild(hero);
- p.appendChild(lap('#s-fin',0.6,760,80,560));
+ const hero=z('#s-fin .hero',0.55,70,470,{drop:true});p.appendChild(hero);
+ p.appendChild(lap('#s-fin',0.74,620,64,610));
  const u=lib.querySelector('#s-fin .hero .track u').getBoundingClientRect();const hb=lib.querySelector('#s-fin .hero').getBoundingClientRect();
- const mx=80+(u.left-hb.left)*0.72+1,my=430+(u.top-hb.top)*0.72;
+ const mx=70+(u.left-hb.left)*0.55+1,my=470+(u.top-hb.top)*0.55;
  callout(p,`M${mx} ${my} V${my-34}`,null);dot(p,mx,my+2);}
 // 3 BENTO finance: dense plates
 {const m=mod('m-ranked',1000);
  const A=plate(m,40,40,880,600);A.appendChild(z('#s-fin .main > .card:last-child',1.12,24,36,{drop:true}));
  const B=plate(m,940,40,620,600);
- B.appendChild(z('#s-fin .callout',0.9,22,36,{drop:true,w:1000}));
- B.appendChild(z('#s-fin .hero',0.72,22,150,{drop:true}));
- B.appendChild(cmp(`<div class="card" style="width:880px;display:flex;flex-direction:column;gap:18px"><div class="cell2"><div class="mini"><b style="width:55.9%;background:#d92d20"></b><u style="left:80%"></u></div><small class="num">Science · ₹9.50 Cr of ₹17.00 Cr</small></div><div class="cell2"><div class="mini"><b style="width:83.8%;background:#12805c"></b><u style="left:80%"></u></div><small class="num">Engineering · ₹28.50 Cr of ₹34.00 Cr</small></div></div>`,0.76,22,370));
+ B.appendChild(z('#s-fin .callout',1.0,22,34,{drop:true,w:1000}));
+ B.appendChild(z('#s-fin .hero',0.82,22,150,{drop:true}));
+ B.appendChild(cmp(`<div class="card" style="width:880px;display:flex;flex-direction:column;gap:18px"><div class="cell2"><div class="mini"><b style="width:55.9%;background:#d92d20"></b><u style="left:80%"></u></div><small class="num">Science · ₹9.50 Cr of ₹17.00 Cr</small></div><div class="cell2"><div class="mini"><b style="width:83.8%;background:#12805c"></b><u style="left:80%"></u></div><small class="num">Engineering · ₹28.50 Cr of ₹34.00 Cr</small></div></div>`,0.9,22,372));
  const C=plate(m,40,660,500,300);
  C.appendChild(cmp(`<div style="display:flex;gap:16px"><span class="chip ok">83.8%</span><span class="chip warn">72.7%</span><span class="chip bad">55.9%</span></div>`,1.7,34,40));
  C.appendChild(cmp(`<div style="display:flex;gap:16px"><span class="chip bad">69.7%</span><span class="chip bad">66.7%</span></div>`,1.7,34,130));
@@ -99,15 +99,15 @@ window.build=()=>{
  const E=plate(m,1080,660,480,300);E.appendChild(z('#s-fin .main > .row:nth-of-type(4) > .card:nth-child(2)',0.95,30,30,{drop:true}));}
 // 4 SPREAD staff: attendance crop + title + laptop with the staff screen
 {const m=mod('m-attendance',820);
- const A=plate(m,40,40,560,440);A.appendChild(z('#s-staff .row:nth-of-type(3) > .card:first-child',1.0,28,36,{drop:true}));
- const bk=document.createElement('div');bk.className='block sm';bk.style.cssText='left:40px;top:500px;width:560px;height:280px';bk.innerHTML='<h3>Attendance at a glance</h3><p>Present, absent and on leave for each college, in one bar.</p>';m.appendChild(bk);
- const B=plate(m,620,40,940,740);B.appendChild(lap('#s-staff',0.72,24,84,576));}
+ const A=plate(m,40,40,460,440);A.appendChild(z('#s-staff .row:nth-of-type(3) > .card:first-child',0.9,22,36,{drop:true}));
+ const bk=document.createElement('div');bk.className='block sm';bk.style.cssText='left:40px;top:500px;width:460px;height:280px;padding:40px 44px';bk.innerHTML='<h3 style="font-size:40px">Attendance at a glance</h3><p style="font-size:20px">Present, absent and on leave for each college, in one bar.</p>';m.appendChild(bk);
+ const B=plate(m,520,40,1040,740);B.appendChild(lap('#s-staff',0.8,26,70,600));}
 // 5 DARK: four levels cascade
 {const m=mod('m-weakest',860);const p=dark(m,40,40,1520,780);
- dtxt(p,80,90,'The weakest row is named at every level','The same line opens each drawer, with its gap to target.');
- const a=lap('#s-d2',0.5,700,90,400);a.style.filter='drop-shadow(0 30px 40px rgba(0,0,0,.4))';p.appendChild(a);
- const b=lap('#s-d3',0.5,940,310,400);b.style.filter='drop-shadow(0 30px 40px rgba(0,0,0,.45))';p.appendChild(b);
- p.appendChild(z('#s-d3 #lowline',0.8,80,470,{drop:true,w:700}));}
+ dtxt(p,80,90,'The weakest row is named at every level','The same line opens each drawer, with its gap to target.');p.lastChild.style.maxWidth='470px';p.lastChild.querySelector('h3').style.fontSize='46px';
+ const a=lap('#s-d2',0.58,640,60,470);a.style.filter='drop-shadow(0 30px 40px rgba(0,0,0,.4))';p.appendChild(a);
+ const b=lap('#s-d3',0.58,900,290,470);b.style.filter='drop-shadow(0 30px 40px rgba(0,0,0,.45))';p.appendChild(b);
+ p.appendChild(z('#s-d3 #lowline',0.62,80,520,{drop:true,w:700}));}
 // 6 BENTO staff: dense
 {const m=mod('m-staff',1000);
  const A=plate(m,40,40,1000,600);A.appendChild(z('#s-staff .main > .row:nth-of-type(2)',1.04,22,36,{drop:false}));
@@ -119,10 +119,10 @@ window.build=()=>{
  D.appendChild(z('#s-staff .row:nth-of-type(2) > .card:nth-child(2)',1.5,34,40,{drop:true}));D.appendChild(z('#s-staff .row:nth-of-type(2) > .card:nth-child(1)',1.5,334,40,{drop:true}));}
 // 7 SPREAD mirrored: laptop with the college drawer, banner crops, title
 {const m=mod('m-totals',820);
- const A=plate(m,40,40,940,740);A.appendChild(lap('#s-d2',0.72,24,84,576));
- const B=plate(m,1000,40,560,440);
- B.appendChild(z('#s-d2 .hero',0.95,26,34,{drop:true}));B.appendChild(z('#s-d3 .hero',0.95,26,236,{drop:true}));
- const bk=document.createElement('div');bk.className='block sm';bk.style.cssText='left:1000px;top:500px;width:560px;height:280px';bk.innerHTML='<h3>Totals for the level you open</h3><p>Each drawer shows its own received, expected and collection, not the group figures.</p>';m.appendChild(bk);}
+ const A=plate(m,520,40,1040,740);A.appendChild(lap('#s-d2',0.8,26,70,600));
+ const B=plate(m,40,40,460,440);
+ B.appendChild(z('#s-d2 .hero',0.9,24,30,{drop:true}));B.appendChild(z('#s-d3 .hero',0.9,24,228,{drop:true}));
+ const bk=document.createElement('div');bk.className='block sm';bk.style.cssText='left:40px;top:500px;width:460px;height:280px;padding:40px 44px';bk.innerHTML='<h3 style="font-size:40px">Totals for the level you open</h3><p style="font-size:20px">Each drawer shows its own received, expected and collection, not the group figures.</p>';m.appendChild(bk);}
 // 8 COLOUR bento: full-bleed colour plates
 {const m=mod('m-colour',900);
  const sp=(l,t,w,h,bg,name,hex,light)=>{const d=document.createElement('div');d.className='swp';d.style.cssText=`left:${l}px;top:${t}px;width:${w}px;height:${h}px;background:${bg};color:${light?'#1B2340':'#fff'};box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)`;d.innerHTML=`<div style="position:absolute;left:44px;bottom:38px"><div style="font:600 30px Figtree">${name}</div><div style="font:500 22px Figtree;opacity:.7;margin-top:4px">${hex}</div></div>`;m.appendChild(d);return d};
