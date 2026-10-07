@@ -18,6 +18,7 @@ export default defineConfig([
     'public/**',
     'dist/**',
     'scripts/ssh-client-embed/**',
+    'scripts/mockups/**',
     '*-video/**',
     'Claude outputs/**',
   ]),

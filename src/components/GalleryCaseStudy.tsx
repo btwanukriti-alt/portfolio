@@ -15,11 +15,13 @@ export default function GalleryCaseStudy({
   project,
   study,
   brand,
+  note,
   images,
 }: {
   project: Project
   study: CaseStudy
   brand: Brand
+  note: string
   images: GalleryImage[]
 }) {
   const vars = {
@@ -28,6 +30,7 @@ export default function GalleryCaseStudy({
     '--c-soft': brand.soft,
     '--c-tint': brand.tint,
     '--c-pop': brand.pop,
+    ...(brand.font ? { '--c-font': brand.font } : {}),
   } as CSSProperties
   const title = study.title ?? project.title
   const meta = [study.label, study.company, study.dates].filter(Boolean).join(' · ')
@@ -70,7 +73,7 @@ export default function GalleryCaseStudy({
               )}
               <SplitReveal
                 as="h1"
-                className="m-0 font-wordmark-zync text-[clamp(64px,12vw,184px)] leading-[0.95] font-bold tracking-[-0.035em] text-ink"
+                className={`m-0 ${brand.font ? '[font-family:var(--c-font)]' : 'font-wordmark-zync'} text-[clamp(64px,12vw,184px)] leading-[0.95] font-bold tracking-[-0.035em] text-ink`}
                 text={title}
               />
             </div>
@@ -119,7 +122,7 @@ export default function GalleryCaseStudy({
         </Reveal>
 
         <p className="mx-auto mt-[clamp(56px,9vh,104px)] mb-0 max-w-[var(--max)] text-[14px] leading-[1.5] text-faint">
-          Screens are refined for this portfolio, and the figures in them are sample data. The last image shows five earlier Home layouts next to the refined one.
+          {note}
         </p>
 
         <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">

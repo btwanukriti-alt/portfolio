@@ -77,9 +77,8 @@ export const PROJECTS: Project[] = [
     timeline: '3 months',
     problem:
       "A sysadmin managing 40 servers shouldn't need to remember 400 commands. I designed it to remember them, and to write the next one on request.",
-    card: '/work/project-4.jpg',
+    card: '/case-studies/ssh-client/01-health.jpg',
     hero: caseStudyImage('ssh-client'),
-    showcase: '/showcase/ssh-client.html?embed&v=6',
     color: '#C9EEDC',
   },
   {

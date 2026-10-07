@@ -1,0 +1,5 @@
+screens/*.png
+screens/*.html
+gallery/
+mockups/
+node_modules/
