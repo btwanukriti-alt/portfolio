@@ -60,15 +60,16 @@ Rank by how visible and defensible each is. Cut anything generic. If a decision 
 - **Interview answer:** two sentences she can say that are true to what she did and what the screens show, including "I don't have usage data; here's what I'd measure."
 
 ### 5. Draft the case study
-- One-sentence hook that states the arc
-- Overview card: Role (specific), Team, Timeline, Context, Outcome
-- Overview, about 150 words: starting state, her job, 3 or 4 core questions
-- 3 or 4 sections, each built around one design problem (never "Research" or "Ideation"), with a short paragraph and a visual with a caption
-- One standout idea
-- "What I delivered" list, then one sentence on the biggest insight
-- A "Next" list with named metrics
+Her format for every project: very short and visual-heavy. A founder or hiring manager spends 30 seconds to 3 minutes on a page.
 
-Length: 500 to 700 words of text, 8 to 12 visuals, about 60% visual. Every caption states what the visual proves. For each visual, name the exact frame to export, or the diagram to make.
+- One-sentence hook that states the arc
+- One info line: label (internship, freelance, concept), company or client, dates, timeline, "Sole designer" or her exact role, team, outcome
+- **Two paragraphs maximum.** Paragraph one: the problem and what she was responsible for. Paragraph two: how she did it, meaning the key decisions. Only what matters, no process labels, no essay.
+- 8 to 10 visuals in a row, each with a one-line caption that states what it proves
+- One standout idea, one line
+- "What I delivered" as one short line or list, and "Next" as one line with named metrics
+
+Length: about 150 to 200 words of text in total. Visuals carry the story. For each visual, name the exact frame to export, or the diagram to make. Cut anything that isn't needed in the first minute. If she wants more, offer it. Don't default to it.
 
 ### 6. Critique and finish
 Do a hiring-manager pass: flag unsupported claims, the weakest section, and anything generic. List placeholder data to fix before publishing. Then give the paste-ready copy and a two-sentence homepage card, and list what's still weak.
