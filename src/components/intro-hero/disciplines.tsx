@@ -17,6 +17,14 @@ const MID = '#bdbdc1'
 const SOFT = '#d9d9dc'
 const FILL = '#f0f0f1'
 const PAPER = '#ffffff'
+// Colour, used sparingly: one hue per card, only where the real tool would show colour (the
+// window's buttons, the selected nav item and the highlighted data in UX; the mark in branding;
+// the moving layer and the playhead in motion). Everything else stays greyscale.
+const BLUE = '#3D6BFF'
+const VIOLET = '#6C55F2'
+const CORAL = '#FF6B4A'
+const CORAL_SOFT = '#FFC7B8'
+const LIGHTS = ['#FF5F57', '#FEBC2E', '#28C840']
 const HERO = { fontFamily: 'var(--font-hero)' }
 const MONO = { fontFamily: 'var(--font-hero-mono)' }
 const draw = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', pathLength: 1 } as const
@@ -33,9 +41,9 @@ function UxArt() {
       <rect data-draw="ux-window" x="40" y="34" width="420" height="320" rx="12" fill={PAPER} stroke={INK} strokeWidth="1.4" pathLength="1" />
       <path data-fade="ux-bar" d="M40.7 62 V46 a11.3 11.3 0 0 1 11.3 -11.3 H460 V62 Z" fill="#ececed" />
       <line data-draw="ux-window" x1="40" y1="62" x2="460" y2="62" stroke={INK} strokeWidth="1.2" {...draw} />
-      <circle data-pop="ux-dots" cx="58" cy="48" r="3.6" fill={MID} />
-      <circle data-pop="ux-dots" cx="70" cy="48" r="3.6" fill={PAPER} stroke={MID} />
-      <circle data-pop="ux-dots" cx="82" cy="48" r="3.6" fill={DARK} />
+      {LIGHTS.map((c, k) => (
+        <circle key={c} data-pop="ux-dots" cx={58 + k * 12} cy="48" r="3.6" fill={c} />
+      ))}
 
       {/* Sidebar */}
       <line data-draw="ux-side" x1="148" y1="62" x2="148" y2="300" stroke={INK} strokeWidth="1.2" {...draw} />
@@ -50,7 +58,7 @@ function UxArt() {
           <line x1="58" y1={132 + k * 30} x2="134" y2={132 + k * 30} stroke="#e4e4e6" />
         </g>
       ))}
-      <circle data-pop="ux-dots" cx="130" cy="118" r="2.6" fill={DARK} />
+      <circle data-pop="ux-dots" cx="130" cy="118" r="2.6" fill={BLUE} />
 
       {/* Cards */}
       <text data-rise="ux-label" x="164" y="92" fontSize="13" fill={INK} style={HERO}>
@@ -71,7 +79,7 @@ function UxArt() {
           Active users
         </text>
       </g>
-      <path data-draw="ux-chart" d={`M${spark}`} stroke={INK} strokeWidth="1.25" {...draw} />
+      <path data-draw="ux-chart" d={`M${spark}`} stroke={BLUE} strokeWidth="1.4" {...draw} />
       <g data-rise="ux-card">
         <rect x="164" y="172" width="270" height="150" rx="8" fill={FILL} />
         <text x="176" y="191" fontSize="9" fill="#8a8a8f" style={HERO}>
@@ -79,7 +87,7 @@ function UxArt() {
         </text>
       </g>
       {BARS.map((h, i) => (
-        <rect key={i} data-bar x={180 + i * 24} y={300 - h} width="14" height={h + 10} rx="3" fill={i === 5 ? DARK : '#cacacd'} />
+        <rect key={i} data-bar x={180 + i * 24} y={300 - h} width="14" height={h + 10} rx="3" fill={i === 5 ? BLUE : '#cacacd'} />
       ))}
     </>
   )
@@ -117,9 +125,9 @@ function BrandArt() {
 
       {/* The mark: a ring, a disc, and a crescent cut from it. */}
       <circle data-draw="br-mark" cx="200" cy="150" r="52" stroke={INK} strokeWidth="1.5" transform="rotate(-90 200 150)" {...draw} />
-      <circle data-pop="br-disc" cx="200" cy="150" r="36" fill={DARK} />
+      <circle data-pop="br-disc" cx="200" cy="150" r="36" fill={VIOLET} />
       <circle data-cut cx="214" cy="136" r="0" fill={PAPER} />
-      <circle data-pop="br-dot" cx="214" cy="136" r="5" fill={DARK} />
+      <circle data-pop="br-dot" cx="214" cy="136" r="5" fill={CORAL} />
 
       {/* A dimension line over the mark. */}
       <g data-rise="br-dim">
@@ -200,7 +208,7 @@ function MotionArt() {
     <>
       <path data-draw="mo-path" d={path} stroke={MID} strokeWidth="1.3" strokeDasharray="0" {...draw} />
       {ghosts.map((g) => (
-        <circle key={g.t} data-ghost={g.t} cx={g.p[0]} cy={g.p[1]} r={g.r} fill="none" stroke={SOFT} strokeWidth="1.2" />
+        <circle key={g.t} data-ghost={g.t} cx={g.p[0]} cy={g.p[1]} r={g.r} fill="none" stroke={CORAL_SOFT} strokeWidth="1.2" />
       ))}
       <line data-draw="mo-handle" x1={H[0][0]} y1={H[0][1]} x2={H[1][0]} y2={H[1][1]} stroke={INK} strokeWidth="0.9" {...draw} />
       {H.map(([x, y]) => (
@@ -209,7 +217,7 @@ function MotionArt() {
       {K.map(([x, y]) => (
         <path key={x} data-pop="mo-key" d={diamond(x, y)} fill={PAPER} stroke={INK} strokeWidth="1.2" />
       ))}
-      <circle data-mover cx={K[0][0]} cy={K[0][1]} r="13" fill={DARK} />
+      <circle data-mover cx={K[0][0]} cy={K[0][1]} r="13" fill={CORAL} />
 
       {/* Timeline */}
       <g data-rise="mo-panel">
@@ -236,8 +244,8 @@ function MotionArt() {
         row.keys.map((t) => <path key={`${row.label}${t}`} data-pop="mo-tkey" d={diamond(tx(t), 236 + k * 22, 4)} fill={DARK} />),
       )}
       <g data-head>
-        <line data-stem x1={tx(0)} y1="222" x2={tx(0)} y2="300" stroke={INK} strokeWidth="1.2" />
-        <rect data-cap x={tx(0) - 17} y="200" width="34" height="14" rx="7" fill={DARK} />
+        <line data-stem x1={tx(0)} y1="222" x2={tx(0)} y2="300" stroke={CORAL} strokeWidth="1.2" />
+        <rect data-cap x={tx(0) - 17} y="200" width="34" height="14" rx="7" fill={CORAL} />
         <text data-time x={tx(0)} y="210" textAnchor="middle" fontSize="7.5" fill={PAPER} style={MONO}>
           0.00s
         </text>
