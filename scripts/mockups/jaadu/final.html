@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="real/devices.min.css">
+<style>
+@font-face{font-family:Geist;font-weight:500;src:url(node_modules/@fontsource/geist/files/geist-latin-500-normal.woff2)}
+@font-face{font-family:Geist;font-weight:400;src:url(node_modules/@fontsource/geist/files/geist-latin-400-normal.woff2)}
+@font-face{font-family:'IBM Plex Mono';font-weight:400;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2)}
+body{margin:0;background:#fff}
+.m{position:relative;width:1600px;overflow:hidden;margin:0 0 60px;font-family:Geist,sans-serif;
+ background:radial-gradient(900px 620px at 12% -8%,rgba(64,102,255,.42),rgba(64,102,255,0) 70%),radial-gradient(700px 520px at 100% 110%,rgba(40,70,220,.22),rgba(0,0,0,0) 70%),linear-gradient(180deg,#02041A,#00010A)}
+.m.b{background:radial-gradient(1100px 700px at 50% 120%,rgba(60,100,255,.35),rgba(0,0,0,0) 70%),linear-gradient(180deg,#000108,#020724)}
+.frame{position:absolute;border-radius:30px;padding:12px;background:linear-gradient(180deg,#14182E,#0A0D1C);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.22),0 60px 120px -40px rgba(0,0,0,.9),0 0 0 1px rgba(0,0,0,.6)}
+.frame img{display:block;border-radius:19px}
+.arc{position:absolute;border-radius:50%;pointer-events:none}
+.ring{background:radial-gradient(closest-side,rgba(0,0,0,0) 97.7%,rgba(90,135,255,.85) 98.7%,rgba(232,242,255,1) 99.25%,rgba(90,135,255,0) 100%)}
+.halo{background:radial-gradient(closest-side,rgba(0,0,0,0) 88%,rgba(40,90,255,.55) 97%,rgba(0,0,0,0) 100%);filter:blur(26px)}
+.card{position:absolute;border-radius:28px;box-shadow:0 50px 90px -30px rgba(0,0,0,.95)}
+.card img{display:block;width:100%;border-radius:inherit}
+.dev{position:absolute;transform-origin:0 0}
+.device-screen{object-fit:cover;object-position:top left}
+.floor{position:absolute;left:0;right:0;bottom:0;height:240px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(30,60,200,.18));}
+.shadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.85),rgba(0,0,0,0));}
+</style>
+<div id="root"></div>
+<script>
+const R='real/'
+const arcs=(cx,top,d)=>`<div class="arc halo" style="left:${cx-d/2}px;top:${top}px;width:${d}px;height:${d}px"></div><div class="arc ring" style="left:${cx-d/2}px;top:${top}px;width:${d}px;height:${d}px"></div>`
+const M=(id,h,inner,cls='')=>`<div class="m ${cls}" id="${id}" style="height:${h}px">${inner}</div>`
+const frame=(src,w,l,t,crop='')=>`<div class="frame" style="left:${l}px;top:${t}px"><img src="${R}${src}" style="width:${w}px;${crop}"></div>`
+const card=(src,w,l,t,r=28)=>`<div class="card" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px"><img src="${R}${src}"></div>`
+const dev=(cls,src,k,l,t,rot=0,extra='')=>`<div class="dev" style="left:${l}px;top:${t}px;transform:scale(${k}) ${rot?`rotate(${rot}deg)`:''}"><div class="device ${cls}"><div class="device-frame"><img class="device-screen" src="${R}${src}" style="${extra}"></div><div class="device-stripe"></div><div class="device-header"></div><div class="device-sensors"></div><div class="device-btns"></div><div class="device-power"></div></div></div>`
+const S=[]
+// 1 hero: footprint desktop, large flat frame, cropped at the bottom
+S.push(M('m1',1000,frame('s-footprint.png',1400,88,96)))
+// 2 footprint chart close-up on the app background, arc glow
+S.push(M('m2',1000,arcs(800,700,2700)+`<div class="card" style="left:170px;top:110px;width:1260px;height:728px;border-radius:26px;background:radial-gradient(900px 300px at 50% -10%,rgba(48,85,227,.35),rgba(0,0,0,0)),#00022B;box-shadow:0 0 0 1px rgba(103,209,255,.45),0 60px 110px -30px rgba(0,0,0,.95)"><img src="${R}c-chart.png" style="width:1260px;border-radius:26px"></div>`,'b'))
+// 3 regime + market components
+S.push(M('m3',860,arcs(800,560,2600)+card('c-regime.png',980,310,150,44),'b'))
+// 4 alerts: zoomed crop of the multi-condition alert
+S.push(M('m4',820,`<div class="frame" style="left:110px;top:100px;width:1380px;height:900px;overflow:hidden;padding:12px"><div style="width:1380px;height:900px;overflow:hidden;border-radius:19px"><img src="${R}s-alerts.png" style="width:1820px;margin-left:-200px;margin-top:-440px;display:block"></div></div>`))
+// 5 overnight discoveries on a MacBook Pro
+S.push(M('m5',1000,`<div class="shadow" style="left:220px;top:860px;width:1160px;height:90px"></div>`+dev('device-macbook-pro device-spacegray','s-overnight.png',1.9,97,90)+`<div class="floor"></div>`,'b'))
+// 6 library on a Pro Display XDR
+S.push(M('m6',1000,dev('device-pro-display-xdr','s-library.png',2.1,128,70)))
+// 7 chart prompt: tablet and phone
+S.push(M('m7',1000,arcs(800,720,2800)+`<div style="position:absolute;left:150px;top:150px;padding:24px;border-radius:44px;background:#0d0d0d;box-shadow:inset 0 0 0 1.5px #babdbf,inset 0 0 1px 4px #e2e3e4,0 70px 120px -40px rgba(0,0,0,.95)"><img src="${R}s-tablet.png" style="display:block;width:960px;border-radius:16px"></div>`+dev('device-iphone-14-pro device-deep-purple','s-mobile.png',.98,1130,110),'b'))
+document.getElementById('root').innerHTML=S.join('')
+</script>
