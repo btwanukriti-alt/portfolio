@@ -80,7 +80,7 @@ export const PROJECTS: Project[] = [
     card: '/case-studies/ssh-client/01-health.jpg',
     hero: caseStudyImage('ssh-client'),
     showcase: '/showcase/ssh-client.html?embed&v=7',
-    color: '#1A1433',
+    color: '#C9EEDC',
   },
   {
     slug: 'college-management',
