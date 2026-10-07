@@ -4,6 +4,38 @@
 <style>:root{color-scheme:dark;--bg:#000}html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}*{-webkit-font-smoothing:antialiased}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<style>@keyframes shp-float{0%,100%{translate:0 0;rotate:0deg}50%{translate:var(--dx) var(--dy);rotate:5deg}}.shp{position:absolute;pointer-events:none;animation:shp-float 12s ease-in-out infinite}@media (prefers-reduced-motion:reduce){.shp{animation:none}}</style>
+<script>
+// The corner shapes, as the gym card lays them out: [kind, x, y (share of the frame), size, colour].
+// Sizes are shares of the frame's longer side. With W and H the frame is in px; without, the
+// shapes size to the page (vmax) and sit by percentage.
+window.__SHAPES = function (set, W, H) {
+  var SETS = {
+    jaadu: [['circle', .05, .92, .3, '#B8EDD6'], ['pill', .94, .13, [.26, .09], '#FFE07A'], ['star', .93, .86, .1, '#7D95FF'], ['ring', .07, .12, .13, 'rgba(255,255,255,.75)']],
+    fitness: [['circle', .05, .92, .3, '#DCCFFF'], ['pill', .94, .13, [.26, .09], '#FFE07A'], ['star', .93, .86, .1, '#FF86A8'], ['ring', .07, .12, .13, 'rgba(255,255,255,.85)']],
+    clihub: [['circle', .05, .92, .3, '#CDBFFF'], ['pill', .94, .13, [.26, .09], '#FFE07A'], ['star', .93, .86, .1, '#7B61FF'], ['ring', .07, .12, .13, 'rgba(255,255,255,.8)']],
+    college: [['circle', .05, .92, .3, '#BFD0FF'], ['pill', .94, .13, [.26, .09], '#A6E5C8'], ['star', .93, .86, .1, '#FF8A5B'], ['ring', .07, .12, .13, 'rgba(255,255,255,.85)']]
+  };
+  var px = W != null, M = px ? Math.max(W, H) : 0;
+  var u = function (v) { return px ? v * M + 'px' : v * 100 + 'vmax' };
+  var STAR = 'M50 2 61 34 96 36 68 57 79 92 50 71 21 92 32 57 4 36 39 34z';
+  return (SETS[set] || []).map(function (s, i) {
+    var kind = s[0], size = s[3], c = s[4];
+    var st = {
+      left: px ? s[1] * W + 'px' : s[1] * 100 + '%',
+      top: px ? s[2] * H + 'px' : s[2] * 100 + '%',
+      transform: 'translate(-50%,-50%)',
+      '--dx': (i % 2 ? -1 : 1) * 0.7 + (px ? '%' : 'vmax'),
+      '--dy': (i % 2 ? 1 : -1) * 0.6 + (px ? '%' : 'vmax'),
+      animationDelay: -i * 2.9 + 's'
+    };
+    if (kind === 'circle') return { tag: 'div', props: { className: 'shp', style: Object.assign(st, { width: u(size), height: u(size), borderRadius: '50%', background: c }) } };
+    if (kind === 'ring') return { tag: 'div', props: { className: 'shp', style: Object.assign(st, { width: u(size), height: u(size), borderRadius: '50%', border: u(size * 0.12) + ' solid ' + c, boxSizing: 'border-box' }) } };
+    if (kind === 'pill') return { tag: 'div', props: { className: 'shp', style: Object.assign(st, { width: u(size[0]), height: u(size[1]), borderRadius: u(size[1]), background: c }) } };
+    return { tag: 'svg', props: { className: 'shp', viewBox: '0 0 100 100', style: Object.assign(st, { width: u(size), height: u(size), overflow: 'visible' }), dangerouslySetInnerHTML: { __html: '<path d="' + STAR + '" fill="' + c + '"/>' } } };
+  });
+};
+</script>
 <div id="root"></div>
 <script>
 // Fitness app showcase, 31s loop (22.8s authored timeline played at 1/PACE). Same stage, type, cursor and motion system as the College
@@ -58,6 +90,7 @@ const fmt = (n) => Math.round(n).toLocaleString('en-US')
 // Flat cream canvas, no gradients or shapes.
 function Studio() {
   return h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden', background: '#FFE8EE' } },
+    ...window.__SHAPES('fitness', W, H).map((p, i) => h(p.tag, { ...p.props, key: i })),
     h('svg', { width: W, height: H, style: { position: 'absolute', inset: 0, opacity: 0.05, mixBlendMode: 'multiply' } },
       h('filter', { id: 'gr' }, h('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.85', numOctaves: '2', seed: '3' })),
       h('rect', { width: W, height: H, filter: 'url(#gr)' })),

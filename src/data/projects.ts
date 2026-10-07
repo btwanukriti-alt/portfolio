@@ -37,7 +37,7 @@ export const PROJECTS: Project[] = [
       "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
     card: '/work/project-1.jpg',
     hero: caseStudyImage('jaadu-2'),
-    showcase: '/showcase/jaadu-2.html?embed&v=3',
+    showcase: '/showcase/jaadu-2.html?embed&v=5',
     color: '#CFDDFF',
   },
   {
@@ -51,7 +51,7 @@ export const PROJECTS: Project[] = [
       "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
     card: '/work/project-2.jpg',
     hero: caseStudyImage('fitness-tracker'),
-    showcase: '/showcase/fitness-tracker.html?v=4',
+    showcase: '/showcase/fitness-tracker.html?v=5',
     color: '#FFE8EE',
   },
   {
@@ -79,8 +79,8 @@ export const PROJECTS: Project[] = [
       "A sysadmin managing 40 servers shouldn't need to remember 400 commands. I designed CLIHUB to remember them, and to write the next one on request.",
     card: '/work/project-4.jpg',
     hero: caseStudyImage('clihub'),
-    showcase: '/showcase/clihub.html?embed&v=4',
-    color: '#B9C7DB',
+    showcase: '/showcase/clihub.html?embed&v=5',
+    color: '#C9EEDC',
   },
   {
     slug: 'college-management',
@@ -93,8 +93,8 @@ export const PROJECTS: Project[] = [
       "A college group had no way to see all its colleges at once. Dhondi puts them on one dashboard, with access set by role.",
     card: caseStudyImage('college-management'),
     hero: caseStudyImage('college-management'),
-    showcase: '/showcase/college-management.html?embed&v=3',
-    color: '#CFDDFF',
+    showcase: '/showcase/college-management.html?embed&v=5',
+    color: '#FFE4D3',
   },
 ]
 
