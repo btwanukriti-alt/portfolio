@@ -14,6 +14,7 @@ body{margin:0;background:#fff}
 .plate{position:absolute;overflow:hidden;border-radius:56px;background:#040929;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.07),0 40px 80px -40px rgba(0,0,0,.9)}
 .glow{display:none}
 .plate.light{background:linear-gradient(180deg,#F1F2F6,#D6DAE5);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9),0 40px 80px -40px rgba(0,0,0,.9)}
+.plate.glass{background:linear-gradient(135deg,#F4F6FF 0%,#D4DCFB 55%,#B9C6F7 100%);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9),0 40px 80px -40px rgba(0,0,0,.9)}
 .plate.warm{background:linear-gradient(180deg,#ECE9E6,#CFCAC6);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.8),0 40px 80px -40px rgba(0,0,0,.9)}
 .block{position:absolute;border-radius:56px;overflow:hidden;background:#0B1757;color:#F1F6FF;padding:60px 68px;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09),0 40px 80px -40px rgba(0,0,0,.9)}
 .block h3{font-weight:400;font-size:56px;margin:0;letter-spacing:-.02em;line-height:1.1;color:#F1F6FF;position:relative;z-index:2}
@@ -40,17 +41,17 @@ const block=(l,t,w,h,a,b)=>`<div class="block" style="left:${l}px;top:${t}px;wid
 const call=(w,h,x1,y1,x2,y2,c,txt,cx,cy)=>`<svg class="dl" width="${w}" height="${h}"><path d="M${x1} ${y1} L${x2} ${y2}" fill="none" stroke="#7F93C4" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="9" fill="${c}" stroke="#fff" stroke-width="3"/></svg><div class="chip" style="--c:${c};left:${cx}px;top:${cy}px"><i></i>${txt}</div>`
 let MI=0;const ORB=[['#00E5FF',.9],['#5985FF',.95],['#7B5CFF',.8],['#45FFB5',.55]]
 const mod=(id,h,inner)=>{const r=(n)=>{MI++;return ((Math.sin(MI*12.9898+n*78.233)*43758.5453)%1+1)%1};let o='';for(let i=0;i<4;i++){const c=ORB[(MI+i)%4],d=300+r(i)*260;o+=`<div class="orb" style="left:${r(1+i)*1500-d/2}px;top:${r(5+i)*(h-100)-d/3}px;width:${d}px;height:${d}px;background:radial-gradient(circle at 35% 30%,${c[0]},rgba(0,0,0,0) 72%);opacity:${c[1]}"></div>`}return `<div class="mod" id="${id}" style="height:${h}px">${inner}</div>`}
-const N='box-shadow:none;overflow:visible';const M=[]
+const N='box-shadow:none;overflow:visible';const tilt=(inner,tf,l,t)=>`<div style="position:absolute;left:${l}px;top:${t}px;transform:${tf};transform-origin:0 0;transform-style:preserve-3d">${inner}</div>`
+const tablet=(scr,k,w=1440,h=900)=>`<div style="position:relative;width:${w*k+56}px;height:${h*k+56}px;box-sizing:border-box;padding:28px;border-radius:46px;background:#06070C;box-shadow:0 0 0 3px #C9CDD9,0 0 0 5px #8E94A8,40px 60px 80px -10px rgba(40,60,160,.55),70px 110px 140px -30px rgba(20,30,100,.5)"><div style="width:${w*k}px;height:${h*k}px;border-radius:18px;overflow:hidden;background:#00022b"><div style="transform:scale(${k});transform-origin:0 0;width:${w}px;height:${h}px">${scr}</div></div><i style="position:absolute;right:9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#14172a"></i></div>`
+const M=[]
 // 1 spread: overnight (standout)
 M.push(mod('m-overnight',1000,
- plate(40,40,740,920,lap(screenOvernight(),.9,40,150),'light')+
+ plate(40,40,740,920,tilt(lap(screenOvernight(),.95,0,0),'perspective(2200px) rotateX(8deg) rotateY(20deg) rotateZ(-3deg)',80,150),'glass')+
  plate(820,40,740,560,cr(campaign(),893,259,1.2,72,150))+
  block(820,620,740,340,'Set it up. Wake to a shortlist','Pick coins and a timeframe. Jaadu runs three falsification stages overnight and keeps what survives.')))
-// 2 spotlight: footprint chart on a laptop (real Figma chart frame 1058:32183 inside the terminal screen)
+// 2 spotlight: footprint chart on a tilted tablet (real Figma chart frame 1058:32183 inside the terminal screen)
 M.push(mod('m-footprint',1080,plate(40,40,1520,1000,
- lap(screenFootprint(),.93,90,90)+
- call(1520,1000,880,415,1130,215,'#5985ff','Regime read beside the price',880,150)+
- call(1520,1000,620,560,430,930,'#ffbd67','Each candle splits into price bins',230,915),'light')))
+ tilt(tablet(screenFootprint(),.86),'perspective(2400px) rotateX(14deg) rotateY(-24deg) rotateZ(-6deg)',210,150),'glass')))
 // 3 bento: market panels
 M.push(mod('m-panels',1000,
  plate(40,40,1520,300,cr(regime(912),912,116,1.45,99,66,16))+
@@ -61,7 +62,7 @@ M.push(mod('m-panels',1000,
 M.push(mod('m-settings',1000,
  plate(40,40,740,560,cr(fpSettings(),640,401,1.2,56,70,24))+
  block(40,620,740,340,'One chart, your way','Four display modes and a volume profile, set in one panel. Each candle splits into price cells.')+
- plate(820,40,740,920,lap(screenFootprint(),.9,-20,150),'light')))
+ plate(820,40,740,920,tilt(lap(screenFootprint(),.95,0,0),'perspective(2200px) rotateX(8deg) rotateY(-20deg) rotateZ(3deg)',-120,150),'glass')))
 // 5 spotlight regime
 M.push(mod('m-regime',560,plate(40,40,1520,480,
  cr(regime(912),912,116,1.55,50,100,16)+
@@ -77,9 +78,9 @@ M.push(mod('m-library',1000,
  plate(40,530,940,430,cr(equity(),891,280,1.2,40,60,12))+
  plate(1000,530,560,430,cr(paramDiff(),891,217,1.0,40,100,12))))
 // 8 spread: mobile chart prompt (real mobile frame 3644:206616)
-const phone=(scr,k,l,t)=>`<div style="position:absolute;left:${l}px;top:${t}px;width:${393*k+34}px;height:${852*k+34}px;border-radius:${68}px;padding:17px;box-sizing:border-box;background:linear-gradient(145deg,#FFFFFF 0%,#E6E8EF 45%,#BFC4D2 100%);box-shadow:0 50px 80px -30px rgba(30,40,90,.55),inset 0 0 0 1.5px #fff"><div style="position:relative;width:100%;height:100%;border-radius:52px;background:#02030A;padding:8px;box-sizing:border-box;box-shadow:inset 0 0 0 1px #000"><div style="position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden"><div style="transform:scale(${k});transform-origin:0 0;width:393px;height:852px">${scr}</div></div><i style="position:absolute;left:50%;top:18px;width:92px;height:26px;margin-left:-46px;border-radius:14px;background:#000;z-index:5"></i></div><i style="position:absolute;right:-4px;top:210px;width:4px;height:90px;border-radius:0 3px 3px 0;background:#C3C8D6"></i><i style="position:absolute;left:-4px;top:170px;width:4px;height:50px;border-radius:3px 0 0 3px;background:#C3C8D6"></i></div>`
+const phone=(scr,k,l,t)=>`<div style="position:relative;width:${393*k+34}px;height:${852*k+34}px;border-radius:${68}px;padding:17px;box-sizing:border-box;background:linear-gradient(145deg,#FFFFFF 0%,#E6E8EF 45%,#BFC4D2 100%);box-shadow:0 50px 80px -30px rgba(30,40,90,.55),inset 0 0 0 1.5px #fff"><div style="position:relative;width:100%;height:100%;border-radius:52px;background:#02030A;padding:8px;box-sizing:border-box;box-shadow:inset 0 0 0 1px #000"><div style="position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden"><div style="transform:scale(${k});transform-origin:0 0;width:393px;height:852px">${scr}</div></div><i style="position:absolute;left:50%;top:18px;width:92px;height:26px;margin-left:-46px;border-radius:14px;background:#000;z-index:5"></i></div><i style="position:absolute;right:-4px;top:210px;width:4px;height:90px;border-radius:0 3px 3px 0;background:#C3C8D6"></i><i style="position:absolute;left:-4px;top:170px;width:4px;height:50px;border-radius:3px 0 0 3px;background:#C3C8D6"></i></div>`
 M.push(mod('m-mobile',1000,
- plate(40,40,740,920,phone(screenMobile(),.96,163,48),'warm')+
+ plate(40,40,740,920,tilt(phone(screenMobile(),.82,0,0),'perspective(2200px) rotateX(8deg) rotateY(-20deg) rotateZ(5deg)',210,70),'warm')+
  plate(820,40,740,560,cr(promptCard(),393,138,1.6,55,160,16))+
  block(820,620,740,340,'Ask about one point','Tap the chart, then ask. On mobile the prompt docks to the bottom of the screen.')))
 // 9 bento design system
