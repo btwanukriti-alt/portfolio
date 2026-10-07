@@ -1,6 +1,6 @@
 :root{
   --ink:#14171F;--t2:#4B5163;--mut:#7B8196;--line:#E6E8F0;--gnd:#F5F6FA;--card:#fff;
-  --pri:#2350FF;--pri-d:#1A3FD6;--pri-s:#EAF0FF;--vio:#6D4AFF;--vio-s:#EFEAFF;--yel:#F5B400;
+  --pri:#1F4FE0;--pri-d:#1636A8;--pri-s:#E8EEFF;--vio:#6D4AFF;--vio-s:#EFEAFF;--yel:#F5B400;
   --grn:#14A06B;--grn-s:#E3F6EE;--red:#E5484D;--red-s:#FDECEC;--amb:#E58A00;--amb-s:#FFF3DC;
 }
 .u,.u *{box-sizing:border-box}
@@ -31,7 +31,7 @@
 .crumb{display:flex;gap:8px;color:var(--mut);font-size:13px}.crumb b{color:var(--pri);font-weight:500}
 .ph{display:flex;align-items:center;justify-content:space-between;margin:10px 0 22px}
 .ph h1{font-size:28px;font-weight:600}
-.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:10px;background:var(--pri);color:#fff;font-weight:500;font-size:14px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:10px;background:var(--ink);color:#fff;font-weight:500;font-size:14px;white-space:nowrap}
 .btn.sm{height:30px;padding:0 12px;font-size:12.5px;border-radius:8px}
 .btn.o{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 .btn.s{background:var(--pri-s);color:var(--pri)}
