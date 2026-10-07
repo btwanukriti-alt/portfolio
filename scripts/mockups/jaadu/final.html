@@ -19,6 +19,13 @@ body{margin:0;background:#fff}
 .device-screen{object-fit:cover;object-position:top left}
 .floor{position:absolute;left:0;right:0;bottom:0;height:240px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(30,60,200,.18));}
 .shadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.85),rgba(0,0,0,0));}
+.c3{position:absolute;transform-style:preserve-3d;transform-origin:50% 50%}
+.c3 .slab{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,#1a2c8a,#070d3a);transform:translateZ(-18px);box-shadow:0 0 0 1px rgba(120,180,255,.35),0 80px 140px -30px rgba(0,0,0,.95)}
+.c3 .face{position:relative;border-radius:inherit;overflow:hidden;background:#00022B;box-shadow:0 0 60px -6px rgba(70,120,255,.55)}
+.c3 .face img{display:block;width:100%}
+.c3 .rim{position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;background:linear-gradient(135deg,#d6f0ff 0%,#6fc3ff 18%,rgba(89,133,255,.15) 45%,rgba(89,133,255,.05) 60%,#5985ff 85%,#9fe7ff 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.c3 .sheen{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 32%,rgba(255,255,255,0) 70%,rgba(130,190,255,.10) 100%)}
+.glowfloor{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(70,110,255,.55),rgba(70,110,255,0));filter:blur(30px)}
 </style>
 <div id="root"></div>
 <script>
@@ -28,25 +35,27 @@ const M=(id,h,inner,cls='')=>`<div class="m ${cls}" id="${id}" style="height:${h
 const frame=(src,w,l,t,crop='')=>`<div class="frame" style="left:${l}px;top:${t}px"><img src="${R}${src}" style="width:${w}px;${crop}"></div>`
 const card=(src,w,l,t,r=28)=>`<div class="card" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px"><img src="${R}${src}"></div>`
 const dev=(cls,src,k,l,t,rot=0,extra='')=>`<div class="dev" style="left:${l}px;top:${t}px;transform:scale(${k}) ${rot?`rotate(${rot}deg)`:''}"><div class="device ${cls}"><div class="device-frame"><img class="device-screen" src="${R}${src}" style="${extra}"></div><div class="device-stripe"></div><div class="device-header"></div><div class="device-sensors"></div><div class="device-btns"></div><div class="device-power"></div></div></div>`
+const c3=(src,w,l,t,tf,r=28,bg='#00022B')=>`<div class="c3" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px;transform:perspective(2200px) ${tf}"><div class="slab"></div><div class="face" style="background:${bg}"><img src="${R}${src}"></div><div class="rim"></div><div class="sheen"></div></div>`
+const gf=(l,t,w,h)=>`<div class="glowfloor" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"></div>`
 const S=[]
 const phone=(src,k,l,t)=>`<div class="dev" style="left:${l}px;top:${t}px;transform:scale(${k})"><div class="device device-iphone-14-pro"><div class="device-frame"><img class="device-screen" src="${R}${src}"></div><div class="device-stripe"></div><div class="device-header"></div><div class="device-sensors"></div><div class="device-btns"></div><div class="device-power"></div></div></div>`
 // 1 footprint desktop
 S.push(M('m1',1000,frame('s-footprint.png',1400,88,96)))
 // 2 regime gauge
-S.push(M('m2',700,card('c-regime.png',980,310,122,44),'b'))
+S.push(M('m2',900,gf(300,560,1000,260)+c3('c-regime.png',1240,180,150,'rotateX(16deg) rotateY(-14deg) rotateZ(3deg)',56),'b'))
 // 3 overnight discoveries on a MacBook Pro
 S.push(M('m3',1000,`<div class="shadow" style="left:220px;top:860px;width:1160px;height:90px"></div>`+dev('device-macbook-pro device-spacegray','s-overnight.png',1.9,97,90)+`<div class="floor"></div>`,'b'))
 // 4 multi-condition alert, zoomed crop
 S.push(M('m4',820,`<div class="frame" style="left:110px;top:100px;width:1380px;height:900px;overflow:hidden;padding:12px"><div style="width:1380px;height:900px;overflow:hidden;border-radius:19px"><img src="${R}s-alerts.png" style="width:1820px;margin-left:-200px;margin-top:-440px;display:block"></div></div>`))
 // 5 create alert modal
-S.push(M('m5',1120,arcs(800,800,2800)+`<div class="card" style="left:488px;top:90px;width:624px;height:953px;border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px rgba(103,209,255,.35),0 60px 120px -30px rgba(0,0,0,.95)"><img src="${R}c-create-alert.png" style="width:624px"></div>`,'b'))
+S.push(M('m5',1000,gf(380,700,900,300)+c3('c-create-alert.png',720,440,70,'rotateX(14deg) rotateY(-16deg) rotateZ(4deg)',30),'b'))
 // 6 chart prompt: phone + desktop states
-S.push(M('m6',1040,arcs(800,760,2800)+phone('s-mobile.png',1.0,190,86)+card('c-prompt-suggested.png',760,760,190,26)+card('c-prompt-typing.png',760,760,500,26)+card('c-prompt-generating.png',760,760,720,26),'b'))
+S.push(M('m6',1040,gf(700,760,800,260)+phone('s-mobile.png',1.0,150,86)+c3('c-prompt-suggested.png',800,700,170,'rotateX(10deg) rotateY(-22deg) rotateZ(2deg)',28,'transparent')+c3('c-prompt-typing.png',800,740,470,'rotateX(10deg) rotateY(-22deg) rotateZ(2deg)',28,'transparent')+c3('c-prompt-generating.png',800,780,720,'rotateX(10deg) rotateY(-22deg) rotateZ(2deg)',28,'transparent'),'b'))
 // 7 library on a Pro Display XDR
 S.push(M('m7',1000,dev('device-pro-display-xdr','s-library.png',2.1,128,70)))
 // 8 trader's diary
-S.push(M('m8',1000,arcs(800,700,2700)+card('c-diary.png',560,520,90,30),'b'))
+S.push(M('m8',1000,gf(420,700,800,300)+c3('c-diary.png',700,450,60,'rotateX(20deg) rotateY(18deg) rotateZ(-5deg)',36),'b'))
 // 9 indicators + coin search
-S.push(M('m9',900,arcs(800,620,2700)+`<div class="card" style="left:110px;top:150px;width:694px;height:678px;border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px rgba(103,209,255,.35),0 60px 120px -30px rgba(0,0,0,.95)"><img src="${R}c-coin-search.png" style="width:694px"></div><div style="position:absolute;left:880px;top:150px;width:614px;height:567px;border-radius:30px;background:#020538"></div><div style="position:absolute;left:860px;top:130px;width:654px"><img src="${R}c-indicators.png" style="width:654px;display:block"></div>`,'b'))
+S.push(M('m9',1000,gf(200,700,1200,300)+c3('c-coin-search.png',800,40,170,'rotateX(14deg) rotateY(18deg) rotateZ(-3deg)',28)+c3('c-indicators.png',780,800,140,'rotateX(14deg) rotateY(-18deg) rotateZ(3deg)',40,'transparent'),'b'))
 document.getElementById('root').innerHTML=S.join('')
 </script>
