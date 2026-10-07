@@ -231,7 +231,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     key: 'college-erp',
     title: 'College group ERP',
-    hook: 'A finance view where a college group finds its weakest college by scanning one column.',
+    hook: 'Stacked drawers that let a college group drill from the whole group down to one batch without losing its place.',
     label: 'Internship',
     company: null,
     dates: null,
@@ -241,9 +241,9 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome: 'Design delivered [confirm].',
     paragraphs: [
       'A college group runs several colleges on an ERP whose finance screens were flat totals with no target and no comparison, and whose head-wise report stopped at a 28-column spreadsheet. I had the earlier version to work from, and redesigned its finance, staff and settlements screens.',
-      'Total received now sits on a bar against expected, and a collection % column runs down every table, so the weakest college is found by scanning one column. A four-level drill-down (group, college, programme, batch) keeps the same columns at every level, and a banner names the lowest-collecting programme and its gap to target.',
+      'The main idea is the drill-down. Group, college, programme and batch each open as a drawer over the last, and every earlier level stays as a labelled spine with its collection %. Each drawer shows its own totals, the same columns as the level above, and a callout naming its weakest row. Esc closes one level; Close all returns to the group.',
     ],
-    standout: 'Every level has the same columns, with the weakest collection always in view.',
+    standout: 'Four levels of drill-down in stacked drawers, with the path and the weakest row always in view.',
     delivered: [
       'Navigation rail',
       'Revenue overview',
@@ -258,7 +258,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       'Whether the banner changes what they open first',
     ],
     visuals: [
-      { n: 1, what: 'Hero: existing showcase video', source: 'public/showcase/college-management.html', caption: 'One dashboard for a college group', status: 'ready' },
+      { n: 1, what: 'Hero: stacked drawers at batch level, with spines for group, college and programme', source: 'redesign mockup (pending approval)', caption: 'Four levels deep, and the path is still on screen', status: 'make' },
       { n: 2, what: 'Flow map, four sections', source: `Figma ${PORTFOLIO} 410:40434`, caption: 'Finance, Staff and Settlements from one file', status: 'export' },
       { n: 3, what: 'Before and after: grey total tiles to target bar with collection %', source: 'before: slide 03 (existing system); after: slide 02 of college-management', caption: 'Totals now sit against a target', status: 'ready' },
       { n: 4, what: 'Before and after: banking page with no navigation to one navigation rail', source: 'before: slide 01; after: slide 02', caption: 'Finance, Staff, Banking and Reports in one rail', status: 'ready' },
@@ -269,7 +269,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       { n: 9, what: 'Before and after: flat settlements list to Transactions & Settlements', source: 'before: slide 05; after: Transactions & Settlements frames in 410:40434', caption: 'A late settlement no longer looks like the rest', status: 'export' },
     ],
     homeCard:
-      'A finance, staff and settlements redesign for a college-group ERP. Every level shares the same columns, so the weakest collection is always in view.',
+      'A finance, staff and settlements redesign for a college-group ERP. Stacked drawers take you from group to batch and keep the path and the weakest row in view.',
     confirm: [
       'Company, dates, role and status',
       'Which drill-down order is final',
