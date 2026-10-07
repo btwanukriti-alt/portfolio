@@ -12,6 +12,7 @@ Continue from `case-study-editor` (copy and decisions) and `src/data/caseStudies
 - **Top:** the description only. Title, hook, one info line (label, company, dates, role, team, outcome), the two paragraphs, the standout idea. Nothing longer.
 - **Bottom:** the modules (see below), stacked, 8 to 10 images. About 80% visual. Very little text, and none on the images except a module's own title block.
 - Rhythm and look are fixed by the reference analysis below. Do not invent a different style.
+- **Read `references/design-language.md` first.** It sets the ground (it follows the product's UI mode, dark or light), the colour rules, the geometry and the build recipe. `references/start-prompt.md` is the prompt for a new session.
 
 ## Reference analysis (DONE, from Anukriti's 17 screenshots, 7 Oct 2026)
 
@@ -44,6 +45,10 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 - Never paste caption pills or numbered pins on the images.
 - Never use whole-screen photos of the app as the main idea. Use components.
 - Never ship before comparing against the reference analysis above, point by point.
+- Never take the ground from `project.color` (that is the work-card strip and the video ground). A dark UI gets a dark ground; a light UI gets `#EEEFF3`.
+- Never use a big slab of one colour (purple, mint) as the title block on a dark ground. The product colour is an accent.
+- Never change the card video, `project.color` or any colour she didn't mention.
+- Never show the modules and the page in one go: modules first, wait for her OK.
 
 ## Process
 
@@ -70,7 +75,9 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 - **Zync is built** in the module style above: `src/components/GalleryCaseStudy.tsx`, `src/data/galleries.ts`, images in `public/case-studies/zync/`, generator in `scripts/mockups/`. Use it as the template for the other four.
 - Still open for Zync: the card video still shows the earlier screens; the logo mark is a 170px render (ask for the SVG).
 - **SSH client is built** (renamed, no project name anywhere): `public/case-studies/ssh-client/`, generator and spec in `scripts/mockups/ssh-client/`. Desktop product, so laptop frames replace phones. Its old card video was dropped (it showed the earlier UI); the mark is a redraw, ask for the original SVG.
-- Other projects still use the old slide-carousel page. Next: Pulsefit CRM, College ERP, Jaadu 2.0.
+- Design language and the start prompt are in `references/`. The SSH client is the template for a dark UI, Zync for a light UI.
+- **Pulsefit CRM is built** (software and website): `public/case-studies/pulsefit-crm/`, generator in `scripts/mockups/pulsefit/`, the logo is the original vector (`public/brand/pulsefit-mark.svg`). See section 9 of the design language.
+- Other projects still use the old slide-carousel page. Next: College ERP, Jaadu 2.0.
 - Open items from `fixBeforePublishing` in the data file still apply to the other four.
 
-Start a new session with: "Use mockup-showcase on [project]."
+Start a new session with `references/start-prompt.md`.
