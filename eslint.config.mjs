@@ -17,7 +17,7 @@ export default defineConfig([
     'next-env.d.ts',
     'public/**',
     'dist/**',
-    'scripts/clihub-embed/**',
+    'scripts/ssh-client-embed/**',
     '*-video/**',
     'Claude outputs/**',
   ]),

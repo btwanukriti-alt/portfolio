@@ -41,7 +41,7 @@ Background, derived from the product's theme
   - a fine grid (about 0.06–0.10) that fades toward the edges;
   - edges that fall off into the base tone.
 - The background stays the same across all scenes of one video and never competes with the UI.
-- Example, clihub: black with low-opacity electric blue (#1E6EFF).
+- Example, SSH client: black with low-opacity electric blue (#1E6EFF).
 
 Layout, chosen from the product's form factor and the screens
 - Desktop or web app: centered composition, with the headline at the top center and the window or panel below. Side panels float beside a dimmed context window.

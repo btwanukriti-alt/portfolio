@@ -1,9 +1,9 @@
-// Chromeless, looping embed of the clihub 20s cut for the portfolio work cards.
+// Chromeless, looping embed of the SSH client 20s cut for the portfolio work cards.
 // Same protocol as the other showcases (scripts/build-showcases.mjs): the stage fills the frame,
 // loops, and plays only between postMessage 'showcase:play' and 'showcase:pause'.
 import React, { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ClihubStage, DURATION } from '../../clihub-video/clihub-showcase-20s-react/src/ClihubShowcase.jsx'
+import { SshClientStage, DURATION } from '../../ssh-client-video/ssh-client-showcase-20s-react/src/SshClientShowcase.jsx'
 
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -52,7 +52,7 @@ function Embed() {
           transform: `scale(${s})`,
         }}
       >
-        <ClihubStage t={t} />
+        <SshClientStage t={t} />
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 # Jaadu 2.0: feature showcase storyboard (48s, 16:9)
 
-**System:** the locked portfolio video system (reference: `clihub-video/final`). Pure black stage with low-opacity electric blue (#1E6EFF): key light from above, drifting floor glow, fine grid fading to the edges. White headlines, grey eyebrows, Geist (the Jaadu UI font). Ease-in-out cubic, no bounce, no outlines or spotlights.
+**System:** the locked portfolio video system (reference: `ssh-client-video/final`). Pure black stage with low-opacity electric blue (#1E6EFF): key light from above, drifting floor glow, fine grid fading to the edges. White headlines, grey eyebrows, Geist (the Jaadu UI font). Ease-in-out cubic, no bounce, no outlines or spotlights.
 **Sources:** `OneDrive/Pictures/Jaadu 2.0 screens` — Trading Terminal: OHLC, Alerts, Alerts: Completed, Chatbot, Quantlab: Overnight Discoveries, Quantlab: Paper Library. Every value on screen comes from these frames.
 
 | # | Time (base) | Scene | Copy | Visual |

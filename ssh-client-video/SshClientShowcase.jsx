@@ -1,10 +1,10 @@
-// clihub — feature showcase v2 (30s, 16:9)
+// SSH client — feature showcase v2 (30s, 16:9)
 // Mix of real screens (camera zooms, no overlays) and component infographics rebuilt
-// as live vector UI from the clihub Figma components (Host Card, Port Mapping cards, Key card,
+// as live vector UI from the SSH client Figma components (Host Card, Port Mapping cards, Key card,
 // connection progress). One clock `t`, ease-in-out cubic, no bounce.
 const { useState, useEffect, useRef, useLayoutEffect } = React;
 
-// ---------- theme (sampled from the clihub Figma file) ----------
+// ---------- theme (sampled from the SSH client Figma file) ----------
 const C = {
   stage: "#0A0A0D",
   ink: "#F4F4F6",      // headlines
@@ -20,7 +20,7 @@ const FONT = "'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', san
 // PACE stretches the whole 30s timeline evenly: holds, transitions and cursor moves all slow down together.
 const PACE = 1.6;
 const DURATION = 30 * PACE;
-const IMG = window.CLIHUB_SCREENS; // { stats, terminal, ai }
+const IMG = window.SSH_CLIENT_SCREENS; // { stats, terminal, ai }
 
 // ---------- timing ----------
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -284,7 +284,7 @@ function Wordmark({ u, size, sub, subStyle, subAt }) {
   const w = prog(u, 0.2, 1.05), s = prog(u, subAt, subAt + 0.7);
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ fontSize: size, fontWeight: 600, color: C.ink, lineHeight: 1, letterSpacing: `${-0.045 + 0.04 * (1 - w)}em`, opacity: w, transform: `translateY(${(1 - w) * 30}px)` }}>clihub</div>
+      <div style={{ fontSize: size, fontWeight: 600, color: C.ink, lineHeight: 1, letterSpacing: `${-0.045 + 0.04 * (1 - w)}em`, opacity: w, transform: `translateY(${(1 - w) * 30}px)` }}>SSH client</div>
       <div style={{ marginTop: 30, opacity: s, transform: `translateY(${(1 - s) * 16}px)`, ...subStyle }}>{sub}</div>
     </div>
   );

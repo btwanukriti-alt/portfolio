@@ -1,4 +1,4 @@
-// Builds the clihub 20s embed into public/showcase/clihub/ (run: npx vite build --config scripts/clihub-embed/vite.config.mjs).
+// Builds the SSH client 20s embed into public/showcase/ssh-client/ (run: npx vite build --config scripts/ssh-client-embed/vite.config.mjs).
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
@@ -14,7 +14,7 @@ export default defineConfig({
     alias: [{ find: /^@fontsource\/outfit\/.*\.css$/, replacement: here('./empty.css') }],
   },
   build: {
-    outDir: here('../../public/showcase/clihub'),
+    outDir: here('../../public/showcase/ssh-client'),
     emptyOutDir: true,
   },
 })

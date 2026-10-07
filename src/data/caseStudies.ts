@@ -201,7 +201,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     visuals: [
       { n: 1, what: 'Hero: existing showcase video', source: 'public/showcase/ (rename file; it carries the project name)', caption: "A host's health, files and terminal in one app", status: 'ready' },
-      { n: 2, what: 'Flow map, 12 sections', source: `Figma ${PORTFOLIO} 400:3561 (delete stray "CLihub Framer" frames elsewhere first)`, caption: 'Twelve sections, one UI, designed from scratch', status: 'export' },
+      { n: 2, what: 'Flow map, 12 sections', source: `Figma ${PORTFOLIO} 400:3561 (delete the stray framer frames elsewhere first)`, caption: 'Twelve sections, one UI, designed from scratch', status: 'export' },
       { n: 3, what: 'Hosts grid and vault switcher', source: 'slide 01 of the project folder', caption: 'Live status and quick actions on every host card', status: 'ready' },
       { n: 4, what: 'Host Overview with Security Insights', source: 'slide 05', caption: 'A host opens on its stats, not a terminal', status: 'ready' },
       { n: 5, what: 'Performance and Activity side by side', source: 'slides 06, 07', caption: "CPU by hour and per core, plus what's running right now", status: 'ready' },

@@ -1,5 +1,5 @@
 // PulseFit — feature showcase (30s base × PACE 1.6 ≈ 48s, 16:9)
-// Locked portfolio system (see clihub final). Every screen is rebuilt as live vector React from the
+// Locked portfolio system (see SSH client final). Every screen is rebuilt as live vector React from the
 // PulseFit Figma frames and refined to one consistent spec (8pt grid, one radius scale, one type ramp,
 // aligned tables, consistent nav). Values and labels come from the frames.
 const { useState, useEffect, useRef, useLayoutEffect } = React;

@@ -1,4 +1,4 @@
-# clihub: feature showcase storyboard, FINAL, locked (48s, 16:9)
+# SSH client: feature showcase storyboard, v7 (48s, 16:9)
 
 **Theme:** pure black stage with low-opacity electric blue (#1E6EFF). A soft blue light from above, a faint blue floor glow that drifts slowly, and a fine blue grid that fades toward the edges. The edges fall off into darkness. White headlines, grey eyebrows, Outfit typeface. Mood: precise and calm.
 **Layout:** centered. The headline sits at the top center, with the UI or infographic centered below.

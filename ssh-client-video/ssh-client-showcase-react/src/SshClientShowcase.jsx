@@ -1,15 +1,15 @@
-// clihub — feature showcase (React component)
-// Usage: import ClihubShowcase from "./ClihubShowcase"; <ClihubShowcase />
-// Or render <ClihubStage t={seconds} /> inside a 1920x1080 box to drive it from your own clock.
+// SSH client — feature showcase (React component)
+// Usage: import SshClientShowcase from "./SshClientShowcase"; <SshClientShowcase />
+// Or render <SshClientStage t={seconds} /> inside a 1920x1080 box to drive it from your own clock.
 // v2 (30s, 16:9)
 // Mix of real screens (camera zooms, no overlays) and component infographics rebuilt
-// as live vector UI from the clihub Figma components (Host Card, Port Mapping cards, Key card,
+// as live vector UI from the SSH client Figma components (Host Card, Port Mapping cards, Key card,
 // connection progress). One clock `t`, ease-in-out cubic, no bounce.
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import "@fontsource/outfit/400.css";
 import "@fontsource/outfit/500.css";
 import "@fontsource/outfit/600.css";
-import "./ClihubShowcase.css";
+import "./SshClientShowcase.css";
 import terminal from "./assets/terminal.png";
 import stats_head from "./assets/stats_head.png";
 import tab_overview from "./assets/tab_overview.png";
@@ -24,7 +24,7 @@ import panel_history from "./assets/panel_history.png";
 import panel_appearance from "./assets/panel_appearance.png";
 import panel_askai from "./assets/panel_askai.png";
 
-// ---------- theme (sampled from the clihub Figma file) ----------
+// ---------- theme (sampled from the SSH client Figma file) ----------
 const C = {
   stage: "#0A0A0D",
   ink: "#F4F4F6",      // headlines
@@ -304,7 +304,7 @@ function Wordmark({ u, size, sub, subStyle, subAt }) {
   const w = prog(u, 0.2, 1.05), s = prog(u, subAt, subAt + 0.7);
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ fontSize: size, fontWeight: 600, color: C.ink, lineHeight: 1, letterSpacing: `${-0.045 + 0.04 * (1 - w)}em`, opacity: w, transform: `translateY(${(1 - w) * 30}px)` }}>clihub</div>
+      <div style={{ fontSize: size, fontWeight: 600, color: C.ink, lineHeight: 1, letterSpacing: `${-0.045 + 0.04 * (1 - w)}em`, opacity: w, transform: `translateY(${(1 - w) * 30}px)` }}>SSH client</div>
       <div style={{ marginTop: 30, opacity: s, transform: `translateY(${(1 - s) * 16}px)`, ...subStyle }}>{sub}</div>
     </div>
   );
@@ -759,5 +759,5 @@ function Player() {
   );
 }
 
-export { Stage as ClihubStage, DURATION };
+export { Stage as SshClientStage, DURATION };
 export default Player;

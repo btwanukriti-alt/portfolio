@@ -23,7 +23,7 @@ Case study → slide source mapping (please confirm the ⚠ ones):
 - `jaadu-2` — no presentation in Figma (no carousel)
 - `fitness-tracker` — Zync — Case Study (7)
 - `bosch-customer-experience` — Pulsefit — Case Study (10) ⚠ card shows Pulsefit
-- `clihub` — CLI Hub — Case Study (16)
+- `ssh-client` — SSH client — Case Study (16)
 - `college-management` — Dhondi — The Solution (9, problem/solution alternating) ⚠
 
 Project data lives in `src/data/projects.ts`; slides are `src/assets/case-studies/<slug>/slide-NN.jpg`.

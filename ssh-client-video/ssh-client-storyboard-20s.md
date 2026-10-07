@@ -1,4 +1,4 @@
-# clihub: 20s agency cut (16:9, 1920×1080, 30fps)
+# SSH client: 20s agency cut (16:9, 1920×1080, 30fps)
 
 **Brief:** a short overview with the three most important features. The pace is smooth and moderate, and each beat holds for at least 1–1.5s.
 
