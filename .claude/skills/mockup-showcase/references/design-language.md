@@ -45,3 +45,12 @@ Dashed line (3px, round, `3 9`) ending in a dot in the product colour with a 3px
 
 ## 8. What went wrong before (don't repeat)
 Whole screens as the main idea; numbered pins and caption pills; tilted or floating cards; a mint ground on a dark UI; a big purple block; guessing the skill instead of checking other branches (`git fetch --all`); removing her card video; changing colours she didn't mention; long replies (keep under 100 words).
+
+## 9. Learned on the Pulsefit CRM (Oct 2026)
+- **Order:** design system first (logo construction, then app icon and palette), then the product UI, then the website. Never interleave them. Show the software and the website the same way (spread, spotlight, bento).
+- **One palette, from the logo.** Read the logo's own fills (`use_figma` read-only `exportAsync({format:'SVG_STRING'})`) and build the UI, website and palette from them, so nothing disagrees. Buttons use the product colour. Never black buttons.
+- **Grounds:** neutral greys for the design system and the product; one soft tint for the website. Never yellow or cream grounds.
+- **Title blocks:** the brand's deep colour (not the bright primary), small yellow bar on top. Bright blue slabs and the same blue on every element strain the eyes.
+- **No type specimen module, no font showcase.** Fonts stay out of the gallery.
+- **Charts only where they help.** Drop a chart module if she says so; keep heatmaps and tables.
+- **Website:** rebuild it clean (the product name everywhere, no user-count claims, no third-party logos, no stock testimonials).

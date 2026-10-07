@@ -76,7 +76,8 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 - Still open for Zync: the card video still shows the earlier screens; the logo mark is a 170px render (ask for the SVG).
 - **SSH client is built** (renamed, no project name anywhere): `public/case-studies/ssh-client/`, generator and spec in `scripts/mockups/ssh-client/`. Desktop product, so laptop frames replace phones. Its old card video was dropped (it showed the earlier UI); the mark is a redraw, ask for the original SVG.
 - Design language and the start prompt are in `references/`. The SSH client is the template for a dark UI, Zync for a light UI.
-- Other projects still use the old slide-carousel page. Next: Pulsefit CRM, College ERP, Jaadu 2.0.
+- **Pulsefit CRM is built** (software and website): `public/case-studies/pulsefit-crm/`, generator in `scripts/mockups/pulsefit/`, the logo is the original vector (`public/brand/pulsefit-mark.svg`). See section 9 of the design language.
+- Other projects still use the old slide-carousel page. Next: College ERP, Jaadu 2.0.
 - Open items from `fixBeforePublishing` in the data file still apply to the other four.
 
 Start a new session with `references/start-prompt.md`.
