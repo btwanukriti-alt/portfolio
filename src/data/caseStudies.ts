@@ -241,9 +241,9 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome: 'Design delivered [confirm].',
     paragraphs: [
       'A college group runs several colleges on an ERP whose finance screens were flat totals with no target and no comparison, and whose head-wise report stopped at a 28-column spreadsheet. I had the earlier version to work from, and redesigned its finance, staff and settlements screens.',
-      'The main idea is the drill-down. Group, college, programme and batch each open as a drawer over the last, and every earlier level stays as a labelled spine with its collection %. Each drawer shows its own totals, the same columns as the level above, and a callout naming its weakest row. Esc closes one level; Close all returns to the group.',
+      'The main idea is the drill-down. Group, college, programme and batch each open as a drawer over the last, so the page behind stays in view. Every drawer keeps the same summary banner and the same columns, and a lowest-collection line names the weakest row and its gap to target.',
     ],
-    standout: 'Four levels of drill-down in stacked drawers, with the path and the weakest row always in view.',
+    standout: 'Four levels of drill-down in stacked drawers, with the same columns and the weakest row at every level.',
     delivered: [
       'Navigation rail',
       'Revenue overview',
@@ -258,7 +258,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       'Whether the banner changes what they open first',
     ],
     visuals: [
-      { n: 1, what: 'Hero: stacked drawers at batch level, with spines for group, college and programme', source: 'redesign mockup (pending approval)', caption: 'Four levels deep, and the path is still on screen', status: 'make' },
+      { n: 1, what: 'Hero: stacked drawers, programme and batch levels (Drawer_College frames)', source: `Figma ${PORTFOLIO} 267:102278, 267:102610`, caption: 'Four levels deep, and the same columns at each one', status: 'make' },
       { n: 2, what: 'Flow map, four sections', source: `Figma ${PORTFOLIO} 410:40434`, caption: 'Finance, Staff and Settlements from one file', status: 'export' },
       { n: 3, what: 'Before and after: grey total tiles to target bar with collection %', source: 'before: slide 03 (existing system); after: slide 02 of college-management', caption: 'Totals now sit against a target', status: 'ready' },
       { n: 4, what: 'Before and after: banking page with no navigation to one navigation rail', source: 'before: slide 01; after: slide 02', caption: 'Finance, Staff, Banking and Reports in one rail', status: 'ready' },
@@ -269,7 +269,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       { n: 9, what: 'Before and after: flat settlements list to Transactions & Settlements', source: 'before: slide 05; after: Transactions & Settlements frames in 410:40434', caption: 'A late settlement no longer looks like the rest', status: 'export' },
     ],
     homeCard:
-      'A finance, staff and settlements redesign for a college-group ERP. Stacked drawers take you from group to batch and keep the path and the weakest row in view.',
+      'A finance, staff and settlements redesign for a college-group ERP. Stacked drawers take you from group to batch with the same columns at every level.',
     confirm: [
       'Company, dates, role and status',
       'Which drill-down order is final',
