@@ -37,8 +37,8 @@ const P = {
 }
 const I = (k, s, c, w) => ic(P[k], s, c, w)
 
-const cardBg = `background:linear-gradient(180deg,rgba(0,117,255,0) 70%,rgba(121,183,255,.2) 100%),radial-gradient(120% 70% at 50% 0%,rgba(70,120,255,.5),rgba(40,83,167,0) 72%),rgba(6,16,80,.62);backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(120,220,255,.75);box-shadow:inset 0 1px 0 rgba(180,235,255,.6),0 0 24px rgba(60,160,255,.25)`
-const flat = `background:${T.glass};border:.5px solid ${T.b10}`
+const cardBg = `background:linear-gradient(180deg,rgba(120,160,255,.14),rgba(255,255,255,.035) 55%),rgba(6,12,50,.5);backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)`
+const flat = `background:linear-gradient(180deg,rgba(120,160,255,.1),rgba(255,255,255,.03)),rgba(6,12,50,.5);backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)`
 
 const btcCoin = (s = 30) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${T.btc};display:grid;place-items:center;color:#fff;font:700 ${s * .58}px Geist">₿</div>`
 
@@ -128,7 +128,7 @@ const dejaQuery = () => { const f = (l, v) => `<div style="flex:1"><div style="f
 
 const dejaEmpty = () => `<div style="width:426px;font-family:Geist;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px"><div style="width:98px;height:97px;border-radius:50%;background:radial-gradient(closest-side,rgba(48,85,227,.35),rgba(48,85,227,0));display:grid;place-items:center;color:${T.p700}">${I('hist', 40, T.p700, 1.5)}</div><div><div style="font:600 18px/22px Geist;color:${T.tx}">Find historical look-alikes</div><div style="font:400 13px/20px Geist;color:${T.sec};margin-top:8px">Describe the current setup using the filters above, then run a search. Déjà Vu scans years of market history for structurally similar moments and shows you what happened next.</div></div></div>`
 
-const fpSettings = () => `<div style="${flat};width:640px;height:401px;border-radius:24px;box-sizing:border-box;border-color:rgba(103,209,255,.5);padding:24px 24px 20px;font-family:Geist;display:flex;flex-direction:column;gap:24px">
+const fpSettings = () => `<div style="${flat};width:640px;height:401px;border-radius:24px;box-sizing:border-box;padding:24px 24px 20px;font-family:Geist;display:flex;flex-direction:column;gap:24px">
  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 20px/28px Geist;color:${T.tx}">Footprint settings</span><span style="color:${T.sec}">${I('x', 24)}</span></div>
  <div style="display:flex;gap:12px">${[['Visual', 1], ['Footer', 0], ['Appearance', 0]].map(t => `<span style="padding:4px 16px;border-radius:8px;font:${t[1] ? 600 : 500} 14px/20px Geist;color:${t[1] ? T.tx : T.sec};${t[1] ? `background:${T.p500}` : `background:${T.inp};border:1px solid ${T.b10}`}">${t[0]}</span>`).join('')}</div>
  <div style="display:flex;flex-direction:column;gap:12px"><div><div style="font:600 14px/20px Geist;color:${T.tx}">Display mode</div><div style="font:400 12px/16px Geist;color:${T.sec}">How each price level is drawn.</div></div>
@@ -172,7 +172,7 @@ const screenOvernight = () => screenBase(`<div style="position:absolute;left:119
  <div style="flex:1"><div style="font:500 12px/16px Geist;color:${T.sec};margin-bottom:8px">Timeframe</div><div style="height:40px;box-sizing:border-box;background:${T.comp};border:.5px solid ${T.b10};border-radius:8px;padding:4px;display:flex;gap:4px"><span style="flex:1;border-radius:4px;background:${T.p400};display:grid;place-items:center;font:600 12px Geist;color:${T.tx}">Intra-day</span><span style="flex:1;display:grid;place-items:center;font:500 12px Geist;color:${T.tx}">Swing</span></div></div></div>
  <span style="background:${T.inp};border:1px solid ${T.inp};border-radius:8px;padding:8px 14px;font:500 12px/16px Geist;color:${T.tx};display:flex;gap:8px;align-items:center">${I('spin', 12, T.p700)}Running...</span></div>
  <div style="margin-top:-6px">${campaign()}</div></div>`, 3)
-const screenFootprint = () => screenBase(`<div style="position:absolute;left:112px;top:104px;display:flex;flex-direction:column;gap:21px"><div style="display:flex;gap:24px;align-items:center;height:52px;font:500 14px Geist;color:${T.sec}"><span style="display:flex;gap:10px;align-items:center;color:${T.tx};font:700 22px Geist">${btcCoin(32)}BTC/USD</span><span style="color:${T.green}">+2.14%</span><span>Vol 6.17B</span></div><img src="assets/footprint.png" style="width:907px;height:520px;border-radius:16px;display:block;box-shadow:0 0 0 1px rgba(103,209,255,.5)">${regime()}</div>
+const screenFootprint = () => screenBase(`<div style="position:absolute;left:112px;top:104px;display:flex;flex-direction:column;gap:21px"><div style="display:flex;gap:24px;align-items:center;height:52px;font:500 14px Geist;color:${T.sec}"><span style="display:flex;gap:10px;align-items:center;color:${T.tx};font:700 22px Geist">${btcCoin(32)}BTC/USD</span><span style="color:${T.green}">+2.14%</span><span>Vol 6.17B</span></div><img src="assets/footprint.png" style="width:907px;height:520px;border-radius:16px;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.14)">${regime()}</div>
  <div style="position:absolute;left:1048px;top:104px;display:flex;flex-direction:column;gap:16px">${coinStats()}${watchlist()}${trades(5, 212)}</div>`, 0)
 const screenDeja = () => screenBase(`<div style="position:absolute;left:119px;top:112px">${quantSide()}</div>
  <div style="position:absolute;left:492px;top:131px;width:893px">${hdr('hist', 'Deja Vu', 'Breakout-VAH-v3 · BTCUSDT 4h · 2024-06 → 2025-06 · 1y / 5s engine')}<div style="margin-top:16px;border-bottom:1px solid rgba(128,197,255,.06)">${dejaQuery()}</div></div>
