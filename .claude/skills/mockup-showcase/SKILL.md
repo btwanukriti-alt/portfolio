@@ -69,7 +69,8 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 - Data `src/data/caseStudies.ts`: five projects. Zync is wired to the new page.
 - **Zync is built** in the module style above: `src/components/GalleryCaseStudy.tsx`, `src/data/galleries.ts`, images in `public/case-studies/zync/`, generator in `scripts/mockups/`. Use it as the template for the other four.
 - Still open for Zync: the card video still shows the earlier screens; the logo mark is a 170px render (ask for the SVG).
-- Other projects still use the old slide-carousel page. Next: Pulsefit CRM, the SSH client (NDA, rename everything), College ERP, Jaadu 2.0.
+- **SSH client is built** (renamed, no project name anywhere): `public/case-studies/ssh-client/`, generator and spec in `scripts/mockups/ssh-client/`. Desktop product, so laptop frames replace phones. Its old card video was dropped (it showed the earlier UI); the mark is a redraw, ask for the original SVG.
+- Other projects still use the old slide-carousel page. Next: Pulsefit CRM, College ERP, Jaadu 2.0.
 - Open items from `fixBeforePublishing` in the data file still apply to the other four.
 
 Start a new session with: "Use mockup-showcase on [project]."

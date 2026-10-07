@@ -41,7 +41,7 @@ const SEGMENT_STYLE = {
 // Written from the resume for now (summary, experience, education and skills).
 const ABOUT = [
   "I'm a UI/UX designer studying Visual Communication at St Joseph's University, Bengaluru, and I design end-to-end digital products for startups and growing teams.",
-  "I've designed across mobile apps, web dashboards and enterprise platforms: Zync, a consumer fitness app; Dhondi, a group-level college ERP; and CliHub, a multi-platform SSH client with an AI terminal assistant.",
+  "I've designed across mobile apps, web dashboards and enterprise platforms: Zync, a consumer fitness app; Dhondi, a group-level college ERP; and a multi-platform SSH client with an AI terminal assistant.",
   'I own the full design lifecycle, from concept and wireframes to high-fidelity Figma prototypes, and work closely with developers and stakeholders to ship products that are both functional and delightful.',
   "I like taking things all the way to launch: at Pulsefit I built the company website end-to-end in WordPress, from design system to deployment. My everyday tools are Figma, Illustrator and Photoshop.",
 ]

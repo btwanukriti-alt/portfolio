@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "build:showcases": "node scripts/build-showcases.mjs",
-    "build:clihub-embed": "vite build --config scripts/clihub-embed/vite.config.mjs"
+    "build:ssh-client-embed": "vite build --config scripts/ssh-client-embed/vite.config.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

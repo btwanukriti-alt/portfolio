@@ -1,5 +1,5 @@
 // Jaadu 2.0 — feature showcase (30s base, 16:9), on the locked portfolio video system
-// (reference: clihub-video/final). Real screens through camera moves, cursor clicks and floating
+// (reference: ssh-client-video/final). Real screens through camera moves, cursor clicks and floating
 // callouts; component infographics rebuilt as live vector UI from the Jaadu screens.
 // One clock `t`, ease-in-out cubic, no bounce. Every value shown comes from the designs.
 const { useState, useEffect, useRef, useLayoutEffect } = React;

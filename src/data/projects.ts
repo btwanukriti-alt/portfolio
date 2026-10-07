@@ -23,7 +23,7 @@ export type Project = {
 const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
 
 // Figma sources: Fitness Tracker -> "Zync — Case Study", BOSCH card (Pulsefit screens) ->
-// "Pulsefit — Case Study", CLIHUB -> "CLI Hub — Case Study", College Management ->
+// "Pulsefit — Case Study", SSH client -> "SSH client — Case Study", College Management ->
 // "Dhondi — The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
 export const PROJECTS: Project[] = [
   {
@@ -69,17 +69,16 @@ export const PROJECTS: Project[] = [
     color: '#DCCFFF',
   },
   {
-    slug: 'clihub',
-    title: 'CLIHUB',
+    slug: 'ssh-client',
+    title: 'SSH client',
     description:
       "A multi-platform SSH client with saved commands, live server stats and an AI terminal assistant.",
     role: 'Sole Designer',
     timeline: '3 months',
     problem:
-      "A sysadmin managing 40 servers shouldn't need to remember 400 commands. I designed CLIHUB to remember them, and to write the next one on request.",
-    card: '/work/project-4.jpg',
-    hero: caseStudyImage('clihub'),
-    showcase: '/showcase/clihub.html?embed&v=5',
+      "A sysadmin managing 40 servers shouldn't need to remember 400 commands. I designed it to remember them, and to write the next one on request.",
+    card: '/case-studies/ssh-client/01-health.jpg',
+    hero: caseStudyImage('ssh-client'),
     color: '#C9EEDC',
   },
   {
