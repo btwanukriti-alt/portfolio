@@ -37,8 +37,8 @@ const P = {
 }
 const I = (k, s, c, w) => ic(P[k], s, c, w)
 
-const cardBg = `background:linear-gradient(180deg,rgba(120,160,255,.14),rgba(255,255,255,.035) 55%),rgba(6,12,50,.5);backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)`
-const flat = `background:linear-gradient(180deg,rgba(120,160,255,.1),rgba(255,255,255,.03)),rgba(6,12,50,.5);backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)`
+const cardBg = `background:#08123C;border:1px solid rgba(255,255,255,.1)`
+const flat = `background:#08123C;border:1px solid rgba(255,255,255,.1)`
 
 const btcCoin = (s = 30) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${T.btc};display:grid;place-items:center;color:#fff;font:700 ${s * .58}px Geist">₿</div>`
 
