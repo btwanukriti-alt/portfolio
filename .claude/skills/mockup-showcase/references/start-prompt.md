@@ -1,18 +1,17 @@
-# Start prompt for the next project
+# Start prompt
 
-Paste this into a new session, filling the brackets.
+Paste this into a new session, then paste the Figma link after "Figma:".
 
 ---
 
-Use mockup-showcase on **[Pulsefit CRM | College ERP | Jaadu 2.0]**. Figma: **[link]**.
+Use mockup-showcase. Figma: 
 
-Before anything: `git fetch --all` and read `.claude/skills/mockup-showcase/SKILL.md` and `references/design-language.md` from the newest branch that has them. Use the SSH client (`scripts/mockups/ssh-client/`, `src/data/galleries.ts`) and Zync as the templates.
+Work out which project this is from the link and `src/data/caseStudies.ts`. First run `git fetch --all`, then read `.claude/skills/mockup-showcase/SKILL.md` and `references/design-language.md` from the newest branch that has them. The SSH client (`scripts/mockups/ssh-client/`, `src/data/galleries.ts`) and Zync are the templates.
 
-Do this, in order:
-1. Audit the frames at full size. List what looks unprofessional (placeholder data, wrong totals, typos, cramped nav, wrong icons). Fix it in HTML, not Figma.
-2. Pick the product's mode (dark or light) and set the ground from the design language. Pull tokens with `get_variable_defs`.
-3. Build 8 to 10 modules: spreads, spotlights, bento, logo construction, icon and palette. Components, not screens. Callouts only as dashed line, dot and chip. No pins, no legends.
-4. Check on a contact sheet. Show me the modules. Stop and wait for my OK.
-5. After my OK: wire the page, lint, build, look at it, push, open a PR.
+1. Audit the frames at full size. Fix placeholder data, wrong totals, typos and cramped nav in HTML, not Figma.
+2. Set the ground from the product's UI mode (dark or light) and take colours from `get_variable_defs`.
+3. Build 8 to 10 modules: spreads, spotlights, bento, logo construction, icon and palette. Components only. Callouts are a dashed line, a dot and a chip. No pins, legends or captions on images.
+4. Check on a contact sheet, show me the modules, and wait for my OK.
+5. Then wire the page, lint, build, look at it, push and open a PR.
 
-Rules: replies under 100 words. Ask only if blocked. Don't touch `project.color`, the card video or any colour I didn't mention. NDA or placeholder content follows the honesty rules in the skill. If the PR is merged, branch from `main` again.
+Replies under 100 words. Ask only if blocked. Don't touch `project.color`, the card video or any colour I didn't mention. If the PR is merged, branch from `main` again.
