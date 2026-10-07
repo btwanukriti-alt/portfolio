@@ -11,6 +11,14 @@
   --color-soft: #f4f4f2;
   --color-accent: #2f4bff;
   --color-hand: #5b4fff;
+  /* Zync supporting palette: the purple and pink of the app, with its tracker colours. */
+  --color-zync: #644acd;
+  --color-zync-deep: #3e2b94;
+  --color-zync-pink: #f5577d;
+  --color-zync-blush: #ffe8ee;
+  --color-zync-lilac: #ece8fa;
+  --color-zync-mint: #2dc6a0;
+  --color-zync-amber: #f5b01d;
 
   --font-body: var(--font-hanken), system-ui, sans-serif;
   --font-wordmark: var(--font-rubik-mono), var(--font-hanken), sans-serif;
@@ -18,6 +26,7 @@
   --font-slides: var(--font-poppins), var(--font-hanken), sans-serif;
   --font-hero: var(--font-inter-tight), var(--font-hanken), sans-serif;
   --font-hero-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-wordmark-zync: var(--font-montserrat), var(--font-hanken), sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
