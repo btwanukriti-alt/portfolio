@@ -8,9 +8,9 @@
 @font-face{font-family:'IBM Plex Mono';font-weight:400;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2)}
 @font-face{font-family:'IBM Plex Mono';font-weight:500;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2)}
 body{margin:0;background:#fff}
-.mod{position:relative;width:1600px;overflow:hidden;font-family:Geist,sans-serif;margin:0 0 60px;background:#00022B}
+.mod{position:relative;width:1600px;overflow:hidden;font-family:Geist,sans-serif;margin:0 0 60px;background:#00010F}
 .orb{position:absolute;border-radius:50%;filter:blur(8px);pointer-events:none}
-.plate{position:absolute;overflow:hidden;border-radius:56px;background:linear-gradient(160deg,rgba(130,190,255,.22),rgba(60,100,230,.08) 45%,rgba(0,10,80,.18));backdrop-filter:blur(34px) saturate(1.5);-webkit-backdrop-filter:blur(34px) saturate(1.5);box-shadow:inset 0 0 0 1.5px rgba(150,215,255,.38),inset 0 2px 0 rgba(255,255,255,.5),inset 0 -30px 60px -30px rgba(0,255,255,.12),0 30px 60px -30px rgba(0,0,40,.7)}
+.plate{position:absolute;overflow:hidden;border-radius:56px;background:linear-gradient(160deg,rgba(130,190,255,.13),rgba(60,100,230,.05) 45%,rgba(0,10,80,.12));backdrop-filter:blur(34px) saturate(1.5);-webkit-backdrop-filter:blur(34px) saturate(1.5);box-shadow:inset 0 0 0 1.5px rgba(150,215,255,.38),inset 0 2px 0 rgba(255,255,255,.5),inset 0 -30px 60px -30px rgba(0,255,255,.12),0 30px 60px -30px rgba(0,0,40,.7)}
 .block{position:absolute;border-radius:56px;background:linear-gradient(150deg,rgba(255,255,255,.28),rgba(130,190,255,.12) 55%,rgba(38,83,207,.25));backdrop-filter:blur(34px) saturate(1.6);-webkit-backdrop-filter:blur(34px) saturate(1.6);color:#F1F6FF;padding:60px 68px;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px rgba(170,225,255,.5),inset 0 2px 0 rgba(255,255,255,.6),0 30px 60px -30px rgba(0,0,40,.7)}
 .block h3{background:linear-gradient(90deg,#fff,#9fdcff 70%,#5ef2ff);-webkit-background-clip:text;color:transparent;font-weight:400;font-size:58px;margin:0;letter-spacing:-.02em;line-height:1.08}
 .block p{font-weight:400;font-size:25px;line-height:1.5;margin:22px 0 0;color:#C9D8F5;max-width:580px}
@@ -40,11 +40,11 @@ M.push(mod('m-overnight',1000,
  plate(40,40,740,920,lap(screenOvernight(),.9,40,150))+
  plate(820,40,740,560,cr(campaign(),893,259,1.2,72,150))+
  block(820,620,740,340,'Set it up. Wake to a shortlist','Pick coins and a timeframe. Jaadu runs three falsification stages overnight and keeps what survives.')))
-// 2 spotlight: footprint chart
+// 2 spotlight: footprint chart (the real Figma frame 1058:32183)
 M.push(mod('m-footprint',960,plate(40,40,1520,880,
- cr(footprint(907,589),907,589,1.38,140,110,16)+
- call(1520,880,710,279,880,110,'#45ffb5','Heaviest buying sits in the body',840,50)+
- call(1520,880,412,418,600,715,'#ffbd67','Point of control outlined',560,700))))
+ `<img src="assets/footprint.png" style="position:absolute;left:170px;top:120px;width:1179px;height:676px;border-radius:16px;box-shadow:0 24px 40px rgba(0,0,0,.55),0 0 0 1px rgba(103,209,255,.5)">`+
+ call(1520,880,1035,275,1000,70,'#5985ff','Regime read beside the price',830,50)+
+ call(1520,880,632,464,520,810,'#ffbd67','Each candle splits into price bins',360,790))))
 // 3 bento: market panels
 M.push(mod('m-panels',1000,
  plate(40,40,1520,300,cr(regime(912),912,116,1.45,99,66,16))+
