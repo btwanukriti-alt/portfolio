@@ -119,26 +119,23 @@ export default function GalleryCaseStudy({
         </Reveal>
 
         <p className="mx-auto mt-[clamp(56px,9vh,104px)] mb-0 max-w-[var(--max)] text-[14px] leading-[1.5] text-faint">
-          Screens are refined for this portfolio, and the figures in them are sample data. The earlier layouts sit next to the refined Home below.
+          Screens are refined for this portfolio, and the figures in them are sample data. Five earlier Home layouts sit next to the refined one near the end.
         </p>
 
-        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(40px,7vh,80px)] p-0">
+        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
           {images.map((img, i) => (
             <li key={img.src}>
-              <Reveal as="figure" className="m-0">
-                <div className="overflow-hidden rounded-[clamp(18px,2.4vw,32px)] bg-[var(--c-soft)] shadow-[0_0_0_1px_rgba(0,0,0,0.05)]">
-                  <img
-                    className="block h-auto w-full"
-                    src={img.src}
-                    width={img.width}
-                    height={img.height}
-                    alt={img.alt}
-                    loading={i < 2 ? 'eager' : 'lazy'}
-                    decoding="async"
-                  />
-                </div>
-                <figcaption className="mt-4 flex items-baseline gap-3 text-[15px] leading-[1.4] font-medium text-muted">
-                  <span aria-hidden="true" className="mt-[0.45em] size-[7px] shrink-0 rounded-full bg-[var(--c-pop)]" />
+              <Reveal as="figure" className="relative m-0 overflow-hidden rounded-[clamp(18px,2.4vw,32px)] bg-[var(--c-soft)]">
+                <img
+                  className="block h-auto w-full"
+                  src={img.src}
+                  width={img.width}
+                  height={img.height}
+                  alt={img.alt}
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+                <figcaption className="absolute bottom-[clamp(10px,1.6vw,24px)] left-[clamp(10px,1.6vw,24px)] max-w-[calc(100%-2*clamp(10px,1.6vw,24px))] rounded-full bg-white/90 px-[clamp(12px,1.2vw,18px)] py-[clamp(6px,0.7vw,10px)] text-[clamp(11px,1vw,14px)] leading-[1.3] font-medium text-ink shadow-[0_6px_20px_-8px_rgba(40,20,110,0.35)] backdrop-blur-[10px]">
                   {img.caption}
                 </figcaption>
               </Reveal>
