@@ -1,6 +1,6 @@
 // Case study content for the five projects: the short format (info line, two paragraphs, 8-12
-// visuals with captions). Not wired into the site yet; the next step is the visuals, then a
-// page that reads this file.
+// visuals with captions). Zync is wired into src/components/GalleryCaseStudy.tsx through
+// src/data/galleries.ts; the other four still use the older layout.
 //
 // Rules the copy follows (see .claude/skills/case-study-editor/SKILL.md):
 // - nothing here claims a launch, a user count, a metric or a quote;
