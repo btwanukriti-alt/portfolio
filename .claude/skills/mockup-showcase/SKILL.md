@@ -24,7 +24,6 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 - **Spreads.** Two columns. Left: one phone (real device frame, black bezel, dynamic island), straight or turned slightly in 3D, cropped by the plate edge. Right top: the same feature enlarged as a component. Right bottom: a solid colour block in the product's colour, with a light-weight white title (about 48 to 56px) and a two-line description. The text lives only in this block.
 - **Bento.** A grid of plates of different sizes, each holding one component, cropped at the edges (integration cards, chat list, status menu, search panel, AI replies).
 - **Callouts.** Dashed lines with a small dot link a floating pill or chip to the card it belongs to. No numbered pins, no captions pasted on the image.
-- **Dark tilted field.** For depth, one image on a near-black navy ground with components laid on a plane tilted in 3D (rotateX about 55deg, rotateZ about -25deg). The edges fade out to black. Used once per page.
 - **Brand module.** The logo on a construction grid (dashed guides, spacing numbers), the app icon as a rounded square (alone in concentric squares, or in a dock row with other icons), and the palette.
 - **Colour.** One product colour per case study (green Fynix, purple Dialin, periwinkle Stratus). The colour block, the highlights and the buttons use it. Everything else is neutral.
 - **Real UI only.** Avatars are real photos. Numbers are plausible sample data.
@@ -34,15 +33,14 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 1. **Spread:** phone left, enlarged component right top, colour block with title and description right bottom. Mirror it for the next one.
 2. **Spotlight:** one component enlarged on one plate, optionally with a dashed callout.
 3. **Bento:** 3 to 5 component plates in an uneven grid, cropped at the edges.
-4. **Dark tilted field:** components on a tilted plane over a dark ground. Once.
-5. **Brand module:** logo construction, app icon, palette.
-6. **Process (only with real earlier versions):** the real earlier frames flat in one plate next to the final, labelled "earlier layouts".
-7. **Motion:** a still from the showcase video, as the hero.
+4. **Brand module:** the logo on a full-width plate with a full construction (dashed guides, circles and diagonals on the mark, clear space, numbered measurements derived from the drawing), then the app icon and the palette on a second module. Never crop the logo.
+5. **Process (only with real earlier versions):** the real earlier frames flat in one plate next to the final, labelled "earlier layouts".
+6. **Motion:** a still from the showcase video, as the hero.
 
 ## Never (these were all done wrong on the first Zync attempt)
 
 - Never show a screen just because it exists. Pick the 5 or 6 features worth highlighting and make each an image.
-- Never tilt or float cards randomly over a gradient. Depth comes from cropping, plates, device frames and one dark tilted field.
+- Never tilt, skew or float cards. No perspective planes, no vignettes. Depth comes only from cropping, plates, device frames and soft shadows.
 - Never paste caption pills or numbered pins on the images.
 - Never use whole-screen photos of the app as the main idea. Use components.
 - Never ship before comparing against the reference analysis above, point by point.
