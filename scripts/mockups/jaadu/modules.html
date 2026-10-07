@@ -8,12 +8,13 @@
 @font-face{font-family:'IBM Plex Mono';font-weight:400;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2)}
 @font-face{font-family:'IBM Plex Mono';font-weight:500;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2)}
 body{margin:0;background:#fff}
-.mod{position:relative;width:1600px;overflow:hidden;font-family:Geist,sans-serif;margin:0 0 60px;background:#00022B}
-.plate{position:absolute;overflow:hidden;border-radius:56px;background:linear-gradient(180deg,#16235E,#0A1240);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07),inset 0 -26px 50px -28px rgba(0,0,0,.35)}
-.block{position:absolute;border-radius:56px;background:#ECEDF4;color:#15141F;padding:60px 68px;box-sizing:border-box;box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}
-.block h3{font-weight:300;font-size:58px;margin:0;letter-spacing:-.02em;line-height:1.08}
-.block p{font-weight:400;font-size:25px;line-height:1.5;margin:22px 0 0;color:#55546B;max-width:580px}
-.cr{position:absolute;overflow:hidden;box-shadow:0 18px 30px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.09)}
+.mod{position:relative;width:1600px;overflow:hidden;font-family:Geist,sans-serif;margin:0 0 60px;background:radial-gradient(1000px 700px at 8% 0%,rgba(38,83,207,.85),transparent 62%),radial-gradient(900px 700px at 100% 40%,rgba(0,160,255,.35),transparent 60%),radial-gradient(1100px 800px at 40% 110%,rgba(89,133,255,.55),transparent 60%),#00022B}
+.orb{position:absolute;border-radius:50%;filter:blur(8px);pointer-events:none}
+.plate{position:absolute;overflow:hidden;border-radius:56px;background:linear-gradient(160deg,rgba(130,190,255,.22),rgba(60,100,230,.08) 45%,rgba(0,10,80,.18));backdrop-filter:blur(34px) saturate(1.5);-webkit-backdrop-filter:blur(34px) saturate(1.5);box-shadow:inset 0 0 0 1.5px rgba(150,215,255,.38),inset 0 2px 0 rgba(255,255,255,.5),inset 0 -30px 60px -30px rgba(0,255,255,.12),0 30px 60px -30px rgba(0,0,40,.7)}
+.block{position:absolute;border-radius:56px;background:linear-gradient(150deg,rgba(255,255,255,.28),rgba(130,190,255,.12) 55%,rgba(38,83,207,.25));backdrop-filter:blur(34px) saturate(1.6);-webkit-backdrop-filter:blur(34px) saturate(1.6);color:#F1F6FF;padding:60px 68px;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px rgba(170,225,255,.5),inset 0 2px 0 rgba(255,255,255,.6),0 30px 60px -30px rgba(0,0,40,.7)}
+.block h3{background:linear-gradient(90deg,#fff,#9fdcff 70%,#5ef2ff);-webkit-background-clip:text;color:transparent;font-weight:400;font-size:58px;margin:0;letter-spacing:-.02em;line-height:1.08}
+.block p{font-weight:400;font-size:25px;line-height:1.5;margin:22px 0 0;color:#C9D8F5;max-width:580px}
+.cr{position:absolute;overflow:hidden;box-shadow:0 24px 40px rgba(0,0,40,.5)}
 .cr>div{transform-origin:0 0}
 .lap{position:absolute}.lap .lid{position:relative;background:#0A0A0D;padding:16px;border-radius:30px 30px 8px 8px;box-shadow:inset 0 0 0 3px #3b3b42,0 40px 70px -34px rgba(0,0,0,.6)}
 .lap .scr{position:relative;overflow:hidden;border-radius:14px;background:#00022b}.lap .scr>div{transform-origin:0 0}
@@ -31,7 +32,8 @@ const lap=(scr,k,l,t,w=1440,h=900)=>`<div class="lap" style="left:${l}px;top:${t
 const plate=(l,t,w,h,inner)=>`<div class="plate" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px">${inner}</div>`
 const block=(l,t,w,h,a,b)=>`<div class="block" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><h3>${a}</h3><p>${b}</p></div>`
 const call=(w,h,x1,y1,x2,y2,c,txt,cx,cy)=>`<svg class="dl" width="${w}" height="${h}"><path d="M${x1} ${y1} L${x2} ${y2}" fill="none" stroke="#7F93C4" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="9" fill="${c}" stroke="#fff" stroke-width="3"/></svg><div class="chip" style="--c:${c};left:${cx}px;top:${cy}px"><i></i>${txt}</div>`
-const mod=(id,h,inner)=>`<div class="mod" id="${id}" style="height:${h}px">${inner}</div>`
+let MI=0;const ORB=[['#00E5FF',.9],['#5985FF',.95],['#7B5CFF',.8],['#45FFB5',.55]]
+const mod=(id,h,inner)=>{const r=(n)=>{MI++;return ((Math.sin(MI*12.9898+n*78.233)*43758.5453)%1+1)%1};let o='';for(let i=0;i<4;i++){const c=ORB[(MI+i)%4],d=300+r(i)*260;o+=`<div class="orb" style="left:${r(1+i)*1500-d/2}px;top:${r(5+i)*(h-100)-d/3}px;width:${d}px;height:${d}px;background:radial-gradient(circle at 35% 30%,${c[0]},rgba(0,0,0,0) 72%);opacity:${c[1]}"></div>`}return `<div class="mod" id="${id}" style="height:${h}px">${o}${inner}</div>`}
 const N='box-shadow:none;overflow:visible';const M=[]
 // 1 spread: overnight (standout)
 M.push(mod('m-overnight',1000,
