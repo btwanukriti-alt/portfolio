@@ -1,0 +1,240 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap">
+<style>
+body{display:block!important;background:#fff!important;padding:0!important;gap:0!important;margin:0}
+#lib{position:absolute;left:-9999px;top:0}
+.mod{position:relative;width:1600px;overflow:hidden;font-family:Poppins,sans-serif;margin:0 0 60px;background:#EEF0F5}
+.abs{position:absolute}
+.plate{position:absolute;overflow:hidden;border-radius:56px;background:linear-gradient(180deg,#F8F9FC,#E7E9F0);box-shadow:inset 0 0 0 2px rgba(255,255,255,.95),inset 0 -26px 50px -28px rgba(30,30,70,.07)}
+.plate.w{background:#fff}
+.block{position:absolute;border-radius:56px;background:#644ACD;color:#fff;padding:60px 68px;box-sizing:border-box}
+.block h3{font-family:Poppins,sans-serif;font-weight:300;font-size:58px;margin:0;letter-spacing:-.02em;line-height:1.08}
+.block p{font-weight:300;font-size:25px;line-height:1.5;margin:22px 0 0;opacity:.9;max-width:580px}
+.dev{position:absolute;padding:14px;background:#0A0A0D;border-radius:74px;box-shadow:inset 0 0 0 3px #3b3b42,0 40px 70px -34px rgba(10,10,40,.55)}
+.dev .scr{position:relative;overflow:hidden;border-radius:60px;background:#fff}
+.dev .isl{position:absolute;left:50%;top:26px;width:132px;height:37px;border-radius:20px;background:#000;transform:translateX(-50%);z-index:5}
+.drop{filter:drop-shadow(0 14px 26px rgba(30,20,80,.14))}
+.mk{display:inline-block;-webkit-mask:url(@MARK@) center/contain no-repeat;mask:url(@MARK@) center/contain no-repeat}
+.gd{position:absolute;border-color:#9C9FB2;border-style:dashed;border-width:0}
+.qcard{position:absolute;background:#fff;border-radius:44px;display:flex;flex-direction:column;align-items:center;padding:44px 44px 40px;box-shadow:0 18px 40px -22px rgba(30,20,80,.25)}
+.lbl{position:absolute;font-weight:500;font-size:26px;color:#8C8FA0}
+</style>
+
+<!-- 1 HOME SPREAD -->
+<div class="mod" id="m-home" style="height:1000px">
+  <div class="plate" style="left:40px;top:40px;width:740px;height:920px">
+    <div class="dev" style="left:102px;top:60px"><div class="scr" data-s="s-home" data-k="1.3" data-h="900"></div><div class="isl"></div></div>
+  </div>
+  <div class="plate" style="left:820px;top:40px;width:740px;height:560px">
+    <div class="abs drop" data-sel="#s-home .card2" data-k="1.5" style="left:107px;top:60px"></div>
+  </div>
+  <div class="block" style="left:820px;top:620px;width:740px;height:340px"><h3>Your day, at a glance</h3><p>Calories against the goal, steps, and the next class, on one scroll.</p></div>
+</div>
+
+<!-- 2 CHECK-IN SPREAD (mirrored) -->
+<div class="mod" id="m-checkin" style="height:1000px">
+  <div class="plate" style="left:40px;top:40px;width:740px;height:560px">
+    <div class="qcard" style="left:180px;top:48px;width:380px"><div id="qrsvg" style="width:300px;height:300px"></div><div style="font-size:34px;font-weight:600;letter-spacing:-.02em;color:#1B1830;margin-top:24px">Check in now</div><div style="font-size:19px;color:#6B6880;margin-top:4px">Show your QR at the desk</div></div>
+  </div>
+  <div class="block" style="left:40px;top:620px;width:740px;height:340px"><h3>Check in with one tap</h3><p>The gym's QR sits one tap from the Gym tab, so nobody waits at the desk.</p></div>
+  <div class="plate" style="left:820px;top:40px;width:740px;height:920px">
+    <div class="dev" style="left:102px;top:60px"><div class="scr" data-s="s-gymact" data-k="1.3" data-h="844"></div><div class="isl"></div></div>
+  </div>
+</div>
+
+<!-- 3 CLASSES SPREAD -->
+<div class="mod" id="m-classes" style="height:1000px">
+  <div class="plate" style="left:40px;top:40px;width:740px;height:560px">
+    <svg class="abs" style="left:0;top:0;width:740px;height:200px;overflow:visible" viewBox="0 0 740 200"><path d="M150 -10 V30 Q150 62 182 62 H220" fill="none" stroke="#8C8FA0" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="222" cy="62" r="8" fill="#644ACD" stroke="#fff" stroke-width="3"/></svg>
+    <div class="abs drop" data-sel="#s-gymev .cls" data-i="0" data-k="1.25" style="left:151px;top:100px"></div>
+    <div class="abs drop" data-sel="#s-gymev .cls" data-i="1" data-k="1.25" style="left:151px;top:250px"></div>
+    <div class="abs drop" data-sel="#s-gymev .cls" data-i="2" data-k="1.25" style="left:151px;top:400px"></div>
+  </div>
+  <div class="block" style="left:40px;top:620px;width:740px;height:340px"><h3>Status before the tap</h3><p>Book, join the waitlist, or see you're booked. Spots show as a bar.</p></div>
+  <div class="plate" style="left:820px;top:40px;width:740px;height:920px">
+    <div class="dev" style="left:102px;top:60px"><div class="scr" data-s="s-gymev" data-k="1.3" data-h="844"></div><div class="isl"></div></div>
+  </div>
+</div>
+
+<!-- 4 LOG BENTO -->
+<div class="mod" id="m-log" style="height:1000px">
+  <div class="plate" style="left:40px;top:40px;width:780px;height:540px"><div class="abs drop" data-sel="#s-log .tiles" data-k="1.5" style="left:128px;top:56px"></div></div>
+  <div class="plate" style="left:840px;top:40px;width:720px;height:540px">
+    <div class="abs drop" data-sel="#s-log .quick" data-k="1.65" style="left:70px;top:50px"></div>
+    <div class="abs drop" data-sel="#s-water .step" data-k="1.45" style="left:106px;top:290px"></div>
+  </div>
+  <div class="plate" style="left:40px;top:600px;width:500px;height:360px">
+    <div class="abs" data-sel="#s-water .big2" data-k="1.15" style="left:135px;top:40px"></div>
+    <div class="abs" data-sel="#s-water .pillrow" data-k="1.3" style="left:60px;top:292px"></div>
+  </div>
+  <div class="plate" style="left:560px;top:600px;width:1000px;height:360px">
+    <div class="abs drop" data-sel="#s-water .card3" data-k="1.55" style="left:60px;top:46px"></div>
+    <div class="abs drop" data-sel="#s-sleep .card3" data-i="0" data-k="1.4" style="left:650px;top:60px"></div>
+  </div>
+</div>
+
+<!-- 5 TRACKERS BENTO -->
+<div class="mod" id="m-trackers" style="height:1000px">
+  <div class="plate" style="left:40px;top:40px;width:500px;height:560px">
+    <div class="abs" data-sel="#s-sleep .big2" data-k="1.5" style="left:100px;top:50px"></div>
+    <div class="abs" data-sel="#s-sleep .pillrow" data-k="1.3" style="left:60px;top:420px"></div>
+  </div>
+  <div class="plate" style="left:40px;top:620px;width:500px;height:340px">
+    <div class="abs drop" data-sel="#s-sleep .card3" data-i="0" data-k="1.2" style="left:40px;top:40px"></div>
+    <div class="abs drop" data-sel="#s-sleep .row.r2" data-k="1.2" style="left:20px;top:210px"></div>
+  </div>
+  <div class="plate" style="left:560px;top:40px;width:1000px;height:430px">
+    <div class="abs" data-sel="#s-food > div:nth-of-type(3)" data-k="1.6" style="left:50px;top:70px"></div>
+    <div class="abs drop" data-sel="#s-food .card3" data-k="1.55" style="left:450px;top:60px"></div>
+  </div>
+  <div class="plate" style="left:560px;top:490px;width:490px;height:470px"><div class="abs drop" data-sel="#s-water .card3" data-k="1.25" style="left:26px;top:56px"></div></div>
+  <div class="plate" style="left:1070px;top:490px;width:490px;height:470px"><div class="abs drop" data-sel="#s-sleep .card3" data-i="1" data-k="1.25" style="left:26px;top:56px"></div></div>
+</div>
+
+<!-- 6 WORKOUT SPREAD -->
+<div class="mod" id="m-workout" style="height:1000px">
+  <div class="plate" style="left:40px;top:40px;width:740px;height:560px">
+    <div class="abs drop" data-sel="#s-wo .wc" data-i="0" data-k="1.5" style="left:107px;top:48px"></div>
+  </div>
+  <div class="block" style="left:40px;top:620px;width:740px;height:340px"><h3>Plans show level and length</h3><p>Beginner, five weeks, sixty minutes. A member knows before opening it.</p></div>
+  <div class="plate" style="left:820px;top:40px;width:740px;height:920px">
+    <div class="dev" style="left:102px;top:60px"><div class="scr" data-s="s-wd" data-k="1.3" data-h="900"></div><div class="isl"></div></div>
+  </div>
+</div>
+
+<!-- 7 STATS + TABLE -->
+<div class="mod" id="m-stats" style="height:700px">
+  <div class="plate" style="left:40px;top:40px;width:740px;height:620px">
+    <div class="abs" style="left:76px;top:48px;width:588px;height:600px;border-radius:40px;background:#fff;padding:24px;box-sizing:border-box;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start;font-family:Poppins,sans-serif"><div style="background:linear-gradient(145deg,#8A72EE,#644ACD 60%,#4B34A8);color:#fff;border-radius:30px;padding:26px;height:236px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;position:relative"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:27px;font-weight:400;letter-spacing:-.01em">Burned</span><span style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none"><svg style="width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-flame"/></svg></span></div><div><div style="font-size:50px;font-weight:600;letter-spacing:-.03em;line-height:1">900<span style="font-size:22px;font-weight:400;margin-left:6px;opacity:.7">cal</span></div><span style="display:inline-flex;margin-top:14px;height:34px;padding:0 14px;border-radius:17px;background:rgba(255,255,255,.22);color:#fff;font-size:17px;font-weight:600;align-items:center">300 to go</span></div></div><div style="background:#F5F5F8;color:#2A2640;border-radius:30px;padding:26px;height:236px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;position:relative"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:27px;font-weight:400;letter-spacing:-.01em">Consumed</span><span style="width:44px;height:44px;border-radius:50%;background:#E7E7EE;display:grid;place-items:center;flex:none"><svg style="width:22px;height:22px;stroke:#2A2640;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-fork"/></svg></span></div><div><div style="font-size:50px;font-weight:600;letter-spacing:-.03em;line-height:1">1,385<span style="font-size:22px;font-weight:400;margin-left:6px;opacity:.7">cal</span></div><span style="display:inline-flex;margin-top:14px;height:34px;padding:0 14px;border-radius:17px;background:#FFE3EA;color:#C93A60;font-size:17px;font-weight:600;align-items:center">865 left</span></div></div><div style="background:#F5F5F8;color:#2A2640;border-radius:30px;padding:26px;height:236px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;position:relative"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:27px;font-weight:400;letter-spacing:-.01em">Steps</span><span style="width:44px;height:44px;border-radius:50%;background:#E7E7EE;display:grid;place-items:center;flex:none"><svg style="width:22px;height:22px;stroke:#2A2640;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-shoe"/></svg></span></div><div><div style="font-size:50px;font-weight:600;letter-spacing:-.03em;line-height:1">2,450<span style="font-size:22px;font-weight:400;margin-left:6px;opacity:.7"></span></div><span style="display:inline-flex;margin-top:14px;height:34px;padding:0 14px;border-radius:17px;background:#ECE8FA;color:#4B34A8;font-size:17px;font-weight:600;align-items:center">550 to go</span></div></div><div style="background:#F5F5F8;color:#2A2640;border-radius:30px;padding:26px;height:236px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;position:relative"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:27px;font-weight:400;letter-spacing:-.01em">Water</span><span style="width:44px;height:44px;border-radius:50%;background:#E7E7EE;display:grid;place-items:center;flex:none"><svg style="width:22px;height:22px;stroke:#2A2640;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-drop"/></svg></span></div><div><div style="font-size:50px;font-weight:600;letter-spacing:-.03em;line-height:1">1.6<span style="font-size:22px;font-weight:400;margin-left:6px;opacity:.7">L</span></div><span style="display:inline-flex;margin-top:14px;height:34px;padding:0 14px;border-radius:17px;background:#E3EDFF;color:#2F6FE0;font-size:17px;font-weight:600;align-items:center">1.4 L to go</span></div></div></div>
+  </div>
+  <div class="plate" style="left:820px;top:40px;width:740px;height:620px">
+    <div class="abs" style="left:-170px;top:56px;width:960px;height:640px;border-radius:40px;background:#fff;padding:26px 30px;box-sizing:border-box;font-family:Poppins,sans-serif">
+      <div style="display:flex;justify-content:flex-end;gap:14px;margin-bottom:22px"><span style="height:48px;padding:0 22px;border-radius:12px;box-shadow:inset 0 0 0 2px #E7E7EE;display:flex;align-items:center;gap:10px;font-size:19px;color:#6B6880"><svg style="width:20px;height:20px;stroke:#2A2640;fill:none;stroke-width:1.8;stroke-linecap:round"><use href="#i-search"/></svg>Search classes</span><span style="height:48px;padding:0 22px;border-radius:12px;box-shadow:inset 0 0 0 2px #E7E7EE;display:flex;align-items:center;gap:10px;font-size:19px;font-weight:500">Filter<svg style="width:20px;height:20px;stroke:#2A2640;fill:none;stroke-width:1.8;stroke-linecap:round"><use href="#i-filter"/></svg></span></div>
+      <div style="display:grid;grid-template-columns:230px 150px 140px 130px 170px;height:64px;align-items:center;background:#F5F5F8;border-radius:16px;font-size:21px;color:#6B6880;margin-bottom:6px"><span style="padding-left:2px">Class</span><span>Staff</span><span>Time</span><span>Spots</span><span>Status</span></div>
+      <div style="display:grid;grid-template-columns:230px 150px 140px 130px 170px;align-items:center;height:104px;border-bottom:2px solid #F0F0F4;font-size:23px;color:#2A2640"><span style="font-weight:600">Kick Box</span><span>Alex John</span><span>12:30 PM</span><span>10 left</span><span style="display:flex;align-items:center;gap:10px"><i style="width:10px;height:10px;border-radius:50%;background:#2DC6A0;display:block"></i>Available</span></div><div style="display:grid;grid-template-columns:230px 150px 140px 130px 170px;align-items:center;height:104px;border-bottom:2px solid #F0F0F4;font-size:23px;color:#2A2640"><span style="font-weight:600">BodyPump</span><span>Alex John</span><span>2:30 PM</span><span>0 left</span><span style="display:flex;align-items:center;gap:10px"><i style="width:10px;height:10px;border-radius:50%;background:#F5577D;display:block"></i>Full</span></div><div style="display:grid;grid-template-columns:230px 150px 140px 130px 170px;align-items:center;height:104px;border-bottom:2px solid #F0F0F4;font-size:23px;color:#2A2640"><span style="font-weight:600">TRX Training</span><span>Maya Rao</span><span>6:00 PM</span><span>4 left</span><span style="display:flex;align-items:center;gap:10px"><i style="width:10px;height:10px;border-radius:50%;background:#644ACD;display:block"></i>Booked</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8 LOGO CONSTRUCTION (full width) -->
+<div class="mod" id="m-brand" style="height:900px">
+  <div class="plate" id="lg" style="left:40px;top:40px;width:1520px;height:820px">
+    <style>
+      #lg .h{position:absolute;left:0;right:0;border-top:2px dashed #B9BCCB;height:0}
+      #lg .h.s{border-top:1.5px dashed #D3D5E0}
+      #lg .v{position:absolute;top:70px;bottom:70px;border-left:2px dashed #B9BCCB;width:0}
+      #lg .v.s{border-left:1.5px dashed #D3D5E0}
+      #lg .dm{position:absolute;height:2px;background:#8C8FA0}
+      #lg .dm:before,#lg .dm:after{content:"";position:absolute;top:-8px;width:2px;height:18px;background:#8C8FA0}
+      #lg .dm:before{left:0}#lg .dm:after{right:0}
+      #lg .dv{position:absolute;width:2px;background:#8C8FA0}
+      #lg .dv:before,#lg .dv:after{content:"";position:absolute;left:-8px;height:2px;width:18px;background:#8C8FA0}
+      #lg .dv:before{top:0}#lg .dv:after{bottom:0}
+      #lg .nb{position:absolute;min-width:46px;height:34px;padding:0 10px;border-radius:17px;background:#fff;color:#2A2640;font-size:19px;font-weight:600;display:grid;place-items:center;box-shadow:0 0 0 2px #C9CBD8;transform:translate(-50%,-50%)}
+      #lg .nb.p{background:#644ACD;color:#fff;box-shadow:none}
+      #lg .tg{position:absolute;font-size:17px;font-weight:500;color:#8C8FA0;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+      #lg .dot{position:absolute;width:14px;height:14px;border-radius:50%;background:#F5577D;border:3px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 1px #F5577D}
+      #lg .cs{position:absolute;background:repeating-linear-gradient(45deg,rgba(245,87,125,.16) 0 6px,rgba(245,87,125,.04) 6px 12px);border:2px dashed rgba(245,87,125,.55);box-sizing:border-box}
+    </style>
+    <div id="lg-stage" class="abs" style="left:0;top:0;width:1520px;height:820px"></div>
+  </div>
+</div>
+
+<!-- 9 APP ICON + PALETTE -->
+<div class="mod" id="m-icon" style="height:800px">
+  <div class="plate" style="left:40px;top:40px;width:740px;height:720px">
+    <div class="abs" style="left:70px;top:60px;width:600px;height:600px;border-radius:150px;border:2px solid rgba(100,74,205,.1)"></div>
+    <div class="abs" style="left:120px;top:110px;width:500px;height:500px;border-radius:125px;border:2px solid rgba(100,74,205,.18)"></div>
+    <div class="abs" style="left:170px;top:160px;width:400px;height:400px;border-radius:100px;border:2px solid rgba(100,74,205,.28)"></div>
+    <div class="abs" style="left:220px;top:210px;width:300px;height:300px;border-radius:78px;background:linear-gradient(145deg,#8E78E8,#644ACD 55%,#3E2B94);box-shadow:0 36px 56px -22px rgba(62,43,148,.65),inset 0 2px 0 rgba(255,255,255,.35);display:grid;place-items:center"><span class="mk" style="width:150px;height:166px;background:#fff"></span></div>
+  </div>
+  <div class="plate" style="left:820px;top:40px;width:740px;height:720px">
+    <div class="abs" style="left:60px;top:60px;display:grid;grid-template-columns:repeat(3,190px);gap:24px">
+      <div style="height:190px;border-radius:36px;background:#644ACD;color:#fff;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Primary</b>#644ACD</div>
+      <div style="height:190px;border-radius:36px;background:#3E2B94;color:#fff;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Deep</b>#3E2B94</div>
+      <div style="height:190px;border-radius:36px;background:#F5577D;color:#fff;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Accent</b>#F5577D</div>
+      <div style="height:190px;border-radius:36px;background:#FFE8EE;color:#7A2C42;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Blush</b>#FFE8EE</div>
+      <div style="height:190px;border-radius:36px;background:#ECE8FA;color:#3E2B94;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Lilac</b>#ECE8FA</div>
+      <div style="height:190px;border-radius:36px;background:#12101C;color:#fff;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Ink</b>#12101C</div>
+      <div style="height:190px;border-radius:36px;background:#4F8BFF;color:#fff;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Water</b>#4F8BFF</div>
+      <div style="height:190px;border-radius:36px;background:#7B3FE4;color:#fff;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Sleep</b>#7B3FE4</div>
+      <div style="height:190px;border-radius:36px;background:#2DC6A0;color:#06463A;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px"><b style="font-size:21px;font-weight:600">Growth</b>#2DC6A0</div>
+    </div>
+  </div>
+</div>
+
+<!-- 9 LAYOUTS -->
+<div class="mod" id="m-layouts" style="height:700px">
+  <div class="plate" style="left:40px;top:40px;width:1520px;height:620px">
+    <div class="lbl" style="left:60px;top:52px">Earlier layouts</div><div class="lbl" style="left:1260px;top:52px;color:#644ACD;font-weight:600">Refined</div>
+    <img src="gal/L1c.jpg" class="abs drop" style="left:60px;top:110px;width:220px;border-radius:26px">
+    <img src="gal/L2c.jpg" class="abs drop" style="left:296px;top:110px;width:220px;border-radius:26px">
+    <img src="gal/L3c.jpg" class="abs drop" style="left:532px;top:110px;width:220px;border-radius:26px">
+    <img src="gal/L4c.jpg" class="abs drop" style="left:768px;top:110px;width:220px;border-radius:26px">
+    <img src="gal/L5c.jpg" class="abs drop" style="left:1004px;top:110px;width:220px;border-radius:26px">
+    <div class="abs" data-s="s-home" data-k="0.564" data-h="900" style="left:1260px;top:110px;border-radius:26px;overflow:hidden;box-shadow:0 0 0 5px #644ACD,0 0 0 16px rgba(100,74,205,.16)"></div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('[data-s],[data-sel]').forEach(function(ph){
+  var k=parseFloat(ph.dataset.k||1),src,w,h;
+  if(ph.dataset.s){src=document.querySelector('#lib #'+ph.dataset.s).cloneNode(true);src.removeAttribute('id');w=390;h=parseFloat(ph.dataset.h);src.style.height=h+'px';ph.style.overflow='hidden'}
+  else{var o=document.querySelectorAll('#lib '+ph.dataset.sel)[parseInt(ph.dataset.i||0)];if(!o){console.log('missing',ph.dataset.sel);return}src=document.createElement('div');src.className='z';src.style.cssText='width:'+o.offsetWidth+'px;height:'+o.offsetHeight+'px;background:transparent;overflow:visible';var c=o.cloneNode(true);c.style.margin='0';src.appendChild(c);w=o.offsetWidth;h=o.offsetHeight;ph.style.overflow='visible'}
+  ph.style.width=(w*k)+'px';ph.style.height=(h*k)+'px';
+  src.style.transform='scale('+k+')';src.style.transformOrigin='0 0';src.style.position='absolute';src.style.left=0;src.style.top=0;
+  ph.appendChild(src)});
+(function(){var n=25,m=[],s=7;function r(){s=(s*16807)%2147483647;return s/2147483647}
+ for(var y=0;y<n;y++){m[y]=[];for(var x=0;x<n;x++)m[y][x]=r()>.5}
+ function fin(ox,oy){for(var y=0;y<7;y++)for(var x=0;x<7;x++){var e=x==0||y==0||x==6||y==6,c=x>=2&&x<=4&&y>=2&&y<=4;m[oy+y][ox+x]=e||c}
+  for(var i=-1;i<8;i++){[[ox+i,oy-1],[ox+i,oy+7],[ox-1,oy+i],[ox+7,oy+i]].forEach(function(p){if(p[0]>=0&&p[1]>=0&&p[0]<n&&p[1]<n&&(p[0]<ox||p[0]>ox+6||p[1]<oy||p[1]>oy+6))m[p[1]][p[0]]=false})}}
+ fin(0,0);fin(n-7,0);fin(0,n-7);
+ var g='<svg viewBox="0 0 '+n+' '+n+'" style="display:block;width:300px;height:300px;stroke:none;fill:#1B1830">';
+ for(var y=0;y<n;y++)for(var x=0;x<n;x++)if(m[y][x])g+='<rect x="'+x+'" y="'+y+'" width="1.02" height="1.02" rx=".18"/>';
+ var el=document.getElementById('qrsvg');if(el)el.innerHTML=g+'</svg>'})();
+
+// logo construction: everything is measured from the drawn lockup
+(function(){
+  var st=document.getElementById('lg-stage'); if(!st) return;
+  var MX=330, MY=200, MW=330, MH=Math.round(330*188/170), FS=210, GAP=110;
+  var WX=MX+MW+GAP; // wordmark left
+  var h='';
+  function add(s){h+=s}
+  // mark + wordmark first so we can measure the wordmark
+  st.innerHTML='<span class="mk abs" style="left:'+MX+'px;top:'+MY+'px;width:'+MW+'px;height:'+MH+'px;background:#644ACD"></span><div id="wm" class="abs" style="left:'+WX+'px;top:0;font-family:Montserrat,sans-serif;font-weight:700;font-size:'+FS+'px;line-height:1;letter-spacing:-.02em;color:#2A2640;white-space:nowrap">Zync</div>';
+  var wm=document.getElementById('wm'), WW=Math.round(wm.getBoundingClientRect().width);
+  var base=MY+MH/2+ (0.8585*FS-0.7*FS/2); // baseline so the cap height centres on the mark
+  var capTop=base-0.7*FS, xTop=base-0.52*FS, desc=base+0.2*FS, T=base-0.8585*FS;
+  wm.style.top=T+'px';
+  var R=WX+WW, U=MW/16; // 16 units = mark width
+  function u(px){return Math.round(px/U*10)/10}
+  // horizontal guides
+  [[MY,0],[capTop,0],[xTop,1],[MY+MH/2,1],[base,0],[desc,1],[MY+MH,0]].forEach(function(p){add('<div class="h'+(p[1]?' s':'')+'" style="top:'+p[0]+'px"></div>')});
+  // vertical guides
+  [[MX,0],[MX+MW,0],[WX,0],[R,0],[MX+MW/2,1]].forEach(function(p){add('<div class="v'+(p[1]?' s':'')+'" style="left:'+p[0]+'px"></div>')});
+  // mark construction (circles, diagonals, box)
+  var cx=MX+MW/2, cy=MY+MH/2, r1=MW/2, r2=Math.sqrt(MW*MW+MH*MH)/2;
+  add('<svg class="abs" style="left:0;top:0;width:1520px;height:820px;overflow:visible" viewBox="0 0 1520 820"><g fill="none" stroke="#8C8FA0" stroke-width="1.6" stroke-dasharray="6 7">'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r1+'"/><circle cx="'+cx+'" cy="'+cy+'" r="'+r2+'"/><circle cx="'+cx+'" cy="'+cy+'" r="'+(r1*0.5)+'"/>'
+    +'<line x1="'+MX+'" y1="'+MY+'" x2="'+(MX+MW)+'" y2="'+(MY+MH)+'"/><line x1="'+(MX+MW)+'" y1="'+MY+'" x2="'+MX+'" y2="'+(MY+MH)+'"/></g>'
+    +'<rect x="'+MX+'" y="'+MY+'" width="'+MW+'" height="'+MH+'" fill="none" stroke="#8C8FA0" stroke-width="1.6"/></svg>');
+  [[MX,MY],[MX+MW,MY],[MX,MY+MH],[MX+MW,MY+MH],[cx,cy]].forEach(function(p){add('<div class="dot" style="left:'+p[0]+'px;top:'+p[1]+'px"></div>')});
+  // clear space: x/4 of the mark height around the lockup
+  var cs=Math.round(MH/4), L=MX-cs, Tt=MY-cs, Rr=R+cs, Bb=MY+MH+cs;
+  add('<div class="abs" style="left:'+L+'px;top:'+Tt+'px;width:'+(Rr-L)+'px;height:'+(Bb-Tt)+'px;border:2px dashed #F5577D;border-radius:6px;box-sizing:border-box"></div>');
+  [[L,Tt],[Rr-cs,Tt],[L,Bb-cs],[Rr-cs,Bb-cs]].forEach(function(p){add('<div class="cs" style="left:'+p[0]+'px;top:'+p[1]+'px;width:'+cs+'px;height:'+cs+'px"></div>')});
+  add('<div class="nb p" style="left:'+(L+cs/2)+'px;top:'+(Tt+cs/2)+'px">x</div><div class="nb p" style="left:'+(Rr-cs/2)+'px;top:'+(Bb-cs/2)+'px">x</div>');
+  // dimensions along the top
+  var dy=Tt-46;
+  add('<div class="dm" style="left:'+MX+'px;top:'+dy+'px;width:'+MW+'px"></div><div class="nb" style="left:'+(MX+MW/2)+'px;top:'+dy+'px">'+u(MW)+'</div>');
+  add('<div class="dm" style="left:'+(MX+MW)+'px;top:'+dy+'px;width:'+GAP+'px"></div><div class="nb" style="left:'+(MX+MW+GAP/2)+'px;top:'+dy+'px">'+u(GAP)+'</div>');
+  add('<div class="dm" style="left:'+WX+'px;top:'+dy+'px;width:'+WW+'px"></div><div class="nb" style="left:'+(WX+WW/2)+'px;top:'+dy+'px">'+u(WW)+'</div>');
+  // dimensions on the right: mark height, cap height, descender
+  var rx=Rr+46;
+  add('<div class="dv" style="left:'+rx+'px;top:'+MY+'px;height:'+MH+'px"></div><div class="nb" style="left:'+rx+'px;top:'+(MY+MH/2)+'px">'+u(MH)+'</div>');
+  add('<div class="dv" style="left:'+(rx+60)+'px;top:'+capTop+'px;height:'+(base-capTop)+'px"></div><div class="nb" style="left:'+(rx+60)+'px;top:'+((capTop+base)/2)+'px">'+u(base-capTop)+'</div>');
+  // labels
+  add('<div class="tg" style="left:'+MX+'px;top:'+(Bb+36)+'px">Mark · 16 u wide</div><div class="tg" style="left:'+WX+'px;top:'+(Bb+36)+'px">Wordmark · Montserrat Bold</div><div class="tg" style="left:'+(L)+'px;top:'+(Tt-110)+'px;color:#F5577D">Clear space = x, a quarter of the mark height</div>');
+  add('<div class="tg" style="left:40px;top:'+(base-18)+'px">Baseline</div><div class="tg" style="left:40px;top:'+(capTop-18)+'px">Cap height</div><div class="tg" style="left:40px;top:'+(xTop-6)+'px;color:#B0B3C2">x-height</div>');
+  st.insertAdjacentHTML('beforeend',h);
+})();
+</script>
