@@ -74,11 +74,12 @@ M.push(mod('m-library',1000,
  plate(40,40,1520,470,cr(libTable(),891,238,1.5,92,60,12))+
  plate(40,530,940,430,cr(equity(),891,280,1.2,40,60,12))+
  plate(1000,530,560,430,cr(paramDiff(),891,217,1.0,40,100,12))))
-// 8 spread deja vu
-M.push(mod('m-deja',1000,
- plate(40,40,740,920,lap(screenDeja(),.9,40,150))+
- plate(820,40,740,560,cr(dejaQuery(),893,170,1.2,56,160,12))+
- block(820,620,740,340,'Find the look-alikes','Describe a setup. Déjà Vu scans market history for similar moments and shows what happened next.')))
+// 8 spread: mobile chart prompt (real mobile frame 3644:206616)
+const phone=(scr,k,l,t)=>`<div style="position:absolute;left:${l}px;top:${t}px;width:${393*k+34}px;height:${852*k+34}px;border-radius:${68}px;padding:17px;box-sizing:border-box;background:linear-gradient(145deg,#8DA2E6 0%,#3A4FA8 38%,#17236B 70%,#0B1244 100%);box-shadow:0 50px 90px -30px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.35)"><div style="position:relative;width:100%;height:100%;border-radius:52px;background:#02030A;padding:8px;box-sizing:border-box;box-shadow:inset 0 0 0 1px #000"><div style="position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden"><div style="transform:scale(${k});transform-origin:0 0;width:393px;height:852px">${scr}</div></div><i style="position:absolute;left:50%;top:18px;width:92px;height:26px;margin-left:-46px;border-radius:14px;background:#000;z-index:5"></i></div><i style="position:absolute;right:-4px;top:210px;width:4px;height:90px;border-radius:0 3px 3px 0;background:#26336f"></i><i style="position:absolute;left:-4px;top:170px;width:4px;height:50px;border-radius:3px 0 0 3px;background:#26336f"></i></div>`
+M.push(mod('m-mobile',1000,
+ plate(40,40,740,920,phone(screenMobile(),.96,163,48))+
+ plate(820,40,740,560,cr(promptCard(),393,138,1.6,55,160,16))+
+ block(820,620,740,340,'Ask about one point','Tap the chart, then ask. On mobile the prompt docks to the bottom of the screen.')))
 // 9 bento design system
 M.push(mod('m-system',820,
  plate(40,40,960,240,cr(dsSeg(),592,48,1.4,65,86,14,N))+
