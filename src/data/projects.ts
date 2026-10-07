@@ -49,7 +49,7 @@ export const PROJECTS: Project[] = [
     timeline: '2 months',
     problem:
       "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
-    card: '/case-studies/zync/02-home.jpg',
+    card: '/case-studies/zync/01-home.jpg',
     hero: caseStudyImage('fitness-tracker'),
     showcase: '/showcase/fitness-tracker.html?v=5',
     color: '#FFE8EE',
