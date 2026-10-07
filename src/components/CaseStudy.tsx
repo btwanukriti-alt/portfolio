@@ -1,12 +1,12 @@
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 import type { Project } from '@/data/projects'
 import SiteHeader from './SiteHeader'
 import SlideCarousel from './SlideCarousel'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
 import { Reveal, SplitReveal } from './Reveal'
-import CollegeGallery from './CollegeGallery'
-import { COLLEGE_INFO } from '@/data/collegeGallery'
+import { COLLEGE_BRAND, COLLEGE_IMAGES } from '@/data/collegeGallery'
 import { caseStudyByKey } from '@/data/caseStudies'
 
 // Case study page (content layout from Figma 125:2): title block, the project's showcase video
@@ -92,11 +92,25 @@ export default function CaseStudy({ project, slides }: { project: Project; slide
   )
 }
 
-// Visual-first layout: the description at the top, the mockup gallery below (mockup-showcase skill).
+// Visual-first layout (mockup-showcase): the description is short and sits on top, the mockup
+// modules run in one long gallery below. The project's colours come in as CSS variables.
 function CollegeCaseStudy() {
   const cs = caseStudyByKey('college-erp')!
+  const vars = {
+    '--c-accent': COLLEGE_BRAND.accent,
+    '--c-deep': COLLEGE_BRAND.deep,
+    '--c-soft': COLLEGE_BRAND.soft,
+    '--c-tint': COLLEGE_BRAND.tint,
+    '--c-pop': COLLEGE_BRAND.pop,
+  } as CSSProperties
+  // Team and outcome stay off the page until they are confirmed.
+  const facts = [
+    ['Role', 'Sole designer'],
+    ['Timeline', cs.timeline],
+    ['Scope', 'Finance, staff and settlements screens of an existing ERP'],
+  ]
   return (
-    <div className="min-h-screen overflow-x-clip bg-paper">
+    <div className="min-h-screen overflow-x-clip bg-paper" style={vars}>
       <SiteHeader />
       <main className="mx-auto max-w-[var(--max)] px-[var(--gutter)] pt-[120px] pb-[clamp(80px,12vh,140px)]">
         <Link
@@ -106,38 +120,94 @@ function CollegeCaseStudy() {
           ← All work
         </Link>
 
-        <div className="mt-[clamp(32px,6vh,64px)] grid grid-cols-1 gap-x-16 gap-y-8 min-[901px]:grid-cols-[3fr_2fr]">
-          <div className="flex flex-col gap-6">
+        <header className="mt-[clamp(28px,5vh,56px)] grid grid-cols-1 gap-y-8 min-[901px]:grid-cols-[3fr_2fr] min-[901px]:items-end min-[901px]:gap-x-16">
+          <div>
+            <Reveal as="p" className="m-0 inline-flex rounded-full bg-[var(--c-soft)] px-4 py-[7px] text-[13px] leading-none font-semibold text-[var(--c-accent)]">
+              {cs.label}
+            </Reveal>
             <SplitReveal
               as="h1"
-              className="m-0 max-w-[12ch] text-[clamp(44px,6.6vw,112px)] leading-[0.98] font-medium tracking-[-0.045em] text-ink"
+              className="m-0 mt-6 max-w-[11ch] text-[clamp(56px,10vw,160px)] leading-[0.95] font-medium tracking-[-0.045em] text-ink"
               text={cs.title ?? ''}
             />
-            <Reveal as="p" className="m-0 max-w-[40ch] text-[clamp(20px,1.8vw,28px)] leading-[1.35] font-medium tracking-[-0.01em] text-ink" delay={150}>
-              {cs.hook}
-            </Reveal>
           </div>
-          <Reveal delay={250} className="flex flex-col gap-8 min-[901px]:pt-4">
-            <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-5">
-              {COLLEGE_INFO.map(([term, value]) => (
-                <div key={term} className="flex flex-col gap-[6px]">
-                  <dt className="text-[13px] leading-none font-medium text-faint">{term}</dt>
-                  <dd className="m-0 text-[17px] leading-[1.25] font-medium text-ink">{value}</dd>
-                </div>
-              ))}
-            </dl>
-            {cs.paragraphs.map((t) => (
-              <p key={t} className="m-0 max-w-[52ch] text-[clamp(16px,1.2vw,18px)] leading-[1.6] text-muted">{t}</p>
-            ))}
+          <Reveal as="p" className="m-0 max-w-[24ch] text-[clamp(22px,2.4vw,36px)] leading-[1.25] font-medium tracking-[-0.02em] text-ink" delay={150}>
+            {cs.hook}
           </Reveal>
-        </div>
+        </header>
 
-        <Reveal className="mt-[clamp(40px,6vh,72px)] grid grid-cols-1 gap-4 border-t border-line pt-7 min-[901px]:grid-cols-[minmax(160px,1fr)_3fr]">
-          <p className="m-0 text-[15px] leading-[1.4] font-medium text-muted">The standout idea</p>
-          <p className="m-0 max-w-[30ch] text-[clamp(22px,2.4vw,36px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink">{cs.standout}</p>
+        <Reveal className="mt-[clamp(40px,7vh,72px)] grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line pt-7 min-[701px]:grid-cols-3">
+          {facts.map(([term, value]) => (
+            <dl key={term} className="m-0 flex flex-col gap-2">
+              <dt className="text-[12px] leading-none font-semibold tracking-[0.08em] text-[var(--c-accent)] uppercase">{term}</dt>
+              <dd className="m-0 max-w-[34ch] text-[15px] leading-[1.5] font-medium text-ink">{value}</dd>
+            </dl>
+          ))}
         </Reveal>
 
-        <CollegeGallery />
+        <Reveal className="mt-[clamp(56px,9vh,104px)] grid grid-cols-1 gap-4 min-[901px]:grid-cols-[minmax(160px,1fr)_3fr]">
+          <p className="m-0 text-[15px] leading-[1.4] font-medium text-muted">The project</p>
+          <div className="flex max-w-[44ch] flex-col gap-6 text-[clamp(19px,1.7vw,26px)] leading-[1.5] font-normal text-ink">
+            {cs.paragraphs.map((text) => (
+              <p key={text.slice(0, 24)} className="m-0">
+                {text}
+              </p>
+            ))}
+          </div>
+        </Reveal>
+
+        <Reveal className="mt-[clamp(40px,7vh,80px)] rounded-[28px] bg-[var(--c-tint)] px-[clamp(24px,5vw,72px)] py-[clamp(32px,6vw,72px)]">
+          <p className="m-0 text-[13px] leading-none font-semibold tracking-[0.08em] text-[var(--c-accent)] uppercase">The idea</p>
+          <p className="m-0 mt-4 max-w-[20ch] text-[clamp(32px,5.4vw,84px)] leading-[1.02] font-semibold tracking-[-0.035em] text-[var(--c-deep)]">
+            {cs.standout}
+          </p>
+        </Reveal>
+
+        <p className="mx-auto mt-[clamp(56px,9vh,104px)] mb-0 max-w-[var(--max)] text-[14px] leading-[1.5] text-faint">
+          Screens are redesigned for this portfolio, and the figures in them are sample data. College names are placeholders. The last image shows earlier layouts next to the redesign.
+        </p>
+
+        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
+          {COLLEGE_IMAGES.map((image, i) => (
+            <li key={image.src}>
+              <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(18px,2.4vw,36px)] bg-[#eef0f5]">
+                <img
+                  className="block h-auto w-full"
+                  src={image.src}
+                  width={image.width}
+                  height={image.height}
+                  alt={image.alt}
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              </Reveal>
+            </li>
+          ))}
+        </ol>
+
+        <Reveal className="mt-[clamp(72px,12vh,140px)] grid grid-cols-1 gap-10 border-t border-line pt-8 min-[901px]:grid-cols-2 min-[901px]:gap-16">
+          <div>
+            <h2 className="m-0 text-[15px] leading-[1.4] font-medium text-muted">What I delivered</h2>
+            <ul className="m-0 mt-5 flex list-none flex-wrap gap-2 p-0">
+              {cs.delivered.map((item) => (
+                <li key={item} className="rounded-full bg-[var(--c-soft)] px-4 py-[9px] text-[15px] leading-none font-medium text-[var(--c-deep)]">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2 className="m-0 text-[15px] leading-[1.4] font-medium text-muted">Next</h2>
+            <ul className="m-0 mt-5 flex list-none flex-col gap-3 p-0">
+              {cs.next.map((item) => (
+                <li key={item} className="flex items-baseline gap-3 text-[16px] leading-[1.5] text-ink">
+                  <span aria-hidden="true" className="mt-[0.5em] size-[7px] shrink-0 rounded-full bg-[var(--c-pop)]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
       </main>
       <Contact />
     </div>

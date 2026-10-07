@@ -1,0 +1,125 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+:root{--display:'Bricolage Grotesque','Figtree',sans-serif;--ui:'Figtree',sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;font-family:var(--ui)}
+#lib{position:absolute;left:-9999px;top:0;width:1200px}
+.mod{position:relative;width:1600px;overflow:hidden;margin:0 0 60px;background:#EEF0F5;font-family:Poppins,sans-serif}
+.abs{position:absolute}
+.plate{position:absolute;overflow:hidden;border-radius:56px;background:linear-gradient(180deg,#F8F9FC,#E7E9F0);box-shadow:inset 0 0 0 2px rgba(255,255,255,.95),inset 0 -26px 50px -28px rgba(30,30,70,.07)}
+.block{position:absolute;border-radius:56px;background:#12326E;color:#fff;padding:60px 68px}
+.block h3{text-wrap:balance;font-weight:300;font-size:58px;margin:0;letter-spacing:-.02em;line-height:1.08}
+.block p{font-weight:300;font-size:25px;line-height:1.5;margin:22px 0 0;opacity:.9;max-width:600px}
+.mon{position:absolute;padding:12px;background:#0A0A0D;border-radius:34px;box-shadow:inset 0 0 0 3px #3b3b42,0 40px 70px -34px rgba(10,10,40,.55)}
+.mon .scr{overflow:hidden;border-radius:24px;background:#fff}
+.card-c{position:absolute;overflow:hidden;background:#fff;border-radius:36px;box-shadow:0 18px 40px -22px rgba(30,30,80,.28)}
+.z{position:absolute;transform-origin:0 0}
+.drop{filter:drop-shadow(0 14px 26px rgba(20,30,80,.16))}
+.pillc{position:absolute;background:#fff;color:#12326E;font:600 26px Figtree,sans-serif;padding:14px 26px;border-radius:99px;box-shadow:0 14px 30px -12px rgba(20,30,80,.35);white-space:nowrap}
+.dot{position:absolute;width:20px;height:20px;border-radius:50%;background:#12326E;box-shadow:0 0 0 5px #fff;transform:translate(-50%,-50%)}
+svg.ln{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.lbl2{position:absolute;font:500 26px Figtree,sans-serif;color:#8C8FA0}
+</style>
+<div id="lib"></div>
+<div id="out"></div>
+<script src="screens.js"></script>
+<script>
+// Render the app screens once into a hidden library; modules clone pieces of them.
+const lib=document.getElementById('lib');
+const mount=(id,html)=>{const d=document.createElement('div');d.id=id;d.innerHTML=html;lib.appendChild(d);return d};
+mount('s-fin',finance());mount('s-staff',staff());mount('s-d3',stackDrawer('programme'));mount('s-d2',stackDrawer('college'));
+const q=(sel,i=0)=>lib.querySelectorAll(sel)[i];
+// z(): clone a library element, scaled by k, absolutely placed.
+function z(sel,k,l,t,{i=0,drop=false,w=null}={}){const el=q(sel,i);const c=el.cloneNode(true);
+  const h=document.createElement('div');h.className='z cmp'+(drop?' drop':'');h.style.cssText=`left:${l}px;top:${t}px;transform:scale(${k});width:${w||el.getBoundingClientRect().width}px`;
+  c.style.margin='0';h.appendChild(c);return h}
+// mon(): a desktop screen in a bezel, cropped by its plate.
+function mon(sel,k,l,t,sx,sy,w,h){const m=document.createElement('div');m.className='mon';m.style.cssText=`left:${l}px;top:${t}px`;
+  const s=document.createElement('div');s.className='scr';s.style.cssText=`width:${w}px;height:${h}px;position:relative`;
+  const c=q(sel+' .app').cloneNode(true);c.dataset.h=q(sel+' .app').getBoundingClientRect().height;c.style.cssText=`position:absolute;left:${-sx*k}px;top:${-sy*k}px;transform:scale(${k});transform-origin:0 0;width:1200px;height:${c.dataset.h||800}px;margin:0`;
+  s.appendChild(c);m.appendChild(s);return m}
+function plate(parent,l,t,w,h){const p=document.createElement('div');p.className='plate';p.style.cssText=`left:${l}px;top:${t}px;width:${w}px;height:${h}px`;parent.appendChild(p);return p}
+function block(parent,l,t,w,h,title,text){const b=document.createElement('div');b.className='block';b.style.cssText=`left:${l}px;top:${t}px;width:${w}px;height:${h}px`;b.innerHTML=`<h3>${title}</h3><p>${text}</p>`;parent.appendChild(b)}
+function cardc(parent,l,t,w,h){const c=document.createElement('div');c.className='card-c';c.style.cssText=`left:${l}px;top:${t}px;width:${w}px;height:${h}px`;parent.appendChild(c);return c}
+function mod(id,h){const m=document.createElement('div');m.className='mod';m.id=id;m.style.height=h+'px';document.getElementById('out').appendChild(m);return m}
+// dashed callout line from (x1,y1) to a dot at (x2,y2)
+function callout(parent,pts,text,px,py){const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','ln');s.setAttribute('width',1);s.setAttribute('height',1);
+  s.innerHTML=`<path d="${pts}" fill="none" stroke="#8C8FA0" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/>`;parent.appendChild(s);
+  if(text){const p=document.createElement('div');p.className='pillc';p.style.cssText=`left:${px}px;top:${py}px`;p.textContent=text;parent.appendChild(p)}}
+function dot(parent,x,y){const d=document.createElement('div');d.className='dot';d.style.cssText=`left:${x}px;top:${y}px`;parent.appendChild(d)}
+function cmp(html,k,l,t,{drop=true}={}){const h=document.createElement('div');h.className='z cmp'+(drop?' drop':'');h.style.cssText=`left:${l}px;top:${t}px;transform:scale(${k})`;h.innerHTML=html;return h}
+
+window.build=()=>{
+// 1 SPREAD: path spines
+{const m=mod('m-spines',1000);
+ const a=plate(m,40,40,740,920);a.appendChild(mon('#s-d3',1,50,120,0,0,900,800));
+ const b=plate(m,820,40,740,560);const c=cardc(b,60,60,620,440);
+ const e=q('#s-d3 .app').cloneNode(true);e.style.cssText='position:absolute;left:-145px;top:-30px;transform:scale(1.5);transform-origin:0 0;width:1200px;height:800px;margin:0';c.appendChild(e);
+ block(m,820,620,740,340,'Every level stays in view','Group, college and programme stay on screen as spines while the next drawer opens.');}
+// 2 SPOTLIGHT: target bar
+{const m=mod('m-target',720);const p=plate(m,40,40,1520,640);
+ const K=1.5,L0=60,T0=230;
+ p.appendChild(z('#s-fin .hero',K,L0,T0,{drop:true}));
+ const u=lib.querySelector('#s-fin .hero .track u').getBoundingClientRect();const hb=lib.querySelector('#s-fin .hero').getBoundingClientRect();
+ const mx=L0+(u.left-hb.left)*K+1,my=T0+(u.top-hb.top)*K;
+ callout(p,`M${mx} ${my} V${my-60} Q${mx} ${my-100} ${mx-40} ${my-100} H${mx-90}`);
+ dot(p,mx,my+4);const pl=document.createElement('div');pl.className='pillc';pl.style.cssText=`left:${mx-96}px;top:${my-100-28}px;transform:translateX(-100%)`;pl.textContent='80% target';p.appendChild(pl);}
+// 3 SPREAD mirrored: totals per level
+{const m=mod('m-totals',1000);
+ const a=plate(m,40,40,740,560);
+ a.appendChild(z('#s-d2 .hero',0.72,36,44,{drop:true}));a.appendChild(z('#s-d3 .hero',0.72,36,214,{drop:true}));
+ a.appendChild(z('#s-fin .hero',0.72,36,384,{drop:true}));
+ block(m,40,620,740,340,'Totals for the level you open','Each drawer shows its own received, expected and collection, not the group figures.');
+ const b=plate(m,820,40,740,920);b.appendChild(mon('#s-d2',1,50,110,0,0,900,800));}
+// 4 BENTO: ranked table pieces
+{const m=mod('m-ranked',1000);
+ const row=(n,c,pct,txt,w,chipc)=>`<div class="card" style="width:${w}px;display:flex;align-items:center;gap:26px"><div class="cname" style="width:150px"><i style="background:${c}"></i>${n}</div><div class="cell2" style="flex:1"><div class="mini"><b style="width:${pct}%;background:${c}"></b><u style="left:80%"></u></div><small class="num">${txt}</small></div><span class="chip ${chipc}">${pct}%</span></div>`;
+ const A=plate(m,40,40,780,540);A.appendChild(z('#s-fin .main > .card:last-child',0.95,36,64,{drop:true}));
+ const B=plate(m,840,40,720,540);
+ B.appendChild(cmp(`<div style="display:flex;gap:22px;align-items:center;width:300px"><span class="chip ok">83.8%</span><span class="chip warn">72.7%</span><span class="chip bad">55.9%</span></div>`,2.0,70,60));
+ B.appendChild(cmp(`<div class="card" style="width:340px;display:flex;flex-direction:column;gap:18px"><div class="cell2"><div class="mini"><b style="width:55.9%;background:#d92d20"></b><u style="left:80%"></u></div><small class="num">₹9.50 Cr of ₹17.00 Cr</small></div><div class="cell2"><div class="mini"><b style="width:83.8%;background:#12805c"></b><u style="left:80%"></u></div><small class="num">₹28.50 Cr of ₹34.00 Cr</small></div></div>`,1.6,70,230));
+ const C=plate(m,40,600,500,360);
+ C.appendChild(cmp(`<div class="card" style="width:230px;text-align:right"><div class="cap">Gap to 80% target</div><div style="font:700 28px var(--display);color:var(--bad);margin-top:6px" class="num">−24.1 pts</div></div>`,1.5,70,44));
+ C.appendChild(cmp(`<div class="card" style="width:230px;text-align:right"><div class="cap">Gap to 80% target</div><div style="font:700 28px var(--display);color:var(--ok);margin-top:6px" class="num">+3.8 pts</div></div>`,1.5,70,220));
+ const D=plate(m,560,600,1000,360);
+ D.appendChild(cmp(row('Science','#d92d20',55.9,'₹9.50 Cr of ₹17.00 Cr',640,'bad'),1.4,50,50));
+ D.appendChild(cmp(row('Engineering','#12805c',83.8,'₹28.50 Cr of ₹34.00 Cr',640,'ok'),1.4,50,200));}
+// 5 SPOTLIGHT: weakest named
+{const m=mod('m-weakest',720);const p=plate(m,40,40,1520,640);
+ p.appendChild(z('#s-fin .callout',1.35,134,80,{drop:true}));
+ p.appendChild(z('#s-d3 #lowline',1.55,170,380,{drop:true,w:800}));
+ dot(p,760,156);
+ callout(p,'M760 156 V250 Q760 280 790 280 H890',null);
+ const pl=document.createElement('div');pl.className='pillc';pl.style.cssText='left:896px;top:252px';pl.textContent='Same line at every level';p.appendChild(pl);}
+// 6 SPREAD: attendance
+{const m=mod('m-attendance',1000);
+ const a=plate(m,40,40,740,920);a.appendChild(mon('#s-staff',1,50,110,0,0,900,800));
+ const b=plate(m,820,40,740,560);b.appendChild(z('#s-staff .row:nth-of-type(3) > .card:first-child',1.12,56,60,{drop:true}));
+ block(m,820,620,740,340,'Attendance at a glance','Present, absent and on leave for each college, in one bar.');}
+// 7 BENTO: staff pieces
+{const m=mod('m-staff',1000);
+ const A=plate(m,40,40,1000,540);A.appendChild(z('#s-staff .main > .row:nth-of-type(2)',1.05,40,170,{drop:false}));
+ const B=plate(m,1060,40,500,540);B.appendChild(z('#s-staff .row:nth-of-type(3) > .card:nth-child(2)',1.0,40,60,{drop:true}));
+ const C=plate(m,40,600,760,360);C.appendChild(z('#s-staff .main > .card:last-child',0.82,40,50,{drop:true}));
+ const D=plate(m,820,600,740,360);
+ D.appendChild(z('#s-staff .row:nth-of-type(2) > .card:nth-child(3)',1.7,150,80,{drop:true}));}
+// 8 COLOUR AND STATUS
+{const m=mod('m-colour',820);const p=plate(m,40,40,1520,740);
+ const sw=(c,n)=>`<div style="width:170px"><div style="height:130px;border-radius:26px;background:${c};box-shadow:0 18px 30px -18px rgba(8,21,58,.5)"></div><div style="font:600 23px Figtree;margin-top:14px;color:#1B2340">${n}</div><div style="font:500 19px Figtree;color:#8C8FA0">${c}</div></div>`;
+ const row=(a,l,t)=>{const d=document.createElement('div');d.className='abs';d.style.cssText=`left:${l}px;top:${t}px;display:flex;gap:36px`;d.innerHTML=a;p.appendChild(d)};
+ row(sw('#08153A','Navy 900')+sw('#12326E','Navy 700')+sw('#4F86E8','Blue 400')+sw('#F5F6F9','Canvas'),90,100);
+ row(sw('#12805C','On target')+sw('#D9910A','Near target')+sw('#D92D20','Below target'),90,400);
+ p.appendChild(cmp(`<div style="display:flex;gap:14px"><span class="chip ok">83.8%</span><span class="chip warn">72.7%</span><span class="chip bad">55.9%</span></div>`,1.7,990,130));
+ p.appendChild(cmp(`<div class="card" style="width:300px;display:flex;flex-direction:column;gap:20px"><div class="cell2"><div class="mini"><b style="width:84%;background:#12805c"></b><u style="left:80%"></u></div></div><div class="cell2"><div class="mini"><b style="width:73%;background:#d9910a"></b><u style="left:80%"></u></div></div><div class="cell2"><div class="mini"><b style="width:56%;background:#d92d20"></b><u style="left:80%"></u></div></div></div>`,1.7,990,330));}
+// 9 PROCESS: earlier layouts next to the redesign
+{const m=mod('m-process',760);
+ const A=plate(m,40,40,1000,680);
+ const img=(src,l,t,w)=>{const i=document.createElement('img');i.src=src;i.style.cssText=`position:absolute;left:${l}px;top:${t}px;width:${w}px;border-radius:22px;box-shadow:0 18px 40px -22px rgba(30,30,80,.35)`;A.appendChild(i)};
+ img(IMG+'earlier-finance.webp',50,110,440);img(IMG+'earlier-drawer-college.webp',510,110,440);img(IMG+'earlier-drawer.webp',510,460,440);
+ const l=document.createElement('div');l.className='lbl2';l.style.cssText='left:56px;top:56px';l.textContent='Earlier layouts';A.appendChild(l);
+ const B=plate(m,1060,40,500,680);B.appendChild(mon('#s-d3',0.62,20,130,60,0,520,520));
+ const l2=document.createElement('div');l2.className='lbl2';l2.style.cssText='left:56px;top:56px';l2.textContent='Redesign';B.appendChild(l2);}
+};
+</script>
