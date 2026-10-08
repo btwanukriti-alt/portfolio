@@ -31,6 +31,7 @@ svg.ln{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .lap .base:after{content:"";position:absolute;left:50%;top:0;width:150px;height:8px;margin-left:-75px;border-radius:0 0 10px 10px;background:#B9B6AF}
 .swp{position:absolute;border-radius:56px;overflow:hidden}
 </style>
+<style id="tight-radius">.plate,.block,.dark,.swp{border-radius:14px!important}.card-c{border-radius:12px!important}</style>
 <div id="lib"></div>
 <div id="out"></div>
 <script src="screens.js"></script>
@@ -143,3 +144,5 @@ window.build=()=>{
  const l2=document.createElement('div');l2.className='lbl2';l2.style.cssText='left:50px;top:54px';l2.textContent='Redesign';B.appendChild(l2);}
 };
 </script>
+
+<script src="../shared/canvas.js"></script>
