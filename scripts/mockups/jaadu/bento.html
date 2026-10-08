@@ -31,11 +31,10 @@ const cursor=(l,t)=>`<svg style="position:absolute;left:${l}px;top:${t}px;z-inde
 const S=[]
 // Page 1: footprint (stacked frames, glow) + regime, then alerts, strategy card, chart prompt
 S.push(P('p1',1440,
- T(40,40,960,720,
-   `<div class="ghost" style="left:110px;top:58px;width:1000px;height:700px"></div><div class="ghost" style="left:80px;top:88px;width:1000px;height:700px"></div>`+
-   `<div class="glow" style="left:50px;top:108px"><img src="${F}fp.png" style="width:1300px"></div>`,
+ T(40,40,1520,720,
+   `<div class="ghost" style="left:110px;top:58px;width:1500px;height:700px"></div><div class="ghost" style="left:80px;top:88px;width:1500px;height:700px"></div>`+
+   `<div class="glow" style="left:50px;top:108px"><img src="${F}fp.png" style="width:1500px"></div>`,
    'Footprint chart','Each candle splits into price bins, with the volume traded in each.',300)+
- T(1020,40,540,720,im('c-regime',460,40,130,28),'Regime','Sideways, breakout, volatile or reversal, read live beside the chart.',230)+
  T(40,780,500,620,im('c-alert',1300,40,90,14),'Multi-condition alerts','Price, POC, footprint and regime, firing only when all of them hold.',220)+
  T(560,780,480,620,`<div class="stackbar" style="left:90px;top:520px;width:300px;height:26px"></div><div class="stackbar" style="left:70px;top:498px;width:340px;height:26px;background:#2B3B60"></div>`+im('card1',380,50,80,22),'Strategy cards','Win rate, drawdown and equity curve for every strategy.',200)+
  T(1060,780,500,620,im('c-prompt-typing',560,40,120,26)+im('c-prompt-suggested',560,40,270,26)+cursor(340,330),'Ask the chart','Tap any point and ask why price moved there.',200)))
