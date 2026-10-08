@@ -78,16 +78,23 @@ function PenD() {
   )
 
   return (
-    <svg
-      ref={root}
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-      className="ml-[0.03em] inline-block h-[0.72em] w-[0.66em] overflow-visible align-baseline"
-    >
+    <svg ref={root} viewBox="0 0 100 100" aria-hidden="true" className="ml-[0.03em] inline-block h-[0.72em] w-[0.66em] overflow-visible align-baseline">
       <path data-shape d={dPath(0)} fill="currentColor" fillRule="evenodd" />
       <path data-outline d={dPath(0)} fill="none" stroke={SELECT} strokeWidth="1.5" vectorEffect="non-scaling-stroke" opacity="0" />
       {NODES.map(([x, y]) => (
-        <rect key={`${x}-${y}`} data-node x={x - 3} y={y - 3} width="6" height="6" fill="#fff" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" opacity="0" />
+        <rect
+          key={`${x}-${y}`}
+          data-node
+          x={x - 3}
+          y={y - 3}
+          width="6"
+          height="6"
+          fill="#fff"
+          stroke={SELECT}
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
+          opacity="0"
+        />
       ))}
       <g data-handle opacity="0">
         <line x1="88" y1="50" x2="88" y2="18" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" />
@@ -106,12 +113,18 @@ function Shapes() {
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       <span className="absolute -top-[12%] -left-[6%] size-[clamp(140px,16vw,240px)] rounded-full border-[clamp(18px,2vw,30px)] border-white/90" />
       <span className="absolute -top-[6%] -right-[8%] h-[clamp(64px,7vw,104px)] w-[clamp(220px,24vw,360px)] rounded-full bg-[#FFD25A]" />
-      <svg className="absolute -right-[4%] -bottom-[24%] w-[clamp(120px,13vw,200px)] animate-[spin_24s_linear_infinite] motion-reduce:animate-none" viewBox="0 0 100 100">
+      <svg
+        className="absolute -right-[4%] -bottom-[24%] w-[clamp(120px,13vw,200px)] animate-[spin_24s_linear_infinite] motion-reduce:animate-none"
+        viewBox="0 0 100 100"
+      >
         <path d="M50 0C53 34 66 47 100 50C66 53 53 66 50 100C47 66 34 53 0 50C34 47 47 34 50 0Z" fill="#7B61FF" />
       </svg>
     </div>
   )
 }
+
+const social =
+  'text-muted no-underline transition-colors hover:text-ink focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent'
 
 // On a case study page, `current` is its slug: the footer then links to the other projects.
 export default function Contact({ current }: { current?: string } = {}) {
@@ -122,83 +135,88 @@ export default function Contact({ current }: { current?: string } = {}) {
   }
 
   return (
-    <footer
-      id="reach-out"
-      aria-labelledby="contact-heading"
-      className="mx-auto max-w-[var(--max)] bg-paper px-[var(--gutter)] pt-[clamp(56px,9vh,104px)] pb-8 font-body"
-    >
-      <Reveal className="relative mt-6">
-        {/* Selection: the frame's name, a border with handles, and its size. */}
-        <span className="absolute bottom-full left-0 mb-2 text-[12px] leading-none font-medium" style={{ color: SELECT }}>
-          Let&apos;s build
-        </span>
-        <div className="relative bg-ink text-white outline outline-1 outline-offset-0" style={{ outlineColor: SELECT }}>
-          <Shapes />
-          <div className="relative flex flex-col gap-10 min-h-[clamp(320px,30vw,440px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(44px,5vw,72px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
-            <div>
-              <p className="m-0 text-[15px] leading-none font-medium text-white/55">Contact</p>
-              <h2
-                id="contact-heading"
-                className="m-0 mt-5 text-[clamp(56px,10vw,168px)] leading-[0.92] font-medium tracking-[-0.045em] whitespace-nowrap"
-              >
-                Let&apos;s <span className="tracking-[-0.02em]">BUIL</span>
-                <PenD />
-                <span className="sr-only">D</span>
-              </h2>
-            </div>
-            <div className="flex flex-col items-start gap-5 min-[901px]:items-end">
-              <a
-                href={`mailto:${EMAIL}`}
-                className="group inline-flex items-center gap-2.5 bg-white px-6 py-4 text-[16px] leading-none font-medium text-ink no-underline [transition:translate_300ms_var(--ease-out-expo),box-shadow_300ms_var(--ease-out-expo)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[3px_3px_0_#7B61FF] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF] motion-reduce:transition-none"
-              >
-                Start a project
-                <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-[3px]">
-                  →
-                </span>
-              </a>
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] leading-none text-white/65">
-                <a href={`mailto:${EMAIL}`} className="text-inherit no-underline transition-colors hover:text-white">
-                  {EMAIL}
+    <>
+      <section
+        id="reach-out"
+        aria-labelledby="contact-heading"
+        className="mx-auto max-w-[var(--max)] bg-paper px-[var(--gutter)] pt-[clamp(56px,9vh,104px)] font-body"
+      >
+        <Reveal className="relative mt-6">
+          {/* Selection: the frame's name, a border with handles, and its size. */}
+          <span className="absolute bottom-full left-0 mb-2 text-[12px] leading-none font-medium" style={{ color: SELECT }}>
+            Let&apos;s build
+          </span>
+          <div className="relative bg-ink text-white outline outline-1 outline-offset-0" style={{ outlineColor: SELECT }}>
+            <Shapes />
+            <div className="relative flex flex-col gap-10 min-h-[clamp(320px,30vw,440px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(44px,5vw,72px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
+              <div>
+                <p className="m-0 text-[15px] leading-none font-medium text-white/55">Contact</p>
+                <h2 id="contact-heading" className="m-0 mt-5 text-[clamp(56px,10vw,168px)] leading-[0.92] font-medium tracking-[-0.045em] whitespace-nowrap">
+                  Let&apos;s <span className="tracking-[-0.02em]">BUIL</span>
+                  <PenD />
+                  <span className="sr-only">D</span>
+                </h2>
+              </div>
+              <div className="flex flex-col items-start gap-5 min-[901px]:items-end">
+                <a
+                  href={`mailto:${EMAIL}`}
+                  className="group inline-flex items-center gap-2.5 bg-white px-6 py-4 text-[16px] leading-none font-medium text-ink no-underline [transition:translate_300ms_var(--ease-out-expo),box-shadow_300ms_var(--ease-out-expo)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[3px_3px_0_#7B61FF] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF] motion-reduce:transition-none"
+                >
+                  Start a project
+                  <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-[3px]">
+                    →
+                  </span>
                 </a>
-                {LINKEDIN && (
-                  <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className="text-inherit no-underline transition-colors hover:text-white">
-                    in/{LINKEDIN_ID}
-                  </a>
-                )}
               </div>
             </div>
-          </div>
-          {HANDLES.map(([x, y]) => (
-            <span
-              key={`${x}-${y}`}
-              aria-hidden="true"
-              className="absolute size-[8px] -translate-x-1/2 -translate-y-1/2 border bg-white"
-              style={{ left: `${x}%`, top: `${y}%`, borderColor: SELECT }}
-            />
-          ))}
-        </div>
-      </Reveal>
-
-      {current && (
-        <nav aria-label="More work" className="mt-[clamp(40px,6vh,72px)] border-t border-line pt-7">
-          <p className="m-0 text-[15px] leading-none font-medium text-muted">More work</p>
-          <ul className="m-0 mt-5 flex list-none flex-wrap gap-x-8 gap-y-3 p-0">
-            {PROJECTS.filter((p) => p.slug !== current).map((p) => (
-              <li key={p.slug}>
-                <Link
-                  href={caseStudyHref(p.slug)}
-                  className="text-[clamp(18px,1.6vw,24px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink no-underline underline-offset-4 hover:underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-                >
-                  {p.title}
-                </Link>
-              </li>
+            {HANDLES.map(([x, y]) => (
+              <span
+                key={`${x}-${y}`}
+                aria-hidden="true"
+                className="absolute size-[8px] -translate-x-1/2 -translate-y-1/2 border bg-white"
+                style={{ left: `${x}%`, top: `${y}%`, borderColor: SELECT }}
+              />
             ))}
-          </ul>
-        </nav>
-      )}
+          </div>
+        </Reveal>
 
-      <div className="mt-[clamp(32px,5vh,56px)] flex items-center justify-between gap-4 text-[13px] leading-none text-faint">
-        <span>© {new Date().getFullYear()} Anukriti Mishra</span>
+        {current && (
+          <nav aria-label="More work" className="mt-[clamp(40px,6vh,72px)] border-t border-line pt-7">
+            <p className="m-0 text-[15px] leading-none font-medium text-muted">More work</p>
+            <ul className="m-0 mt-5 flex list-none flex-wrap gap-x-8 gap-y-3 p-0">
+              {PROJECTS.filter((p) => p.slug !== current).map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={caseStudyHref(p.slug)}
+                    className="text-[clamp(18px,1.6vw,24px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink no-underline underline-offset-4 hover:underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                  >
+                    {p.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </section>
+
+      {/* Site footer: copyright, socials, back to top. */}
+      <footer className="mx-auto mt-[clamp(40px,6vh,72px)] flex max-w-[var(--max)] flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-line px-[var(--gutter)] py-7 font-body text-[14px] leading-none">
+        <p className="m-0 flex items-baseline gap-3">
+          <span className="text-[16px] font-medium tracking-[-0.02em] text-ink">Anukriti Mishra</span>
+          <span className="text-faint">© {new Date().getFullYear()}</span>
+        </p>
+        <ul className="m-0 flex list-none items-center gap-6 p-0" aria-label="Socials">
+          <li>
+            <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className={social}>
+              LinkedIn{LINKEDIN_ID && <span className="text-faint"> · in/{LINKEDIN_ID}</span>}
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${EMAIL}`} className={social}>
+              {EMAIL}
+            </a>
+          </li>
+        </ul>
         <button
           type="button"
           onClick={toTop}
@@ -209,7 +227,7 @@ export default function Contact({ current }: { current?: string } = {}) {
             ↑
           </span>
         </button>
-      </div>
-    </footer>
+      </footer>
+    </>
   )
 }
