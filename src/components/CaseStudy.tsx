@@ -5,7 +5,6 @@ import SiteHeader from './SiteHeader'
 import SlideCarousel from './SlideCarousel'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
-import FigmaFrame, { layerName } from './FigmaFrame'
 import { Reveal, SplitReveal } from './Reveal'
 import { COLLEGE_BRAND, COLLEGE_IMAGES } from '@/data/collegeGallery'
 import { caseStudyByKey } from '@/data/caseStudies'
@@ -168,13 +167,12 @@ function CollegeCaseStudy() {
           Screens are redesigned for this portfolio, and the figures in them are sample data. College names are placeholders. The last image shows earlier layouts next to the redesign.
         </p>
 
-        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
+        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(6px,0.6vw,10px)] p-0">
           {COLLEGE_IMAGES.map((image, i) => (
             <li key={image.src}>
-              <Reveal as="figure" className="m-0">
-                <FigmaFrame index={i + 1} name={layerName(image.src)} size={`${image.width} × ${image.height}`}>
+              <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(12px,1.4vw,20px)]">
                   <img
-                    className="block h-auto w-full"
+                    className="-my-[2.5%] block h-auto w-full"
                     src={image.src}
                     width={image.width}
                     height={image.height}
@@ -182,7 +180,6 @@ function CollegeCaseStudy() {
                     loading={i < 2 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
-                </FigmaFrame>
               </Reveal>
             </li>
           ))}
