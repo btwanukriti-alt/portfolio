@@ -61,14 +61,14 @@ function Autocomplete() {
     <div className="flex h-full flex-col justify-center gap-4 text-white">
       <div className="flex items-center justify-between rounded-[14px] bg-white/[0.04] px-5 py-4 ring-1 ring-white/[0.07]">
         <span className="text-[15px]">✦ Autocomplete commands</span>
-        <span className="flex h-[24px] w-[44px] items-center justify-end rounded-full bg-[linear-gradient(135deg,#22D3EE,#3B82F6)] px-[3px]">
+        <span className="flex h-[24px] w-[44px] items-center justify-end rounded-full bg-[#3B82F6] px-[3px]">
           <span className="size-[18px] rounded-full bg-white" />
         </span>
       </div>
       <div className="rounded-[14px] bg-white/[0.04] px-5 py-4 font-mono text-[13px] text-white/70 ring-1 ring-white/[0.07]">
         <span className="text-[#5EEAD4]">$</span> docker ps <span className="text-white/30">-a --format</span>
       </div>
-      <span className="self-end rounded-full bg-[linear-gradient(135deg,#22D3EE,#3B82F6)] px-5 py-[10px] text-[14px] font-medium">✦ Ask AI</span>
+      <span className="self-end rounded-full bg-[#3B82F6] px-5 py-[10px] text-[14px] font-medium">✦ Ask AI</span>
     </div>
   )
 }
