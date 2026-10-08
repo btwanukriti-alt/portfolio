@@ -216,191 +216,165 @@ export function Target() {
   )
 }
 
-// Each college's collection against the 80% target, lowest first, with the gap spelled out.
-export function Ranked() {
-  const rows: [string, number, number][] = [
-    ['Science', 9.5, 17.0],
-    ['Law', 14.0, 21.0],
-    ['Arts & Mgmt', 12.55, 18.0],
-    ['Medical', 16.0, 22.0],
-    ['Engineering', 28.5, 34.0],
+// The employee attendance register: status tabs with counts, and one row per person.
+export function AttendanceTable() {
+  const tabs: [string, number, string][] = [
+    ['All', 1000, 'bg-[#344054] text-white'],
+    ['Present', 800, 'bg-[#12805C] text-white'],
+    ['Absent', 80, 'bg-[#B42318] text-white'],
+    ['On leave', 120, 'bg-[#F2B53A] text-white'],
+    ['Late', 2, 'bg-[#FDE8E6] text-[#B42318]'],
+    ['Early check-out', 4, 'bg-[#FDF1D8] text-[#A15C07]'],
   ]
-  return (
-    <div className="flex h-full flex-col">
-      <Head
-        title="Collection by college"
-        note="Lowest first. The tick is the 80% target."
-        right={<span className="rounded-full bg-[#FDE8E6] px-3 py-1 text-[12px] font-semibold text-[#B42318]">4 of 5 below target</span>}
-      />
-      <div className="mt-6 flex flex-col gap-4">
-        {rows.map(([name, r, e]) => {
-          const p = pct(r, e)
-          const gap = p - 80
-          return (
-            <div key={name} className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)_3.5rem_4.5rem] items-center gap-4">
-              <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
-              <TargetBar p={p} />
-              <span className={`text-right text-[14px] font-semibold tabular-nums ${ink}`}>{p.toFixed(1)}%</span>
-              <span className="text-right text-[13px] font-semibold tabular-nums" style={{ color: gap >= 0 ? OK : BAD }}>
-                {gap >= 0 ? '+' : '−'}
-                {Math.abs(gap).toFixed(1)} pts
-              </span>
-            </div>
-          )
-        })}
-      </div>
-      <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#E6E9EF] pt-5">
-        <span className={`text-[13px] ${sub}`}>Group, all 5 colleges</span>
-        <span className="flex items-center gap-3">
-          <span className={`text-[14px] font-semibold tabular-nums ${ink}`}>71.9%</span>
-          <span className="text-[13px] font-semibold tabular-nums" style={{ color: BAD }}>
-            −8.1 pts
-          </span>
-        </span>
-      </div>
-    </div>
+  const division: Record<string, string> = {
+    Teaching: 'bg-[#E6EDF9] text-[#12326E]',
+    'Non-teaching': 'bg-[#FDE8E6] text-[#B42318]',
+    Management: 'bg-[#FDF1D8] text-[#A15C07]',
+  }
+  type Row = [string, string, string, string, string, string | null, string | null, string, boolean?, boolean?]
+  const rows: Row[] = [
+    ['Aarav Patel', 'Professor', 'Teaching', 'Computer Science', 'EMP-1012', '08:50 AM', '05:00 PM', 'Present'],
+    ['Neha Rao', 'Lab Assistant', 'Non-teaching', 'Chemistry Lab', 'EMP-1047', '08:50 AM', '04:00 PM', 'Present', false, true],
+    ['Vikram Shah', 'Admin', 'Management', 'AI/ML', 'EMP-1103', null, null, 'Absent'],
+    ['Priya Menon', 'Professor', 'Teaching', 'Mechanical', 'EMP-1121', '10:50 AM', '05:00 PM', 'Present', true],
+    ['Rohan Iyer', 'Professor', 'Teaching', 'CSE', 'EMP-1158', null, null, 'On leave (CL)'],
+  ]
+  const time = (t: string, flag?: boolean) => (
+    <span className={`rounded-md px-2 py-1 text-[12px] font-medium tabular-nums ${flag ? 'bg-[#FDE8E6] text-[#B42318]' : 'bg-[#E6EDF9] text-[#12326E]'}`}>
+      {t}
+    </span>
   )
-}
-
-// Cumulative collection against the fee schedule, April to December.
-export function Schedule() {
-  const W = 420
-  const H = 200
-  const L = 30
-  const R = 8
-  const T = 12
-  const B = 26
-  const max = 120
-  const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const received = [14, 27, 38, 47, 55, 63, 70, 76, 80.55]
-  const due = [20, 36, 52, 68, 80, 92, 102, 108, 112]
-  const x = (i: number) => L + (i * (W - L - R)) / 8
-  const y = (v: number) => T + (1 - v / max) * (H - T - B)
-  const line = (a: number[]) => a.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join('')
   return (
     <div className="flex h-full flex-col">
-      <Head title="Collection against schedule" note="Cumulative, ₹ Cr" />
-      <div className={`mt-3 flex gap-4 text-[12px] ${sub}`}>
-        <span className="flex items-center gap-1.5">
-          <i className="h-[3px] w-4 rounded-full bg-[#12326E]" />
-          Received
-        </span>
-        <span className="flex items-center gap-1.5">
-          <i className="h-0 w-4 border-t-2 border-dashed border-[#98A2B3]" />
-          Due
-        </span>
-      </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 block w-full" role="img" aria-label="Received ₹80.55 Cr by December against ₹112 Cr due">
-        <defs>
-          <linearGradient id="college-schedule" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#4F86E8" stopOpacity=".28" />
-            <stop offset="1" stopColor="#4F86E8" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {[0, 40, 80, 120].map((v) => (
-          <g key={v}>
-            <line x1={L} x2={W - R} y1={y(v)} y2={y(v)} stroke="#E6E9EF" />
-            <text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="10" fill="#667085">
-              {v}
-            </text>
-          </g>
-        ))}
-        {months.map((m, i) => (
-          <text key={m} x={x(i)} y={H - 6} textAnchor="middle" fontSize="10" fill="#667085">
-            {m}
-          </text>
-        ))}
-        <path d={`${line(received)}L${x(8)} ${y(0)}L${x(0)} ${y(0)}Z`} fill="url(#college-schedule)" />
-        <path d={line(due)} fill="none" stroke="#98A2B3" strokeWidth="1.6" strokeDasharray="4 4" />
-        <path d={line(received)} fill="none" stroke="#12326E" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx={x(8)} cy={y(80.55)} r="4.5" fill="#12326E" stroke="#fff" strokeWidth="2" />
-        <text x={x(8) - 8} y={y(80.55) + 18} textAnchor="end" fontSize="11" fontWeight="700" fill="#12326E">
-          ₹80.55 Cr
-        </text>
-        <text x={x(8) - 8} y={y(112) - 6} textAnchor="end" fontSize="10" fill="#667085">
-          Due by Dec ₹112 Cr
-        </text>
-      </svg>
-    </div>
-  )
-}
-
-export function Attendance() {
-  const rows: [string, number, number, number][] = [
-    ['Engineering', 512, 28, 31],
-    ['Medical', 231, 10, 17],
-    ['Arts & Mgmt', 148, 7, 11],
-    ['Science', 130, 6, 12],
-    ['Law', 94, 5, 8],
-  ]
-  const legend: [string, string][] = [
-    ['Present', OK],
-    ['Absent', BAD],
-    ['On leave', '#F2B53A'],
-  ]
-  return (
-    <div className="flex h-full flex-col">
-      <Head title="Staff attendance today" note="Share of staff present, by college" />
-      <div className="mt-6 flex flex-col gap-4">
-        {rows.map(([name, present, absent, leave]) => {
-          const t = present + absent + leave
-          return (
-            <div key={name} className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)_3.5rem] items-center gap-4">
-              <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
-              <span className="flex h-2.5 gap-[3px]">
-                <i className="rounded-full" style={{ width: `${(present / t) * 100}%`, background: OK }} />
-                <i className="rounded-full" style={{ width: `${(absent / t) * 100}%`, background: BAD }} />
-                <i className="rounded-full" style={{ width: `${(leave / t) * 100}%`, background: '#F2B53A' }} />
-              </span>
-              <span className={`text-right text-[14px] font-semibold tabular-nums ${ink}`}>{((present / t) * 100).toFixed(1)}%</span>
-            </div>
-          )
-        })}
-      </div>
-      <div className={`mt-auto flex gap-4 pt-6 text-[12px] ${sub}`}>
-        {legend.map(([l, c]) => (
-          <span key={l} className="flex items-center gap-1.5">
-            <i className="size-2 rounded-full" style={{ background: c }} />
-            {l}
+      <Head title="Employee attendance" note="Engineering College · today" />
+      <div className="mt-5 flex gap-1 overflow-x-auto border-b border-[#E6E9EF] pb-3">
+        {tabs.map(([label, n, cls], i) => (
+          <span
+            key={label}
+            className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-[13px] ${i === 0 ? `bg-[#F2F4F7] font-semibold ${ink}` : sub}`}
+          >
+            {label}
+            <span className={`rounded-md px-1.5 py-0.5 text-[11px] font-semibold tabular-nums ${cls}`}>{n.toLocaleString('en-IN')}</span>
           </span>
         ))}
       </div>
-    </div>
-  )
-}
-
-export function Alerts() {
-  const alerts: [string, 'bad' | 'warn', string, string][] = [
-    ['Receipt cancelled', 'bad', 'Receipt #RCP-08432', 'Incorrect amount · ₹11,000 · Engineering'],
-    ['Fee updated', 'warn', 'Concession approved', '₹20,000 to ₹17,000 · Engineering'],
-    ['Receipt cancelled', 'bad', 'Receipt #RCP-08433', 'Duplicate entry · Law'],
-  ]
-  return (
-    <div className="flex h-full flex-col">
-      <Head
-        title="Finance alerts"
-        note="Receipts and fee changes to review"
-        right={
-          <span className="flex rounded-full bg-[#E4E7EE] p-1 text-[12px] font-medium">
-            <span className={`rounded-full bg-white px-3 py-1 shadow-[0_1px_3px_rgba(16,24,40,0.08)] ${ink}`}>All</span>
-            <span className={`px-3 py-1 ${sub}`}>Unread</span>
-          </span>
-        }
-      />
-      <div className="mt-6 flex flex-col gap-2.5">
-        {alerts.map(([tag, t, title, detail]) => (
-          <div key={title} className="flex items-center justify-between gap-4 rounded-[16px] bg-white px-4 py-3 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
-            <span className="flex min-w-0 flex-col gap-0.5">
-              <span className={`text-[14px] font-semibold ${ink}`}>{title}</span>
-              <span className={`truncate text-[12px] tabular-nums ${sub}`}>{detail}</span>
-            </span>
-            <span
-              className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${t === 'bad' ? 'bg-[#FDE8E6] text-[#B42318]' : 'bg-[#FDF1D8] text-[#A15C07]'}`}
-            >
-              {tag}
-            </span>
+      <div className="mt-3 overflow-x-auto">
+        <div className="min-w-[760px]">
+          <div className={`grid grid-cols-[1.5fr_1fr_1.3fr_0.9fr_0.9fr_1fr] gap-4 px-3 py-2.5 text-[12px] font-medium ${sub}`}>
+            <span>Name</span>
+            <span>Division</span>
+            <span>Department</span>
+            <span>Check in</span>
+            <span>Check out</span>
+            <span className="text-right">Status</span>
           </div>
+          {rows.map(([name, role, div, dept, id, cin, cout, status, late, early]) => (
+            <div key={id} className="grid grid-cols-[1.5fr_1fr_1.3fr_0.9fr_0.9fr_1fr] items-center gap-4 border-t border-[#EEF0F4] px-3 py-3">
+              <span className="flex items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#E6EDF9] text-[12px] font-semibold text-[#12326E]">
+                  {name
+                    .split(' ')
+                    .map((w) => w[0])
+                    .join('')}
+                </span>
+                <span className="flex min-w-0 flex-col leading-tight">
+                  <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
+                  <span className={`text-[12px] ${sub}`}>{role}</span>
+                </span>
+              </span>
+              <span>
+                <span className={`rounded-md px-2 py-1 text-[12px] font-medium ${division[div]}`}>{div}</span>
+              </span>
+              <span className="flex flex-col leading-tight">
+                <span className={`text-[13px] ${ink}`}>Engineering College</span>
+                <span className={`text-[12px] ${sub}`}>{dept}</span>
+              </span>
+              {cin && cout ? (
+                <>
+                  <span>{time(cin, late)}</span>
+                  <span>{time(cout, early)}</span>
+                  <span className="text-right">
+                    <span className="rounded-md bg-[#E3F5EC] px-2 py-1 text-[12px] font-semibold text-[#12805C]">{status}</span>
+                  </span>
+                </>
+              ) : (
+                <span
+                  className={`col-span-3 rounded-md px-3 py-1.5 text-right text-[12px] font-semibold ${
+                    status === 'Absent'
+                      ? 'bg-[linear-gradient(90deg,transparent,#FDE8E6)] text-[#B42318]'
+                      : 'bg-[linear-gradient(90deg,transparent,#FDF1D8)] text-[#A15C07]'
+                  }`}
+                >
+                  {status}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// One employee's record: identity on top, tabs, then work experience and education.
+export function Profile() {
+  const tabs = ['Identity', 'Background & credentials', 'Research', 'Workshops & FDP', 'Achievements']
+  const work: [string, string, string][] = [
+    ['Professor', 'State University of Technology', 'May 2023 – present'],
+    ['Assistant Professor', 'State University of Technology', 'May 2020 – Jul 2023'],
+    ['Lecturer', 'City Engineering College', 'May 2019 – Jul 2020'],
+  ]
+  const edu: [string, string, string][] = [
+    ['PhD, Electronics and Communication', 'National Institute of Science', '2020 – 2022'],
+    ['BE, Electronics and Communication', 'National Institute of Science', '2014 – 2017'],
+    ['Higher Secondary, PCMB', 'Central PU College', '2012 – 2014'],
+  ]
+  const list = (title: string, items: [string, string, string][]) => (
+    <div className="rounded-[18px] bg-white p-5 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
+      <p className="m-0 text-[14px] font-semibold text-[#12326E]">{title}</p>
+      <ol className="m-0 mt-4 flex list-none flex-col gap-4 p-0">
+        {items.map(([a, b, c], i) => (
+          <li key={a} className="relative flex gap-3">
+            <span className="mt-1 flex flex-col items-center">
+              <i className={`size-2.5 rounded-full ${i === 0 ? 'bg-[#12326E]' : 'bg-[#C7D2E6]'}`} />
+              {i < items.length - 1 && <i className="mt-1 w-px flex-1 bg-[#DDE3EE]" />}
+            </span>
+            <span className="flex flex-col leading-snug">
+              <span className={`text-[14px] font-semibold ${ink}`}>{a}</span>
+              <span className={`text-[13px] ${sub}`}>{b}</span>
+              <span className="text-[12px] text-[#98A2B3]">{c}</span>
+            </span>
+          </li>
         ))}
+      </ol>
+    </div>
+  )
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex flex-wrap items-center gap-4">
+        <span className="flex size-14 items-center justify-center rounded-full bg-[#12326E] text-[18px] font-semibold text-white">MC</span>
+        <span className="flex flex-col gap-1.5">
+          <span className={`text-[clamp(18px,1.6vw,24px)] font-semibold tracking-[-0.01em] ${ink}`}>Mireya Conner</span>
+          <span className="flex flex-wrap gap-2 text-[12px]">
+            <span className={`rounded-full bg-white px-2.5 py-1 ${sub}`}>
+              Employee ID <b className={`font-semibold ${ink}`}>EMP-101234</b>
+            </span>
+            <span className={`rounded-full bg-white px-2.5 py-1 ${sub}`}>
+              Professor <b className={`font-semibold ${ink}`}>· ECE</b>
+            </span>
+          </span>
+        </span>
+      </div>
+      <div className="mt-5 flex gap-5 overflow-x-auto border-b border-[#CBD5E6] text-[13px]">
+        {tabs.map((t, i) => (
+          <span key={t} className={`shrink-0 pb-2.5 ${i === 1 ? `border-b-2 border-[#12326E] font-semibold ${ink}` : sub}`}>
+            {t}
+          </span>
+        ))}
+      </div>
+      <div className="mt-5 grid flex-1 grid-cols-1 gap-3 min-[701px]:grid-cols-2">
+        {list('Work experience', work)}
+        {list('Education', edu)}
       </div>
     </div>
   )
@@ -411,8 +385,6 @@ export const COLLEGE_BLOCKS: Record<string, () => ReactNode> = {
   'batch-table': BatchTable,
   'lowest-line': LowestLine,
   target: Target,
-  ranked: Ranked,
-  schedule: Schedule,
-  attendance: Attendance,
-  alerts: Alerts,
+  'attendance-table': AttendanceTable,
+  profile: Profile,
 }

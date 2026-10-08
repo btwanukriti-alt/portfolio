@@ -171,7 +171,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       font: 'var(--font-hanken), system-ui, sans-serif',
     },
     images: [],
-    // The flow: the drill-down drawers (the main feature), the finance dashboard, then widgets.
+    // The flow: the drill-down drawers (the main feature), the finance dashboard, then staff attendance and profiles.
     sections: [
       {
         label: 'Main feature: drill-down drawers',
@@ -205,13 +205,17 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         ],
       },
       {
-        label: 'Widgets',
+        label: 'Staff: attendance and profiles',
         rows: 'auto',
         cards: [
-          cblock('ranked', 'Collection by college, lowest first, with each gap to the 80% target', 'min-[901px]:col-span-7', 'white'),
-          cblock('schedule', 'Cumulative collection against the fee schedule, April to December', 'min-[901px]:col-span-5', 'plate'),
-          cblock('attendance', 'Staff attendance today: share present by college', 'min-[901px]:col-span-6', 'tint'),
-          cblock('alerts', 'Finance alerts: cancelled receipts and an approved concession', 'min-[901px]:col-span-6', 'plate'),
+          ctext(
+            'Staff · Attendance and profiles',
+            "From the day's register to one person's record",
+            'The register filters by status in one row of tabs, with late check-ins in red. Any name opens that person’s history and credentials.',
+            'min-[901px]:col-span-4',
+          ),
+          cblock('profile', 'An employee profile: ID, tabs, work experience and education', 'min-[901px]:col-span-8', 'tint'),
+          cblock('attendance-table', 'The employee attendance register with status tabs, division, check-in and check-out times and status', 'col-span-12', 'white'),
         ],
       },
     ],
