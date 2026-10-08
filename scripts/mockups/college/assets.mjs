@@ -1,4 +1,5 @@
-// Exports the desktop screens as transparent laptop PNGs for the bento page.
+// Exports the desktop screens as transparent laptop PNGs for the bento page. The page uses
+// laptop-staff, and laptop-programme stacked over laptop-finance (laptops-drawer-finance).
 // Usage: node assets.mjs <abs path to modules.html> <out dir>
 import {chromium} from '/opt/node22/lib/node_modules/playwright/index.mjs'
 const [file,out]=process.argv.slice(2)
@@ -7,7 +8,9 @@ const p=await b.newPage({viewport:{width:1800,height:1200},deviceScaleFactor:2})
 p.on('pageerror',e=>console.log('ERR',e.message))
 await p.addInitScript('window.IMG=""')
 await p.goto('file://'+file);await p.waitForTimeout(2500)
-const shots=[['laptop-finance','#s-fin'],['laptop-college','#s-d2'],['laptop-programme','#s-d3'],['laptop-staff','#s-staff']]
+// The finance screen ends at the collection chart and alerts: drop the colleges table below them.
+await p.evaluate(()=>document.querySelector('#s-fin .main > .card:last-child').remove())
+const shots=[['laptop-finance','#s-fin'],['laptop-programme','#s-d3'],['laptop-staff','#s-staff']]
 for(const [name,sel] of shots){
   await p.evaluate(sel=>{document.querySelectorAll('.xp').forEach(e=>e.remove())
     document.body.style.background='transparent'

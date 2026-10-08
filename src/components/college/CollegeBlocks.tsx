@@ -5,12 +5,7 @@ import type { ReactNode } from 'react'
 
 const ink = 'text-[#101828]'
 const sub = 'text-[#667085]'
-const OK = '#12805C'
-const WARN = '#D9910A'
-const BAD = '#D92D20'
-const tone = (p: number) => (p >= 80 ? OK : p >= 70 ? WARN : BAD)
 const chipCls = (p: number) => (p >= 80 ? 'bg-[#E3F5EC] text-[#12805C]' : p >= 70 ? 'bg-[#FDF1D8] text-[#A15C07]' : 'bg-[#FDE8E6] text-[#B42318]')
-const pct = (r: number, e: number) => Math.round((r / e) * 1000) / 10
 
 function Head({ title, note, right }: { title: string; note?: string; right?: ReactNode }) {
   return (
@@ -29,16 +24,6 @@ function Chip({ p }: { p: number }) {
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold tabular-nums ${chipCls(p)}`}>
       <i className="size-1.5 rounded-full bg-current" />
       {p.toFixed(1)}%
-    </span>
-  )
-}
-
-// Received against expected, with a black tick at the 80% target.
-function TargetBar({ p }: { p: number }) {
-  return (
-    <span className="relative block h-2 rounded-full bg-[#E6E9EF]">
-      <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${Math.min(p, 100)}%`, background: tone(p) }} />
-      <span className="absolute -top-1 -bottom-1 w-[2px] rounded-full bg-[#344054]" style={{ left: '80%' }} />
     </span>
   )
 }
@@ -90,57 +75,6 @@ export function DrillPath() {
             </span>
           </div>
         ))}
-      </div>
-    </div>
-  )
-}
-
-export function BatchTable() {
-  const rows: [string, number, number][] = [
-    ['Batch 2029', 2.8, 5],
-    ['Batch 2028', 3.6, 5],
-    ['Batch 2027', 4.0, 5],
-    ['Batch 2026', 4.6, 5],
-  ]
-  return (
-    <div className="flex h-full flex-col">
-      <Head
-        title="B.Tech, by batch"
-        note="Same columns as the group and college levels"
-        right={<span className="text-[13px] font-medium text-[#12326E]">Fee breakdown</span>}
-      />
-      <div className="mt-5 flex flex-1 flex-col justify-center">
-        <div className={`grid grid-cols-[1.1fr_1.6fr_0.8fr_0.8fr] gap-4 border-b border-[#DDE1E8] pb-2.5 text-[12px] font-medium ${sub}`}>
-          <span>Batch</span>
-          <span>Received vs expected</span>
-          <span className="text-right">Collection</span>
-          <span className="text-right">Gap to 80%</span>
-        </div>
-        {rows.map(([name, r, e]) => {
-          const p = pct(r, e)
-          const gap = p - 80
-          return (
-            <div key={name} className="grid grid-cols-[1.1fr_1.6fr_0.8fr_0.8fr] items-center gap-4 border-b border-[#E6E9EF] py-3.5 last:border-0">
-              <span className="flex items-center gap-2.5">
-                <i className="h-6 w-1 rounded-full" style={{ background: tone(p) }} />
-                <span className={`text-[14px] font-semibold ${ink}`}>{name}</span>
-              </span>
-              <span className="flex flex-col gap-1.5">
-                <TargetBar p={p} />
-                <span className={`text-[11px] tabular-nums ${sub}`}>
-                  ₹{r.toFixed(2)} Cr of ₹{e.toFixed(2)} Cr
-                </span>
-              </span>
-              <span className="text-right">
-                <Chip p={p} />
-              </span>
-              <span className="text-right text-[14px] font-semibold tabular-nums" style={{ color: gap >= 0 ? OK : BAD }}>
-                {gap >= 0 ? '+' : '−'}
-                {Math.abs(gap).toFixed(1)} pts
-              </span>
-            </div>
-          )
-        })}
       </div>
     </div>
   )
@@ -380,11 +314,149 @@ export function Profile() {
   )
 }
 
+// How alerts are sorted: two groups, each type with its own colour and what raises it.
+export function AlertTypes() {
+  const groups: [string, [string, 'bad' | 'warn', string][]][] = [
+    [
+      'Finance',
+      [
+        ['Receipt cancelled', 'bad', 'A receipt is voided. Shows the amount, the student and who owns it.'],
+        ['Fee updated', 'warn', 'A fee or concession changes. Shows the old and new amount.'],
+      ],
+    ],
+    [
+      'Staff',
+      [
+        ['Absence trend', 'bad', 'A pattern across the period, such as absences peaking on Mondays.'],
+        ['Uninformed absence', 'warn', 'Absent with no leave request or notice.'],
+      ],
+    ],
+  ]
+  return (
+    <div className="flex h-full flex-col">
+      <Head title="Four alert types, two groups" note="Red needs action, amber needs a look" />
+      <div className="mt-6 grid flex-1 grid-cols-1 gap-6 min-[701px]:grid-cols-2">
+        {groups.map(([group, types]) => (
+          <div key={group} className="flex flex-col gap-3">
+            <p className="m-0 text-[12px] font-semibold tracking-[0.08em] text-[#12326E] uppercase">{group}</p>
+            {types.map(([tag, t, text]) => (
+              <div key={tag} className="flex flex-col items-start gap-2 rounded-[16px] bg-[#F5F6F9] p-4">
+                <Tag t={t}>{tag}</Tag>
+                <span className={`text-[13px] leading-snug ${sub}`}>{text}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Tag({ t, children }: { t: 'bad' | 'warn'; children: ReactNode }) {
+  return (
+    <span className={`rounded-md px-2 py-0.5 text-[12px] font-semibold ${t === 'bad' ? 'bg-[#FDE8E6] text-[#B42318]' : 'bg-[#FDF1D8] text-[#A15C07]'}`}>
+      {children}
+    </span>
+  )
+}
+
+// The alerts panel as designed: filter, read state, then one card per alert with its details.
+function AlertPanel({ items }: { items: [string, 'bad' | 'warn', string, string, [string, string][]][] }) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between gap-3">
+        <span className="flex items-center gap-2">
+          <Warn className="text-[#D9910A]" />
+          <span className={`text-[clamp(16px,1.3vw,20px)] font-semibold ${ink}`}>Alerts</span>
+        </span>
+        <span className={`flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[12px] font-medium ring-1 ring-[#E6E9EF] ${ink}`}>
+          All colleges
+          <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </span>
+      </div>
+      <div className="mt-4 grid grid-cols-3 rounded-xl bg-[#E4E7EE] p-1 text-center text-[12px] font-medium">
+        <span className={`rounded-lg bg-white py-1.5 shadow-[0_1px_3px_rgba(16,24,40,0.08)] ${ink}`}>All</span>
+        <span className={`py-1.5 ${sub}`}>Read</span>
+        <span className={`py-1.5 ${sub}`}>Unread</span>
+      </div>
+      <div className="mt-4 flex flex-col gap-3">
+        {items.map(([tag, t, title, text, details]) => (
+          <div key={title} className="flex flex-col gap-2 rounded-[16px] bg-white p-4 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
+            <span className="flex items-center justify-between">
+              <Tag t={t}>{tag}</Tag>
+              <span className="text-[11px] text-[#98A2B3]">Today, 12:00</span>
+            </span>
+            <span className={`text-[15px] font-semibold ${ink}`}>{title}</span>
+            <span className={`text-[12px] leading-snug ${sub}`}>{text}</span>
+            <span className={`self-start rounded-md bg-[#F2F4F7] px-2 py-1 text-[11px] font-medium ${ink}`}>Engineering College</span>
+            {details.length > 0 && (
+              <span className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]">
+                {details.map(([k, v]) => (
+                  <span key={k} className="contents">
+                    <span className={sub}>{k}</span>
+                    <span className={`tabular-nums ${ink}`}>{v}</span>
+                  </span>
+                ))}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function FinanceAlerts() {
+  return (
+    <AlertPanel
+      items={[
+        [
+          'Receipt cancelled',
+          'bad',
+          'Receipt #RCP-08432 cancelled',
+          'Fee receipt cancelled for an incorrect amount.',
+          [
+            ['Amount', '₹11,000'],
+            ['Student', 'Riya Sen · 23IT56 · B.Tech 2023'],
+            ['Owner', 'Accounts office'],
+          ],
+        ],
+        [
+          'Fee updated',
+          'warn',
+          'Fee reduced',
+          'Fee updated after a concession was approved.',
+          [
+            ['Amount', '₹20,000 → ₹17,000'],
+            ['Student', 'Kabir Das · 23IT61 · B.Tech 2023'],
+          ],
+        ],
+      ]}
+    />
+  )
+}
+
+export function StaffAlerts() {
+  return (
+    <AlertPanel
+      items={[
+        ['Absence trend', 'bad', 'Absences are highest on Mondays', 'Monday has the most staff absences across this period.', []],
+        ['Uninformed absence', 'warn', '3 uninformed absences recorded', 'A staff member was absent on 3 working days this month with no leave request.', []],
+        ['Absence trend', 'bad', 'Late check-ins up 4.5%', '23 late check-ins today across all colleges, up on yesterday.', []],
+      ]}
+    />
+  )
+}
+
 export const COLLEGE_BLOCKS: Record<string, () => ReactNode> = {
   'drill-path': DrillPath,
-  'batch-table': BatchTable,
   'lowest-line': LowestLine,
   target: Target,
   'attendance-table': AttendanceTable,
   profile: Profile,
+  'alert-types': AlertTypes,
+  'finance-alerts': FinanceAlerts,
+  'staff-alerts': StaffAlerts,
 }
