@@ -100,19 +100,15 @@ function PenD() {
   )
 }
 
-// Small shapes floating in the frame, in the canvas colours.
+// The showcase canvas shapes (ring, pill, star), large and cropped by the frame's edges.
 function Shapes() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <svg className="absolute top-[14%] right-[30%] w-[clamp(26px,3vw,44px)] animate-[spin_14s_linear_infinite] motion-reduce:animate-none" viewBox="0 0 40 40">
-        <path d="M20 0l4.5 15.5L40 20l-15.5 4.5L20 40l-4.5-15.5L0 20l15.5-4.5z" fill="#FF2D78" />
+      <span className="absolute -top-[12%] -left-[6%] size-[clamp(140px,16vw,240px)] rounded-full border-[clamp(18px,2vw,30px)] border-white/90" />
+      <span className="absolute -top-[6%] -right-[8%] h-[clamp(64px,7vw,104px)] w-[clamp(220px,24vw,360px)] rounded-full bg-[#FFD25A]" />
+      <svg className="absolute -right-[4%] -bottom-[24%] w-[clamp(120px,13vw,200px)] animate-[spin_24s_linear_infinite] motion-reduce:animate-none" viewBox="0 0 100 100">
+        <path d="M50 0C53 34 66 47 100 50C66 53 53 66 50 100C47 66 34 53 0 50C34 47 47 34 50 0Z" fill="#7B61FF" />
       </svg>
-      <span className="absolute right-[8%] bottom-[16%] h-[clamp(16px,1.8vw,26px)] w-[clamp(48px,5.4vw,78px)] rotate-[-14deg] rounded-full bg-[#7B61FF]" />
-      <span className="absolute top-[22%] right-[6%] size-[clamp(14px,1.5vw,22px)] rounded-full border-[3px] border-[#F5B01D]" />
-      <svg className="absolute bottom-[12%] left-[46%] w-[clamp(54px,6vw,92px)]" viewBox="0 0 90 20">
-        <path d="M2 14c8-10 14-10 22 0s14 10 22 0 14-10 22 0 14 10 20 2" fill="none" stroke="#2DC6A0" strokeWidth="4" strokeLinecap="round" />
-      </svg>
-      <span className="absolute top-[10%] left-[44%] size-[clamp(10px,1vw,14px)] rotate-45 bg-white/80" />
     </div>
   )
 }
@@ -129,7 +125,7 @@ export default function Contact({ current }: { current?: string } = {}) {
     <footer
       id="reach-out"
       aria-labelledby="contact-heading"
-      className="mx-auto max-w-[var(--max)] bg-paper px-[var(--gutter)] pt-[clamp(56px,9vh,104px)] pb-8 font-hero"
+      className="mx-auto max-w-[var(--max)] bg-paper px-[var(--gutter)] pt-[clamp(56px,9vh,104px)] pb-8 font-body"
     >
       <Reveal className="relative mt-6">
         {/* Selection: the frame's name, a border with handles, and its size. */}
@@ -138,9 +134,9 @@ export default function Contact({ current }: { current?: string } = {}) {
         </span>
         <div className="relative bg-ink text-white outline outline-1 outline-offset-0" style={{ outlineColor: SELECT }}>
           <Shapes />
-          <div className="relative flex flex-col gap-10 px-[clamp(24px,5vw,72px)] py-[clamp(48px,8vw,112px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
+          <div className="relative flex flex-col gap-10 min-h-[clamp(440px,42vw,620px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(56px,7vw,104px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
             <div>
-              <p className="m-0 font-hero-mono text-[11px] tracking-[0.14em] text-white/55 uppercase">Contact</p>
+              <p className="m-0 text-[15px] leading-none font-medium text-white/55">Contact</p>
               <h2
                 id="contact-heading"
                 className="m-0 mt-5 text-[clamp(56px,10vw,168px)] leading-[0.92] font-medium tracking-[-0.045em] whitespace-nowrap"

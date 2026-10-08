@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { RESUME } from '@/data/site'
 
-// The header row shared by the landing hero and every other page: name on the left, About and
-// Contact in the middle, Replay (quiet) and Resume (the one black button) on the right.
+// The header row shared by the landing hero and every other page: name on the left, Work, About
+// and Contact in the middle, Replay (quiet) and Resume (the one black button) on the right.
 // On the landing page `onReplay` restarts the intro; elsewhere Replay goes home, where it plays.
 const focus = 'focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent'
 
@@ -26,6 +26,9 @@ export default function NavBar({ home = false, onReplay }: { home?: boolean; onR
       </Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-8 min-[721px]:flex">
+        <Link href={`${base}#work`} className={navLink}>
+          Work
+        </Link>
         <Link href={`${base}#about`} className={navLink}>
           About
         </Link>
