@@ -1,0 +1,158 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Geist;font-weight:400;src:url(../node_modules/@fontsource/geist/files/geist-latin-400-normal.woff2)}
+@font-face{font-family:Geist;font-weight:500;src:url(../node_modules/@fontsource/geist/files/geist-latin-500-normal.woff2)}
+@font-face{font-family:Geist;font-weight:600;src:url(../node_modules/@fontsource/geist/files/geist-latin-600-normal.woff2)}
+@font-face{font-family:Plex;font-weight:500;src:url(../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2)}
+*{box-sizing:border-box}
+body{margin:0;background:#888;font-family:Geist,sans-serif}
+.m{width:1600px;position:relative;overflow:hidden;padding:80px;margin-bottom:40px;display:flex;gap:40px;align-items:center;justify-content:center}
+/* Desktop app: the product's own navy, one soft haze from the top */
+.dark{background:#00022B;background-image:radial-gradient(1000px 520px at 62% -8%,rgba(38,83,207,.42),transparent 70%)}
+/* Website: light lavender plate so the two parts never read as one */
+.light{background:#E7ECFF;background-image:radial-gradient(1100px 600px at 65% 0%,#CFDDFF,transparent 72%)}
+.panel{background:#030733;border:1px solid rgba(120,150,255,.24);border-radius:18px;overflow:hidden;position:relative;flex:none}
+.panel img{display:block;width:100%}
+.pad{padding:22px}
+.shot{border-radius:16px;overflow:hidden;flex:none;position:relative;border:1px solid rgba(150,180,255,.35);box-shadow:0 0 0 8px rgba(89,133,255,.07),0 30px 140px rgba(38,83,207,.45)}
+.shot img{display:block;width:100%}
+.light .shot{border-color:rgba(38,83,207,.25);box-shadow:0 30px 80px rgba(0,2,43,.22)}
+.light .panel{border-color:rgba(38,83,207,.2);box-shadow:0 24px 60px rgba(0,2,43,.16)}
+.tb{background:#2653CF;color:#fff;border-radius:18px;padding:28px 30px 30px;width:320px;flex:none}
+.tb .n{font:500 14px Plex,monospace;color:#B9CCFF;letter-spacing:.08em;text-transform:uppercase}
+.tb h3{font-weight:600;font-size:30px;line-height:1.12;margin:12px 0 12px;letter-spacing:-.02em}
+.tb p{font-size:18px;line-height:1.45;color:#DCE5FF;margin:0}
+.col{display:flex;flex-direction:column;gap:24px;flex:none}
+.ring{position:absolute;border:2px solid #5CB5FF;border-radius:10px;box-shadow:0 0 0 6px rgba(92,181,255,.16)}
+.chip{position:absolute;background:#5CB5FF;color:#00022B;font:500 15px Plex,monospace;padding:8px 12px;border-radius:8px;white-space:nowrap}
+.dot{position:absolute;width:10px;height:10px;border-radius:50%;background:#5CB5FF}
+.dash{position:absolute;border-top:2px dashed #5CB5FF}
+.arrow{flex:none;width:44px;height:44px;border-radius:50%;background:#2653CF;display:grid;place-items:center;color:#fff;font-size:22px}
+.fade{-webkit-mask-image:linear-gradient(#000 80%,transparent)}
+</style></head><body>
+
+<!-- 01 Trading terminal -->
+<section class="m dark" id="s01">
+  <div class="tb"><div class="n">Trading terminal</div><h3>Everything before a trade, on one screen</h3><p>Chart, regime, watchlist and live trades sit side by side.</p></div>
+  <div class="shot" style="width:1080px"><img src="src/s-terminal.png"></div>
+</section>
+
+<!-- 02 Footprint chart -->
+<section class="m dark" id="s02">
+  <div class="tb"><div class="n">Footprint chart</div><h3>See inside every candle</h3><p>Each candle splits into price bins with the buy and sell volume at each level.</p></div>
+  <div class="panel pad" style="width:1048px">
+    <img src="src/footprint.png">
+    <div class="ring" style="left:88px;top:116px;width:516px;height:32px"></div>
+    <div class="dash" style="left:120px;top:148px;height:16px;border-top:0;border-left:2px dashed #5CB5FF"></div>
+    <div class="chip" style="left:96px;top:164px">Hovered bin: buys vs sells</div>
+  </div>
+</section>
+
+<!-- 03 Alerts: create, then track -->
+<section class="m dark" id="s03" style="align-items:flex-start">
+  <div class="col" style="width:400px">
+    <div class="tb" style="width:400px"><div class="n">Alerts · 01 Create</div><h3>Stack conditions in one form</h3><p>Footprint, price, POC or regime, each with its own timeframe.</p></div>
+    <div class="panel" style="width:400px"><img src="src/create-alert.png"></div>
+  </div>
+  <div class="arrow" style="margin-top:420px">→</div>
+  <div class="col" style="width:916px;align-self:stretch;justify-content:space-between">
+    <div class="shot" style="width:916px;height:466px"><img src="src/s-alerts-crop.png"></div>
+    <div class="tb" style="width:916px;display:flex;gap:40px;align-items:flex-start"><div style="width:300px;flex:none"><div class="n">Alerts · 02 Track</div><h3>Every match, condition by condition</h3></div><p style="margin-top:34px">Open an alert to see which conditions are met, which are still active, and when they last held together.</p></div>
+  </div>
+</section>
+
+<!-- 04 Regime (small) -->
+<section class="m dark" id="s04" style="padding:64px 80px">
+  <div class="tb"><div class="n">Market regime</div><h3>The market's mood, in one gauge</h3><p>Sideways, breakout, volatile or reversal, read live beside the chart.</p></div>
+  <div class="panel pad" style="width:600px"><img src="src/c-regime.png"></div>
+</section>
+
+<!-- 05 Quant Lab build: prompt or form -->
+<section class="m dark" id="s05" style="flex-direction:column;align-items:stretch;gap:40px">
+  <div style="display:flex;gap:40px;align-items:center">
+    <div class="tb" style="width:400px"><div class="n">Quant Lab · Build</div><h3>Describe a strategy in plain words</h3><p>The prompt compiles into a strategy card you can copy, edit or run.</p></div>
+    <div class="panel pad" style="width:940px"><img src="src/build-response.png"></div>
+  </div>
+  <div style="display:flex;gap:40px;align-items:center">
+    <div class="panel pad" style="width:940px"><img src="src/build-form.png"></div>
+    <div class="tb" style="width:400px"><div class="n">Quant Lab · Form</div><h3>Or click it together</h3><p>Symbol, entry conditions, exits, sizing and regime scope, field by field.</p></div>
+  </div>
+</section>
+
+<!-- 06 Quant Lab results -->
+<section class="m dark" id="s06">
+  <div class="tb" style="width:380px"><div class="n">Quant Lab · Results</div><h3>A backtest you can trust at a glance</h3><p>Eight key numbers, the equity curve with its drawdown, and performance split by regime.</p></div>
+  <div class="col" style="width:940px">
+    <img src="src/bt-stats.png" style="width:940px;display:block">
+    <img src="src/bt-equity-regime.png" style="width:940px;display:block">
+  </div>
+</section>
+
+<!-- 07 Library -->
+<section class="m dark" id="s07">
+  <div class="tb"><div class="n">Library · Strategies</div><h3>Every saved strategy is a card</h3><p>Filter by regime, see the win rate, then backtest, paper trade or fork.</p></div>
+  <div class="panel pad" style="width:940px">
+    <img src="src/lib-filters.png" style="width:885px">
+    <img class="fade" src="src/lib-cards.png" style="width:885px;margin-top:8px">
+  </div>
+</section>
+
+<!-- 08 Comparison -->
+<section class="m dark" id="s08">
+  <div class="col" style="width:940px">
+    <div class="panel"><img src="src/cmp-table.png"></div>
+    <div class="panel"><img src="src/cmp-equity.png"></div>
+  </div>
+  <div class="tb"><div class="n">Library · Compare</div><h3>Strategies side by side</h3><p>The best value in each column is highlighted, with every equity curve on one chart.</p></div>
+</section>
+
+<!-- 09 Paper trade results -->
+<section class="m dark" id="s09">
+  <div class="tb"><div class="n">Library · Paper trade</div><h3>Test the winner live, without risk</h3><p>Match confidence, ranked alternatives and 13 veto checks before any real money moves.</p></div>
+  <div class="col" style="width:940px">
+    <img src="src/pt-router.png" style="width:940px;display:block">
+    <img src="src/pt-results.png" style="width:940px;display:block">
+  </div>
+</section>
+
+<!-- 10 Journal + Quick chat -->
+<section class="m dark" id="s10" style="gap:56px">
+  <div style="display:flex;gap:24px;align-items:flex-end">
+    <div class="tb" style="width:290px"><div class="n">Trading journal</div><h3>Notes tied to the trade</h3><p>Every entry is tagged with the coin and the regime.</p></div>
+    <div class="panel" style="width:369px"><img src="src/journal.png"></div>
+  </div>
+  <div style="display:flex;gap:24px;align-items:flex-end">
+    <div class="tb" style="width:290px"><div class="n">Quick chat</div><h3>An analyst one click away</h3><p>Ask about any asset, strategy or trade from any screen.</p></div>
+    <div class="panel" style="width:369px"><img src="src/chat.png"></div>
+  </div>
+</section>
+
+<!-- Website -->
+<section class="m light" id="w01">
+  <div class="tb"><div class="n">Website · Hero</div><h3>The promise, then the product</h3><p>A one-line pitch and the live terminal, with the programmes that back it.</p></div>
+  <div class="shot" style="width:1060px"><img src="src/web-hero.png"></div>
+</section>
+
+<section class="m light" id="w02">
+  <div class="tb"><div class="n">Website · Quant Lab</div><h3>Six tools behind six tabs</h3><p>Each tab pairs one line of copy with a small diagram of the tool.</p></div>
+  <div class="shot" style="width:1080px;border-radius:20px"><img src="src/web-quantlab.png"></div>
+</section>
+
+<section class="m light" id="w03">
+  <div class="tb"><div class="n">Website · Features</div><h3>The terminal as a bento</h3><p>Six cards, one feature each, drawn from the real product UI.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(3,330px);gap:20px">
+    <div class="panel"><img src="src/web-card1.png"></div><div class="panel"><img src="src/web-card2.png"></div><div class="panel"><img src="src/web-card3.png"></div>
+    <div class="panel"><img src="src/web-card4.png"></div><div class="panel"><img src="src/web-card5.png"></div><div class="panel"><img src="src/web-card6.png"></div>
+  </div>
+</section>
+
+<section class="m light" id="w04">
+  <div class="tb"><div class="n">Website · Story</div><h3>Why it exists, and who builds it</h3><p>A timeline from first trade to launch, then the team.</p></div>
+  <div class="col" style="width:1060px">
+    <div class="shot"><img src="src/web-timeline.png"></div>
+    <div class="shot"><img src="src/web-team.png"></div>
+  </div>
+</section>
+
+</body></html>
