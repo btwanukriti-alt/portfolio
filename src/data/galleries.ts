@@ -121,10 +121,14 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pop: '#5985FF',
     },
     images: [
-      jaadu('01-footprint.jpg', 1500, 'The trading terminal in footprint view, with the regime gauge, watchlist and trades beside the chart', 'Each candle splits into price cells, with the regime read beside it.'),
-      jaadu('02-market.jpg', 1800, 'Regime gauge, coin stats, watchlist, trades and the trading journal as separate cards', 'Regime, market stats and the journal, each a card of its own.'),
-      jaadu('03-alerts-search.jpg', 1800, 'The create-alert panel, two chart prompt states, coin search and indicators', 'Alerts with stacked conditions, and a prompt anchored to the chart.'),
-      jaadu('04-quant-lab.jpg', 1710, 'An overnight campaign card, the library comparison table and equity curve, and the alerts list', 'Quant Lab narrows a night of strategy search to a shortlist.'),
+      jaadu('01-footprint.jpg', 1140, 'A zoomed footprint chart where each candle is split into price bins, with the hovered bin showing buys, sells and delta', 'The footprint splits each candle into price bins.'),
+      jaadu('02-regime.jpg', 1140, 'The regime gauge showing sideways, breakout, volatile and reversal shares', 'The market regime, read live beside the chart.'),
+      jaadu('03-alerts.jpg', 1590, 'A multi-condition alert with its condition list, and the create-alert panel', 'Alerts combine price, POC, footprint and regime conditions.'),
+      jaadu('04-overnight.jpg', 1965, 'Overnight Discoveries: the falsification funnel, discoveries per night and the surviving strategy cards', 'Quant Lab: set it up, it works overnight, you wake up to a shortlist.'),
+      jaadu('05-library.jpg', 1500, 'The strategy library as cards with regime, direction, win rate and backtest actions', 'Every saved strategy is a card.'),
+      jaadu('06-comparison.jpg', 1980, 'The strategy comparison table with the best value per column highlighted, above the equity curves', 'Strategies compared side by side.'),
+      jaadu('07-deja-vu.jpg', 1140, 'Deja Vu: historical matches, the current setup beside a match, and the outcome distribution', 'Deja Vu finds look-alike setups in market history.'),
+      jaadu('08-chart-prompt.jpg', 1140, 'The chart prompt in its suggested and typing states', 'Ask about any point on the chart.'),
     ],
   },
   'bosch-customer-experience': {
