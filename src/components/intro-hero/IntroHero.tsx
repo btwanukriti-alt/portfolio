@@ -22,7 +22,7 @@ import {
   type Origin,
   type Spot,
 } from './scene'
-import { TILES } from './tiles'
+import { TILES, type Tile } from './tiles'
 import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 
 // The hero, staged like a Figma canvas. "Hello, I am Anukriti." is typed in; Anukriti's
@@ -61,6 +61,19 @@ const N = TILES.length
 const CHAIN_GAP = 0.2 // radians between screenshots while they stream out
 const SPREAD_GAP = (Math.PI * 2) / N
 const IDLE_SPEED = 0.14
+// The foreground device of each screen lifts out of its frame, holds, settles back and rests, on
+// a loop. Starts are spread by the golden ratio so a few screens are up at any moment.
+const POP_PERIOD = 6.5 // seconds per cycle
+const popCycle = (u: number) => {
+  if (u < 0.14) {
+    // Rise with a small overshoot (ease-out back).
+    const x = u / 0.14 - 1
+    return 1 + 2.2 * x * x * x + 1.2 * x * x
+  }
+  if (u < 0.44) return 1
+  if (u < 0.6) return 1 - smooth((u - 0.44) / 0.16)
+  return 0
+}
 // Scroll: the hero is pinned for 2.3 extra screens. Stage 1 (ring + headline) takes the first,
 // stage 2 (scatter + About) the second, then a short hold.
 const SCROLL_STAGES = 2.3
@@ -107,6 +120,22 @@ const TOOLS: { id: string; label: string; icon: ReactNode }[] = [
   { id: 'text', label: 'Text', icon: icon(<path d="M4 4h10M9 4v10.5M7.2 14.5h3.6" />) },
   { id: 'comment', label: 'Comment', icon: icon(<path d="M4 13.5 L3.2 15.6 L6 14.6 A6 6 0 1 0 4 13.5 Z" />) },
 ]
+
+// A screen's foreground device, laid over its ground at rest. Live ones lift out of the frame
+// (the ticker sets their transform), so they sit outside the tile's clip.
+function PopLayer({ tile, live }: { tile: Tile; live?: boolean }) {
+  const { pop } = tile
+  return (
+    <img
+      src={pop.src}
+      alt=""
+      draggable={false}
+      data-pop={live ? '' : undefined}
+      className="absolute block max-w-none origin-[50%_80%] will-change-transform"
+      style={{ left: `${pop.x * 100}%`, top: `${pop.y * 100}%`, width: `${pop.w * 100}%`, height: `${pop.h * 100}%` }}
+    />
+  )
+}
 
 type Engine = { hover: (index: number, on: boolean) => void }
 
@@ -203,6 +232,8 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const flight = [{ v: 0 }, { v: 0 }, { v: 0 }]
     let cardSlot: { x: number; y: number; w: number; h: number }[] = []
     const hover = TILES.map(() => new Spring(0, 0, 220, 22))
+    const pops = tiles.current.map((el) => el?.querySelector<HTMLElement>('[data-pop]') ?? null)
+    let popOn = 0 // the loop fades in once the intro is complete
     let layout: Layout | null = null
     let spots: Spot[] = []
     let visible = true
@@ -299,6 +330,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       mouse.x += (mouse.tx - mouse.x) * Math.min(1, dt * 3)
       mouse.y += (mouse.ty - mouse.y) * Math.min(1, dt * 3)
       if (!reduce) ringTurn += dt * 0.045
+      popOn += ((!reduce && (!tl || tl.progress() >= 1) ? 1 : 0) - popOn) * Math.min(1, dt * 1.5)
       const now = reduce ? 0 : performance.now() - t0
 
       tiles.current.forEach((el, i) => {
@@ -319,6 +351,15 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         const h = hover[i].value
         if (h > 0.001) p = { ...p, s: p.s * (1 + 0.08 * h), o: p.o + (1 - p.o) * h, blur: p.blur * (1 - h) }
         el.style.transform = `translate3d(${p.x - L.tileW / 2}px,${p.y - L.tileH / 2}px,0) scale(${p.s})`
+        const popEl = pops[i]
+        if (popEl) {
+          // Up front during the orbit, every screen once they've gathered.
+          const weight = lerp(lerp(0.35, 1, near), 1, a)
+          const loop = popOn > 0.001 ? popCycle((now / 1000 / POP_PERIOD + i * 0.618034) % 1) * weight * popOn : 0
+          const up = Math.max(loop, h)
+          popEl.style.transform = `translate3d(0,${(-up * 24).toFixed(2)}%,0) scale(${(1 + 0.34 * up).toFixed(4)})`
+          popEl.style.filter = `drop-shadow(0 ${(2 + up * 12).toFixed(1)}px ${(3 + up * 12).toFixed(1)}px rgba(8,10,30,${(0.18 + up * 0.32).toFixed(3)}))`
+        }
         el.style.opacity = String(p.o)
         el.style.filter = p.blur > 0.25 ? `blur(${p.blur.toFixed(2)}px)` : 'none'
         el.style.zIndex = String(h > 0.3 ? 390 : Math.round(200 + p.z / 8 + (p.z >= 0 ? 1 : -1)))
@@ -695,6 +736,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
                   className="absolute inset-0 overflow-hidden bg-soft shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
                 >
                   <img src={TILES[k].src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
+                  <PopLayer tile={TILES[k]} />
                 </div>
               </div>
               {/* Selected: a black border and handles, kept until the card lifts off. */}
@@ -787,9 +829,12 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
             onPointerLeave={() => engine.current?.hover(i, false)}
             onFocus={() => engine.current?.hover(i, true)}
             onBlur={() => engine.current?.hover(i, false)}
-            className="pointer-events-none absolute top-0 left-0 block origin-center overflow-hidden rounded-[8px] bg-soft opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="pointer-events-none absolute top-0 left-0 block origin-center rounded-[8px] bg-soft opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <img src={tile.src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
+            <span className="absolute inset-0 overflow-hidden rounded-[8px]">
+              <img src={tile.src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
+            </span>
+            <PopLayer tile={tile} live />
           </Link>
         ))}
       </div>
