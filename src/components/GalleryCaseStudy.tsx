@@ -6,6 +6,7 @@ import type { Brand, GalleryImage } from '@/data/galleries'
 import SiteHeader from './SiteHeader'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
+import FigmaFrame, { layerName } from './FigmaFrame'
 import { Reveal, SplitReveal } from './Reveal'
 
 // Visual-first case study page (the mockup-showcase layout): the description is short and sits on
@@ -111,10 +112,11 @@ export default function GalleryCaseStudy({
           {note}
         </p>
 
-        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(6px,0.6vw,10px)] p-0">
+        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
           {images.map((img, i) => (
             <li key={img.src}>
-              <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(12px,1.4vw,20px)]">
+              <Reveal as="figure" className="m-0">
+                <FigmaFrame index={i + 1} name={layerName(img.src)} size={`${img.width} × ${img.height}`}>
                   <img
                     className="block h-auto w-full"
                     src={img.src}
@@ -124,6 +126,7 @@ export default function GalleryCaseStudy({
                     loading={i < 2 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
+                </FigmaFrame>
               </Reveal>
             </li>
           ))}
