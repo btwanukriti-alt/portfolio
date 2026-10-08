@@ -5,6 +5,7 @@ import SiteHeader from './SiteHeader'
 import SlideCarousel from './SlideCarousel'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
+import FigmaFrame, { layerName } from './FigmaFrame'
 import { Reveal, SplitReveal } from './Reveal'
 import { COLLEGE_BRAND, COLLEGE_IMAGES } from '@/data/collegeGallery'
 import { caseStudyByKey } from '@/data/caseStudies'
@@ -170,16 +171,18 @@ function CollegeCaseStudy() {
         <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
           {COLLEGE_IMAGES.map((image, i) => (
             <li key={image.src}>
-              <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(18px,2.4vw,36px)] bg-[#eef0f5]">
-                <img
-                  className="block h-auto w-full"
-                  src={image.src}
-                  width={image.width}
-                  height={image.height}
-                  alt={image.alt}
-                  loading={i < 2 ? 'eager' : 'lazy'}
-                  decoding="async"
-                />
+              <Reveal as="figure" className="m-0">
+                <FigmaFrame index={i + 1} name={layerName(image.src)} size={`${image.width} × ${image.height}`}>
+                  <img
+                    className="block h-auto w-full"
+                    src={image.src}
+                    width={image.width}
+                    height={image.height}
+                    alt={image.alt}
+                    loading={i < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                </FigmaFrame>
               </Reveal>
             </li>
           ))}
