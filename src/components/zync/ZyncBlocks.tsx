@@ -16,11 +16,17 @@ function Head({ title, right }: { title: string; right?: ReactNode }) {
   )
 }
 
-function Toggle({ items }: { items: [string, string] }) {
+function Toggle({ items, active = 0 }: { items: [string, string]; active?: 0 | 1 }) {
   return (
     <div className="flex rounded-full bg-[#F1F0F6] p-1 text-[13px] font-medium">
-      <span className={`rounded-full bg-white px-3.5 py-1.5 shadow-[0_1px_3px_rgba(18,16,28,0.08)] ${ink}`}>{items[0]}</span>
-      <span className={`px-3.5 py-1.5 ${sub}`}>{items[1]}</span>
+      {items.map((item, i) => (
+        <span
+          key={item}
+          className={i === active ? `rounded-full bg-white px-3.5 py-1.5 shadow-[0_1px_3px_rgba(18,16,28,0.08)] ${ink}` : `px-3.5 py-1.5 ${sub}`}
+        >
+          {item}
+        </span>
+      ))}
     </div>
   )
 }
@@ -128,38 +134,36 @@ export function Calories() {
   )
 }
 
-export function Today() {
-  const tiles: [string, string, string, string, string][] = [
-    ['Burned', '900', 'cal', '300 to go', 'brand'],
-    ['Consumed', '1,385', 'cal', '865 left', 'pink'],
-    ['Steps', '2,450', '', '550 to go', 'lilac'],
-    ['Water', '1.6', 'L', '1.4 L to go', 'blue'],
+// The Consumed side of the calorie card: 1,385 cal eaten, split by each macro's share of calories.
+export function Consumed() {
+  const parts: [string, string, number, string][] = [
+    ['Carbs', '239 g', 68, '#2DC6A0'],
+    ['Fat', '35 g', 22, '#F5B01D'],
+    ['Protein', '35 g', 10, '#F5577D'],
   ]
-  const chip: Record<string, string> = {
-    brand: 'bg-white/20 text-white',
-    pink: 'bg-[#FFE8EE] text-[#D63B63]',
-    lilac: 'bg-[#ECE8FA] text-[#644ACD]',
-    blue: 'bg-[#E4EEFF] text-[#2F6BE0]',
-  }
   return (
     <div className="flex h-full flex-col font-slides">
-      <Head title="Today" right={<span className={`text-[13px] ${sub}`}>Thu, 20 Feb</span>} />
-      <div className="mt-5 grid flex-1 grid-cols-2 gap-3 min-[901px]:grid-cols-4">
-        {tiles.map(([label, value, unit, left, tone]) => (
-          <div
-            key={label}
-            className={`flex min-h-[150px] flex-col justify-between rounded-[22px] p-5 ${
-              tone === 'brand' ? 'bg-[linear-gradient(145deg,#8A72EE,#644ACD_60%,#4B34A8)] text-white' : `bg-[#F6F5FA] ${ink}`
-            }`}
-          >
-            <span className={`text-[15px] font-medium ${tone === 'brand' ? 'text-white/90' : sub}`}>{label}</span>
-            <span>
-              <span className="text-[clamp(26px,2.4vw,36px)] leading-none font-semibold tracking-[-0.02em]">{value}</span>
-              {unit && <span className="ml-1 text-[13px] opacity-70">{unit}</span>}
-            </span>
-            <span className={`self-start rounded-full px-2.5 py-1 text-[11px] font-semibold ${chip[tone]}`}>{left}</span>
-          </div>
-        ))}
+      <Head title="Calories" right={<Toggle items={['Burned', 'Consumed']} active={1} />} />
+      <div className="grid flex-1 grid-cols-1 items-center gap-8 pt-5 min-[701px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="mx-auto w-[min(70%,220px)]">
+          <Ring parts={parts.map(([, , pct, c]) => [(pct / 100) * 1385, c] as [number, string])} total={2250}>
+            <span className={`text-[clamp(26px,2.4vw,36px)] leading-none font-semibold ${ink}`}>1,385</span>
+            <span className={`mt-1 text-[12px] ${sub}`}>of 2,250 cal</span>
+            <span className="mt-2 rounded-full bg-[#FFE8EE] px-2.5 py-1 text-[11px] font-semibold text-[#D63B63]">865 left</span>
+          </Ring>
+        </div>
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          {parts.map(([name, grams, pct, color]) => (
+            <li key={name} className="flex items-center gap-4 rounded-[18px] bg-[#F6F5FA] px-4 py-3.5">
+              <span className="h-8 w-1.5 rounded-full" style={{ background: color }} />
+              <span className="flex flex-1 flex-col leading-tight">
+                <span className={`text-[15px] font-semibold ${ink}`}>{name}</span>
+                <span className={`text-[12px] ${sub}`}>{grams}</span>
+              </span>
+              <span className={`text-[15px] font-semibold ${ink}`}>{pct}%</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )
@@ -331,12 +335,95 @@ export function Plans() {
   )
 }
 
+export function Food() {
+  const macros: [string, number, string, string][] = [
+    ['Protein', 31, '35 / 112 g', '#F5577D'],
+    ['Carbs', 47, '239 / 281 g', '#2DC6A0'],
+    ['Fat', 47, '35 / 75 g', '#F5B01D'],
+    ['Fibre', 87, '26 / 30 g', '#C46BF2'],
+  ]
+  const meals: [string, string, string][] = [
+    ['Pomegranate', '1 piece', '114 cal'],
+    ['Coffee', '100 ml', '234 cal'],
+  ]
+  // A half gauge: 1,385 of 2,250 cal.
+  const r = 80
+  const half = Math.PI * r
+  return (
+    <div className="grid h-full grid-cols-1 gap-8 font-slides min-[901px]:grid-cols-[1fr_1.2fr_1.3fr] min-[901px]:gap-10">
+      <div className="flex flex-col">
+        <Head title="Food log" />
+        <div className="flex flex-1 flex-col items-center justify-center pt-4">
+          <div className="relative w-full max-w-[240px]">
+            <svg viewBox="0 0 200 110" className="block w-full">
+              <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#FFE3EA" strokeWidth="16" strokeLinecap="round" />
+              <path
+                d="M20 100 A80 80 0 0 1 180 100"
+                fill="none"
+                stroke="#F5577D"
+                strokeWidth="16"
+                strokeLinecap="round"
+                strokeDasharray={`${(1385 / 2250) * half} ${half}`}
+              />
+            </svg>
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center leading-tight">
+              <span className={`text-[clamp(22px,2vw,30px)] font-semibold tracking-[-0.02em] ${ink}`}>1,385 cal</span>
+              <span className={`text-[12px] ${sub}`}>of 2,250 cal</span>
+            </div>
+          </div>
+          <span className="mt-4 rounded-full bg-[#FFE8EE] px-3 py-1 text-[12px] font-semibold text-[#D63B63]">865 cal left today</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 content-center gap-x-6 gap-y-6 min-[901px]:border-x min-[901px]:border-[#EEEDF4] min-[901px]:px-10">
+        {macros.map(([name, pct, grams, color]) => (
+          <div key={name} className="flex flex-col gap-2">
+            <span className="flex justify-between text-[14px]">
+              <span className={`font-semibold ${ink}`}>{name}</span>
+              <span className={sub}>{pct}%</span>
+            </span>
+            <span className="h-2 overflow-hidden rounded-full bg-[#EEEDF4]">
+              <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+            </span>
+            <span className={`text-[12px] ${sub}`}>{grams}</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col justify-center gap-3">
+        <div className="flex items-center justify-between">
+          <span className="flex flex-col leading-tight">
+            <span className={`text-[16px] font-semibold ${ink}`}>Breakfast</span>
+            <span className={`text-[12px] ${sub}`}>8:00 am · 348 of 562 cal</span>
+          </span>
+          <span className="flex size-9 items-center justify-center rounded-full bg-[#FFE8EE] text-[18px] text-[#F5577D]">+</span>
+        </div>
+        {meals.map(([name, qty, cal]) => (
+          <div key={name} className="flex items-center justify-between rounded-[16px] bg-[#F6F5FA] px-4 py-3">
+            <span className="flex flex-col leading-tight">
+              <span className={`text-[14px] font-semibold ${ink}`}>{name}</span>
+              <span className={`text-[12px] ${sub}`}>{qty}</span>
+            </span>
+            <span className={`text-[14px] font-semibold ${ink}`}>{cal}</span>
+          </div>
+        ))}
+        <div className="flex items-center justify-between rounded-[16px] px-4 py-3 ring-1 ring-[#EEEDF4] ring-inset">
+          <span className="flex flex-col leading-tight">
+            <span className={`text-[14px] font-semibold ${ink}`}>Lunch</span>
+            <span className={`text-[12px] ${sub}`}>Not logged · 700 cal suggested</span>
+          </span>
+          <span className="flex size-8 items-center justify-center rounded-full bg-[#FFE8EE] text-[16px] text-[#F5577D]">+</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export const ZYNC_BLOCKS: Record<string, () => ReactNode> = {
   palette: Palette,
   calories: Calories,
-  today: Today,
+  consumed: Consumed,
   checkin: CheckIn,
   classes: Classes,
   hydration: Hydration,
+  food: Food,
   plans: Plans,
 }

@@ -34,7 +34,8 @@ export type BentoCard =
   // A component rebuilt in React (src/components/zync/ZyncBlocks.tsx); the card is its surface.
   | { kind: 'block'; block: string; label: string; span: string }
 
-export type GallerySection = { label: string; cards: BentoCard[] }
+// rows: how many grid rows the section uses on desktop (2 by default, or 3).
+export type GallerySection = { label: string; rows?: 2 | 3; cards: BentoCard[] }
 
 type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[]; sections?: GallerySection[] }
 
@@ -104,9 +105,9 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         label: 'Main feature: Home',
         cards: [
           ui('phone-home', 1542, 2904, 'The Zync Home screen on a phone', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          text('Main feature · Home', 'The whole day on one screen', 'Calories against the goal, steps, BMI and the next class. A member reads the day before the first scroll.', 'min-[901px]:col-span-4'),
+          text('Main feature · Home', 'The whole day on one screen', 'Calories burned and eaten against the goal, steps, BMI and the next class. A member reads the day before the first scroll.', 'min-[901px]:col-span-4'),
           block('calories', 'The calorie ring: 900 of 1,200 cal burned, split by activity', 'min-[901px]:col-span-4'),
-          block('today', 'Four tiles for today: burned, consumed, steps and water', 'min-[901px]:col-span-8'),
+          block('consumed', 'The Consumed side of the calorie card: 1,385 of 2,250 cal, split into carbs, fat and protein', 'min-[901px]:col-span-8'),
         ],
       },
       {
@@ -119,12 +120,14 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         ],
       },
       {
-        label: 'Log',
+        label: 'Log: water and food',
+        rows: 3,
         cards: [
-          text('Log', 'Every tracker reads the same way', 'Food, water, sleep, workout, steps and weight open from one Log tab. Each shows today against the goal, then the week.', 'min-[901px]:col-span-4'),
-          ui('phone-log', 1542, 2904, 'The Log screen with six tracker shortcuts and quick add', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          text('Log · Water and food', 'Water and food read the same way', 'Today against the goal comes first: a ring for water, a gauge for calories. Quick amounts and meals sit right below.', 'min-[901px]:col-span-4'),
           ui('phone-water', 1542, 2904, 'The Hydration screen with the intake ring and glass sizes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          ui('phone-food', 1542, 2904, 'The Food log screen with the calorie gauge, macros and meals', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
           block('hydration', 'The hydration ring with quick amounts and the glass stepper', 'min-[901px]:col-span-4'),
+          block('food', 'The food log: 1,385 of 2,250 cal, macros and the meals logged today', 'col-span-12'),
         ],
       },
       {

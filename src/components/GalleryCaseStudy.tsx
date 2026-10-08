@@ -120,7 +120,9 @@ export default function GalleryCaseStudy({
               <section
                 key={section.label}
                 aria-label={section.label}
-                className="grid grid-cols-1 gap-[clamp(12px,1.4vw,20px)] min-[901px]:grid-cols-12 min-[901px]:grid-rows-[repeat(2,clamp(300px,28vw,420px))]"
+                className={`grid grid-cols-1 gap-[clamp(12px,1.4vw,20px)] min-[901px]:grid-cols-12 ${
+                  section.rows === 3 ? 'min-[901px]:grid-rows-[repeat(3,clamp(300px,28vw,420px))]' : 'min-[901px]:grid-rows-[repeat(2,clamp(300px,28vw,420px))]'
+                }`}
               >
                 {section.cards.map((card, j) => (
                   <Bento key={j} card={card} eager={i === 0 && j < 2} />
