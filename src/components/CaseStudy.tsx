@@ -29,7 +29,7 @@ export default function CaseStudy({ project, slides }: { project: Project; slide
         <div className="mt-[clamp(32px,6vh,64px)] grid grid-cols-1 gap-6 min-[901px]:grid-cols-[3fr_2fr] min-[901px]:items-end min-[901px]:gap-x-16">
           <SplitReveal
             as="h1"
-            className="m-0 max-w-[14ch] text-[clamp(44px,6.6vw,112px)] leading-[0.98] font-medium tracking-[-0.045em] text-ink min-[901px]:row-span-2"
+            className="m-0 max-w-[14ch] text-[clamp(36px,4.8vw,76px)] leading-[1] font-medium tracking-[-0.045em] text-ink min-[901px]:row-span-2"
             text={project.title}
           />
           <Reveal as="p" className="m-0 max-w-[46ch] text-[clamp(17px,1.3vw,20px)] leading-[1.55] font-normal text-muted" delay={150}>
