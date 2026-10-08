@@ -16,7 +16,7 @@ export default function SiteHeader({ afterHero = false }: { afterHero?: boolean 
   const links = [
     { href: `${base}#work`, label: 'Work' },
     { href: `${base}#about`, label: 'About' },
-    { href: `${base}#reach-out`, label: 'Contact' },
+    { href: '/resume.pdf', label: 'Resume' },
   ]
 
   useEffect(() => {
@@ -55,33 +55,36 @@ export default function SiteHeader({ afterHero = false }: { afterHero?: boolean 
       data-scrolled={scrolled || undefined}
       className="fixed inset-x-0 top-0 z-40 border-b border-transparent [transition:transform_600ms_var(--ease-out-expo),background-color_300ms_ease,border-color_300ms_ease] motion-reduce:transition-none data-[hidden]:[transform:translateY(-101%)] data-[scrolled]:border-line data-[scrolled]:bg-white/82 data-[scrolled]:backdrop-blur-[16px] data-[scrolled]:backdrop-saturate-[1.6] [html[data-glasses]_&]:[transform:translateY(-101%)]"
     >
-      {/* Same layout as the home hero's header: name left, links centred, a pill on the right. */}
-      <div className="mx-auto grid h-[64px] max-w-[var(--max)] grid-cols-[1fr_auto] items-center px-[var(--gutter)] font-hero text-[13px] text-ink md:grid-cols-[1fr_auto_1fr]">
+      <div className="mx-auto flex h-[72px] max-w-[var(--max)] items-center justify-between gap-6 px-[var(--gutter)]">
         <Link
           href={afterHero ? '#welcome' : '/'}
-          className="inline-flex items-center gap-2.5 text-[15px] font-medium text-ink no-underline focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent"
+          className="font-body text-[17px] leading-none font-semibold tracking-[-0.02em] whitespace-nowrap text-ink no-underline focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent"
         >
-          <span className="size-[9px] rounded-full bg-ink shadow-[0_0_0_3px_rgba(13,13,12,.1)]" />
-          Anukriti
+          Anukriti Mishra
         </Link>
-        <nav className="hidden gap-7 text-muted md:flex" aria-label="Primary">
-          {links.map(({ href, label }) => (
-            <Link key={href} href={href} className="group relative text-muted no-underline transition-colors hover:text-ink">
+        <nav className="flex items-center gap-1" aria-label="Primary">
+          {links.map(({ href, label }) => {
+            // The resume is a static file: a plain link, opened in a new tab.
+            const Tag = href.endsWith('.pdf') ? 'a' : Link
+            return (
+            <Tag
+              key={href}
+              href={href}
+              {...(Tag === 'a' && { target: '_blank', rel: 'noopener noreferrer' })}
+              // Underline draws in from the left on hover.
+              className="relative px-[14px] py-[10px] font-body text-[15px] leading-none font-medium text-ink no-underline after:absolute after:right-[14px] after:bottom-1 after:left-[14px] after:h-px after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-[450ms] after:ease-[var(--ease-out-expo)] hover:after:origin-left hover:after:scale-x-100 focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:after:transition-none max-[640px]:hidden max-[640px]:first:block"
+            >
               {label}
-              <span className="absolute inset-x-0 -bottom-1 h-px origin-right scale-x-0 bg-current transition-transform duration-500 ease-[cubic-bezier(.2,.7,.1,1)] group-hover:origin-left group-hover:scale-x-100" />
-            </Link>
-          ))}
-        </nav>
-        <div className="flex items-center justify-end gap-2">
-          <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-[#0d0d0c1f] px-3.5 py-2 font-hero-mono text-[11px] tracking-[0.08em] text-muted uppercase no-underline transition-colors hover:border-ink/35 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            </Tag>
+            )
+          })}
+          <Link
+            href={`${base}#reach-out`}
+            className="ml-[10px] rounded-full bg-ink px-5 py-3 font-body text-[15px] leading-none font-medium whitespace-nowrap text-white no-underline [transition:translate_300ms_var(--ease-out-expo),background-color_200ms_ease] hover:-translate-y-px hover:bg-[#2a2a2d] focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:transition-none max-[640px]:px-4 max-[640px]:py-[10px]"
           >
-            Resume
-          </a>
-        </div>
+            Let&apos;s talk
+          </Link>
+        </nav>
       </div>
     </header>
   )
