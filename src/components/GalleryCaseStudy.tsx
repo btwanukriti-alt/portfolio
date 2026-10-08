@@ -2,12 +2,24 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import type { Project } from '@/data/projects'
 import type { CaseStudy } from '@/data/caseStudies'
-import type { BentoCard, Brand, GalleryImage, GallerySection } from '@/data/galleries'
+import type { BentoCard, Brand, GalleryImage, GallerySection, Surface } from '@/data/galleries'
 import SiteHeader from './SiteHeader'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
 import { Reveal, SplitReveal } from './Reveal'
 import { ZYNC_BLOCKS } from './zync/ZyncBlocks'
+import { COLLEGE_BLOCKS } from './college/CollegeBlocks'
+
+const BLOCKS = { ...ZYNC_BLOCKS, ...COLLEGE_BLOCKS }
+
+// Card grounds, in the project's own colours (CSS variables set on the page).
+const SURFACE: Record<Surface, string> = {
+  plate: 'bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)]',
+  tint: 'bg-[var(--c-soft)]',
+  deep: 'bg-[radial-gradient(120%_140%_at_85%_0%,var(--c-accent)_0%,var(--c-deep)_70%)] text-white',
+  pop: 'bg-[var(--c-pop)] text-white',
+  white: 'bg-white ring-1 ring-[#E7E8EE]',
+}
 
 // Visual-first case study page (the mockup-showcase layout): the description is short and sits on
 // top, the mockups run in one long gallery below. The project's own colours come in as CSS
@@ -121,7 +133,11 @@ export default function GalleryCaseStudy({
                 key={section.label}
                 aria-label={section.label}
                 className={`grid grid-cols-1 gap-[clamp(12px,1.4vw,20px)] min-[901px]:grid-cols-12 ${
-                  section.rows === 3 ? 'min-[901px]:grid-rows-[repeat(3,clamp(300px,28vw,420px))]' : 'min-[901px]:grid-rows-[repeat(2,clamp(300px,28vw,420px))]'
+                  section.rows === 3
+                    ? 'min-[901px]:grid-rows-[repeat(3,clamp(300px,28vw,420px))]'
+                    : section.rows === 1
+                      ? 'min-[901px]:grid-rows-[clamp(300px,28vw,420px)]'
+                      : 'min-[901px]:grid-rows-[repeat(2,clamp(300px,28vw,420px))]'
                 }`}
               >
                 {section.cards.map((card, j) => (
@@ -184,7 +200,11 @@ export default function GalleryCaseStudy({
 function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
   if (card.kind === 'text') {
     return (
-      <Reveal className={`${card.span} flex flex-col justify-end rounded-[clamp(22px,2.4vw,36px)] bg-[var(--c-accent)] p-[clamp(28px,3.2vw,52px)] text-white`}>
+      <Reveal
+        className={`${card.span} flex flex-col justify-end rounded-[clamp(22px,2.4vw,36px)] p-[clamp(28px,3.2vw,52px)] text-white ${
+          card.surface ? SURFACE[card.surface] : 'bg-[var(--c-accent)]'
+        }`}
+      >
         <p className="m-0 text-[12px] leading-none font-semibold tracking-[0.1em] text-white/70 uppercase">{card.kicker}</p>
         <h3 className="m-0 mt-4 text-[clamp(28px,2.7vw,44px)] leading-[1.08] font-light tracking-[-0.025em]">{card.title}</h3>
         <p className="m-0 mt-4 max-w-[36ch] text-[clamp(15px,1.1vw,17px)] leading-[1.55] text-white/85">{card.text}</p>
@@ -192,19 +212,19 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
     )
   }
   if (card.kind === 'block') {
-    const Block = ZYNC_BLOCKS[card.block]
+    const Block = BLOCKS[card.block]
     return (
-      <Reveal as="figure" className={`${card.span} m-0 rounded-[clamp(22px,2.4vw,36px)] bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] p-[clamp(22px,2.6vw,40px)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)]`}>
+      <Reveal as="figure" className={`${card.span} m-0 rounded-[clamp(22px,2.4vw,36px)] p-[clamp(22px,2.6vw,40px)] ${SURFACE[card.surface ?? 'plate']}`}>
         <figcaption className="sr-only">{card.label}</figcaption>
         <Block />
       </Reveal>
     )
   }
-  const tall = card.span.includes('row-span-2')
+  const tall = card.span.includes('row-span-2') && card.height > card.width
   return (
     <Reveal
       as="figure"
-      className={`${card.span} relative m-0 overflow-hidden rounded-[clamp(22px,2.4vw,36px)] bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)] ${
+      className={`${card.span} relative m-0 overflow-hidden rounded-[clamp(22px,2.4vw,36px)] ${SURFACE[card.surface ?? 'plate']} ${
         tall ? 'aspect-[4/5]' : 'aspect-[4/3]'
       } min-[901px]:aspect-auto`}
     >
@@ -219,7 +239,7 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
           decoding="async"
         />
       ) : (
-        <div className={`absolute inset-0 m-auto flex items-center justify-center ${tall ? 'h-[86%] w-[86%]' : card.size ? `h-[84%] ${card.size} w-full` : 'h-[80%] w-[80%]'}`}>
+        <div className={`absolute inset-0 m-auto flex items-center justify-center ${tall ? 'h-[86%] w-[86%]' : card.span.includes('row-span-2') ? 'h-[92%] w-[94%]' : card.size ? `h-[84%] ${card.size} w-full` : 'h-[80%] w-[80%]'}`}>
           <img
             className="block h-auto max-h-full w-auto max-w-full object-contain"
             src={card.src}
