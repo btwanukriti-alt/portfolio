@@ -59,18 +59,26 @@ export default function GalleryCaseStudy({
               {meta}
             </Reveal>
             <div className="mt-6 flex items-center gap-[clamp(14px,2.2vw,32px)]">
-              {brand.mark && (
-                <span
-                  role="img"
-                  aria-label={`${title} logo`}
-                  className="block h-[clamp(56px,9vw,132px)] shrink-0 bg-[var(--c-accent)]"
-                  style={{
-                    aspectRatio: brand.mark.ratio,
-                    WebkitMask: `url(${brand.mark.src}) center / contain no-repeat`,
-                    mask: `url(${brand.mark.src}) center / contain no-repeat`,
-                  }}
-                />
-              )}
+              {brand.mark &&
+                (brand.mark.full ? (
+                  <img
+                    src={brand.mark.src}
+                    alt={`${title} logo`}
+                    className="block h-[clamp(56px,9vw,132px)] w-auto shrink-0"
+                    style={{ aspectRatio: brand.mark.ratio }}
+                  />
+                ) : (
+                  <span
+                    role="img"
+                    aria-label={`${title} logo`}
+                    className="block h-[clamp(56px,9vw,132px)] shrink-0 bg-[var(--c-accent)]"
+                    style={{
+                      aspectRatio: brand.mark.ratio,
+                      WebkitMask: `url(${brand.mark.src}) center / contain no-repeat`,
+                      mask: `url(${brand.mark.src}) center / contain no-repeat`,
+                    }}
+                  />
+                ))}
               <SplitReveal
                 as="h1"
                 className={`m-0 ${brand.font ? '[font-family:var(--c-font)]' : 'font-wordmark-zync'} text-[clamp(64px,12vw,184px)] leading-[0.95] font-bold tracking-[-0.035em] text-ink`}

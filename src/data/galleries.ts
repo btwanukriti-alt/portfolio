@@ -22,13 +22,21 @@ export type Brand = {
   // Font stack for the page title (default: the Zync wordmark font).
   font?: string
   // White-on-transparent mark in public/brand/, drawn in the accent colour with a CSS mask.
-  mark?: { src: string; ratio: number }
+  mark?: { src: string; ratio: number; full?: boolean }
 }
 
 type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[] }
 
 const ssh = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/ssh-client/${file}`,
+  width: 2400,
+  height,
+  alt,
+  caption,
+})
+
+const pf = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
+  src: `/case-studies/pulsefit-crm/${file}`,
   width: 2400,
   height,
   alt,
@@ -117,6 +125,31 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       jaadu('02-market.jpg', 1800, 'Regime gauge, coin stats, watchlist, trades and the trading journal as separate cards', 'Regime, market stats and the journal, each a card of its own.'),
       jaadu('03-alerts-search.jpg', 1800, 'The create-alert panel, two chart prompt states, coin search and indicators', 'Alerts with stacked conditions, and a prompt anchored to the chart.'),
       jaadu('04-quant-lab.jpg', 1710, 'An overnight campaign card, the library comparison table and equity curve, and the alerts list', 'Quant Lab narrows a night of strategy search to a shortlist.'),
+    ],
+  },
+  'bosch-customer-experience': {
+    studyKey: 'pulsefit-crm',
+    note: 'The software and the website are rebuilt for this portfolio with sample content. Every name and figure in them is sample data.',
+    brand: {
+      accent: '#0063F8',
+      deep: '#003A92',
+      soft: '#E6F0FF',
+      tint: '#DCCFFF',
+      pop: '#FFB800',
+      font: 'var(--font-hanken), system-ui, sans-serif',
+      // The original mark keeps its own colours, so it is drawn as an image rather than a mask.
+      mark: { src: '/brand/pulsefit-mark.svg', ratio: 20.48 / 22.28, full: true },
+    },
+    images: [
+      pf('01-logo.jpg', 1350, 'The Pulsefit logo on a construction grid with measurements and clear space', 'Logo first: every module draws from it.'),
+      pf('02-icon-palette.jpg', 1200, 'The app icon and the colour palette taken from the logo', 'One palette, taken from the logo.'),
+      pf('03-leads.jpg', 1500, 'A laptop showing the lead tasks screen beside the enlarged stale leads card', 'Each alert has its Follow up button.'),
+      pf('04-members.jpg', 1500, 'The member tasks screen on a laptop beside the enlarged expiring subscriptions card', 'Renew and Remind sit on the row.'),
+      pf('05-attendance.jpg', 1140, 'The attendance heatmap by hour and weekday with a callout on the busiest hour', 'Attendance by hour, with the busiest one marked.'),
+      pf('06-tables-forms.jpg', 1500, 'The staff table, create lead form, equipment table and a plan card as separate cards', 'One table pattern across modules.'),
+      pf('07-website.jpg', 1500, 'The Pulsefit homepage on a laptop beside the enlarged feature tabs', 'The homepage opens on the promise.'),
+      pf('08-pricing.jpg', 1050, 'Three pricing plans, Starter, Growth and Scale, on one plate', 'Three plans, one clear action each.'),
+      pf('09-website-cards.jpg', 1500, 'How it works steps, FAQ, a call to action and the lead follow-up flow as separate cards', 'Setup, questions and the follow-up flow, as cards.'),
     ],
   },
 }
