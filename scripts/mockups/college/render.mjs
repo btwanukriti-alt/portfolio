@@ -8,5 +8,6 @@ p.on('pageerror',e=>console.log('ERR',e.message))
 await p.addInitScript(`window.IMG=${JSON.stringify('file://'+img)}`)
 await p.goto('file://'+file);await p.waitForTimeout(2500)
 await p.evaluate(()=>window.build());await p.waitForTimeout(1500)
+await p.evaluate(()=>window.canvasify&&window.canvasify({ground:'#FFE4D3',star:'#4F86E8'}));await p.waitForTimeout(300)
 for(const [id,n] of names){await (await p.$('#'+id)).screenshot({path:`${out}/${n}.jpg`,type:'jpeg',quality:88})}
 await b.close()
