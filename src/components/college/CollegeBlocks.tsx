@@ -181,69 +181,71 @@ export function AttendanceTable() {
   return (
     <div className="flex h-full flex-col">
       <Head title="Employee attendance" note="Engineering College · today" />
-      <div className="mt-5 flex gap-1 overflow-x-auto border-b border-[#E6E9EF] pb-3">
-        {tabs.map(([label, n, cls], i) => (
-          <span
-            key={label}
-            className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-[13px] ${i === 0 ? `bg-[#F2F4F7] font-semibold ${ink}` : sub}`}
-          >
-            {label}
-            <span className={`rounded-md px-1.5 py-0.5 text-[11px] font-semibold tabular-nums ${cls}`}>{n.toLocaleString('en-IN')}</span>
-          </span>
-        ))}
-      </div>
-      <div className="mt-3 overflow-x-auto">
-        <div className="min-w-[760px]">
-          <div className={`grid grid-cols-[1.5fr_1fr_1.3fr_0.9fr_0.9fr_1fr] gap-4 px-3 py-2.5 text-[12px] font-medium ${sub}`}>
-            <span>Name</span>
-            <span>Division</span>
-            <span>Department</span>
-            <span>Check in</span>
-            <span>Check out</span>
-            <span className="text-right">Status</span>
-          </div>
-          {rows.map(([name, role, div, dept, id, cin, cout, status, late, early]) => (
-            <div key={id} className="grid grid-cols-[1.5fr_1fr_1.3fr_0.9fr_0.9fr_1fr] items-center gap-4 border-t border-[#EEF0F4] px-3 py-3">
-              <span className="flex items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#E6EDF9] text-[12px] font-semibold text-[#12326E]">
-                  {name
-                    .split(' ')
-                    .map((w) => w[0])
-                    .join('')}
-                </span>
-                <span className="flex min-w-0 flex-col leading-tight">
-                  <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
-                  <span className={`text-[12px] ${sub}`}>{role}</span>
-                </span>
-              </span>
-              <span>
-                <span className={`rounded-md px-2 py-1 text-[12px] font-medium ${division[div]}`}>{div}</span>
-              </span>
-              <span className="flex flex-col leading-tight">
-                <span className={`text-[13px] ${ink}`}>Engineering College</span>
-                <span className={`text-[12px] ${sub}`}>{dept}</span>
-              </span>
-              {cin && cout ? (
-                <>
-                  <span>{time(cin, late)}</span>
-                  <span>{time(cout, early)}</span>
-                  <span className="text-right">
-                    <span className="rounded-md bg-[#E3F5EC] px-2 py-1 text-[12px] font-semibold text-[#12805C]">{status}</span>
-                  </span>
-                </>
-              ) : (
-                <span
-                  className={`col-span-3 rounded-md px-3 py-1.5 text-right text-[12px] font-semibold ${
-                    status === 'Absent'
-                      ? 'bg-[linear-gradient(90deg,transparent,#FDE8E6)] text-[#B42318]'
-                      : 'bg-[linear-gradient(90deg,transparent,#FDF1D8)] text-[#A15C07]'
-                  }`}
-                >
-                  {status}
-                </span>
-              )}
-            </div>
+      <div className="mt-5 rounded-[20px] bg-white p-[clamp(12px,1.6vw,24px)] shadow-[0_10px_30px_-18px_rgba(16,24,40,0.25)]">
+        <div className="flex gap-1 overflow-x-auto border-b border-[#E6E9EF] pb-3">
+          {tabs.map(([label, n, cls], i) => (
+            <span
+              key={label}
+              className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 text-[13px] ${i === 0 ? `bg-[#F2F4F7] font-semibold ${ink}` : sub}`}
+            >
+              {label}
+              <span className={`rounded-md px-1.5 py-0.5 text-[11px] font-semibold tabular-nums ${cls}`}>{n.toLocaleString('en-IN')}</span>
+            </span>
           ))}
+        </div>
+        <div className="mt-3 overflow-x-auto">
+          <div className="min-w-[760px]">
+            <div className={`grid grid-cols-[1.5fr_1fr_1.3fr_0.9fr_0.9fr_1fr] gap-4 px-3 py-2.5 text-[12px] font-medium ${sub}`}>
+              <span>Name</span>
+              <span>Division</span>
+              <span>Department</span>
+              <span>Check in</span>
+              <span>Check out</span>
+              <span className="text-right">Status</span>
+            </div>
+            {rows.map(([name, role, div, dept, id, cin, cout, status, late, early]) => (
+              <div key={id} className="grid grid-cols-[1.5fr_1fr_1.3fr_0.9fr_0.9fr_1fr] items-center gap-4 border-t border-[#EEF0F4] px-3 py-3">
+                <span className="flex items-center gap-3">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#E6EDF9] text-[12px] font-semibold text-[#12326E]">
+                    {name
+                      .split(' ')
+                      .map((w) => w[0])
+                      .join('')}
+                  </span>
+                  <span className="flex min-w-0 flex-col leading-tight">
+                    <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
+                    <span className={`text-[12px] ${sub}`}>{role}</span>
+                  </span>
+                </span>
+                <span>
+                  <span className={`rounded-md px-2 py-1 text-[12px] font-medium ${division[div]}`}>{div}</span>
+                </span>
+                <span className="flex flex-col leading-tight">
+                  <span className={`text-[13px] ${ink}`}>Engineering College</span>
+                  <span className={`text-[12px] ${sub}`}>{dept}</span>
+                </span>
+                {cin && cout ? (
+                  <>
+                    <span>{time(cin, late)}</span>
+                    <span>{time(cout, early)}</span>
+                    <span className="text-right">
+                      <span className="rounded-md bg-[#E3F5EC] px-2 py-1 text-[12px] font-semibold text-[#12805C]">{status}</span>
+                    </span>
+                  </>
+                ) : (
+                  <span
+                    className={`col-span-3 rounded-md px-3 py-1.5 text-right text-[12px] font-semibold ${
+                      status === 'Absent'
+                        ? 'bg-[linear-gradient(90deg,transparent,#FDE8E6)] text-[#B42318]'
+                        : 'bg-[linear-gradient(90deg,transparent,#FDF1D8)] text-[#A15C07]'
+                    }`}
+                  >
+                    {status}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
