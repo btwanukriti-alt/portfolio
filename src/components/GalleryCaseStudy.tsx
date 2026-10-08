@@ -2,11 +2,12 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import type { Project } from '@/data/projects'
 import type { CaseStudy } from '@/data/caseStudies'
-import type { Brand, GalleryImage } from '@/data/galleries'
+import type { BentoCard, Brand, GalleryImage, GallerySection } from '@/data/galleries'
 import SiteHeader from './SiteHeader'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
 import { Reveal, SplitReveal } from './Reveal'
+import { ZYNC_BLOCKS } from './zync/ZyncBlocks'
 
 // Visual-first case study page (the mockup-showcase layout): the description is short and sits on
 // top, the mockups run in one long gallery below. The project's own colours come in as CSS
@@ -17,12 +18,14 @@ export default function GalleryCaseStudy({
   brand,
   note,
   images,
+  sections,
 }: {
   project: Project
   study: CaseStudy
   brand: Brand
   note: string
   images: GalleryImage[]
+  sections?: GallerySection[]
 }) {
   const vars = {
     '--c-accent': brand.accent,
@@ -111,23 +114,41 @@ export default function GalleryCaseStudy({
           {note}
         </p>
 
-        <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
-          {images.map((img, i) => (
-            <li key={img.src}>
-              <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(18px,2.4vw,36px)] bg-[#eef0f5]">
-                <img
-                  className="block h-auto w-full"
-                  src={img.src}
-                  width={img.width}
-                  height={img.height}
-                  alt={img.alt}
-                  loading={i < 2 ? 'eager' : 'lazy'}
-                  decoding="async"
-                />
-              </Reveal>
-            </li>
-          ))}
-        </ol>
+        {sections ? (
+          <div className="mt-6 flex flex-col gap-[clamp(40px,7vh,88px)]">
+            {sections.map((section, i) => (
+              <section
+                key={section.label}
+                aria-label={section.label}
+                className={`grid grid-cols-1 gap-[clamp(12px,1.4vw,20px)] min-[901px]:grid-cols-12 ${
+                  section.rows === 3 ? 'min-[901px]:grid-rows-[repeat(3,clamp(300px,28vw,420px))]' : 'min-[901px]:grid-rows-[repeat(2,clamp(300px,28vw,420px))]'
+                }`}
+              >
+                {section.cards.map((card, j) => (
+                  <Bento key={j} card={card} eager={i === 0 && j < 2} />
+                ))}
+              </section>
+            ))}
+          </div>
+        ) : (
+          <ol className="m-0 mt-6 flex list-none flex-col gap-[clamp(12px,1.6vw,24px)] p-0">
+            {images.map((img, i) => (
+              <li key={img.src}>
+                <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(18px,2.4vw,36px)] bg-[#eef0f5]">
+                  <img
+                    className="block h-auto w-full"
+                    src={img.src}
+                    width={img.width}
+                    height={img.height}
+                    alt={img.alt}
+                    loading={i < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                </Reveal>
+              </li>
+            ))}
+          </ol>
+        )}
 
         <Reveal className="mt-[clamp(72px,12vh,140px)] grid grid-cols-1 gap-10 border-t border-line pt-8 min-[901px]:grid-cols-2 min-[901px]:gap-16">
           <div>
@@ -156,5 +177,60 @@ export default function GalleryCaseStudy({
 
       <Contact current={project.slug} />
     </div>
+  )
+}
+
+// One bento card: a UI component on a soft plate with room around it, or the feature's text box.
+function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
+  if (card.kind === 'text') {
+    return (
+      <Reveal className={`${card.span} flex flex-col justify-end rounded-[clamp(22px,2.4vw,36px)] bg-[var(--c-accent)] p-[clamp(28px,3.2vw,52px)] text-white`}>
+        <p className="m-0 text-[12px] leading-none font-semibold tracking-[0.1em] text-white/70 uppercase">{card.kicker}</p>
+        <h3 className="m-0 mt-4 text-[clamp(28px,2.7vw,44px)] leading-[1.08] font-light tracking-[-0.025em]">{card.title}</h3>
+        <p className="m-0 mt-4 max-w-[36ch] text-[clamp(15px,1.1vw,17px)] leading-[1.55] text-white/85">{card.text}</p>
+      </Reveal>
+    )
+  }
+  if (card.kind === 'block') {
+    const Block = ZYNC_BLOCKS[card.block]
+    return (
+      <Reveal as="figure" className={`${card.span} m-0 rounded-[clamp(22px,2.4vw,36px)] bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] p-[clamp(22px,2.6vw,40px)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)]`}>
+        <figcaption className="sr-only">{card.label}</figcaption>
+        <Block />
+      </Reveal>
+    )
+  }
+  const tall = card.span.includes('row-span-2')
+  return (
+    <Reveal
+      as="figure"
+      className={`${card.span} relative m-0 overflow-hidden rounded-[clamp(22px,2.4vw,36px)] bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)] ${
+        tall ? 'aspect-[4/5]' : 'aspect-[4/3]'
+      } min-[901px]:aspect-auto`}
+    >
+      {card.fit === 'top' ? (
+        <img
+          className="absolute top-[12%] left-1/2 block h-auto w-[min(62%,300px)] -translate-x-1/2"
+          src={card.src}
+          width={card.width}
+          height={card.height}
+          alt={card.alt}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      ) : (
+        <div className={`absolute inset-0 m-auto flex items-center justify-center ${tall ? 'h-[86%] w-[86%]' : card.size ? `h-[84%] ${card.size} w-full` : 'h-[80%] w-[80%]'}`}>
+          <img
+            className="block h-auto max-h-full w-auto max-w-full object-contain"
+            src={card.src}
+            width={card.width}
+            height={card.height}
+            alt={card.alt}
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        </div>
+      )}
+    </Reveal>
   )
 }

@@ -25,7 +25,19 @@ export type Brand = {
   mark?: { src: string; ratio: number; full?: boolean }
 }
 
-type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[] }
+// Bento page (Zync): each feature is a two-row grid of cards. A 'ui' card holds one transparent
+// component image from public/case-studies/<folder>/ui/ with room around it; a 'text' card is the
+// feature's text box; a 'block' card is a component rebuilt in React. `span` holds the card's grid classes on the 12-column desktop grid.
+export type BentoCard =
+  | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top'; size?: string }
+  | { kind: 'text'; kicker: string; title: string; text: string; span: string }
+  // A component rebuilt in React (src/components/zync/ZyncBlocks.tsx); the card is its surface.
+  | { kind: 'block'; block: string; label: string; span: string }
+
+// rows: how many grid rows the section uses on desktop (2 by default, or 3).
+export type GallerySection = { label: string; rows?: 2 | 3; cards: BentoCard[] }
+
+type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[]; sections?: GallerySection[] }
 
 const ssh = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/ssh-client/${file}`,
@@ -43,13 +55,19 @@ const pf = (file: string, height: number, alt: string, caption: string): Gallery
   caption,
 })
 
-const zync = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
-  src: `/case-studies/zync/${file}`,
-  width: 2400,
+const ui = (file: string, width: number, height: number, alt: string, span: string, fitOrSize?: string): BentoCard => ({
+  kind: 'ui',
+  src: `/case-studies/zync/ui/${file}.webp`,
+  width,
   height,
   alt,
-  caption,
+  span,
+  ...(fitOrSize === 'top' ? { fit: 'top' as const } : fitOrSize ? { size: fitOrSize } : {}),
 })
+
+const text = (kicker: string, title: string, body: string, span: string): BentoCard => ({ kind: 'text', kicker, title, text: body, span })
+
+const block = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span })
 
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
@@ -63,7 +81,7 @@ const jaadu = (file: string, height: number, alt: string, caption: string): Gall
 export const GALLERIES: Record<string, GalleryConfig> = {
   'fitness-tracker': {
     studyKey: 'zync',
-    note: 'Screens are refined for this portfolio, and the figures in them are sample data. The last image shows five earlier Home layouts next to the refined one.',
+    note: 'Screens are refined for this portfolio, and the figures in them are sample data.',
     brand: {
       accent: '#644ACD',
       deep: '#3E2B94',
@@ -72,17 +90,53 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pop: '#F5577D',
       mark: { src: '/brand/zync-mark.png', ratio: 170 / 188 },
     },
-    images: [
-      zync('01-home.jpg', 1500, 'A phone showing the Zync Home screen beside the enlarged calorie card', 'Your day, at a glance.'),
-      zync('02-checkin.jpg', 1500, 'A large QR check-in card beside the Gym tab on a phone', 'Check in with one tap.'),
-      zync('03-classes.jpg', 1500, 'Three class cards (available, full, booked) beside the Gym Events screen', 'Status before the tap.'),
-      zync('04-log.jpg', 1500, 'The Log shortcuts, quick-add chips, water stepper, hydration ring and chart as separate cards', 'Log in two taps.'),
-      zync('05-trackers.jpg', 1500, 'Sleep ring, food gauge, macros and the weekly water and sleep charts as separate cards', 'Water, sleep and food follow one pattern.'),
-      zync('06-workout.jpg', 1500, 'A workout plan card beside the workout detail screen on a phone', 'Plans show level and length.'),
-      zync('07-stats.jpg', 1050, 'Four daily stat tiles and a class table, each as its own component', 'Today at a glance, and the class list.'),
-      zync('08-brand.jpg', 1350, 'The Zync logo on a construction grid with measurements and clear space', 'Colour and type were set before any screen.'),
-      zync('09-icon.jpg', 1200, 'The Zync app icon and the colour palette', 'The app icon and palette.'),
-      zync('10-layouts.jpg', 1050, 'Five earlier Home layouts next to the refined Home', 'Five Home layouts tried, then one refined.'),
+    images: [],
+    // The flow: the brand, then the main feature (Home), then the features around it.
+    sections: [
+      {
+        label: 'Brand',
+        cards: [
+          ui('logo', 4824, 2748, 'The Zync logo on its construction grid, with measurements and clear space', 'col-span-12', 'max-w-[78%]'),
+          ui('icon', 2484, 2448, 'The Zync app icon inside concentric squares', 'min-[901px]:col-span-4'),
+          block('palette', 'The Zync colour palette: primary, deep, accent and the tracker colours', 'min-[901px]:col-span-8'),
+        ],
+      },
+      {
+        label: 'Main feature: Home',
+        cards: [
+          ui('phone-home', 1542, 2904, 'The Zync Home screen on a phone', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          text('Main feature · Home', 'The whole day on one screen', 'Calories burned and eaten against the goal, steps, BMI and the next class. A member reads the day before the first scroll.', 'min-[901px]:col-span-4'),
+          block('calories', 'The calorie ring: 900 of 1,200 cal burned, split by activity', 'min-[901px]:col-span-4'),
+          block('consumed', 'The Consumed side of the calorie card: 1,385 of 2,250 cal, split into carbs, fat and protein', 'min-[901px]:col-span-8'),
+        ],
+      },
+      {
+        label: 'Gym',
+        cards: [
+          ui('phone-gym', 1542, 2904, 'The Gym tab on a phone, with the check-in card and upcoming classes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          block('checkin', 'The check-in QR card', 'min-[901px]:col-span-4'),
+          text('Gym · Check-in and classes', 'Check in, then book', 'The QR is one tap from the Gym tab. Each class says book, join the waitlist or booked before the tap.', 'min-[901px]:col-span-4'),
+          block('classes', 'Three classes: one to book, one full with a waitlist, one booked', 'min-[901px]:col-span-8'),
+        ],
+      },
+      {
+        label: 'Log: water and food',
+        rows: 3,
+        cards: [
+          text('Log · Water and food', 'Water and food read the same way', 'Today against the goal comes first: a ring for water, a gauge for calories. Quick amounts and meals sit right below.', 'min-[901px]:col-span-4'),
+          ui('phone-water', 1542, 2904, 'The Hydration screen with the intake ring and glass sizes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          ui('phone-food', 1542, 2904, 'The Food log screen with the calorie gauge, macros and meals', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          block('hydration', 'The hydration ring with quick amounts and the glass stepper', 'min-[901px]:col-span-4'),
+          block('food', 'The food log: 1,385 of 2,250 cal, macros and the meals logged today', 'col-span-12'),
+        ],
+      },
+      {
+        label: 'Workouts',
+        cards: [
+          ui('phone-workout', 1542, 2904, 'The workout detail screen with duration, session, level and the exercise list', 'min-[901px]:col-span-5 min-[901px]:row-span-2'),
+          block('plans', 'Suggested workout plans with length, session time and tags', 'min-[901px]:col-span-7 min-[901px]:row-span-2'),
+        ],
+      },
     ],
   },
   'ssh-client': {
