@@ -4,19 +4,19 @@
 @font-face{font-family:Geist;font-weight:500;src:url(node_modules/@fontsource/geist/files/geist-latin-500-normal.woff2)}
 body{margin:0;background:#fff}
 .pg{position:relative;width:1600px;overflow:hidden;margin:0 0 60px;background:#B0C1CE;font-family:Geist,sans-serif}
-.t{position:absolute;overflow:hidden;border-radius:36px;background:linear-gradient(180deg,#323A4B,#2B3241);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 1px 0 rgba(255,255,255,.08)}
+.t{position:absolute;overflow:hidden;border-radius:36px;background:linear-gradient(180deg,#C4D2DC,#BCCBD6);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),inset 0 1px 0 rgba(255,255,255,.7)}
 .t .cap{position:absolute;left:44px;right:44px;bottom:40px;z-index:4}
-.t .cap h3{margin:0;font:500 30px/1.15 Geist;color:#EEF2FA;letter-spacing:-.02em}
-.t .cap p{margin:10px 0 0;font:400 18px/1.5 Geist;color:#98A3BA;max-width:520px}
-.t .fade{position:absolute;left:0;right:0;bottom:0;z-index:3;background:linear-gradient(180deg,rgba(43,50,65,0),#2B3241 62%)}
+.t .cap h3{margin:0;font:500 30px/1.15 Geist;color:#16202F;letter-spacing:-.02em}
+.t .cap p{margin:10px 0 0;font:400 18px/1.5 Geist;color:#4B5A6E;max-width:520px}
+.t .fade{position:absolute;left:0;right:0;bottom:0;z-index:3;background:linear-gradient(180deg,rgba(188,203,214,0),#BCCBD6 62%)}
 .c{position:absolute;z-index:2;display:block;border-radius:18px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
 .glow{position:absolute;z-index:2;border-radius:30px;padding:16px;background:linear-gradient(135deg,#7FB6FF,#3D6BFF 40%,#2346C8);box-shadow:0 0 70px -10px rgba(70,120,255,.55)}
 .glow img{display:block;border-radius:16px}
-.ghost{position:absolute;z-index:1;border-radius:32px;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.02)}
+.ghost{position:absolute;z-index:1;border-radius:32px;border:2px solid rgba(22,32,47,.18);background:rgba(255,255,255,.12)}
 .wide .side{position:absolute;left:56px;top:0;bottom:0;width:440px;display:flex;flex-direction:column;justify-content:center}
-.wide .side h3{margin:0;font:500 44px/1.12 Geist;color:#EEF2FA;letter-spacing:-.025em}
-.wide .side p{margin:20px 0 0;font:400 20px/1.55 Geist;color:#98A3BA}
-.stackbar{position:absolute;z-index:1;border-radius:0 0 22px 22px;background:#1B2236;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.wide .side h3{margin:0;font:500 44px/1.12 Geist;color:#16202F;letter-spacing:-.025em}
+.wide .side p{margin:20px 0 0;font:400 20px/1.55 Geist;color:#4B5A6E}
+.stackbar{position:absolute;z-index:1;border-radius:0 0 22px 22px;background:#22304F;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
 </style>
 <div id="root"></div>
 <script>
@@ -24,7 +24,7 @@ const F='feat/'
 const P=(id,h,inner)=>`<div class="pg" id="${id}" style="height:${h}px">${inner}</div>`
 const T=(l,t,w,h,inner,title,body,fade=170)=>`<div class="t" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px">${inner}<div class="fade" style="height:${fade}px"></div><div class="cap"><h3>${title}</h3><p>${body}</p></div></div>`
 const im=(n,w,l,t,r=18)=>`<img class="c" src="${F}${n}.png" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px">`
-const cursor=(l,t)=>`<svg style="position:absolute;left:${l}px;top:${t}px;z-index:3;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))" width="46" height="50" viewBox="0 0 20 22"><path d="M2 1.5l15 8.2-6.6 1.6-3.2 6.4z" fill="#EEF2FA" stroke="#2B3241" stroke-width="1.2" stroke-linejoin="round"/></svg>`
+const cursor=(l,t)=>`<svg style="position:absolute;left:${l}px;top:${t}px;z-index:3;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))" width="46" height="50" viewBox="0 0 20 22"><path d="M2 1.5l15 8.2-6.6 1.6-3.2 6.4z" fill="#FFFFFF" stroke="#16202F" stroke-width="1.2" stroke-linejoin="round"/></svg>`
 const S=[]
 // Page 1: footprint (stacked frames, glow) + regime, then alerts, strategy card, chart prompt
 S.push(P('p1',1440,
@@ -34,7 +34,7 @@ S.push(P('p1',1440,
    'Footprint chart','Each candle splits into price bins, with the volume traded in each.',300)+
  T(1020,40,540,720,im('c-regime',700,40,150,40),'Regime','Sideways, breakout, volatile or reversal, read live beside the chart.',230)+
  T(40,780,500,620,im('c-alert',1300,40,90,14),'Multi-condition alerts','Price, POC, footprint and regime, firing only when all of them hold.',220)+
- T(560,780,480,620,`<div class="stackbar" style="left:90px;top:520px;width:300px;height:26px"></div><div class="stackbar" style="left:70px;top:498px;width:340px;height:26px;background:#212A42"></div>`+im('card1',380,50,80,22),'Strategy cards','Win rate, drawdown and equity curve for every strategy.',200)+
+ T(560,780,480,620,`<div class="stackbar" style="left:90px;top:520px;width:300px;height:26px"></div><div class="stackbar" style="left:70px;top:498px;width:340px;height:26px;background:#2B3B60"></div>`+im('card1',380,50,80,22),'Strategy cards','Win rate, drawdown and equity curve for every strategy.',200)+
  T(1060,780,500,620,im('c-prompt-typing',560,40,120,26)+im('c-prompt-suggested',560,40,270,26)+cursor(340,330),'Ask the chart','Tap any point and ask why price moved there.',200)))
 // Page 2: wide Overnight Discoveries, then comparison + deja vu
 S.push(P('p2',1220,
