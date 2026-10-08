@@ -36,10 +36,10 @@ const NODES = [
   [0, 100],
 ]
 
-// Figma's pen tool, nib down, so it reads as the apostrophe in "Let's". Nib tip at (12, 32).
+// Figma's pen tool, nib down and tilted around its tip, so it reads as the apostrophe in "Let's". Nib tip at (12, 32).
 function PenIcon() {
   return (
-    <svg viewBox="0 0 24 32" className="block h-full w-full overflow-visible" aria-hidden="true">
+    <svg viewBox="0 0 24 32" className="block h-full w-full origin-bottom rotate-[18deg] overflow-visible" aria-hidden="true">
       <rect x="5" y="0" width="14" height="4" fill={SELECT} />
       <path d="M5 5h14l3.5 13L12 32 1.5 18z" fill="#fff" />
       <path d="M12 32V19" stroke="#0b0b0c" strokeWidth="1.6" strokeLinecap="round" />
