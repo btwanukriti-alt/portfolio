@@ -1,0 +1,54 @@
+<!doctype html><meta charset="utf-8">
+<style>
+body{margin:0;background:#fff}
+.bd{position:relative;width:1600px;overflow:hidden;margin:0 0 60px;background:radial-gradient(1100px 760px at 15% 0%,rgba(30,90,255,.16),rgba(30,90,255,0) 70%),radial-gradient(1000px 700px at 95% 100%,rgba(0,140,255,.10),rgba(0,140,255,0) 70%),linear-gradient(160deg,#01072A 0%,#01041A 55%,#000210 100%)}
+.it{position:absolute;display:block;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
+.sc{position:absolute;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.sc img{display:block;width:100%}
+.tl{position:absolute;overflow:hidden;border-radius:36px;background:linear-gradient(180deg,rgba(90,140,255,.10),rgba(90,140,255,.03));box-shadow:inset 0 0 0 1px rgba(150,190,255,.14),inset 0 1px 0 rgba(255,255,255,.12)}
+.tl img{position:absolute;display:block;filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+.tl::after,.sc::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;z-index:5;background:linear-gradient(135deg,#ffffff 0%,#8fd3ff 12%,rgba(90,140,255,.35) 35%,rgba(90,140,255,.08) 55%,rgba(90,140,255,.35) 78%,#6fb8ff 92%,#e6f4ff 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.tl,.sc{box-shadow:0 0 40px -10px rgba(80,150,255,.45),inset 0 1px 0 rgba(255,255,255,.12)!important}
+</style>
+<div id="root"></div>
+<script>
+const T='tight/',R='real/'
+const SZ={'c-regime':[1080,501],'c-crypto':[1080,648],'c-watch':[1080,507],'c-trades':[1080,561],'c-prompt-suggested':[1140,404],'c-prompt-typing':[1140,314],'c-prompt-generating':[1140,344],'c-diary':[738,1544],'c-create-alert':[624,953],'c-coin-search':[694,678],'c-indicators':[1342,1170]}
+// columns: [x, width, startY, [names]]
+function board(id,h,cols,gap=28){let o='';for(const [x,w,y0,names] of cols){let y=y0;for(const n of names){const [iw,ih]=SZ[n];const hh=w*ih/iw;o+=`<img class="it" src="${T}${n}.png" style="left:${x}px;top:${y}px;width:${w}px">`;y+=hh+gap}}return `<div class="bd" id="${id}" style="height:${h}px">${o}</div>`}
+const B=[]
+// board 1: market panels and chart prompt
+B.push(board('b1',880,[[60,500,40,['c-regime','c-crypto','c-trades']],[588,500,60,['c-watch','c-prompt-suggested','c-prompt-typing','c-prompt-generating']],[1116,424,40,['c-diary']]]))
+// board 2: create alert, coin search, indicators
+B.push(board('b2',820,[[60,500,30,['c-create-alert']],[588,460,186,['c-coin-search']],[1076,464,208,['c-indicators']]]))
+// screens: flat, black ground
+const sc=(id,h,src,w,l,t,crop='')=>`<div class="bd" id="${id}" style="height:${h}px"><div class="sc" style="left:${l}px;top:${t}px;width:${w}px">${crop||`<img src="${R}${src}">`}</div></div>`
+B.push(sc('b3',1000,'s-footprint.png',1440,80,80))
+B.push(sc('b4',1000,'s-overnight.png',1440,80,80))
+B.push(sc('b5',1000,'s-library.png',1440,80,80))
+B.push(sc('b6',840,'',1440,80,80,`<div style="height:780px;overflow:hidden"><img src="${R}s-alerts.png" style="width:1900px;max-width:none;margin-left:-210px;margin-top:-460px"></div>`))
+B.push(`<div class="bd" id="b7" style="height:1000px"><div class="sc" style="left:150px;top:80px;width:470px;border-radius:52px"><img src="${R}s-mobile.png"></div><div class="sc" style="left:690px;top:80px;width:1100px"><img src="${R}s-tablet.png"></div></div>`)
+
+const tile=(l,t,w,h,inner)=>`<div class="tl" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px">${inner}</div>`
+const im=(n,w,l,t,dir=T)=>`<img src="${dir}${n}.png" style="left:${l}px;top:${t}px;width:${w}px">`
+const cen=(n,w,tw,th)=>{const [iw,ih]=SZ[n];const h=w*ih/iw;return im(n,w,(tw-w)/2,(th-h)/2)}
+const bento=(id,h,tiles)=>`<div class="bd" id="${id}" style="height:${h}px">${tiles.join('')}</div>`
+const BB=[]
+BB.push(bento('g1',1200,[
+ tile(40,40,740,520,cen('c-regime',640,740,520)),
+ tile(800,40,760,520,cen('c-crypto',600,760,520)),
+ tile(40,580,480,580,cen('c-watch',420,480,580)),
+ tile(540,580,560,580,cen('c-trades',500,560,580)),
+ tile(1120,580,440,580,im('c-diary',380,30,50))]))
+BB.push(bento('g2',1200,[
+ tile(40,40,560,1120,cen('c-create-alert',480,560,1120)),
+ tile(620,40,940,540,im('c-prompt-suggested',640,150,70)+im('c-prompt-typing',640,150,320)),
+ tile(620,600,460,560,cen('c-coin-search',400,460,560)),
+ tile(1100,600,460,560,cen('c-indicators',400,460,560))]))
+BB.push(bento('g3',1140,[
+ tile(40,40,1520,560,`<img src="${R}s-overnight.png" style="left:-648px;top:-400px;width:2160px;border-radius:20px">`),
+ tile(40,620,740,480,`<img src="${R}s-library.png" style="left:-380px;top:-130px;width:1152px;border-radius:20px">`),
+ tile(800,620,760,480,`<img src="${R}s-alerts.png" style="left:-120px;top:-250px;width:1040px;border-radius:20px">`)]))
+window.BB=BB
+document.getElementById('root').innerHTML=window.BB.join('')+B.join('')
+</script>
