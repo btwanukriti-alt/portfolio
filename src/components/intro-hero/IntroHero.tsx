@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { caseStudyHref } from '@/data/projects'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 import { getLenis } from '../SmoothScroll'
+import NavBar from '../NavBar'
+import { EMAIL as CONTACT_EMAIL } from '@/data/site'
 import {
   Spring,
   clamp,
@@ -34,13 +36,7 @@ import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 // screens into a ring around the headline, then scatters them at different depths around a short
 // About paragraph.
 
-const EMAIL = 'mailto:hey@anukritimishra.xyz'
-
-const NAV = [
-  { label: 'Work', href: '#work' },
-  { label: 'About', href: '#about' },
-  { label: 'Contact', href: EMAIL },
-]
+const EMAIL = `mailto:${CONTACT_EMAIL}`
 
 const LINE_1 = 'Hello, I am Anukriti.'
 const LINE_2 = 'Experience Designer'
@@ -81,9 +77,6 @@ const springEase = (t: number) => {
   const wd = omega * Math.sqrt(1 - zeta * zeta)
   return 1 - Math.exp(-zeta * omega * t) * (Math.cos(wd * t) + ((zeta * omega) / wd) * Math.sin(wd * t))
 }
-
-const pill =
-  'rounded-full border border-[#0d0d0c1f] px-3.5 py-2 font-hero-mono text-[11px] tracking-[0.08em] uppercase transition-colors hover:border-ink/35 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
 const lineType =
   'font-hero text-[clamp(34px,4.8vw,72px)] max-[719px]:text-[7.6vw] leading-[1.12] font-normal tracking-[-0.035em] whitespace-nowrap text-ink'
@@ -886,27 +879,8 @@ export default function IntroHero() {
     <section ref={section} id="welcome" aria-label="Introduction" className="relative bg-paper" style={{ height: HERO_HEIGHT }}>
       <h1 className="sr-only">Anukriti Mishra, experience designer</h1>
       <div className="sticky top-0 h-svh min-h-[320px] overflow-hidden">
-        <header
-          ref={header}
-          className="invisible absolute inset-x-0 top-0 z-[500] grid grid-cols-[1fr_auto] items-center px-4 py-5 font-hero text-[13px] text-ink sm:px-10 md:grid-cols-[1fr_auto_1fr]"
-        >
-          <a href="#welcome" className="inline-flex items-center gap-2.5 text-[15px] font-medium">
-            <span className="size-[9px] rounded-full bg-ink shadow-[0_0_0_3px_rgba(13,13,12,.1)]" />
-            Anukriti
-          </a>
-          <nav className="hidden gap-7 text-muted md:flex" aria-label="Primary">
-            {NAV.map(({ label, href }) => (
-              <a key={label} href={href} className="group relative transition-colors hover:text-ink">
-                {label}
-                <span className="absolute inset-x-0 -bottom-1 h-px origin-right scale-x-0 bg-current transition-transform duration-500 ease-[cubic-bezier(.2,.7,.1,1)] group-hover:origin-left group-hover:scale-x-100" />
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center justify-end gap-2">
-            <button type="button" onClick={replay} className={`${pill} text-muted`}>
-              Replay
-            </button>
-          </div>
+        <header ref={header} className="invisible absolute inset-x-0 top-0 z-[500]">
+          <NavBar home onReplay={replay} />
         </header>
 
         <Scene key={run} scrollRoot={section} />
