@@ -8,10 +8,10 @@ body{margin:0;background:#fff}
 .rim::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;z-index:5;background:linear-gradient(135deg,#ffffff 0%,#8fd3ff 12%,rgba(90,140,255,.35) 35%,rgba(90,140,255,.08) 55%,rgba(90,140,255,.35) 78%,#6fb8ff 92%,#e6f4ff 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .tl{position:absolute;overflow:hidden;border-radius:36px;background:linear-gradient(180deg,rgba(90,140,255,.10),rgba(90,140,255,.03));box-shadow:0 0 40px -10px rgba(80,150,255,.45)}
 .tl img{position:absolute;display:block;border-radius:18px;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
-.ex{position:absolute;border-radius:36px;padding:56px 52px;box-sizing:border-box;background:linear-gradient(160deg,rgba(90,140,255,.16),rgba(90,140,255,.05));box-shadow:0 0 40px -10px rgba(80,150,255,.45);color:#F1F6FF}
-.ex .lb{font:600 18px Geist;letter-spacing:.14em;color:#5CB5FF;text-transform:uppercase}
-.ex h3{font:500 46px/1.1 Geist;margin:18px 0 0;letter-spacing:-.02em}
-.ex p{font:400 22px/1.55 Geist;color:#A7BCE4;margin:22px 0 0}
+.ex{position:absolute;padding:56px 8px;box-sizing:border-box;color:#F1F6FF;display:flex;flex-direction:column;justify-content:center}
+.ex .lb{font:500 19px Geist;color:#6F86B8}
+.ex h3{font:500 44px/1.12 Geist;margin:14px 0 0;letter-spacing:-.025em}
+.ex p{font:400 21px/1.55 Geist;color:#8FA3CC;margin:18px 0 0;max-width:640px}
 .ex ul{margin:26px 0 0;padding:0;list-style:none}
 .ex li{font:400 20px/1.45 Geist;color:#D6E2FA;padding:12px 0 12px 30px;position:relative;border-top:1px solid rgba(150,190,255,.14)}
 .ex li:before{content:'';position:absolute;left:4px;top:22px;width:10px;height:10px;border-radius:50%;background:#5985FF;box-shadow:0 0 10px #5985FF}
@@ -25,7 +25,7 @@ const F='feat/'
 const M=(id,h,inner)=>`<div class="bd" id="${id}" style="height:${h}px">${inner}</div>`
 const tile=(l,t,w,h,inner)=>`<div class="tl rim" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px">${inner}</div>`
 const img=(n,w,l,t,r=18)=>`<img src="${F}${n}.png" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px">`
-const ex=(l,t,w,h,lb,title,body,items=[])=>`<div class="ex rim" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><div class="lb">${lb}</div><h3>${title}</h3><p>${body}</p>${items.length?`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}</div>`
+const ex=(l,t,w,h,lb,title,body,items=[])=>`<div class="ex" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><div class="lb">${lb}</div><h3>${title}</h3><p>${body}</p></div>`
 const call=(x1,y1,x2,y2,c,txt,cx,cy)=>`<svg class="dl" width="1600" height="1200"><path d="M${x1} ${y1} L${x2} ${y2}" fill="none" stroke="#9FB4E8" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="9" fill="${c}" stroke="#fff" stroke-width="3"/></svg><div class="chip" style="--c:${c};left:${cx}px;top:${cy}px"><i></i>${txt}</div>`
 const S=[]
 // 1 Footprint, zoomed
