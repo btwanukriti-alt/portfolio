@@ -172,7 +172,7 @@ function CollegeCaseStudy() {
             <li key={image.src}>
               <Reveal as="figure" className="m-0 overflow-hidden rounded-[clamp(12px,1.4vw,20px)]">
                   <img
-                    className="-my-[2.5%] block h-auto w-full"
+                    className="block h-auto w-full"
                     src={image.src}
                     width={image.width}
                     height={image.height}
