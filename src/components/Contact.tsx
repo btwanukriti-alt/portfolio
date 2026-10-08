@@ -6,7 +6,7 @@ import { Reveal } from './Reveal'
 import { getLenis } from './SmoothScroll'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
-import { EMAIL, LINKEDIN, LINKEDIN_ID } from '@/data/site'
+import { EMAIL, LINKEDIN } from '@/data/site'
 
 // Contact footer: a black frame, selected like a Figma layer, that says "Let's BUILD". The D is
 // drawn with the pen tool, its curve dragged out by a handle, then let go so it shakes back.
@@ -123,8 +123,9 @@ function Shapes() {
   )
 }
 
-const social =
-  'text-muted no-underline transition-colors hover:text-ink focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent'
+// Square icon buttons, like the Resume button.
+const iconButton =
+  'grid size-10 place-items-center border border-line text-ink no-underline transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent'
 
 // On a case study page, `current` is its slug: the footer then links to the other projects.
 export default function Contact({ current }: { current?: string } = {}) {
@@ -199,34 +200,33 @@ export default function Contact({ current }: { current?: string } = {}) {
         )}
       </section>
 
-      {/* Site footer: copyright, socials, back to top. */}
-      <footer className="mx-auto mt-[clamp(40px,6vh,72px)] flex max-w-[var(--max)] flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-line px-[var(--gutter)] py-7 font-body text-[14px] leading-none">
-        <p className="m-0 flex items-baseline gap-3">
-          <span className="text-[16px] font-medium tracking-[-0.02em] text-ink">Anukriti Mishra</span>
-          <span className="text-faint">© {new Date().getFullYear()}</span>
+      {/* Site footer: name on the left, copyright in the centre, socials and back to top as icons. */}
+      <footer className="mx-auto mt-[clamp(40px,6vh,72px)] grid max-w-[var(--max)] grid-cols-[1fr_auto] items-center gap-4 border-t border-line px-[var(--gutter)] py-6 font-body text-[14px] leading-none min-[641px]:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="inline-flex items-center gap-2.5 justify-self-start text-[16px] font-medium tracking-[-0.02em] text-ink no-underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+          <span aria-hidden className="size-[9px] rounded-full bg-ink shadow-[0_0_0_3px_rgba(13,13,12,.1)]" />
+          Anukriti Mishra
+        </Link>
+        <p className="col-span-2 row-start-2 m-0 text-center text-faint min-[641px]:col-span-1 min-[641px]:row-start-auto">
+          © {new Date().getFullYear()} Anukriti Mishra
         </p>
-        <ul className="m-0 flex list-none items-center gap-6 p-0" aria-label="Socials">
-          <li>
-            <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className={social}>
-              LinkedIn{LINKEDIN_ID && <span className="text-faint"> · in/{LINKEDIN_ID}</span>}
-            </a>
-          </li>
-          <li>
-            <a href={`mailto:${EMAIL}`} className={social}>
-              {EMAIL}
-            </a>
-          </li>
-        </ul>
-        <button
-          type="button"
-          onClick={toTop}
-          className="group inline-flex items-center gap-1.5 text-muted transition-colors hover:text-ink focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        >
-          Back to top
-          <span aria-hidden className="transition-transform duration-300 group-hover:-translate-y-[2px]">
-            ↑
-          </span>
-        </button>
+        <div className="flex items-center justify-end gap-2">
+          <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={iconButton}>
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.75h4v11H3zM9.5 9.75h3.8v1.5h.06c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1v5.45h-4v-4.83c0-1.15-.02-2.63-1.6-2.63-1.6 0-1.85 1.25-1.85 2.55v4.91h-4z" />
+            </svg>
+          </a>
+          <a href={`mailto:${EMAIL}`} aria-label={`Email ${EMAIL}`} className={iconButton}>
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
+              <rect x="3" y="5" width="18" height="14" />
+              <path d="M3.5 6l8.5 7 8.5-7" />
+            </svg>
+          </a>
+          <button type="button" onClick={toTop} aria-label="Back to top" className={`group ${iconButton} ml-2 bg-ink text-white hover:bg-[#2a2a2d]`}>
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:-translate-y-[2px]">
+              <path d="M12 19V5M6 11l6-6 6 6" />
+            </svg>
+          </button>
+        </div>
       </footer>
     </>
   )
