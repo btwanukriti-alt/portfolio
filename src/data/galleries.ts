@@ -43,6 +43,14 @@ const zync = (file: string, height: number, alt: string, caption: string): Galle
   caption,
 })
 
+const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
+  src: `/case-studies/jaadu-2/${file}`,
+  width: 2400,
+  height,
+  alt,
+  caption,
+})
+
 // Keyed by project slug (src/data/projects.ts); studyKey points at src/data/caseStudies.ts.
 export const GALLERIES: Record<string, GalleryConfig> = {
   'fitness-tracker': {
@@ -92,6 +100,23 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       ssh('08-ports-sessions.jpg', 1000, 'Port mapping cards for local, remote and dynamic tunnels above the active sessions table', 'Tunnels and sessions, each readable at a glance.'),
       ssh('09-logo.jpg', 900, 'The logo mark on a construction grid with measurements and clear space', 'A ring for security, a hub for connections.'),
       ssh('10-icon-palette.jpg', 800, 'The app icon and the colour palette', 'The app icon and palette.'),
+    ],
+  },
+  'jaadu-2': {
+    studyKey: 'jaadu-2',
+    note: 'Screens and components are exported from the Figma file. Every figure in them is sample data.',
+    brand: {
+      accent: '#2653CF',
+      deep: '#00022B',
+      soft: '#E8EEFF',
+      tint: '#CFDDFF',
+      pop: '#5985FF',
+    },
+    images: [
+      jaadu('01-footprint.jpg', 1500, 'The trading terminal in footprint view, with the regime gauge, watchlist and trades beside the chart', 'Each candle splits into price cells, with the regime read beside it.'),
+      jaadu('02-market.jpg', 1800, 'Regime gauge, coin stats, watchlist, trades and the trading journal as separate cards', 'Regime, market stats and the journal, each a card of its own.'),
+      jaadu('03-alerts-search.jpg', 1800, 'The create-alert panel, two chart prompt states, coin search and indicators', 'Alerts with stacked conditions, and a prompt anchored to the chart.'),
+      jaadu('04-quant-lab.jpg', 1710, 'An overnight campaign card, the library comparison table and equity curve, and the alerts list', 'Quant Lab narrows a night of strategy search to a shortlist.'),
     ],
   },
 }
