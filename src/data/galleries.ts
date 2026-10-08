@@ -254,7 +254,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         rows: 'auto',
         cards: [
           sui('hosts', 'The hosts list with each server’s IP, group, tags, status and quick actions', 'min-[901px]:col-span-8 min-[901px]:row-span-2', [1280, 832], 'fill'),
-          stext('Hosts', 'Every server, one list', 'Status, tags and quick actions on each row.', 'min-[901px]:col-span-4'),
+          stext('Hosts', 'All servers in one list', 'Each row shows status, tags and quick actions, so you can check a server without opening it.', 'min-[901px]:col-span-4'),
           sblock('ssh-host-card', 'A host card with its IP, live status and a Connect button', 'min-[901px]:col-span-4'),
         ],
       },
@@ -263,7 +263,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         rows: 'auto',
         cards: [
           sui('overview', 'The API Gateway overview with host info, system metadata and security insights', 'min-[901px]:col-span-7 min-[901px]:row-span-2', [988, 952], 'fill'),
-          stext('Main feature · Host stats', 'Open a host, see its health', 'Uptime, traffic and security, before you type a command.', 'min-[901px]:col-span-5'),
+          stext('Main feature · Host stats', 'A host opens on its stats', 'I made stats the first screen, not the terminal. Uptime, traffic and warnings show before you run anything.', 'min-[901px]:col-span-5'),
           sblock('ssh-network', 'Live download and upload rates for eth0', 'min-[901px]:col-span-5'),
         ],
       },
@@ -274,20 +274,36 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       },
       {
         label: 'Main feature: terminal settings',
-        rows: 2,
+        rows: 'auto',
         cards: [
-          stext('Main feature · Terminal settings', 'Commands you don’t retype', 'Save scripts as packages. Rerun anything from history.', 'min-[901px]:col-span-4', 'pop'),
-          sui('packages', 'Command packages with devops-kit open', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
-          sui('history', 'Command history filtered by host and week', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
-          sblock('ssh-autocomplete', 'Autocomplete toggle, a suggested command and Ask AI', 'min-[901px]:col-span-4'),
+          stext('Main feature · Terminal settings', 'Save a script once, run it again', 'Scripts are grouped into packages. Open one to read it, then run it in one click.', 'min-[901px]:col-span-6', 'pop'),
+          sblock('ssh-autocomplete', 'Autocomplete toggle, a suggested command and Ask AI', 'min-[901px]:col-span-6'),
         ],
       },
       {
-        label: 'Security',
+        label: 'Packages, command and history',
+        rows: 2,
+        cards: [
+          sui('packages', 'Command packages with devops-kit open', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
+          sui('command', 'The Check Network Load script open with Copy and Run', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
+          sui('history', 'Command history filtered by host and week', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
+        ],
+      },
+      {
+        label: 'SSH keys',
+        rows: 2,
+        cards: [
+          sui('key-generate', 'Generate Key with the stepper, label, key type and passphrase', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [445, 740]),
+          sui('key-export', 'Exporting the key to a host, with each step ticked off', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [445, 740]),
+          stext('SSH keys', 'A key in four steps', 'Configure, review, export, connect. The stepper shows where you are, and export shows each step as it happens.', 'min-[901px]:col-span-4'),
+          sui('key-done', 'Connection successful after the key is exported', 'min-[901px]:col-span-4', [445, 470]),
+        ],
+      },
+      {
+        label: 'Sessions',
         rows: 'auto',
         cards: [
-          sui('fido', 'The FIDO2 key panel with user presence, PIN and passphrase options', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [445, 740]),
-          stext('Security', 'Keys, and who’s signed in', 'Hardware keys in one panel. Every session, with its device and key.', 'min-[901px]:col-span-8'),
+          stext('Sessions', 'Who is signed in', 'Each session shows the user, device, location, time and key, grouped by day.', 'min-[901px]:col-span-4', 'pop'),
           sui('sessions', 'Active sessions with user, device, location, duration and key', 'min-[901px]:col-span-8', [1003, 461], 'fill'),
         ],
       },
