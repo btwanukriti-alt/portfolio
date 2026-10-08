@@ -25,7 +25,7 @@ const F='feat/'
 const M=(id,h,inner)=>`<div class="bd" id="${id}" style="height:${h}px">${inner}</div>`
 const tile=(l,t,w,h,inner)=>`<div class="tl rim" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px">${inner}</div>`
 const img=(n,w,l,t,r=18)=>`<img src="${F}${n}.png" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px">`
-const ex=(l,t,w,h,lb,title,body,items=[])=>`<div class="ex" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><div class="lb">${lb}</div><h3>${title}</h3><p>${body}</p></div>`
+const ex=(l,t,w,h,lb,title,body,items=[])=>`<div class="ex" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><h3>${title}</h3><p>${body}</p></div>`
 const call=(x1,y1,x2,y2,c,txt,cx,cy)=>`<svg class="dl" width="1600" height="1200"><path d="M${x1} ${y1} L${x2} ${y2}" fill="none" stroke="#9FB4E8" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="9" fill="${c}" stroke="#fff" stroke-width="3"/></svg><div class="chip" style="--c:${c};left:${cx}px;top:${cy}px"><i></i>${txt}</div>`
 const S=[]
 const T=(l,t,w,lb,title,body)=>ex(l,t,w,230,lb,title,body)
