@@ -31,7 +31,7 @@ export type Brand = {
 // surface: the card's ground. plate (light grey, default), tint (the project's soft colour), deep (a
 // dark gradient in the project's deep colour), pop (the second accent), white. Text cards default to
 // the accent colour.
-export type Surface = 'plate' | 'tint' | 'deep' | 'pop' | 'white'
+export type Surface = 'plate' | 'tint' | 'deep' | 'pop' | 'white' | 'night'
 export type BentoCard =
   | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top' | 'fill'; size?: string; surface?: Surface }
   | { kind: 'text'; kicker: string; title: string; text: string; span: string; surface?: Surface }
@@ -42,14 +42,6 @@ export type BentoCard =
 export type GallerySection = { label: string; rows?: 1 | 2 | 3 | 'auto'; cards: BentoCard[] }
 
 type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[]; sections?: GallerySection[] }
-
-const ssh = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
-  src: `/case-studies/ssh-client/${file}`,
-  width: 2400,
-  height,
-  alt,
-  caption,
-})
 
 const pf = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/pulsefit-crm/${file}`,
@@ -88,6 +80,22 @@ const cui = (file: string, alt: string, span: string, surface?: Surface, fit?: '
 const cblock = (name: string, label: string, span: string, surface?: Surface): BentoCard => ({ kind: 'block', block: name, label, span, surface })
 
 const ctext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
+
+// SSH client bento cards: dark screens from public/case-studies/ssh-client/ui/.
+const sui = (file: string, alt: string, span: string, size: [number, number], fit?: 'fill'): BentoCard => ({
+  kind: 'ui',
+  src: `/case-studies/ssh-client/ui/${file}.webp`,
+  width: size[0],
+  height: size[1],
+  alt,
+  span,
+  surface: 'night',
+  fit,
+})
+
+const sblock = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span, surface: 'night' })
+
+const stext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
 
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
@@ -235,21 +243,55 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       deep: '#3B1D91',
       soft: '#EFE9FD',
       tint: '#E4DBFF',
-      pop: '#8049EC',
+      pop: '#1E9FE6',
       font: 'var(--font-outfit), var(--font-hanken), sans-serif',
       mark: { src: '/brand/ssh-client-mark.png', ratio: 84 / 80 },
     },
-    images: [
-      ssh('01-health.jpg', 1000, 'A laptop showing the host stats screen beside the enlarged per-core CPU card', 'A host opens on its stats, not a terminal.'),
-      ssh('02-disks.jpg', 860, 'The storage table with the nearly full disks in red and a callout on one bar', 'Disks at 95% turn red, so the risky one is found first.'),
-      ssh('03-activity.jpg', 1000, 'Services, system logs, process list and process counts as separate cards', 'Running services and recent logs, read in one place.'),
-      ssh('04-terminal.jpg', 1000, 'The command packages panel beside a laptop showing the terminal', 'Saved commands and an AI helper stay beside the terminal.'),
-      ssh('05-add-host.jpg', 1000, 'The New Host panel with callouts on the four tabs and the default port', 'Adding a host takes four short tabs.'),
-      ssh('06-hosts-keys.jpg', 1000, 'Host cards, key cards and their filters as separate cards', 'Hosts and keys share one card pattern.'),
-      ssh('07-sftp.jpg', 1000, 'A laptop showing SFTP beside the enlarged Quick Connect card', 'Local files and a new connection, side by side.'),
-      ssh('08-ports-sessions.jpg', 1000, 'Port mapping cards for local, remote and dynamic tunnels above the active sessions table', 'Tunnels and sessions, each readable at a glance.'),
-      ssh('09-logo.jpg', 900, 'The logo mark on a construction grid with measurements and clear space', 'A ring for security, a hub for connections.'),
-      ssh('10-icon-palette.jpg', 800, 'The app icon and the colour palette', 'The app icon and palette.'),
+    images: [],
+    sections: [
+      {
+        label: 'Hosts',
+        rows: 'auto',
+        cards: [
+          sui('hosts', 'The hosts list with each server’s IP, group, tags, status and quick actions', 'min-[901px]:col-span-8 min-[901px]:row-span-2', [1280, 832], 'fill'),
+          stext('Hosts', 'Every server, one list', 'Status, tags and quick actions on each row.', 'min-[901px]:col-span-4'),
+          sblock('ssh-host-card', 'A host card with its IP, live status and a Connect button', 'min-[901px]:col-span-4'),
+        ],
+      },
+      {
+        label: 'Main feature: host stats',
+        rows: 'auto',
+        cards: [
+          sui('overview', 'The API Gateway overview with host info, system metadata and security insights', 'min-[901px]:col-span-7 min-[901px]:row-span-3', [988, 952], 'fill'),
+          stext('Main feature · Host stats', 'Open a host, see its health', 'Uptime, traffic and security, before you type a command.', 'min-[901px]:col-span-5'),
+          sblock('ssh-network', 'Live download and upload rates for eth0', 'min-[901px]:col-span-5'),
+          sblock('ssh-security', 'Security insights with one disk warning', 'min-[901px]:col-span-5'),
+        ],
+      },
+      {
+        label: 'Terminal',
+        rows: 'auto',
+        cards: [sui('terminal', 'The terminal beside the Terminal Settings panel with a saved script ready to run', 'min-[901px]:col-span-12', [1280, 832], 'fill')],
+      },
+      {
+        label: 'Main feature: terminal settings',
+        rows: 2,
+        cards: [
+          stext('Main feature · Terminal settings', 'Commands you don’t retype', 'Save scripts as packages. Rerun anything from history.', 'min-[901px]:col-span-4', 'pop'),
+          sui('packages', 'Command packages with devops-kit open', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
+          sui('history', 'Command history filtered by host and week', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
+          sblock('ssh-autocomplete', 'Autocomplete toggle, a suggested command and Ask AI', 'min-[901px]:col-span-4'),
+        ],
+      },
+      {
+        label: 'Security',
+        rows: 'auto',
+        cards: [
+          sui('fido', 'The FIDO2 key panel with user presence, PIN and passphrase options', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [445, 740]),
+          stext('Security', 'Keys, and who’s signed in', 'Hardware keys in one panel. Every session, with its device and key.', 'min-[901px]:col-span-8'),
+          sui('sessions', 'Active sessions with user, device, location, duration and key', 'min-[901px]:col-span-8', [1003, 461], 'fill'),
+        ],
+      },
     ],
   },
   'jaadu-2': {

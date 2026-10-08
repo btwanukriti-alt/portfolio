@@ -9,8 +9,9 @@ import Contact from './Contact'
 import { Reveal, SplitReveal } from './Reveal'
 import { ZYNC_BLOCKS } from './zync/ZyncBlocks'
 import { COLLEGE_BLOCKS } from './college/CollegeBlocks'
+import { SSH_BLOCKS } from './ssh/SshBlocks'
 
-const BLOCKS = { ...ZYNC_BLOCKS, ...COLLEGE_BLOCKS }
+const BLOCKS = { ...ZYNC_BLOCKS, ...COLLEGE_BLOCKS, ...SSH_BLOCKS }
 
 // Card grounds, in the project's own colours (CSS variables set on the page).
 const SURFACE: Record<Surface, string> = {
@@ -19,6 +20,7 @@ const SURFACE: Record<Surface, string> = {
   deep: 'bg-[radial-gradient(120%_140%_at_85%_0%,var(--c-accent)_0%,var(--c-deep)_70%)] text-white',
   pop: 'bg-[var(--c-pop)] text-white',
   white: 'bg-white ring-1 ring-[#E7E8EE]',
+  night: 'bg-[radial-gradient(120%_120%_at_85%_0%,#221B3A_0%,#0C0C13_62%)] text-white',
 }
 
 // Visual-first case study page (the mockup-showcase layout): the description is short and sits on
@@ -198,6 +200,9 @@ export default function GalleryCaseStudy({
   )
 }
 
+// Dark screens on a dark card need an edge.
+const FRAME = 'rounded-[clamp(8px,1vw,14px)] ring-1 ring-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.45)]'
+
 // One bento card: a UI component on a soft plate with room around it, or the feature's text box.
 function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
   if (card.kind === 'text') {
@@ -226,9 +231,9 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
   // fill: the card takes the image's height, for a wide screen in an auto-height row.
   if (card.fit === 'fill') {
     return (
-      <Reveal as="figure" className={`${card.span} m-0 overflow-hidden rounded-[clamp(22px,2.4vw,36px)] px-[5%] pt-[3%] pb-[1%] ${SURFACE[card.surface ?? 'plate']}`}>
+      <Reveal as="figure" className={`${card.span} m-0 overflow-hidden rounded-[clamp(22px,2.4vw,36px)] ${card.surface === 'night' ? 'flex items-center p-[4%]' : 'px-[5%] pt-[3%] pb-[1%]'} ${SURFACE[card.surface ?? 'plate']}`}>
         <img
-          className="mx-auto block h-auto w-full max-w-[1080px]"
+          className={`mx-auto block h-auto w-full max-w-[1080px] ${card.surface === 'night' ? FRAME : ''}`}
           src={card.src}
           width={card.width}
           height={card.height}
@@ -259,7 +264,7 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
       ) : (
         <div className={`absolute inset-0 m-auto flex items-center justify-center ${tall ? 'h-[86%] w-[86%]' : card.span.includes('row-span-2') ? 'h-[92%] w-[94%]' : card.size ? `h-[84%] ${card.size} w-full` : 'h-[80%] w-[80%]'}`}>
           <img
-            className="block h-auto max-h-full w-auto max-w-full object-contain"
+            className={`block h-auto max-h-full w-auto max-w-full object-contain ${card.surface === 'night' ? FRAME : ''}`}
             src={card.src}
             width={card.width}
             height={card.height}
