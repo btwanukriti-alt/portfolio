@@ -56,7 +56,7 @@ Whole screens as the main idea; numbered pins and caption pills; tilted or float
 - **Website:** rebuild it clean (the product name everywhere, no user-count claims, no third-party logos, no stock testimonials).
 
 ## 9. ZeeNovo / Anyway AI references (Your Brand Mate, Oct 2026)
-Anukriti's chosen standard for SaaS case studies. Notes from her screenshots (the site is blocked in the cloud session):
+Take ZeeNovo's taste, not its layout or flow: one colour family carried through every image, simple repeated shapes, clean neutral grounds, consistent radii and spacing. ZeeNovo is an agency piece and image-heavy; ours is UI-heavy, because recruiters judge the UI, the UX, the flows and the features. So every module shows real screens and components in a flow, with a short text box naming the feature. Notes from her screenshots (the site is blocked in the cloud session):
 - **Brand first.** Logo lockup on light and dark halves over a faint layout grid; the mark alone on four tiles (light, tint, deep, dark) with colour variants.
 - **Dark product ground.** Near-black with a soft purple-blue haze; the full product screen floats in a dark frame over a grainy lavender gradient.
 - **Exploded components.** Real form fields, a date picker, a table and a checklist laid flat in isometric perspective on the dark ground, one highlighted state (the selected date) in light lavender.
