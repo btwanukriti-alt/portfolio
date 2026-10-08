@@ -1,0 +1,99 @@
+<!doctype html><meta charset="utf-8">
+<!-- Jaadu 2.0 case study modules: design system, then the product flow, one step per image.
+     Every screen and component is exported from the Figma file (flow/). Render with render7.js. -->
+<style>
+@font-face{font-family:Geist;font-weight:400;src:url(node_modules/@fontsource/geist/files/geist-latin-400-normal.woff2)}
+@font-face{font-family:Geist;font-weight:500;src:url(node_modules/@fontsource/geist/files/geist-latin-500-normal.woff2)}
+@font-face{font-family:Geist;font-weight:600;src:url(node_modules/@fontsource/geist/files/geist-latin-600-normal.woff2)}
+@font-face{font-family:Geist;font-weight:700;src:url(node_modules/@fontsource/geist/files/geist-latin-700-normal.woff2)}
+@font-face{font-family:'IBM Plex Mono';font-weight:400;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2)}
+@font-face{font-family:'IBM Plex Mono';font-weight:500;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2)}
+:root{--r:14px;--ink:#00022B;--blue:#2653CF;--sky:#5CB5FF;--muted:#A7BCE4}
+body{margin:0;background:#fff}
+.m{position:relative;width:1600px;overflow:hidden;margin:0 0 60px;background:#EEF1F6;font-family:Geist,sans-serif}
+.a{position:absolute}
+/* text box */
+.tx{position:absolute;box-sizing:border-box;border-radius:var(--r);background:var(--ink);color:#fff;padding:44px 44px}
+.tx .st{font:500 15px/1 'IBM Plex Mono';letter-spacing:.06em;color:var(--sky);text-transform:uppercase}
+.tx h3{margin:18px 0 0;font:500 40px/1.12 Geist;letter-spacing:-.02em}
+.tx p{margin:16px 0 0;font:400 19px/1.55 Geist;color:var(--muted)}
+.tx ol{margin:26px 0 0;padding:0;list-style:none;counter-reset:n}
+.tx li{counter-increment:n;position:relative;padding:14px 0 14px 46px;border-top:1px solid rgba(167,188,228,.16);font:400 18px/1.45 Geist;color:#DCE6FA}
+.tx li b{display:block;font-weight:500;color:#fff}
+.tx li:before{content:counter(n);position:absolute;left:0;top:14px;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font:600 14px/28px Geist;text-align:center}
+.tx.row{display:flex;align-items:flex-end;justify-content:space-between;gap:60px}
+.tx.row h3{margin-top:14px}.tx.row p{max-width:640px;margin:0}
+/* app window */
+.win{position:absolute;border-radius:var(--r);overflow:hidden;background:#050833;box-shadow:0 0 0 1px rgba(10,20,60,.10),0 30px 60px -34px rgba(10,20,70,.45)}
+.win .bar{height:30px;display:flex;align-items:center;gap:7px;padding:0 14px;background:#0B1038;border-bottom:1px solid rgba(255,255,255,.06)}
+.win .bar i{width:10px;height:10px;border-radius:50%;background:#2A3260}
+.win img{display:block;width:100%}
+.card{position:absolute;border-radius:var(--r);overflow:hidden;box-shadow:0 0 0 1px rgba(10,20,60,.10),0 30px 60px -34px rgba(10,20,70,.45)}
+.card img{display:block;width:100%}
+/* numbered markers on a screen */
+.pin{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--blue);color:#fff;font:600 14px/30px Geist;text-align:center;box-shadow:0 0 0 4px rgba(255,255,255,.9);z-index:3}
+/* flow connector */
+.go{position:absolute;display:flex;align-items:center;gap:10px;font:500 14px/1 'IBM Plex Mono';color:#4A5A86;letter-spacing:.04em;text-transform:uppercase;z-index:3}
+.go svg{display:block}
+.lab{position:absolute;font:500 15px/1 'IBM Plex Mono';letter-spacing:.05em;color:#4A5A86;text-transform:uppercase}
+.lab b{color:var(--blue);font-weight:500;margin-right:8px}
+</style>
+<div id="root"></div>
+<script>
+const F='flow/'
+const M=(id,h,inner)=>`<div class="m" id="${id}" style="height:${h}px">${inner}</div>`
+const win=(src,w,l,t,crop)=>`<div class="win" style="left:${l}px;top:${t}px;width:${w}px"><div class="bar"><i></i><i></i><i></i></div>${crop?`<div style="height:${crop.h}px;overflow:hidden"><img src="${F}${src}" style="width:${crop.w}px;margin:${-crop.y}px 0 0 ${-crop.x}px;max-width:none"></div>`:`<img src="${F}${src}">`}</div>`
+const card=(src,w,l,t)=>`<div class="card" style="left:${l}px;top:${t}px;width:${w}px"><img src="${F}${src}"></div>`
+const tx=(l,t,w,h,step,title,body,items=[])=>`<div class="tx" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><div class="st">${step}</div><h3>${title}</h3>${body?`<p>${body}</p>`:''}${items.length?`<ol>${items.map(([b,d])=>`<li><b>${b}</b>${d}</li>`).join('')}</ol>`:''}</div>`
+const txRow=(l,t,w,h,step,title,body)=>`<div class="tx row" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><div><div class="st">${step}</div><h3>${title}</h3></div><p>${body}</p></div>`
+// pins on a window: screen coords (1440 x 900) -> window position
+const pins=(l,t,w,list)=>list.map(([n,x,y])=>`<div class="pin" style="left:${l+x*w/1440}px;top:${t+30+y*w/1440}px">${n}</div>`).join('')
+const arrow=(l,t,label)=>`<div class="go" style="left:${l}px;top:${t}px"><svg width="44" height="16" viewBox="0 0 44 16"><path d="M0 8h40M33 2l7 6-7 6" fill="none" stroke="#2653CF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>${label||''}</div>`
+const lab=(l,t,n,text)=>`<div class="lab" style="left:${l}px;top:${t}px"><b>${n}</b>${text}</div>`
+// two screens side by side under a row text box
+const pair=(id,step,title,body,[a,la],[b,lb])=>M(id,860,txRow(40,40,1520,170,step,title,body)+lab(40,246,'A',la)+lab(820,246,'B',lb)+win(a,740,40,276)+win(b,740,820,276)+arrow(778,500,''))
+const S=[]
+
+// 01 Design system
+const sw=[['#00022B','Background'],['#2653CF','Primary 400'],['#5985FF','Primary 500'],['#5CB5FF','Primary 700'],['#45FFB5','Gain'],['#FF5971','Loss'],['#FFBD67','Warning'],['#A7BCE4','Text secondary']]
+S.push(M('d1',1000,
+ `<div class="a" style="left:40px;top:40px;width:960px;height:920px;border-radius:var(--r);background:radial-gradient(60% 45% at 50% 44%,rgba(38,83,207,.55),rgba(0,2,43,0) 75%),#00022B"></div>`+
+ `<img class="a" src="${F}logo.png" style="left:150px;top:400px;width:740px">`+
+ `<div class="a" style="left:150px;top:600px;width:740px;text-align:center;font:400 22px/1.5 Geist;color:#A7BCE4">A trading terminal and a strategy lab, in one dark, data-dense interface.</div>`+
+ `<div class="a" style="left:80px;top:80px;font:500 15px/1 'IBM Plex Mono';letter-spacing:.06em;color:#5CB5FF;text-transform:uppercase">01 · Design system</div>`+
+ `<div class="a" style="left:1020px;top:40px;width:540px;height:560px;border-radius:var(--r);background:#fff;box-shadow:0 0 0 1px rgba(10,20,60,.08)"><div style="padding:36px 36px 0;font:500 15px/1 'IBM Plex Mono';letter-spacing:.06em;color:#4A5A86;text-transform:uppercase">Colour tokens</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:24px 36px">${sw.map(s=>`<div style="display:flex;gap:14px;align-items:center"><span style="width:58px;height:58px;border-radius:10px;background:${s[0]};box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"></span><span style="font:500 17px/1.3 Geist;color:#0B1038">${s[1]}<br><span style="font:400 14px 'IBM Plex Mono';color:#6B7699">${s[0]}</span></span></div>`).join('')}</div></div>`+
+ `<div class="a" style="left:1020px;top:620px;width:540px;height:340px;border-radius:var(--r);background:#fff;box-shadow:0 0 0 1px rgba(10,20,60,.08);box-sizing:border-box;padding:36px"><div style="font:500 15px/1 'IBM Plex Mono';letter-spacing:.06em;color:#4A5A86;text-transform:uppercase">Type</div><div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div style="font:600 96px/1 Geist;color:#0B1038;letter-spacing:-.03em">Aa</div><div style="font:500 52px/1 'IBM Plex Mono';color:#2653CF">60,553</div></div><div style="display:flex;justify-content:space-between;margin-top:22px;font:400 17px/1.4 Geist;color:#4A5A86"><span>Geist · interface</span><span>IBM Plex Mono · prices</span></div><div style="margin-top:22px;font:400 15px/1.5 Geist;color:#6B7699">Prices, sizes and times sit in a monospace so columns line up as they tick.</div></div>`))
+S.push(M('d2',780,
+ tx(40,40,560,700,'01 · Design system','Components built for live data','One set of cards, chips and inputs across the terminal, alerts and Quant Lab.',[['Strategy card','Win rate, drawdown and equity curve at a glance'],['Chart prompt','Suggested, typing and generating states'],['Regime gauge','The market’s mood as one reading']])+
+ `<div class="a" style="left:620px;top:40px;width:940px;height:700px;border-radius:var(--r);background:#00022B"></div>`+
+ card('card1.png',360,660,80)+card('c-regime.png',500,1040,80)+card('c-prompt-suggested.png',500,1040,340)+card('c-prompt-generating.png',500,1040,540)+card('c-prompt-typing.png',360,660,500)))
+
+// 02 Terminal
+S.push(M('t1',860,
+ tx(40,40,460,780,'02 · Trading terminal','Everything for one trade, on one screen','The chart, the market regime and live trades stay in view together.',[['Footprint chart','Each candle split into price bins'],['Regime','Sideways, breakout, volatile or reversal'],['Watchlist and trades','Live prices and the tape']])+
+ win('s-footprint.png',1040,520,108)+pins(520,108,1040,[[1,560,420],[2,1228,330],[3,1228,640]])))
+// 03 Footprint
+S.push(M('t2',820,
+ `<div class="card" style="left:40px;top:40px;width:1040px;height:740px;background:#00022B"><img src="${F}fp.png" style="width:1040px;margin-top:70px"></div>`+
+ pins(40,10,1040*1440/1040,[])+
+ `<div class="pin" style="left:${40+1040*0.38}px;top:${40+70+600*0.42}px">1</div><div class="pin" style="left:${40+1040*0.86}px;top:${40+70+600*0.31}px">2</div>`+
+ tx(1100,40,460,740,'03 · Footprint chart','See inside every candle','A normal candle shows four prices. The footprint shows the volume traded at each price inside it.',[['Price bins','Buys and sells at each level, colour-coded'],['Patterns and regime','Labelled right on the chart']])))
+// 04 Alerts
+S.push(M('a1',1000,
+ lab(40,40,'A','Create alert')+card('c-create-alert.png',520,40,70)+arrow(574,470,'')+
+ txRow(620,40,940,230,'04 · Alerts','Alerts on more than price','Combine price, POC, footprint and regime conditions. The alert fires only when all of them hold together.')+
+ lab(620,300,'B','Your alerts, with conditions met')+win('s-alerts.png',940,620,330,{w:1340,x:150,y:210,h:600})))
+// 05 Quant Lab: ask
+S.push(M('q1',705,
+ win('research.png',1040,40,40)+
+ tx(1100,40,460,625,'05 · Quant Lab','Ask the lab a question','Describe a strategy or a hunch in plain words. The agent writes and runs the research and checks every result for overfitting.',[['Tools','Overnight Discoveries, Library, Paper Trade, Déjà Vu'],['History','Every past session one click away']])))
+S.push(pair('q2','06 · Overnight Discoveries','Set it up. Wake up to a shortlist.','Pick coins and a timeframe. Overnight, hundreds of candidates go through three falsification tests. Only the survivors reach the morning list.',['overnight-setup.png','Set up the campaign'],['overnight-results.png','Morning: 3 of 642 survived']))
+S.push(pair('q3','07 · Library','Keep, compare, then commit','Every saved strategy is a card. Pick a few and compare them on one table and one equity chart.',['library-screen.png','Strategy library'],['compare.png','Side-by-side comparison']))
+S.push(pair('q4','08 · Paper trade and Déjà Vu','Test it live. Check if it happened before.','Paper trading routes the strategy that fits today’s regime. Déjà Vu finds similar moments in history and shows what came next.',['paper.png','Paper trade with veto checks'],['deja.png','Historical look-alikes']))
+// 09 Chart prompt across devices
+S.push(M('p1',1000,
+ txRow(40,40,1520,170,'09 · AI chart prompt','Ask about any point, on any screen','Tap the chart and ask. The prompt floats on desktop and tablet and docks to the bottom on mobile.')+
+ lab(40,246,'A','Tablet')+`<div class="card" style="left:40px;top:276px;width:1000px;border-radius:26px;background:#0B0D14;padding:16px;box-sizing:border-box"><img src="${F}s-tablet.png" style="border-radius:12px"></div>`+
+ lab(1100,246,'B','Mobile')+`<div class="card" style="left:1100px;top:276px;width:300px;height:690px;border-radius:40px;background:#0B0D14;padding:12px;box-sizing:border-box"><img src="${F}s-mobile.png" style="border-radius:30px;height:666px;width:276px;object-fit:cover;object-position:top"></div>`))
+document.getElementById('root').innerHTML=S.join('')
+</script>
