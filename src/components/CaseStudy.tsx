@@ -87,7 +87,7 @@ export default function CaseStudy({ project, slides }: { project: Project; slide
         )}
       </main>
 
-      <Contact />
+      <Contact current={project.slug} />
     </div>
   )
 }
@@ -127,7 +127,7 @@ function CollegeCaseStudy() {
             </Reveal>
             <SplitReveal
               as="h1"
-              className="m-0 mt-6 max-w-[11ch] text-[clamp(56px,10vw,160px)] leading-[0.95] font-medium tracking-[-0.045em] text-ink"
+              className="m-0 mt-6 max-w-[14ch] text-[clamp(40px,5.5vw,84px)] leading-[1] font-medium tracking-[-0.045em] text-ink"
               text={cs.title ?? ''}
             />
           </div>
@@ -158,7 +158,7 @@ function CollegeCaseStudy() {
 
         <Reveal className="mt-[clamp(40px,7vh,80px)] rounded-[28px] bg-[var(--c-tint)] px-[clamp(24px,5vw,72px)] py-[clamp(32px,6vw,72px)]">
           <p className="m-0 text-[13px] leading-none font-semibold tracking-[0.08em] text-[var(--c-accent)] uppercase">The idea</p>
-          <p className="m-0 mt-4 max-w-[20ch] text-[clamp(32px,5.4vw,84px)] leading-[1.02] font-semibold tracking-[-0.035em] text-[var(--c-deep)]">
+          <p className="m-0 mt-4 max-w-[34ch] text-[clamp(20px,2vw,28px)] leading-[1.3] font-semibold tracking-[-0.02em] text-[var(--c-deep)]">
             {cs.standout}
           </p>
         </Reveal>
@@ -209,7 +209,7 @@ function CollegeCaseStudy() {
           </div>
         </Reveal>
       </main>
-      <Contact />
+      <Contact current="college-management" />
     </div>
   )
 }

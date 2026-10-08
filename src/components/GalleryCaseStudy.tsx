@@ -154,7 +154,7 @@ export default function GalleryCaseStudy({
         </Reveal>
       </main>
 
-      <Contact />
+      <Contact current={project.slug} />
     </div>
   )
 }

@@ -42,7 +42,6 @@ const REPEAT_MS = 650
 
 // The showcases' stage sizes. A landscape window gets 16:9 cards; a portrait one (phones,
 // tablets held upright) gets 9:16 cards, and the showcases inside switch to their portrait cut.
-const isPortrait = () => window.innerHeight > window.innerWidth
 const stageSize = (portrait: boolean) => (portrait ? { w: 1080, h: 1920 } : { w: 1920, h: 1080 })
 
 // Row geometry for a window size: strip thickness, auto-layout gap, the fill card's size and the
@@ -58,6 +57,8 @@ type Row = {
   portrait: boolean
   vertical: boolean
 }
+// Room kept above the frame for the section heading (px).
+const TITLE_SPACE = 96
 function rowFor(vw: number, vh: number): Row {
   const portrait = vh > vw
   const vertical = portrait && vw < 720
@@ -68,38 +69,16 @@ function rowFor(vw: number, vh: number): Row {
   const padX = Math.min(96, Math.max(16, vw * 0.06))
   const padY = Math.min(140, Math.max(84, vh * (portrait ? 0.1 : 0.14)))
   const rest = (N - 1) * (strip + gap)
+  const head = small ? 72 : TITLE_SPACE
   if (vertical) {
-    const fillH = Math.max(200, Math.min(vh - 2 * padY - rest, (vw - 2 * padX) / ratio))
+    const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest, (vw - 2 * padX) / ratio))
     return { strip, gap, fillW: fillH * ratio, fillH, w: fillH * ratio, h: fillH + rest, portrait, vertical }
   }
-  const fillW = Math.max(120, Math.min(vw - 2 * padX - rest, (vh - 2 * padY) * ratio))
+  const fillW = Math.max(120, Math.min(vw - 2 * padX - rest, (vh - 2 * padY - head) * ratio))
   return { strip, gap, fillW, fillH: fillW / ratio, w: fillW + rest, h: fillW / ratio, portrait, vertical }
 }
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
-
-// The intro's pieces, found by data attribute: the drawn box (border, handles, size tag), the row
-// it reveals, the button that settles in after, and the cursor that draws it.
-const parts = (f: HTMLElement) => {
-  const q = gsap.utils.selector(f)
-  return {
-    box: q('[data-draw-box]')[0] as HTMLElement,
-    content: q('[data-draw-content]')[0] as HTMLElement,
-    size: q('[data-draw-size]')[0] as HTMLElement,
-    cursor: q('[data-cursor]')[0] as HTMLElement,
-    handles: q('[data-draw-handle]'),
-    fades: q('[data-fade]'),
-  }
-}
-
-function hideFrame(f: HTMLElement) {
-  const { box, content, size, cursor, handles, fades } = parts(f)
-  gsap.set(box, { width: 0, height: 0, autoAlpha: 1 })
-  gsap.set(content, { clipPath: 'inset(0 100% 100% 0)' })
-  gsap.set([size, cursor, ...handles], { autoAlpha: 0 })
-  gsap.set(handles, { scale: 0 })
-  gsap.set(fades, { autoAlpha: 0, y: 6 })
-}
 
 // Holds the page still (no wheel, touch or key scrolling) while the frame draws.
 function lockScroll(on: boolean) {
@@ -120,91 +99,12 @@ function jumpTo(track: HTMLElement, i: number, glide = false) {
   else window.scrollTo({ top: y, behavior: 'instant' })
 }
 
-// The section intro: the heading types in at the centre of the screen, lifts away, and the cursor
-// draws the row's frame. The page is held still until the frame is drawn.
-function intro(stage: HTMLElement, frame: HTMLElement, trackTop: number) {
-  const q = gsap.utils.selector(stage)
-  const title = q('[data-title]')[0] as HTMLElement
-  const label = q('[data-title-label]')[0] as HTMLElement
-  const typed = q('[data-typed]')[0] as HTMLElement
-  const caret = q('[data-caret]')[0] as HTMLElement
-  lockScroll(true)
-  // Settle the section exactly on screen first.
-  getLenis()?.scrollTo(trackTop, { duration: 0.7, easing: (x) => 1 - Math.pow(1 - x, 3), force: true })
-
-  const chars = { n: 0 }
-  const typeAt = 0.7
-  const typeFor = WORK_TITLE.length * 0.045
-  const leave = typeAt + typeFor + 0.7
-  gsap
-    .timeline()
-    .set(title, { autoAlpha: 1 }, 0)
-    .fromTo(label, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 0.35)
-    .set(caret, { visibility: 'visible', animation: 'none' }, typeAt - 0.15)
-    .to(
-      chars,
-      {
-        n: WORK_TITLE.length,
-        duration: typeFor,
-        ease: 'none',
-        onUpdate: () => void (typed.textContent = WORK_TITLE.slice(0, Math.round(chars.n))),
-      },
-      typeAt,
-    )
-    .set(caret, { animation: '' }, typeAt + typeFor)
-    // The heading lifts away, and the frame is drawn in its place.
-    .to(title, { autoAlpha: 0, y: -28, duration: 0.55, ease: 'power3.in' }, leave)
-    .add(() => drawFrame(frame, () => lockScroll(false)), leave + 0.35)
-}
-
-function drawFrame(f: HTMLElement, onDrawn?: () => void) {
-  const { box, content, size, cursor, handles, fades } = parts(f)
-  const W = f.offsetWidth
-  const H = f.offsetHeight
-  // The frame's size in the showcase's units (the fill card is one stage across).
-  const stage = stageSize(isPortrait())
-  const first = f.querySelector<HTMLElement>('[data-card]')
-  const vertical = f.dataset.vertical === 'true'
-  const fw = vertical ? stage.w : Math.round((stage.w * W) / (first?.offsetWidth || W))
-  const fh = vertical ? Math.round((stage.h * H) / (first?.offsetHeight || H)) : stage.h
-  const p = { w: 0, h: 0 }
-  const render = () => {
-    box.style.width = `${p.w * 100}%`
-    box.style.height = `${p.h * 100}%`
-    content.style.clipPath = `inset(0 ${(1 - p.w) * 100}% ${(1 - p.h) * 100}% 0)`
-    size.textContent = `${Math.round(fw * p.w)} × ${Math.round(fh * p.h)}`
-    gsap.set(cursor, { x: p.w * W, y: p.h * H })
-  }
-  const press = 0.65
-  const drag = press + 0.12
-  const release = drag + 1.15
-  gsap
-    .timeline({ onComplete: () => void (content.style.clipPath = '') })
-    // The cursor glides in to the frame's top-left corner and presses...
-    .set(cursor, { x: -W * 0.08, y: H * 0.3, scale: 1 }, 0)
-    .to(cursor, { autoAlpha: 1, duration: 0.25, ease: 'power1.out' }, 0)
-    .to(cursor, { x: 0, y: 0, duration: 0.6, ease: 'power3.inOut' }, 0)
-    .to(cursor, { scale: 0.86, duration: 0.1, ease: 'power2.out' }, press)
-    // ...drags the frame out to full size, its dimensions counting up beneath it...
-    .set(size, { autoAlpha: 1 }, drag)
-    .to(p, { w: 1, duration: 1.15, ease: 'power3.inOut', onUpdate: render }, drag)
-    .to(p, { h: 1, duration: 1.15, ease: 'power2.inOut', onUpdate: render }, drag)
-    // ...and lets go: handles pop on, then the selection passes to the fill card, the button
-    // settles, and the cursor drifts off.
-    .to(cursor, { scale: 1, duration: 0.2, ease: 'back.out(3)' }, release)
-    .call(() => onDrawn?.(), [], release)
-    .to(handles, { autoAlpha: 1, scale: 1, duration: 0.35, ease: 'back.out(3)', stagger: 0.03 }, release)
-    .to(box, { autoAlpha: 0, duration: 0.45, ease: 'power2.out' }, release + 0.7)
-    .to(fades, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, release + 0.3)
-    .to(cursor, { x: W + 40, y: H + 30, duration: 0.8, ease: 'power2.in' }, release + 0.3)
-    .to(cursor, { autoAlpha: 0, duration: 0.3 }, release + 0.8)
-}
-
 export default function Work() {
   const section = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const stage = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLDivElement>(null)
+  const heading = useRef<HTMLDivElement>(null)
   const cards = useRef<(HTMLDivElement | null)[]>([])
   const videos = useRef<(HTMLIFrameElement | null)[]>([])
   const playing = useRef<boolean[]>([])
@@ -268,14 +168,14 @@ export default function Work() {
   useGSAP(
     () => {
       let row = rowFor(window.innerWidth, window.innerHeight)
-      let drawn = reducedMotion()
-      if (!drawn && frame.current) hideFrame(frame.current)
+      const drawn = true
 
       const layout = () => {
         row = rowFor(window.innerWidth, window.innerHeight)
         const f = frame.current
         if (!f) return
         f.style.width = `${row.w}px`
+        if (heading.current) heading.current.style.width = `${row.w}px`
         f.style.height = `${row.h}px`
         f.style.setProperty('--fill-w', `${row.fillW}px`)
         f.style.setProperty('--fill-h', `${row.fillH}px`)
@@ -349,10 +249,6 @@ export default function Work() {
         const vh = window.innerHeight
         if (!vh) return // a window with no height yet (an embedded preview while it loads)
 
-        if (!drawn && stage.current && frame.current && r.top < vh * 0.4 && r.bottom > vh) {
-          drawn = true
-          intro(stage.current, frame.current, r.top + window.scrollY)
-        }
 
         // Arriving with momentum (a flick from above or below) lands on the first or last
         // project instead of sailing past the ones in between. The stage is pinned throughout,
@@ -481,7 +377,7 @@ export default function Work() {
 
   return (
     <section ref={section} id="work" aria-labelledby="work-heading" className="relative bg-paper">
-      {/* The heading is shown by the intro (typed in at the centre). */}
+      {/* The visible heading sits above the frame (aria-hidden there). */}
       <h2 id="work-heading" className="sr-only">
         Selected work: {WORK_TITLE}
       </h2>
@@ -494,7 +390,14 @@ export default function Work() {
         style={{ height: `calc(${(N - 1) * SEGMENT * 100}svh + 100svh)` }}
         data-fullscreen
       >
-        <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full items-center justify-center overflow-hidden">
+        <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full flex-col items-center justify-center overflow-hidden">
+          {/* The section heading, top left of the frame (its width follows the frame). */}
+          <div ref={heading} aria-hidden="true" className="mb-[clamp(28px,4vh,44px)] flex max-w-full items-end justify-between gap-4">
+            <p className="m-0 text-[clamp(26px,2.6vw,40px)] leading-[1.05] font-medium tracking-[-0.035em] text-ink">{WORK_TITLE}</p>
+            <p className="m-0 text-[15px] leading-none font-medium text-muted">
+              Selected work <span className="text-faint">({String(N).padStart(2, '0')})</span>
+            </p>
+          </div>
           {/* The auto-layout frame (sized by layout()). */}
           <div ref={frame} className="group/row relative">
             <div data-draw-content className="flex h-full w-full gap-[var(--gap)] group-data-[vertical=true]/row:flex-col">
@@ -646,27 +549,6 @@ export default function Work() {
             </Link>
           </div>
 
-          {/* The section heading, typed in at the centre by the intro. */}
-          <div
-            data-title
-            aria-hidden="true"
-            className="pointer-events-none invisible absolute inset-0 z-[3] flex flex-col items-center justify-center gap-5 px-6 text-center opacity-0"
-          >
-            <p data-title-label className="m-0 text-[15px] leading-none font-medium text-muted">
-              Selected work <span className="text-faint">({String(N).padStart(2, '0')})</span>
-            </p>
-            {/* An invisible copy holds the full size, so the typed line grows in place. */}
-            <p className="relative m-0 max-w-[16ch] text-[clamp(36px,5vw,76px)] leading-[1.02] font-medium tracking-[-0.04em] text-ink">
-              <span className="invisible">{WORK_TITLE}</span>
-              <span className="absolute inset-0">
-                <span data-typed />
-                <i
-                  data-caret
-                  className="invisible ml-[0.04em] inline-block h-[0.85em] w-[3px] translate-y-[0.1em] animate-[caret-blink_1.06s_steps(1)_infinite] bg-ink align-baseline"
-                />
-              </span>
-            </p>
-          </div>
         </div>
       </div>
 
