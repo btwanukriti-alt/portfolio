@@ -204,7 +204,6 @@ export const GALLERIES: Record<string, GalleryConfig> = {
             'Each alert says what, where and who',
             'Alerts are sorted into finance and staff, and each type has its own colour. Every card carries the college, and finance alerts add the amount, the student and the owner.',
             'min-[901px]:col-span-4',
-            'pop',
           ),
           cblock('alert-types', 'The four alert types in two groups, with what raises each one', 'min-[901px]:col-span-8', 'white'),
           cblock('finance-alerts', 'The finance alerts panel: a cancelled receipt and a fee reduction, with amount, student and owner', 'min-[901px]:col-span-6', 'tint'),
