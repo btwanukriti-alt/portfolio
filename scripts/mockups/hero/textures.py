@@ -273,20 +273,60 @@ def bauhaus(name, bg, cols, seed):
                     d.pieslice((gx - s * 0.5 + s * 0.5, gy, gx + s * 1.0, gy + s), 90, 270, fill=c)
     save(grain(supersample(draw, bg), 12, seed), name)
 
+# Blend a finished pattern toward its ground so it reads as texture, not artwork.
+def soften(name, base, amt):
+    a = np.asarray(Image.open(f'{OUT}/{name}.png').convert('RGB'), float)
+    save(a * (1 - amt) + hexrgb(base) * amt, name)
+
+# Blueprint grid: fine lines, a stronger line every fifth, one soft glow.
+def grid(name, bg, line, glow, seed):
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    fine = ((xx % 30) < 1.2) | ((yy % 30) < 1.2)
+    major = ((xx % 150) < 2) | ((yy % 150) < 2)
+    g = np.clip(1 - np.hypot((xx - W * 0.75) / W, (yy - H * 0.2) / H) / 0.6, 0, 1)[..., None] ** 1.6
+    img = hexrgb(bg) * (1 - g) + hexrgb(glow) * g * 0.6 + hexrgb(bg) * g * 0.4
+    img = np.where(fine[..., None], img * 0.55 + hexrgb(line) * 0.45, img)
+    img = np.where(major[..., None], img * 0.3 + hexrgb(line) * 0.7, img)
+    save(grain(img, 8, seed), name)
+
+# Concentric rounded squares (echoes the app-icon modules), very light.
+def squares(name, bg, line, seed):
+    def draw(d, k):
+        cx, cy = W * k / 2, H * k * 0.44
+        for i in range(1, 16):
+            r = i * 44 * k
+            d.rounded_rectangle((cx - r, cy - r, cx + r, cy + r), radius=int(r * 0.32), outline=line, width=int(2 * k))
+    save(grain(supersample(draw, bg), 8, seed), name)
+
+# Diagonal pinstripes with a soft glow.
+def pinstripes(name, bg, line, glow, seed):
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    st = ((xx + yy) % 26) < 2.2
+    g = np.clip(1 - np.hypot((xx - W * 0.5) / W, (yy - H * 0.45) / H) / 0.55, 0, 1)[..., None] ** 1.4
+    img = hexrgb(bg) * (1 - g) + hexrgb(glow) * g
+    img = np.where(st[..., None], img * 0.7 + hexrgb(line) * 0.3, img)
+    save(grain(img, 8, seed), name)
+
 # One pattern per tile, each tuned to its screen.
 space('p01', '#060823', '#3B2BA8', '#2D6BFF', 3)                       # Jaadu chart (neon navy)
 paper('p02', '#FFF1D6', [('circle', '#FFB800', (700, -240, 1260, 300)), ('poly', '#F28C28', [(0, 470), (430, 330), (720, 720), (0, 720)]), ('circle', '#0063F8', (-150, -190, 250, 210)), ('poly', '#DCCFFF', [(1080, 480), (800, 720), (1080, 720)])], 12)  # Pulsefit website (deep blue)
 grainy('p03', '#F5577D', [['#7C5CFF', 0.0, 0.0, 0.9], ['#FF8A3D', 1.0, 0.1, 0.8], ['#FFC371', 1.0, 1.0, 0.6], ['#E0457B', 0.2, 0.9, 0.6]], 5, 28)  # SSH performance (black)
 rays('p04', '#7B61FF', '#9479FF', 540, 820, 26, 31)                  # Zync phones (white, violet)
 sky('p05', [(0.0, '#2A57C6'), (0.35, '#4F86E8'), (0.62, '#9DBBF3'), (0.82, '#F2C14E'), (1.05, '#F08A3C')], 21)  # College finance
-halftone('p06', '#120B3A', '#3B6CFF', '#F472B6', 6)                    # Jaadu library (multicolour lines)
-memphis('p07', '#DCE6FF', ['#0063F8', '#FFB800', '#5233D6', '#F28C28', '#003A92'], 7)  # Pulsefit leads
-topo('p08', '#1A1030', '#8B6CFF', '#FF8A3D', 8)                        # SSH hosts (orange/blue avatars)
-terrazzo('p09', '#E3EEF9', ['#12326E', '#1A9E6E', '#F2C14E', '#4F86E8', '#D64545', '#9DBBF3'], 9)  # College staff (green/red bars)
-synthwave('p10', '#1A0B4A', '#7A1E8C', '#FFD166', '#F5577D', '#22D3EE', '#0B0730', 10)  # Jaadu tablet (candles)
-ripples('p11', '#0063F8', '#BFD3FF', '#FFB800', 11)                    # Pulsefit members
-waves('p12', ['#C9B8FF', '#7B61FF', '#F5577D', '#FFE8EE', '#644ACD', '#FFB3C7'], 12)  # Zync phones
-pixels('p13', '#120F1E', '#FF8A3D', '#F5577D', '#7C5CFF', 13)          # SSH sessions (black)
+# Subtle ones (the newer tiles): low contrast, close tones, then softened toward the ground.
+halftone('p06', '#0A0F33', '#1C2E7A', '#3E2F9C', 6)                    # Jaadu AI chat
+memphis('p07', '#EEF3FF', ['#C4D6FF', '#FFE2A0', '#D8CCFF', '#FFD1B0', '#AFC6FF'], 7)  # Pulsefit create lead
+topo('p08', '#130F24', '#4A3A9A', '#2E1F5E', 8)                        # SSH sign-in
+waves('p09', ['#EAE4FF', '#DED4FF', '#F4F0FF', '#D3C7FB', '#F6E9F2'], 9)  # Zync trio (sign-up, workout, sleep)
+pixels('p10', '#0E0D16', '#1C1A2C', '#272241', '#352A62', 10)          # SSH SFTP
+ripples('p11', '#FFF1D3', '#FBE3B3', '#FFC94D', 11)                    # Pulsefit pricing (blue page)
+terrazzo('p12', '#F7EFF8', ['#D9CCFF', '#FFC7D6', '#C9B8FF', '#FFE0EA', '#B8A6F0', '#E6DEFF'], 12)  # Zync trio (events, profile, log)
+aurora('p13', '#050A24', '#1D7F86', '#4A35A0', 13)                     # Jaadu alerts
 hills('p14', '#BFD3F7', '#F6E2B3', '#F2C14E', ['#6E9BF0', '#2653CF', '#12326E'], 14)  # College drawer
-aurora('p15', '#050A24', '#22E3B0', '#8B5CF6', 15)                     # Jaadu overnight
-bauhaus('p16', '#F3EFE6', ['#0063F8', '#FFB800', '#F28C28', '#5233D6', '#003A92'], 16)  # Pulsefit plans
+grid('p15', '#110F1D', '#2A2545', '#4B3A9C', 15)                        # SSH add host
+bauhaus('p16', '#E9EEF8', ['#C9D8F7', '#F6E2B3', '#AFC3EE', '#DCE6F7', '#BFD0F2'], 16)  # College drawer (Engineering)
+squares('p17', '#EEF3FF', '#D3DFFB', 17)                                # Pulsefit logo
+pinstripes('p18', '#F1EDFF', '#D9CFFF', '#FFFFFF', 18)                 # Zync logo
+
+for n, base, amt in [('p06', '#0A0F33', 0.35), ('p07', '#EEF3FF', 0.35), ('p08', '#130F24', 0.25), ('p10', '#0E0D16', 0.3), ('p11', '#FFF1D3', 0.35), ('p12', '#F7EFF8', 0.3), ('p16', '#E9EEF8', 0.35)]:
+    soften(n, base, amt)
