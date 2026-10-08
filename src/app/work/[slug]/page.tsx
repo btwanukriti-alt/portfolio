@@ -32,6 +32,6 @@ export default async function Page({ params }: PageProps<'/work/[slug]'>) {
   // Projects with a mockup gallery use the visual-first layout; the rest keep the slide carousel.
   const gallery = GALLERIES[slug]
   const study = gallery && CASE_STUDIES.find((s) => s.key === gallery.studyKey)
-  if (gallery && study) return <GalleryCaseStudy project={project} study={study} brand={gallery.brand} note={gallery.note} images={gallery.images} />
+  if (gallery && study) return <GalleryCaseStudy project={project} study={study} brand={gallery.brand} note={gallery.note} images={gallery.images} sections={gallery.sections} />
   return <CaseStudy project={project} slides={slidesFor(slug)} />
 }
