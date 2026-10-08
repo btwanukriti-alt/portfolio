@@ -131,8 +131,9 @@ const iconButton =
 export default function Contact({ current }: { current?: string } = {}) {
   const toTop = () => {
     const lenis = getLenis()
-    if (lenis) lenis.scrollTo(0, { duration: 1.4 })
-    else window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })
+    // Jump straight to the hero: a smooth scroll gets caught by the work cards' snapping on the way up.
+    if (lenis) lenis.scrollTo(0, { immediate: true, force: true })
+    else window.scrollTo(0, 0)
   }
 
   return (
