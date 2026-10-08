@@ -15,8 +15,7 @@
 .chipc{position:absolute;height:48px;padding:0 22px;border-radius:24px;background:#fff;color:#14171F;font-family:Poppins,sans-serif;font-weight:500;font-size:24px;display:flex;align-items:center;white-space:nowrap;box-shadow:0 12px 28px -12px rgba(20,12,60,.35)}
 .gd{position:absolute;border-color:#9C9FB2;border-style:dashed;border-width:0}
 .lbl{position:absolute;font-weight:500;font-size:26px;color:#8C8FA0}
-</style>
-<style id="tight-radius">.plate,.block{border-radius:14px!important}</style><!-- 9 BRAND: logo construction -->
+</style><!-- 9 BRAND: logo construction -->
 <div class="mod" id="m9" style="height:900px;background:#EEEFF3;--g1:#F8F9FC;--g2:#E7E9F0;--acc:#FFB800"><div class="plate" id="lg" style="left:40px;top:40px;width:1520px;height:820px">
   <style>
     #lg .h{position:absolute;left:0;right:0;border-top:2px dashed #B9BCCB;height:0}#lg .h.s{border-top:1.5px dashed #D3D5E0}
@@ -138,5 +137,3 @@ callout('p5','h5','peak',0,'Peak hour: Wednesday, 9 AM',null,612);
   var c=[['Primary','#0063F8','#fff'],['Deep','#003A92','#fff'],['Soft','#E6F0FF','#003A92'],['Yellow','#FFB800','#4A3500'],['Green','#14A06B','#fff'],['Red','#E5484D','#fff'],['Amber','#E58A00','#fff'],['Violet','#6D4AFF','#fff'],['Ink','#14171F','#fff']];
   pal.insertAdjacentHTML('beforeend','<div class="abs" style="left:60px;top:60px;display:grid;grid-template-columns:repeat(3,190px);gap:24px">'+c.map(function(x){return '<div style="height:190px;border-radius:36px;background:'+x[1]+';color:'+x[2]+';padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;font-size:17px;font-family:Inter,sans-serif'+(x[0]=='Soft'?';box-shadow:inset 0 0 0 2px #fff':'')+'"><b style="font-size:21px;font-weight:600;font-family:Poppins,sans-serif">'+x[0]+'</b>'+x[1]+'</div>'}).join('')+'</div>')})();
 </script>
-
-<script src="../shared/canvas.js"></script><script>canvasify({ground:'#DCCFFF',star:'#0063F8',skip:/^(m9|m10)$/})</script>
