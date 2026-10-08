@@ -28,14 +28,18 @@ export type Brand = {
 // Bento page (Zync): each feature is a two-row grid of cards. A 'ui' card holds one transparent
 // component image from public/case-studies/<folder>/ui/ with room around it; a 'text' card is the
 // feature's text box; a 'block' card is a component rebuilt in React. `span` holds the card's grid classes on the 12-column desktop grid.
+// surface: the card's ground. plate (light grey, default), tint (the project's soft colour), deep (a
+// dark gradient in the project's deep colour), pop (the second accent), white. Text cards default to
+// the accent colour.
+export type Surface = 'plate' | 'tint' | 'deep' | 'pop' | 'white'
 export type BentoCard =
-  | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top'; size?: string }
-  | { kind: 'text'; kicker: string; title: string; text: string; span: string }
+  | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top' | 'fill'; size?: string; surface?: Surface }
+  | { kind: 'text'; kicker: string; title: string; text: string; span: string; surface?: Surface }
   // A component rebuilt in React (src/components/zync/ZyncBlocks.tsx); the card is its surface.
-  | { kind: 'block'; block: string; label: string; span: string }
+  | { kind: 'block'; block: string; label: string; span: string; surface?: Surface }
 
 // rows: how many grid rows the section uses on desktop (2 by default, or 3).
-export type GallerySection = { label: string; rows?: 2 | 3; cards: BentoCard[] }
+export type GallerySection = { label: string; rows?: 1 | 2 | 3 | 'auto'; cards: BentoCard[] }
 
 type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[]; sections?: GallerySection[] }
 
@@ -68,6 +72,22 @@ const ui = (file: string, width: number, height: number, alt: string, span: stri
 const text = (kicker: string, title: string, body: string, span: string): BentoCard => ({ kind: 'text', kicker, title, text: body, span })
 
 const block = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span })
+
+// College ERP bento cards: laptop screens from public/case-studies/college-management/ui/.
+const cui = (file: string, alt: string, span: string, surface?: Surface, fit?: 'fill', size: [number, number] = [2776, 1884]): BentoCard => ({
+  kind: 'ui',
+  src: `/case-studies/college-management/ui/${file}.webp`,
+  width: size[0],
+  height: size[1],
+  alt,
+  span,
+  surface,
+  fit,
+})
+
+const cblock = (name: string, label: string, span: string, surface?: Surface): BentoCard => ({ kind: 'block', block: name, label, span, surface })
+
+const ctext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
 
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
@@ -135,6 +155,74 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         cards: [
           ui('phone-workout', 1542, 2904, 'The workout detail screen with duration, session, level and the exercise list', 'min-[901px]:col-span-5 min-[901px]:row-span-2'),
           block('plans', 'Suggested workout plans with length, session time and tags', 'min-[901px]:col-span-7 min-[901px]:row-span-2'),
+        ],
+      },
+    ],
+  },
+  'college-management': {
+    studyKey: 'college-erp',
+    note: 'Screens are rebuilt for this portfolio with sample content. Every figure in them is sample data.',
+    brand: {
+      accent: '#12326E',
+      deep: '#08153A',
+      soft: '#E6EDF9',
+      tint: '#D5DDED',
+      pop: '#4F86E8',
+      font: 'var(--font-hanken), system-ui, sans-serif',
+    },
+    images: [],
+    // The flow: the drill-down drawers (the main feature), the finance dashboard, then staff attendance and profiles.
+    sections: [
+      {
+        label: 'Main feature: drill-down drawers',
+        rows: 3,
+        cards: [
+          ctext(
+            'Main feature · Drill-down',
+            'Group to batch, without losing your place',
+            'Each level opens as a drawer over the finance dashboard. The levels behind stay as spines on the left, so the path is always in view.',
+            'min-[901px]:col-span-4',
+          ),
+          cui(
+            'laptops-drawer-finance',
+            'The B.Tech drawer open over the college and group drawers, above the finance overview it opens from',
+            'min-[901px]:col-span-8 min-[901px]:row-span-3',
+            'deep',
+            undefined,
+            [2712, 3448],
+          ),
+          cblock('drill-path', 'Group, college, programme and batch stacked as drawers, each with its collection', 'min-[901px]:col-span-4', 'tint'),
+          cblock('lowest-line', 'The lowest-collection line at group, college and programme level', 'min-[901px]:col-span-4', 'plate'),
+        ],
+      },
+      {
+        label: 'Alerts',
+        rows: 'auto',
+        cards: [
+          ctext(
+            'Alerts',
+            'Each alert says what, where and who',
+            'Alerts are sorted into finance and staff, and each type has its own colour. Every card carries the college, and finance alerts add the amount, the student and the owner.',
+            'min-[901px]:col-span-4',
+          ),
+          cblock('alert-types', 'The four alert types in two groups, with what raises each one', 'min-[901px]:col-span-8', 'white'),
+          cblock('finance-alerts', 'The finance alerts panel: a cancelled receipt and a fee reduction, with amount, student and owner', 'min-[901px]:col-span-6', 'tint'),
+          cblock('staff-alerts', 'The staff alerts panel: an absence trend and uninformed absences', 'min-[901px]:col-span-6', 'plate'),
+        ],
+      },
+      {
+        label: 'Staff: dashboard, register and profiles',
+        rows: 'auto',
+        cards: [
+          ctext(
+            'Staff · Dashboard and register',
+            "From the staff dashboard to one person's record",
+            'The overview shows who is in, by college, and flags absence patterns. The register filters by status in one row of tabs, and any name opens that person’s history.',
+            'min-[901px]:col-span-4',
+          ),
+          cui('laptop-staff', 'The staff overview: totals with trends, attendance by college, alerts and most days absent', 'min-[901px]:col-span-8', 'tint', 'fill'),
+          cblock('attendance-table', 'The employee attendance register with status tabs, division, check-in and check-out times and status', 'col-span-12', 'plate'),
+          cblock('profile', 'An employee profile: ID, tabs, work experience and education', 'col-span-12', 'tint'),
         ],
       },
     ],
