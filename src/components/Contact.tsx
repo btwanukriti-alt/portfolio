@@ -22,12 +22,8 @@ const HANDLES = [
   [100, 100],
 ]
 
-// The D in a 100-unit cap height; `b` pushes the bowl out (the dragged handle).
+// The D's outline in a 100-unit box; `b` pushes the bowl out (the dragged handle).
 const outer = (b: number) => `M0 0H38C${70 + b} 0 ${88 + b} 20 ${88 + b} 50C${88 + b} 80 ${70 + b} 100 38 100H0Z`
-const inner = (b: number) => {
-  const i = 71 + b * 0.8
-  return `M15 15H36C${58 + b * 0.8} 15 ${i} 29 ${i} 50C${i} 71 ${58 + b * 0.8} 85 36 85H15Z`
-}
 const NODES = [
   [0, 0],
   [38, 0],
@@ -59,7 +55,7 @@ function BuildHeading() {
       const h = root.current
       if (!h) return
       const svg = h.querySelector<SVGSVGElement>('[data-d]')!
-      const shape = svg.querySelector<SVGPathElement>('[data-shape]')!
+      const real = h.querySelector<HTMLElement>('[data-real]')!
       const outline = svg.querySelector<SVGPathElement>('[data-outline]')!
       const nodes = svg.querySelectorAll('[data-node]')
       const handle = svg.querySelector<SVGGElement>('[data-handle]')!
@@ -67,7 +63,24 @@ function BuildHeading() {
       const pen = h.querySelector<HTMLElement>('[data-pen]')!
       if (reducedMotion()) return
 
-      const state = { b: 0, t: 0, at: 0 }
+      // Fit the drawing to the real D's ink box (from the font's metrics), so the pen traces the
+      // letter that is left behind.
+      const fit = () => {
+        const cs = getComputedStyle(real)
+        const ctx = document.createElement('canvas').getContext('2d')
+        if (!ctx) return
+        ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`
+        const m = ctx.measureText('D')
+        Object.assign(svg.style, {
+          left: `${-m.actualBoundingBoxLeft}px`,
+          top: `${m.fontBoundingBoxAscent - m.actualBoundingBoxAscent}px`,
+          width: `${m.actualBoundingBoxLeft + m.actualBoundingBoxRight}px`,
+          height: `${m.actualBoundingBoxAscent}px`,
+        })
+      }
+
+      // at: home (0) to the D (1); hop: progress of the current jump, for a cartoon arc.
+      const state = { b: 0, t: 0, at: 0, hop: 0 }
       // Screen position of a point in the D's 100-unit space.
       const toScreen = (x: number, y: number) => {
         const m = svg.getScreenCTM()
@@ -77,13 +90,12 @@ function BuildHeading() {
       const placePen = (x: number, y: number) => {
         const r = home.getBoundingClientRect()
         const nib = { x: r.left + r.width / 2, y: r.bottom }
-        gsap.set(pen, { x: (x - nib.x) * state.at, y: (y - nib.y) * state.at })
+        const arc = -Math.sin(Math.PI * state.hop) * r.height * 1.6
+        gsap.set(pen, { x: (x - nib.x) * state.at, y: (y - nib.y) * state.at + arc })
       }
-      const len = outline.getTotalLength()
+      let len = 0
       const update = () => {
-        const d = outer(state.b)
-        shape.setAttribute('d', d + inner(state.b))
-        outline.setAttribute('d', d)
+        outline.setAttribute('d', outer(state.b))
         handle.setAttribute('transform', `translate(${state.b} 0)`)
         // While drawing, the nib follows the outline; while dragging, it holds the handle.
         const p = state.t < 1 ? outline.getPointAtLength(len * state.t) : { x: 88 + state.b, y: 18 }
@@ -91,35 +103,63 @@ function BuildHeading() {
         placePen(s.x, s.y)
       }
 
-      gsap.set(shape, { opacity: 0 })
-      gsap.set(outline, { strokeDasharray: len, strokeDashoffset: len, opacity: 1 })
-      gsap.set([nodes, handle], { opacity: 0 })
+      // The pen's slot between t and s: it closes up when the pen leaves and pops open when it lands.
+      const slot = { width: 0, margin: 0 }
+      const hopTo = (at: number) => ({ at, duration: 0.45, ease: 'back.out(1.7)' })
 
       const tl = gsap.timeline({ paused: true, onUpdate: update })
-      tl.to(state, { at: 1, duration: 0.35, ease: 'power2.inOut' })
+      tl
+        // Leave with a wiggle and hop over to the D while the gap behind it closes.
+        .to(pen, { rotation: -22, duration: 0.12, ease: 'power2.out' })
+        .to(state, hopTo(1))
+        .fromTo(state, { hop: 0 }, { hop: 1, duration: 0.45, ease: 'none' }, '<')
+        .to(pen, { rotation: 0, duration: 0.45, ease: 'elastic.out(1, 0.45)' }, '<')
+        .to(home, { width: 0, marginLeft: 0, marginRight: 0, duration: 0.35, ease: 'back.in(1.6)' }, '<0.05')
         // Trace the outline (0.6s), dropping a point at each corner.
         .to(state, { t: 1, duration: 0.6, ease: 'none' })
         .to(outline, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, '<')
         .to(nodes, { opacity: 1, duration: 0.05, stagger: 0.12 }, '<')
-        // Grab the curve's handle and pull (0.25s), then let go: it shakes back (0.55s).
+        // Grab the curve's handle and pull (0.25s), then let go: it shakes back (0.55s) and the
+        // letter fills in.
         .set(handle, { opacity: 1 })
         .to(state, { b: 18, duration: 0.25, ease: 'power2.out' })
         .to(state, { b: 0, duration: 0.55, ease: 'elastic.out(1.1, 0.3)' })
-        .to(shape, { opacity: 1, duration: 0.25 }, '<0.05')
-        .to([outline, nodes, handle], { opacity: 0, duration: 0.25 }, '<0.15')
-        // The pen goes back to being the apostrophe.
-        .to(state, { at: 0, duration: 0.35, ease: 'power2.inOut' }, '<')
+        .to(real, { opacity: 1, duration: 0.25 }, '<0.2')
+        .to([outline, nodes, handle], { opacity: 0, duration: 0.25 }, '<0.1')
+        // Hop back; the gap pops open to make room and the pen lands with a squash.
+        .to(state, hopTo(0), '<')
+        .fromTo(state, { hop: 0 }, { hop: 1, duration: 0.45, ease: 'none' }, '<')
+        .to(home, { width: () => slot.width, marginLeft: () => slot.margin, marginRight: () => slot.margin, duration: 0.5, ease: 'elastic.out(1.1, 0.45)' }, '<0.25')
+        .fromTo(pen, { scaleY: 0.75, scaleX: 1.2 }, { scaleY: 1, scaleX: 1, duration: 0.4, ease: 'elastic.out(1.2, 0.35)', transformOrigin: '50% 100%', immediateRender: false }, '<0.15')
+        // Back to the stylesheet's em sizes, so the slot keeps scaling with the type.
+        .set(home, { clearProps: 'width,marginLeft,marginRight' })
 
-      const io = new IntersectionObserver(
-        ([e]) => {
-          if (!e.isIntersecting) return
-          io.disconnect()
-          tl.play()
-        },
-        { threshold: 0.7 },
-      )
-      io.observe(h)
-      return () => io.disconnect()
+      let io: IntersectionObserver | undefined
+      document.fonts.ready.then(() => {
+        if (!root.current) return
+        fit()
+        const cs = getComputedStyle(home)
+        slot.width = parseFloat(cs.width)
+        slot.margin = parseFloat(cs.marginLeft)
+        len = outline.getTotalLength()
+        gsap.set(real, { opacity: 0 })
+        gsap.set(outline, { strokeDasharray: len, strokeDashoffset: len, opacity: 1 })
+        gsap.set([nodes, handle], { opacity: 0 })
+        io = new IntersectionObserver(
+          ([e]) => {
+            if (!e.isIntersecting) return
+            io?.disconnect()
+            tl.play()
+          },
+          { threshold: 0.7 },
+        )
+        io.observe(h)
+      })
+      window.addEventListener('resize', fit)
+      return () => {
+        io?.disconnect()
+        window.removeEventListener('resize', fit)
+      }
     },
     { scope: root },
   )
@@ -135,22 +175,27 @@ function BuildHeading() {
         Let
         {/* The pen: sits where the apostrophe goes. */}
         <span data-home className="relative mx-[0.02em] inline-block h-[0.3em] w-[0.22em] -translate-y-[0.42em] align-baseline">
-          <span data-pen className="absolute inset-0 z-10 will-change-transform">
+          <span data-pen className="absolute bottom-0 left-1/2 z-10 -ml-[0.11em] h-[0.3em] w-[0.22em] will-change-transform">
             <PenIcon />
           </span>
         </span>
-        s <span className="tracking-[-0.02em]">BUIL</span>
-        <svg data-d viewBox="0 0 100 100" className="ml-[0.03em] inline-block h-[0.72em] w-[0.66em] overflow-visible align-baseline">
-          <path data-shape d={outer(0) + inner(0)} fill="currentColor" fillRule="evenodd" />
-          <path data-outline d={outer(0)} fill="none" stroke={SELECT} strokeWidth="1.5" vectorEffect="non-scaling-stroke" opacity="0" />
-          {NODES.map(([x, y]) => (
-            <rect key={`${x}-${y}`} data-node x={x - 3} y={y - 3} width="6" height="6" fill="#fff" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" opacity="0" />
-          ))}
-          <g data-handle opacity="0">
-            <line x1="88" y1="50" x2="88" y2="18" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" />
-            <circle cx="88" cy="18" r="3.2" fill={SELECT} />
-          </g>
-        </svg>
+        s{' '}
+        <span className="tracking-[-0.02em]">
+          BUIL
+          <span className="relative">
+            <span data-real>D</span>
+            <svg data-d viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute top-0 left-0 overflow-visible">
+              <path data-outline d={outer(0)} fill="none" stroke={SELECT} strokeWidth="1.5" vectorEffect="non-scaling-stroke" opacity="0" />
+              {NODES.map(([x, y]) => (
+                <rect key={`${x}-${y}`} data-node x={x - 3} y={y - 3} width="6" height="6" fill="#fff" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" opacity="0" />
+              ))}
+              <g data-handle opacity="0">
+                <line x1="88" y1="50" x2="88" y2="18" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                <circle cx="88" cy="18" r="3.2" fill={SELECT} />
+              </g>
+            </svg>
+          </span>
+        </span>
       </span>
     </h2>
   )
