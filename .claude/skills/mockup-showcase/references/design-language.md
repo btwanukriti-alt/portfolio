@@ -37,7 +37,7 @@ Dashed line (3px, round, `3 9`) ending in a dot in the product colour with a 3px
 ## 7. Build recipe
 1. Audit the frames at full size. List content faults.
 2. Rebuild the needed screens as HTML (see `scripts/mockups/ssh-client/screens-src/`), render at 3x with Playwright.
-3. Compose modules from crops (`scripts/mockups/ssh-client/modules.html`), render to JPEG.
+3. Compose modules from crops in HTML styled and laid out with **Tailwind CSS only** (utility classes; tokens in one `@theme` block; compiled with the repo's Tailwind v4 via `@tailwindcss/postcss`), render to JPEG with Playwright.
 4. Check every module on a contact sheet. Fix before showing.
 5. Show the modules. **Wait for approval before building the page.**
 6. Page: add the project to `src/data/galleries.ts` (accent, deep, soft, tint, pop, font, mark, note, images), delete old slide images that show earlier UI or a name, keep the card video unless she says drop it.

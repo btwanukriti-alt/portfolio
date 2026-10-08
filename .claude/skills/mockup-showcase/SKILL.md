@@ -55,7 +55,7 @@ Sources she sent: Behance "Stratus CRM", "Dialin" (AI phone and chat system), "F
 1. Load the project's entry from `src/data/caseStudies.ts`. Its `visuals` list says what exists (`ready`, `export`, `make`, `missing`).
 2. Pick 8 to 10 modules from the list above. The first spread leads with the standout idea.
 3. For each, write: the source frame, the module type, the plate layout, and the title block text (title of 6 words or fewer, description of 20 words or fewer).
-4. Build the modules. In the cloud session Figma's image host is blocked, so render them from HTML: the screens as HTML (see `scripts/mockups/`), cloned into plates, exported with Playwright as 2400px JPEGs. Photos come from Figma screenshots of the image layers (`get_screenshot`, base64). Or build them in Figma through the Figma MCP (load `figma-use` first).
+4. Build the modules with **Tailwind CSS** (Anukriti's rule, Oct 2026): every module is HTML styled and laid out only with Tailwind utility classes. Project tokens (ground, plate, product colour, radii) go in one `@theme` block; no other hand-written CSS. Compile with the repo's Tailwind v4 (`@tailwindcss/postcss`), then export with Playwright as 2400px JPEGs. In the cloud session Figma's image host is blocked, so the screens and components come in as Figma exports (see `scripts/mockups/`). Photos come from Figma screenshots of the image layers (`get_screenshot`, base64). Or build them in Figma through the Figma MCP (load `figma-use` first).
 5. The page is `src/components/GalleryCaseStudy.tsx`, fed by `src/data/galleries.ts`. Read the Next.js docs in `node_modules/next/dist/docs/` before changing code (see AGENTS.md; run `npm install` first if `node_modules` is missing).
 
 ## Honesty rules (carry over from case-study-editor)
