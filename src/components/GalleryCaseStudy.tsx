@@ -135,7 +135,9 @@ export default function GalleryCaseStudy({
                 className={`grid grid-cols-1 gap-[clamp(12px,1.4vw,20px)] min-[901px]:grid-cols-12 ${
                   section.rows === 3
                     ? 'min-[901px]:grid-rows-[repeat(3,clamp(300px,28vw,420px))]'
-                    : section.rows === 1
+                    : section.rows === 'auto'
+                      ? ''
+                      : section.rows === 1
                       ? 'min-[901px]:grid-rows-[clamp(300px,28vw,420px)]'
                       : 'min-[901px]:grid-rows-[repeat(2,clamp(300px,28vw,420px))]'
                 }`}
@@ -221,6 +223,22 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
     )
   }
   const tall = card.span.includes('row-span-2') && card.height > card.width
+  // fill: the card takes the image's height, for a wide screen in an auto-height row.
+  if (card.fit === 'fill') {
+    return (
+      <Reveal as="figure" className={`${card.span} m-0 overflow-hidden rounded-[clamp(22px,2.4vw,36px)] px-[5%] pt-[3%] pb-[1%] ${SURFACE[card.surface ?? 'plate']}`}>
+        <img
+          className="mx-auto block h-auto w-full max-w-[1080px]"
+          src={card.src}
+          width={card.width}
+          height={card.height}
+          alt={card.alt}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </Reveal>
+    )
+  }
   return (
     <Reveal
       as="figure"

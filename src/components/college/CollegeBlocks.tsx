@@ -175,7 +175,8 @@ export function LowestLine() {
   )
 }
 
-// Dark surface: the bento card supplies the navy, this fills it.
+// Dark surface: the bento card supplies the navy, this fills it. Wide layout: figure and bar on
+// top, the four stats in one row below.
 export function Target() {
   const stats: [string, string][] = [
     ['Pending', '₹31.45 Cr'],
@@ -184,11 +185,13 @@ export function Target() {
     ['Behind target', '−8.1 pts'],
   ]
   return (
-    <div className="flex h-full flex-col justify-between gap-6 text-white">
-      <div>
-        <p className="m-0 text-[12px] font-semibold tracking-[0.1em] text-white/60 uppercase">Total received</p>
-        <p className="m-0 mt-2 text-[clamp(32px,3vw,48px)] leading-none font-semibold tracking-[-0.02em] tabular-nums">₹80.55 Cr</p>
-        <p className="m-0 mt-2 text-[14px] text-white/70 tabular-nums">of ₹112.00 Cr expected · 71.9% collected</p>
+    <div className="flex h-full flex-col justify-between gap-8 text-white">
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
+        <div>
+          <p className="m-0 text-[12px] font-semibold tracking-[0.1em] text-white/60 uppercase">Total received</p>
+          <p className="m-0 mt-2 text-[clamp(34px,3.4vw,52px)] leading-none font-semibold tracking-[-0.02em] tabular-nums">₹80.55 Cr</p>
+        </div>
+        <p className="m-0 text-[14px] text-white/70 tabular-nums">of ₹112.00 Cr expected · 71.9% collected</p>
       </div>
       <div>
         <div className="relative h-2.5 rounded-full bg-white/15">
@@ -201,7 +204,7 @@ export function Target() {
           <span>₹112 Cr</span>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-white/15 pt-5">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-white/15 pt-5 min-[701px]:grid-cols-4">
         {stats.map(([label, value]) => (
           <span key={label} className="flex flex-col gap-1">
             <span className="text-[12px] text-white/60">{label}</span>
@@ -213,64 +216,111 @@ export function Target() {
   )
 }
 
+// Each college's collection against the 80% target, lowest first, with the gap spelled out.
 export function Ranked() {
   const rows: [string, number, number][] = [
     ['Science', 9.5, 17.0],
     ['Law', 14.0, 21.0],
-    ['Arts & Management', 12.55, 18.0],
+    ['Arts & Mgmt', 12.55, 18.0],
     ['Medical', 16.0, 22.0],
     ['Engineering', 28.5, 34.0],
   ]
   return (
     <div className="flex h-full flex-col">
-      <Head title="Colleges, lowest collection first" note="Black tick marks the 80% target" />
-      <div className="mt-5 flex flex-1 flex-col justify-center gap-4">
+      <Head
+        title="Collection by college"
+        note="Lowest first. The tick is the 80% target."
+        right={<span className="rounded-full bg-[#FDE8E6] px-3 py-1 text-[12px] font-semibold text-[#B42318]">4 of 5 below target</span>}
+      />
+      <div className="mt-6 flex flex-col gap-4">
         {rows.map(([name, r, e]) => {
           const p = pct(r, e)
+          const gap = p - 80
           return (
-            <div key={name} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_auto] items-center gap-4">
-              <span className="flex items-center gap-2.5">
-                <i className="h-6 w-1 shrink-0 rounded-full" style={{ background: tone(p) }} />
-                <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
+            <div key={name} className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)_3.5rem_4.5rem] items-center gap-4">
+              <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
+              <TargetBar p={p} />
+              <span className={`text-right text-[14px] font-semibold tabular-nums ${ink}`}>{p.toFixed(1)}%</span>
+              <span className="text-right text-[13px] font-semibold tabular-nums" style={{ color: gap >= 0 ? OK : BAD }}>
+                {gap >= 0 ? '+' : '−'}
+                {Math.abs(gap).toFixed(1)} pts
               </span>
-              <span className="flex flex-col gap-1.5">
-                <TargetBar p={p} />
-                <span className={`text-[11px] tabular-nums ${sub}`}>
-                  ₹{r.toFixed(2)} Cr of ₹{e.toFixed(2)} Cr
-                </span>
-              </span>
-              <Chip p={p} />
             </div>
           )
         })}
+      </div>
+      <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#E6E9EF] pt-5">
+        <span className={`text-[13px] ${sub}`}>Group, all 5 colleges</span>
+        <span className="flex items-center gap-3">
+          <span className={`text-[14px] font-semibold tabular-nums ${ink}`}>71.9%</span>
+          <span className="text-[13px] font-semibold tabular-nums" style={{ color: BAD }}>
+            −8.1 pts
+          </span>
+        </span>
       </div>
     </div>
   )
 }
 
-export function StatusScale() {
-  const steps: [string, string, number, string][] = [
-    ['On target', '80% and above', 84, OK],
-    ['Near target', '70% to 79%', 73, WARN],
-    ['Below target', 'Under 70%', 56, BAD],
-  ]
+// Cumulative collection against the fee schedule, April to December.
+export function Schedule() {
+  const W = 420
+  const H = 200
+  const L = 30
+  const R = 8
+  const T = 12
+  const B = 26
+  const max = 120
+  const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const received = [14, 27, 38, 47, 55, 63, 70, 76, 80.55]
+  const due = [20, 36, 52, 68, 80, 92, 102, 108, 112]
+  const x = (i: number) => L + (i * (W - L - R)) / 8
+  const y = (v: number) => T + (1 - v / max) * (H - T - B)
+  const line = (a: number[]) => a.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join('')
   return (
     <div className="flex h-full flex-col">
-      <Head title="Three colours, one rule" note="Every bar, chip and row uses the same scale" />
-      <div className="mt-5 flex flex-1 flex-col justify-center gap-3">
-        {steps.map(([name, range, p, color]) => (
-          <div key={name} className="flex flex-col gap-3 rounded-[18px] p-4 text-white" style={{ background: color }}>
-            <span className="flex items-baseline justify-between">
-              <span className="text-[15px] font-semibold">{name}</span>
-              <span className="text-[12px] text-white/80">{range}</span>
-            </span>
-            <span className="relative block h-1.5 rounded-full bg-white/30">
-              <span className="absolute inset-y-0 left-0 rounded-full bg-white" style={{ width: `${p}%` }} />
-              <span className="absolute -top-1 -bottom-1 w-[2px] rounded-full bg-white" style={{ left: '80%' }} />
-            </span>
-          </div>
-        ))}
+      <Head title="Collection against schedule" note="Cumulative, ₹ Cr" />
+      <div className={`mt-3 flex gap-4 text-[12px] ${sub}`}>
+        <span className="flex items-center gap-1.5">
+          <i className="h-[3px] w-4 rounded-full bg-[#12326E]" />
+          Received
+        </span>
+        <span className="flex items-center gap-1.5">
+          <i className="h-0 w-4 border-t-2 border-dashed border-[#98A2B3]" />
+          Due
+        </span>
       </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 block w-full" role="img" aria-label="Received ₹80.55 Cr by December against ₹112 Cr due">
+        <defs>
+          <linearGradient id="college-schedule" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="#4F86E8" stopOpacity=".28" />
+            <stop offset="1" stopColor="#4F86E8" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0, 40, 80, 120].map((v) => (
+          <g key={v}>
+            <line x1={L} x2={W - R} y1={y(v)} y2={y(v)} stroke="#E6E9EF" />
+            <text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="10" fill="#667085">
+              {v}
+            </text>
+          </g>
+        ))}
+        {months.map((m, i) => (
+          <text key={m} x={x(i)} y={H - 6} textAnchor="middle" fontSize="10" fill="#667085">
+            {m}
+          </text>
+        ))}
+        <path d={`${line(received)}L${x(8)} ${y(0)}L${x(0)} ${y(0)}Z`} fill="url(#college-schedule)" />
+        <path d={line(due)} fill="none" stroke="#98A2B3" strokeWidth="1.6" strokeDasharray="4 4" />
+        <path d={line(received)} fill="none" stroke="#12326E" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={x(8)} cy={y(80.55)} r="4.5" fill="#12326E" stroke="#fff" strokeWidth="2" />
+        <text x={x(8) - 8} y={y(80.55) + 18} textAnchor="end" fontSize="11" fontWeight="700" fill="#12326E">
+          ₹80.55 Cr
+        </text>
+        <text x={x(8) - 8} y={y(112) - 6} textAnchor="end" fontSize="10" fill="#667085">
+          Due by Dec ₹112 Cr
+        </text>
+      </svg>
     </div>
   )
 }
@@ -279,47 +329,41 @@ export function Attendance() {
   const rows: [string, number, number, number][] = [
     ['Engineering', 512, 28, 31],
     ['Medical', 231, 10, 17],
-    ['Arts & Management', 148, 7, 11],
+    ['Arts & Mgmt', 148, 7, 11],
     ['Science', 130, 6, 12],
     ['Law', 94, 5, 8],
   ]
+  const legend: [string, string][] = [
+    ['Present', OK],
+    ['Absent', BAD],
+    ['On leave', '#F2B53A'],
+  ]
   return (
     <div className="flex h-full flex-col">
-      <Head
-        title="Attendance by college"
-        note="Share of staff, today"
-        right={
-          <span className={`hidden gap-3 text-[12px] min-[1101px]:flex ${sub}`}>
-            {(
-              [
-                ['Present', OK],
-                ['Absent', BAD],
-                ['On leave', '#F2B53A'],
-              ] as const
-            ).map(([l, c]) => (
-              <span key={l} className="flex items-center gap-1.5">
-                <i className="size-2 rounded-full" style={{ background: c }} />
-                {l}
-              </span>
-            ))}
-          </span>
-        }
-      />
-      <div className="mt-5 flex flex-1 flex-col justify-center gap-4">
+      <Head title="Staff attendance today" note="Share of staff present, by college" />
+      <div className="mt-6 flex flex-col gap-4">
         {rows.map(([name, present, absent, leave]) => {
           const t = present + absent + leave
           return (
-            <div key={name} className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] items-center gap-4">
+            <div key={name} className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)_3.5rem] items-center gap-4">
               <span className={`truncate text-[14px] font-semibold ${ink}`}>{name}</span>
               <span className="flex h-2.5 gap-[3px]">
                 <i className="rounded-full" style={{ width: `${(present / t) * 100}%`, background: OK }} />
                 <i className="rounded-full" style={{ width: `${(absent / t) * 100}%`, background: BAD }} />
                 <i className="rounded-full" style={{ width: `${(leave / t) * 100}%`, background: '#F2B53A' }} />
               </span>
-              <span className={`text-[14px] font-semibold tabular-nums ${ink}`}>{((present / t) * 100).toFixed(1)}%</span>
+              <span className={`text-right text-[14px] font-semibold tabular-nums ${ink}`}>{((present / t) * 100).toFixed(1)}%</span>
             </div>
           )
         })}
+      </div>
+      <div className={`mt-auto flex gap-4 pt-6 text-[12px] ${sub}`}>
+        {legend.map(([l, c]) => (
+          <span key={l} className="flex items-center gap-1.5">
+            <i className="size-2 rounded-full" style={{ background: c }} />
+            {l}
+          </span>
+        ))}
       </div>
     </div>
   )
@@ -334,7 +378,8 @@ export function Alerts() {
   return (
     <div className="flex h-full flex-col">
       <Head
-        title="Alerts"
+        title="Finance alerts"
+        note="Receipts and fee changes to review"
         right={
           <span className="flex rounded-full bg-[#E4E7EE] p-1 text-[12px] font-medium">
             <span className={`rounded-full bg-white px-3 py-1 shadow-[0_1px_3px_rgba(16,24,40,0.08)] ${ink}`}>All</span>
@@ -342,14 +387,18 @@ export function Alerts() {
           </span>
         }
       />
-      <div className="mt-4 flex flex-1 flex-col justify-center gap-2.5">
+      <div className="mt-6 flex flex-col gap-2.5">
         {alerts.map(([tag, t, title, detail]) => (
-          <div key={title} className="flex flex-col items-start gap-1 rounded-[16px] bg-white px-4 py-3 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
-            <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${t === 'bad' ? 'bg-[#FDE8E6] text-[#B42318]' : 'bg-[#FDF1D8] text-[#A15C07]'}`}>
+          <div key={title} className="flex items-center justify-between gap-4 rounded-[16px] bg-white px-4 py-3 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className={`text-[14px] font-semibold ${ink}`}>{title}</span>
+              <span className={`truncate text-[12px] tabular-nums ${sub}`}>{detail}</span>
+            </span>
+            <span
+              className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${t === 'bad' ? 'bg-[#FDE8E6] text-[#B42318]' : 'bg-[#FDF1D8] text-[#A15C07]'}`}
+            >
               {tag}
             </span>
-            <span className={`text-[14px] font-semibold ${ink}`}>{title}</span>
-            <span className={`text-[12px] tabular-nums ${sub}`}>{detail}</span>
           </div>
         ))}
       </div>
@@ -363,7 +412,7 @@ export const COLLEGE_BLOCKS: Record<string, () => ReactNode> = {
   'lowest-line': LowestLine,
   target: Target,
   ranked: Ranked,
-  status: StatusScale,
+  schedule: Schedule,
   attendance: Attendance,
   alerts: Alerts,
 }

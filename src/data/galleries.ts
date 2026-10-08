@@ -33,13 +33,13 @@ export type Brand = {
 // the accent colour.
 export type Surface = 'plate' | 'tint' | 'deep' | 'pop' | 'white'
 export type BentoCard =
-  | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top'; size?: string; surface?: Surface }
+  | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top' | 'fill'; size?: string; surface?: Surface }
   | { kind: 'text'; kicker: string; title: string; text: string; span: string; surface?: Surface }
   // A component rebuilt in React (src/components/zync/ZyncBlocks.tsx); the card is its surface.
   | { kind: 'block'; block: string; label: string; span: string; surface?: Surface }
 
 // rows: how many grid rows the section uses on desktop (2 by default, or 3).
-export type GallerySection = { label: string; rows?: 1 | 2 | 3; cards: BentoCard[] }
+export type GallerySection = { label: string; rows?: 1 | 2 | 3 | 'auto'; cards: BentoCard[] }
 
 type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[]; sections?: GallerySection[] }
 
@@ -74,7 +74,7 @@ const text = (kicker: string, title: string, body: string, span: string): BentoC
 const block = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span })
 
 // College ERP bento cards: laptop screens from public/case-studies/college-management/ui/.
-const cui = (file: string, alt: string, span: string, surface?: Surface): BentoCard => ({
+const cui = (file: string, alt: string, span: string, surface?: Surface, fit?: 'fill'): BentoCard => ({
   kind: 'ui',
   src: `/case-studies/college-management/ui/${file}.webp`,
   width: 2776,
@@ -82,6 +82,7 @@ const cui = (file: string, alt: string, span: string, surface?: Surface): BentoC
   alt,
   span,
   surface,
+  fit,
 })
 
 const cblock = (name: string, label: string, span: string, surface?: Surface): BentoCard => ({ kind: 'block', block: name, label, span, surface })
@@ -190,24 +191,26 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       },
       {
         label: 'Finance dashboard',
+        rows: 'auto',
         cards: [
-          cui('laptop-finance', 'The finance overview: total received against target, the weakest college, collection trend and alerts', 'min-[901px]:col-span-8 min-[901px]:row-span-2', 'tint'),
           ctext(
             'Dashboard · Finance overview',
             'Collected against a target',
             'One bar and one marker show how far the group is from 80%. The weakest college is named right under it.',
-            'min-[901px]:col-span-4',
+            'min-[901px]:col-span-5',
             'pop',
           ),
-          cblock('target', 'Total received: ₹80.55 Cr of ₹112.00 Cr, against the 80% target', 'min-[901px]:col-span-4', 'deep'),
+          cblock('target', 'Total received: ₹80.55 Cr of ₹112.00 Cr, against the 80% target', 'min-[901px]:col-span-7', 'deep'),
+          cui('laptop-finance', 'The finance overview: total received against target, the weakest college, collection trend and alerts', 'col-span-12', 'tint', 'fill'),
         ],
       },
       {
         label: 'Widgets',
+        rows: 'auto',
         cards: [
-          cblock('ranked', 'Colleges ranked by collection, lowest first, against the 80% target', 'min-[901px]:col-span-7', 'white'),
-          cblock('status', 'The status scale: on target, near target and below target', 'min-[901px]:col-span-5', 'plate'),
-          cblock('attendance', 'Staff attendance by college: present, absent and on leave', 'min-[901px]:col-span-6', 'tint'),
+          cblock('ranked', 'Collection by college, lowest first, with each gap to the 80% target', 'min-[901px]:col-span-7', 'white'),
+          cblock('schedule', 'Cumulative collection against the fee schedule, April to December', 'min-[901px]:col-span-5', 'plate'),
+          cblock('attendance', 'Staff attendance today: share present by college', 'min-[901px]:col-span-6', 'tint'),
           cblock('alerts', 'Finance alerts: cancelled receipts and an approved concession', 'min-[901px]:col-span-6', 'plate'),
         ],
       },
