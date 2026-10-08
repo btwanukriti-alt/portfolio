@@ -145,15 +145,19 @@ function BuildHeading() {
         gsap.set(real, { opacity: 0 })
         gsap.set(outline, { strokeDasharray: len, strokeDashoffset: len, opacity: 1 })
         gsap.set([nodes, handle], { opacity: 0 })
+        // Play once the visitor is actually at the frame: (nearly) all of it on screen, or as
+        // much of it as fits when it's taller than the window.
+        const frame = h.closest<HTMLElement>('[data-frame]') ?? h
+        const need = Math.min(0.9, (0.9 * window.innerHeight) / frame.offsetHeight)
         io = new IntersectionObserver(
           ([e]) => {
-            if (!e.isIntersecting) return
+            if (e.intersectionRatio < need) return
             io?.disconnect()
-            tl.play()
+            gsap.delayedCall(0.3, () => tl.play())
           },
-          { threshold: 0.7 },
+          { threshold: [need] },
         )
-        io.observe(h)
+        io.observe(frame)
       })
       window.addEventListener('resize', fit)
       return () => {
@@ -242,7 +246,7 @@ export default function Contact({ current }: { current?: string } = {}) {
           <span className="absolute bottom-full left-0 mb-2 text-[12px] leading-none font-medium" style={{ color: SELECT }}>
             Let&apos;s build
           </span>
-          <div className="relative bg-ink text-white outline outline-1 outline-offset-0" style={{ outlineColor: SELECT }}>
+          <div data-frame className="relative bg-ink text-white outline outline-1 outline-offset-0" style={{ outlineColor: SELECT }}>
             <Shapes />
             <div className="relative flex flex-col gap-10 min-h-[clamp(320px,30vw,440px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(44px,5vw,72px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
               <div>
