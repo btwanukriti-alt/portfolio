@@ -10,7 +10,7 @@ const rubikMono = Rubik_Mono_One({ subsets: ['latin'], weight: '400', variable: 
 // Figma Hand isn't a public web font; Architects Daughter is the closest match.
 const architects = Architects_Daughter({ subsets: ['latin'], weight: '400', variable: '--font-architects' })
 // Used by the slide counter patch, to match the Poppins in the presentation slides.
-const poppins = Poppins({ subsets: ['latin'], weight: '500', variable: '--font-poppins' })
+const poppins = Poppins({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-poppins' })
 // The intro hero (Figma-style type and UI labels).
 const interTight = Inter_Tight({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-inter-tight' })
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], weight: '400', variable: '--font-jetbrains' })

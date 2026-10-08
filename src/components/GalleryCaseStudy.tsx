@@ -7,6 +7,7 @@ import SiteHeader from './SiteHeader'
 import ShowcaseVideo from './ShowcaseVideo'
 import Contact from './Contact'
 import { Reveal, SplitReveal } from './Reveal'
+import { ZYNC_BLOCKS } from './zync/ZyncBlocks'
 
 // Visual-first case study page (the mockup-showcase layout): the description is short and sits on
 // top, the mockups run in one long gallery below. The project's own colours come in as CSS
@@ -185,6 +186,15 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
         <p className="m-0 text-[12px] leading-none font-semibold tracking-[0.1em] text-white/70 uppercase">{card.kicker}</p>
         <h3 className="m-0 mt-4 text-[clamp(28px,2.7vw,44px)] leading-[1.08] font-light tracking-[-0.025em]">{card.title}</h3>
         <p className="m-0 mt-4 max-w-[36ch] text-[clamp(15px,1.1vw,17px)] leading-[1.55] text-white/85">{card.text}</p>
+      </Reveal>
+    )
+  }
+  if (card.kind === 'block') {
+    const Block = ZYNC_BLOCKS[card.block]
+    return (
+      <Reveal as="figure" className={`${card.span} m-0 rounded-[clamp(22px,2.4vw,36px)] bg-white p-[clamp(22px,2.6vw,40px)] ring-1 ring-[#E9E8F0]`}>
+        <figcaption className="sr-only">{card.label}</figcaption>
+        <Block />
       </Reveal>
     )
   }

@@ -27,10 +27,12 @@ export type Brand = {
 
 // Bento page (Zync): each feature is a two-row grid of cards. A 'ui' card holds one transparent
 // component image from public/case-studies/<folder>/ui/ with room around it; a 'text' card is the
-// feature's text box. `span` holds the card's grid classes on the 12-column desktop grid.
+// feature's text box; a 'block' card is a component rebuilt in React. `span` holds the card's grid classes on the 12-column desktop grid.
 export type BentoCard =
   | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top'; size?: string }
   | { kind: 'text'; kicker: string; title: string; text: string; span: string }
+  // A component rebuilt in React (src/components/zync/ZyncBlocks.tsx); the card is its surface.
+  | { kind: 'block'; block: string; label: string; span: string }
 
 export type GallerySection = { label: string; cards: BentoCard[] }
 
@@ -64,6 +66,8 @@ const ui = (file: string, width: number, height: number, alt: string, span: stri
 
 const text = (kicker: string, title: string, body: string, span: string): BentoCard => ({ kind: 'text', kicker, title, text: body, span })
 
+const block = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span })
+
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
   width: 2400,
@@ -93,50 +97,41 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         cards: [
           ui('logo', 4824, 2748, 'The Zync logo on its construction grid, with measurements and clear space', 'col-span-12', 'max-w-[78%]'),
           ui('icon', 2484, 2448, 'The Zync app icon inside concentric squares', 'min-[901px]:col-span-4'),
-          ui('palette', 2142, 2142, 'The Zync colour palette: primary, deep, accent and the tracker colours', 'min-[901px]:col-span-4'),
-          text('Brand', 'The mark came first', 'Colour and type were set before any screen. Every card on this page draws from them.', 'min-[901px]:col-span-4'),
+          block('palette', 'The Zync colour palette: primary, deep, accent and the tracker colours', 'min-[901px]:col-span-8'),
         ],
       },
       {
-        label: 'Main feature',
+        label: 'Main feature: Home',
         cards: [
           ui('phone-home', 1542, 2904, 'The Zync Home screen on a phone', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          text('Main feature · Home', 'Your day, at a glance', 'Calories against the goal, steps, BMI and the next class, on one scroll.', 'min-[901px]:col-span-4'),
-          ui('calories', 1338, 1362, 'The calorie card with burned and consumed tabs and a ring per activity', 'min-[901px]:col-span-4'),
-          ui('stats', 2052, 2088, 'Four daily stat tiles: burned, consumed, steps and water', 'min-[901px]:col-span-4'),
-          ui('table', 3168, 2208, 'The class table with staff, time, spots and status', 'min-[901px]:col-span-4'),
+          text('Main feature · Home', 'The whole day on one screen', 'Calories against the goal, steps, BMI and the next class. A member reads the day before the first scroll.', 'min-[901px]:col-span-4'),
+          block('calories', 'The calorie ring: 900 of 1,200 cal burned, split by activity', 'min-[901px]:col-span-4'),
+          block('today', 'Four tiles for today: burned, consumed, steps and water', 'min-[901px]:col-span-8'),
         ],
       },
       {
         label: 'Gym',
         cards: [
           ui('phone-gym', 1542, 2904, 'The Gym tab on a phone, with the check-in card and upcoming classes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          ui('qr', 1872, 1764, 'The check-in QR card', 'min-[901px]:col-span-4'),
-          text('Gym · Check-in and classes', 'Check in, then book', "The gym's QR sits one tap from the Gym tab. Each class shows book, waitlist or booked before the tap.", 'min-[901px]:col-span-4'),
-          ui('classes', 1338, 1368, 'Three class cards: available, full with a waitlist, and booked', 'min-[901px]:col-span-4'),
-          ui('phone-events', 1542, 2904, 'The Gym Events screen with the week strip and class list', 'min-[901px]:col-span-4', 'top'),
+          block('checkin', 'The check-in QR card', 'min-[901px]:col-span-4'),
+          text('Gym · Check-in and classes', 'Check in, then book', 'The QR is one tap from the Gym tab. Each class says book, join the waitlist or booked before the tap.', 'min-[901px]:col-span-4'),
+          block('classes', 'Three classes: one to book, one full with a waitlist, one booked', 'min-[901px]:col-span-8'),
         ],
       },
       {
-        label: 'Tracking',
+        label: 'Log',
         cards: [
-          text('Health · Tracking', 'Log in two taps', 'Shortcuts for every log. Water, sleep and food follow one pattern: a ring, a goal, a week.', 'min-[901px]:col-span-4'),
-          ui('tiles', 1338, 1368, 'Log shortcuts for food, water, sleep, workout, steps and weight', 'min-[901px]:col-span-4'),
-          ui('water-chart', 1338, 1158, 'Daily water intake over seven days against a goal of 12 glasses', 'min-[901px]:col-span-4'),
-          ui('water-ring', 1458, 1026, 'The hydration ring: 1,600 of 3,000 ml', 'min-[901px]:col-span-3'),
-          ui('sleep-ring', 1458, 1026, 'The sleep ring: 6h 30m of an 8h goal', 'min-[901px]:col-span-3'),
-          ui('sleep-chart', 1338, 1158, 'Sleep analysis over seven days against an 8h goal', 'min-[901px]:col-span-3'),
-          ui('macros', 1338, 786, 'Macros: protein, carbs, fat and fibre against their goals', 'min-[901px]:col-span-3'),
+          text('Log', 'Every tracker reads the same way', 'Food, water, sleep, workout, steps and weight open from one Log tab. Each shows today against the goal, then the week.', 'min-[901px]:col-span-4'),
+          ui('phone-log', 1542, 2904, 'The Log screen with six tracker shortcuts and quick add', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          ui('phone-water', 1542, 2904, 'The Hydration screen with the intake ring and glass sizes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
+          block('hydration', 'The hydration ring with quick amounts and the glass stepper', 'min-[901px]:col-span-4'),
         ],
       },
       {
         label: 'Workouts',
         cards: [
-          text('Workouts', 'Plans show level and length', 'Beginner, five weeks, sixty minutes. A member knows before opening a plan.', 'min-[901px]:col-span-4'),
-          ui('plan-1', 1338, 1176, 'The Core Plus workout plan card', 'min-[901px]:col-span-4'),
-          ui('phone-workout', 1542, 2904, 'The workout detail screen with duration, session, level and the exercise list', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          ui('plan-2', 978, 957, 'The Game Changer workout plan card', 'min-[901px]:col-span-4'),
-          ui('plan-3', 978, 957, 'The Stretching workout plan card', 'min-[901px]:col-span-4'),
+          ui('phone-workout', 1542, 2904, 'The workout detail screen with duration, session, level and the exercise list', 'min-[901px]:col-span-5 min-[901px]:row-span-2'),
+          block('plans', 'Suggested workout plans with length, session time and tags', 'min-[901px]:col-span-7 min-[901px]:row-span-2'),
         ],
       },
     ],
