@@ -58,7 +58,7 @@ type Row = {
   vertical: boolean
 }
 // Room kept above the frame for the section heading (px).
-const TITLE_SPACE = 96
+const TITLE_SPACE = 80
 function rowFor(vw: number, vh: number): Row {
   const portrait = vh > vw
   const vertical = portrait && vw < 720
@@ -66,8 +66,8 @@ function rowFor(vw: number, vh: number): Row {
   const small = vw < 720
   const strip = small ? 10 : Math.min(26, Math.max(16, vw * 0.015))
   const gap = small ? 4 : 8
-  const padX = Math.min(96, Math.max(16, vw * 0.06))
-  const padY = Math.min(140, Math.max(84, vh * (portrait ? 0.1 : 0.14)))
+  const padX = Math.min(56, Math.max(16, vw * 0.035))
+  const padY = Math.min(88, Math.max(48, vh * (portrait ? 0.07 : 0.08)))
   const rest = (N - 1) * (strip + gap)
   const head = small ? 72 : TITLE_SPACE
   if (vertical) {
