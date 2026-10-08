@@ -31,7 +31,7 @@ export type Brand = {
 // surface: the card's ground. plate (light grey, default), tint (the project's soft colour), deep (a
 // dark gradient in the project's deep colour), pop (the second accent), white. Text cards default to
 // the accent colour.
-export type Surface = 'plate' | 'tint' | 'deep' | 'pop' | 'white' | 'night'
+export type Surface = 'plate' | 'tint' | 'deep' | 'pop' | 'white' | 'night' | 'aqua'
 export type BentoCard =
   | { kind: 'ui'; src: string; width: number; height: number; alt: string; span: string; fit?: 'contain' | 'top' | 'fill'; size?: string; surface?: Surface }
   | { kind: 'text'; kicker: string; title: string; text: string; span: string; surface?: Surface }
@@ -95,7 +95,7 @@ const sui = (file: string, alt: string, span: string, size: [number, number], fi
 
 const sblock = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span, surface: 'night' })
 
-const stext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
+const stext = (kicker: string, title: string, body: string, span: string, surface: Surface = 'deep'): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
 
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
@@ -239,11 +239,11 @@ export const GALLERIES: Record<string, GalleryConfig> = {
     studyKey: 'ssh-client',
     note: 'Screens are rebuilt for this portfolio with sample content. Every figure in them is sample data.',
     brand: {
-      accent: '#6D34D8',
-      deep: '#3B1D91',
-      soft: '#EFE9FD',
-      tint: '#E4DBFF',
-      pop: '#1E9FE6',
+      accent: '#7C5CFF',
+      deep: '#2B1C70',
+      soft: '#F1EDFF',
+      tint: '#E6DEFF',
+      pop: '#3B82F6',
       font: 'var(--font-outfit), var(--font-hanken), sans-serif',
       mark: { src: '/brand/ssh-client-mark.png', ratio: 84 / 80 },
     },
@@ -262,10 +262,9 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         label: 'Main feature: host stats',
         rows: 'auto',
         cards: [
-          sui('overview', 'The API Gateway overview with host info, system metadata and security insights', 'min-[901px]:col-span-7 min-[901px]:row-span-3', [988, 952], 'fill'),
+          sui('overview', 'The API Gateway overview with host info, system metadata and security insights', 'min-[901px]:col-span-7 min-[901px]:row-span-2', [988, 952], 'fill'),
           stext('Main feature · Host stats', 'Open a host, see its health', 'Uptime, traffic and security, before you type a command.', 'min-[901px]:col-span-5'),
           sblock('ssh-network', 'Live download and upload rates for eth0', 'min-[901px]:col-span-5'),
-          sblock('ssh-security', 'Security insights with one disk warning', 'min-[901px]:col-span-5'),
         ],
       },
       {
@@ -277,7 +276,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
         label: 'Main feature: terminal settings',
         rows: 2,
         cards: [
-          stext('Main feature · Terminal settings', 'Commands you don’t retype', 'Save scripts as packages. Rerun anything from history.', 'min-[901px]:col-span-4', 'pop'),
+          stext('Main feature · Terminal settings', 'Commands you don’t retype', 'Save scripts as packages. Rerun anything from history.', 'min-[901px]:col-span-4', 'aqua'),
           sui('packages', 'Command packages with devops-kit open', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
           sui('history', 'Command history filtered by host and week', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
           sblock('ssh-autocomplete', 'Autocomplete toggle, a suggested command and Ask AI', 'min-[901px]:col-span-4'),

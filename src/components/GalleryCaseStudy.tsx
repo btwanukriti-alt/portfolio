@@ -20,7 +20,8 @@ const SURFACE: Record<Surface, string> = {
   deep: 'bg-[radial-gradient(120%_140%_at_85%_0%,var(--c-accent)_0%,var(--c-deep)_70%)] text-white',
   pop: 'bg-[var(--c-pop)] text-white',
   white: 'bg-white ring-1 ring-[#E7E8EE]',
-  night: 'bg-[radial-gradient(120%_120%_at_85%_0%,#221B3A_0%,#0C0C13_62%)] text-white',
+  night: 'bg-[radial-gradient(90%_70%_at_100%_0%,rgba(124,92,255,0.16),transparent_70%),linear-gradient(180deg,#121218,#0B0B0F)] ring-1 ring-white/[0.06] text-white',
+  aqua: 'bg-[linear-gradient(135deg,#22D3EE_0%,#3B82F6_60%,#6366F1_100%)] text-white',
 }
 
 // Visual-first case study page (the mockup-showcase layout): the description is short and sits on
@@ -129,7 +130,7 @@ export default function GalleryCaseStudy({
         </p>
 
         {sections ? (
-          <div className="mt-6 flex flex-col gap-[clamp(40px,7vh,88px)]">
+          <div className="mt-6 flex flex-col gap-[clamp(16px,1.8vw,28px)]">
             {sections.map((section, i) => (
               <section
                 key={section.label}
