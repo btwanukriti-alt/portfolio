@@ -134,7 +134,7 @@ export default function Contact({ current }: { current?: string } = {}) {
         </span>
         <div className="relative bg-ink text-white outline outline-1 outline-offset-0" style={{ outlineColor: SELECT }}>
           <Shapes />
-          <div className="relative flex flex-col gap-10 min-h-[clamp(440px,42vw,620px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(56px,7vw,104px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
+          <div className="relative flex flex-col gap-10 min-h-[clamp(320px,30vw,440px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(44px,5vw,72px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
             <div>
               <p className="m-0 text-[15px] leading-none font-medium text-white/55">Contact</p>
               <h2
