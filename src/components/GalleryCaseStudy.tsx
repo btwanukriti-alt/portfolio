@@ -194,7 +194,7 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
   if (card.kind === 'block') {
     const Block = ZYNC_BLOCKS[card.block]
     return (
-      <Reveal as="figure" className={`${card.span} m-0 rounded-[clamp(22px,2.4vw,36px)] bg-white p-[clamp(22px,2.6vw,40px)] ring-1 ring-[#E9E8F0]`}>
+      <Reveal as="figure" className={`${card.span} m-0 rounded-[clamp(22px,2.4vw,36px)] bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] p-[clamp(22px,2.6vw,40px)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)]`}>
         <figcaption className="sr-only">{card.label}</figcaption>
         <Block />
       </Reveal>
