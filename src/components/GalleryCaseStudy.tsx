@@ -58,33 +58,11 @@ export default function GalleryCaseStudy({
             <Reveal as="p" className="m-0 inline-flex rounded-full bg-[var(--c-soft)] px-4 py-[7px] text-[13px] leading-none font-semibold text-[var(--c-accent)]">
               {meta}
             </Reveal>
-            <div className="mt-6 flex items-center gap-[clamp(14px,2.2vw,32px)]">
-              {brand.mark &&
-                (brand.mark.full ? (
-                  <img
-                    src={brand.mark.src}
-                    alt={`${title} logo`}
-                    className="block h-[clamp(56px,9vw,132px)] w-auto shrink-0"
-                    style={{ aspectRatio: brand.mark.ratio }}
-                  />
-                ) : (
-                  <span
-                    role="img"
-                    aria-label={`${title} logo`}
-                    className="block h-[clamp(56px,9vw,132px)] shrink-0 bg-[var(--c-accent)]"
-                    style={{
-                      aspectRatio: brand.mark.ratio,
-                      WebkitMask: `url(${brand.mark.src}) center / contain no-repeat`,
-                      mask: `url(${brand.mark.src}) center / contain no-repeat`,
-                    }}
-                  />
-                ))}
-              <SplitReveal
-                as="h1"
-                className={`m-0 ${brand.font ? '[font-family:var(--c-font)]' : 'font-wordmark-zync'} text-[clamp(64px,12vw,184px)] leading-[0.95] font-bold tracking-[-0.035em] text-ink`}
-                text={title}
-              />
-            </div>
+            <SplitReveal
+              as="h1"
+              className={`m-0 mt-6 ${brand.font ? '[font-family:var(--c-font)]' : 'font-wordmark-zync'} text-[clamp(40px,5.5vw,84px)] leading-[1] font-bold tracking-[-0.035em] text-ink`}
+              text={title}
+            />
           </div>
           <Reveal as="p" className="m-0 max-w-[24ch] text-[clamp(22px,2.4vw,36px)] leading-[1.25] font-medium tracking-[-0.02em] text-ink" delay={150}>
             {study.hook}
@@ -124,7 +102,7 @@ export default function GalleryCaseStudy({
 
         <Reveal className="mt-[clamp(40px,7vh,80px)] rounded-[28px] bg-[var(--c-tint)] px-[clamp(24px,5vw,72px)] py-[clamp(32px,6vw,72px)]">
           <p className="m-0 text-[13px] leading-none font-semibold tracking-[0.08em] text-[var(--c-pop)] uppercase">The idea</p>
-          <p className="m-0 mt-4 max-w-[20ch] text-[clamp(32px,5.4vw,84px)] leading-[1.02] font-semibold tracking-[-0.035em] text-[var(--c-deep)]">
+          <p className="m-0 mt-4 max-w-[34ch] text-[clamp(20px,2vw,28px)] leading-[1.3] font-semibold tracking-[-0.02em] text-[var(--c-deep)]">
             {study.standout}
           </p>
         </Reveal>
