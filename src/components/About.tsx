@@ -4,8 +4,8 @@ import { useRef } from 'react'
 import { Reveal } from './Reveal'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
-// About: a headline set like a Figma selection, the disciplines as coloured chips, a career
-// timeline of pastel cards on a gradient line, and four short notes. Roles from the resume.
+// About: a headline with an empty Figma frame for the blank canvas, the disciplines as coloured
+// chips, a slim career timeline on a gradient line, and four short notes. Roles from the resume.
 
 const SELECT = '#7B61FF'
 
@@ -18,14 +18,14 @@ const CHIPS = [
   { label: 'AI features', bg: '#FFE8EE', fg: '#9E1F45' },
 ]
 
-type Stop = { year: string; role: string; company: string; kind: string; bg: string; dot: string }
+type Stop = { year: string; role: string; company: string; kind: string; dot: string }
 
-// From the resume (Anukriti Mishra_ UI UX Designer.pdf). Each card takes a colour from the palette.
+// From the resume (Anukriti Mishra_ UI UX Designer.pdf). Each stop takes a colour from the palette.
 const STOPS: Stop[] = [
-  { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', kind: 'Internship', bg: '#E4ECFF', dot: '#4F86E8' },
-  { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', kind: 'Internship', bg: '#FFF1E6', dot: '#F28C28' },
-  { year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', kind: 'Internship', bg: '#EEE8FF', dot: SELECT },
-  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', kind: 'Freelance', bg: '#E3F6EC', dot: '#1A9E6E' },
+  { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', kind: 'Internship', dot: '#4F86E8' },
+  { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', kind: 'Internship', dot: '#F28C28' },
+  { year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', kind: 'Internship', dot: SELECT },
+  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', kind: 'Freelance', dot: '#1A9E6E' },
 ]
 
 const ABOUT = [
@@ -52,7 +52,7 @@ export default function About() {
       const scrollTrigger = { trigger: timeline.current, start: 'top 82%', once: true }
       gsap.to(line, { scale: 1, duration: 1.4, ease: 'power2.inOut', scrollTrigger })
       gsap.fromTo(dots, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out', stagger: 0.22, delay: 0.15, scrollTrigger })
-      gsap.fromTo(cards, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12, delay: 0.25, scrollTrigger })
+      gsap.fromTo(cards, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12, delay: 0.25, scrollTrigger })
     },
     { scope: timeline },
   )
@@ -70,34 +70,33 @@ export default function About() {
         </Reveal>
         <div>
           <Reveal as="h2" id="about-heading" className="m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] text-ink">
-            I design{' '}
+            I take products from a{' '}
             <span className="relative inline-block">
-              <span aria-hidden="true" className="absolute -inset-x-[0.1em] inset-y-[0.04em]" >
-                <span className="absolute inset-0 border-[1.5px]" style={{ borderColor: SELECT }} />
-              {[
-                [0, 0],
-                [100, 0],
-                [0, 100],
-                [100, 100],
-              ].map(([x, y]) => (
+              {/* An empty Figma frame: the blank canvas everything starts on. */}
+              <span aria-hidden="true" className="absolute -inset-x-[0.1em] inset-y-[0.04em]">
+                <span className="absolute inset-0 border-[1.5px] border-dashed" style={{ borderColor: SELECT }} />
+                {[
+                  [0, 0],
+                  [100, 0],
+                  [0, 100],
+                  [100, 100],
+                ].map(([x, y]) => (
+                  <span
+                    key={`${x}-${y}`}
+                    className="absolute size-[clamp(6px,0.6vw,9px)] -translate-x-1/2 -translate-y-1/2 border-[1.5px] bg-white"
+                    style={{ left: `${x}%`, top: `${y}%`, borderColor: SELECT }}
+                  />
+                ))}
                 <span
-                  key={`${x}-${y}`}
-                  aria-hidden="true"
-                  className="absolute size-[clamp(6px,0.6vw,9px)] -translate-x-1/2 -translate-y-1/2 border-[1.5px] bg-white"
-                  style={{ left: `${x}%`, top: `${y}%`, borderColor: SELECT }}
-                />
-              ))}
-              <span
-                aria-hidden="true"
-                className="absolute bottom-full left-0 mb-[6px] rounded-[3px] px-[6px] py-[3px] text-[clamp(10px,0.8vw,12px)] leading-none font-medium tracking-normal whitespace-nowrap text-white"
-                style={{ background: SELECT }}
-              >
-                Product
+                  className="absolute top-0 left-full ml-[0.35em] rounded-[3px] px-[6px] py-[3px] text-[clamp(10px,0.8vw,12px)] leading-none font-medium tracking-normal whitespace-nowrap text-white"
+                  style={{ background: SELECT }}
+                >
+                  Frame 1
+                </span>
               </span>
-              </span>
-              products
+              blank canvas
             </span>
-            ,<br /> and everything around them.
+            <br /> to launch day.
           </Reveal>
           <Reveal as="ul" delay={150} className="m-0 mt-[clamp(24px,3vw,36px)] flex list-none flex-wrap gap-2.5 p-0">
             {CHIPS.map((c) => (
@@ -113,24 +112,21 @@ export default function About() {
         </div>
       </div>
 
-      {/* Timeline: a gradient line through coloured dots, a pastel card per role, and the open spot. */}
+      {/* Timeline: a slim gradient line through coloured dots, each role in a few words under its
+          dot, ending at an open spot. Down the left on narrow screens. */}
       <div ref={timeline}>
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <p className="m-0 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">Experience</p>
-          <p className="m-0 text-[13px] leading-none font-medium text-faint tabular-nums">2024 — Now</p>
-        </div>
-        <ol aria-label="Career timeline" className="relative m-0 grid list-none grid-cols-1 gap-3 p-0 pl-8 min-[901px]:grid-cols-5 min-[901px]:gap-4 min-[901px]:pt-9 min-[901px]:pl-0">
-          {/* The line: across the top of the cards on wide screens, down their left on narrow ones. */}
+        <p className="m-0 mb-5 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">Experience</p>
+        <ol aria-label="Career timeline" className="relative m-0 grid list-none grid-cols-1 gap-6 p-0 pl-7 min-[901px]:grid-cols-5 min-[901px]:gap-6 min-[901px]:pt-7 min-[901px]:pl-0">
           <span
             data-line
             aria-hidden="true"
-            className="absolute top-[14px] left-0 hidden h-[3px] w-full origin-left scale-x-0 rounded-full min-[901px]:block"
+            className="absolute top-[6px] left-0 hidden h-[2px] w-full origin-left scale-x-0 rounded-full min-[901px]:block"
             style={{ background: `linear-gradient(90deg, #4F86E8, #F28C28 30%, ${SELECT} 55%, #1A9E6E 78%, #0b0b0c)` }}
           />
           <span
             data-line
             aria-hidden="true"
-            className="absolute top-2 bottom-2 left-[10px] w-[3px] origin-top scale-y-0 rounded-full min-[901px]:hidden"
+            className="absolute top-1 bottom-1 left-[6px] w-[2px] origin-top scale-y-0 rounded-full min-[901px]:hidden"
             style={{ background: `linear-gradient(180deg, #4F86E8, #F28C28 30%, ${SELECT} 55%, #1A9E6E 78%, #0b0b0c)` }}
           />
           {STOPS.map((stop) => (
@@ -138,18 +134,15 @@ export default function About() {
               <span
                 data-dot
                 aria-hidden="true"
-                className="invisible absolute top-[22px] -left-[29px] size-[15px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[29px] min-[901px]:left-6"
+                className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[27px] min-[901px]:left-0"
                 style={{ background: stop.dot }}
               />
-              <div data-card className="invisible flex h-full flex-col gap-3 rounded-[20px] p-[clamp(18px,1.6vw,24px)]" style={{ background: stop.bg }}>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-full bg-white px-[10px] py-[6px] text-[12px] leading-none font-semibold text-ink tabular-nums">{stop.year}</span>
-                  <span className="text-[12px] leading-none font-medium" style={{ color: stop.dot }}>
-                    {stop.kind}
-                  </span>
-                </div>
-                <p className="m-0 mt-auto pt-[clamp(12px,2.2vw,36px)] text-[clamp(16px,1.25vw,19px)] leading-[1.2] font-semibold tracking-[-0.015em] text-ink">{stop.role}</p>
-                <p className="m-0 text-[14px] leading-[1.3] text-muted">{stop.company}</p>
+              <div data-card className="invisible">
+                <p className="m-0 text-[13px] leading-none font-semibold tabular-nums" style={{ color: stop.dot }}>
+                  {stop.year} · {stop.kind}
+                </p>
+                <p className="m-0 mt-2.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">{stop.role}</p>
+                <p className="m-0 mt-1 text-[14px] leading-[1.3] text-muted">{stop.company}</p>
               </div>
             </li>
           ))}
@@ -157,29 +150,23 @@ export default function About() {
             <span
               data-dot
               aria-hidden="true"
-              className="invisible absolute top-[22px] -left-[29px] size-[15px] rounded-full border-[3px] border-white bg-ink shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[29px] min-[901px]:left-6"
+              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white bg-ink shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[27px] min-[901px]:left-0"
             />
-            <a
-              data-card
-              href="#reach-out"
-              className="group invisible flex h-full flex-col gap-3 rounded-[20px] border-[1.5px] border-dashed bg-white p-[clamp(18px,1.6vw,24px)] text-ink no-underline transition-colors hover:bg-[#F7F5FF] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF]"
-              style={{ borderColor: SELECT }}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="rounded-full bg-ink px-[10px] py-[6px] text-[12px] leading-none font-semibold text-white">Now</span>
-                <span className="inline-flex items-center gap-1.5 text-[12px] leading-none font-medium text-[#1A9E6E]">
-                  <span className="size-[7px] animate-pulse rounded-full bg-[#1A9E6E] motion-reduce:animate-none" />
-                  Open to work
-                </span>
-              </div>
-              <p className="m-0 mt-auto pt-[clamp(12px,2.2vw,36px)] text-[clamp(16px,1.25vw,19px)] leading-[1.2] font-semibold tracking-[-0.015em]">Your team, next?</p>
-              <p className="m-0 inline-flex items-center gap-1.5 text-[14px] leading-[1.3] text-muted transition-colors group-hover:text-ink">
-                Get in touch
+            <div data-card className="invisible">
+              <p className="m-0 flex items-center gap-1.5 text-[13px] leading-none font-semibold text-[#1A9E6E]">
+                <span className="size-[7px] animate-pulse rounded-full bg-[#1A9E6E] motion-reduce:animate-none" />
+                Now · Open to work
+              </p>
+              <a
+                href="#reach-out"
+                className="group mt-2.5 flex w-fit items-center gap-1.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink no-underline underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF]"
+              >
+                Your team, next?
                 <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-[3px]">
                   →
                 </span>
-              </p>
-            </a>
+              </a>
+            </div>
           </li>
         </ol>
       </div>
