@@ -11,7 +11,7 @@ import { getLenis, pageScroll } from './SmoothScroll'
 // section pins while you scroll through it, and the fill follows the scroll continuously: the next
 // card widens as the one before compacts back to a strip, like a horizontal swipe. When the scroll
 // comes to rest, the nearest project eases fully into place. The fill card carries the black
-// selection (border, handles, live size), plays its looping showcase once settled, and over it the
+// selection (border and handles), plays its looping showcase once settled, and over it the
 // pointer becomes a black "Open" label; clicking a strip scrolls to that project.
 
 // Selection handles: corners and edge midpoints (x%, y%).
@@ -36,10 +36,6 @@ const N = PROJECTS.length
 const SEGMENT = 0.55
 // After the scroll rests this long, the nearest project eases into place.
 const SETTLE_MS = 140
-
-// The showcases' stage sizes. A landscape window gets 16:9 cards; a portrait one (phones,
-// tablets held upright) gets 9:16 cards, and the showcases inside switch to their portrait cut.
-const stageSize = (portrait: boolean) => (portrait ? { w: 1080, h: 1920 } : { w: 1920, h: 1080 })
 
 // Row geometry for a window size: strip thickness, auto-layout gap, the fill card's size and the
 // frame's. On a phone held upright the auto layout is vertical: the fill card spans the width,
@@ -206,15 +202,6 @@ export default function Work() {
           const sel = clamp01((fill - 0.7) / 0.3).toFixed(3)
           if (card.style.getPropertyValue('--strip') !== strip) card.style.setProperty('--strip', strip)
           if (card.style.getPropertyValue('--sel') !== sel) card.style.setProperty('--sel', sel)
-          const size = card.querySelector<HTMLElement>('[data-size]')
-          if (size) {
-            const stage = stageSize(row.portrait)
-            const grown = fill > 0.99 ? 1 : extent / full
-            const label = row.vertical
-              ? `${stage.w} × ${Math.round(stage.h * grown)}`
-              : `${Math.round(stage.w * grown)} × ${stage.h}`
-            if (size.textContent !== label) size.textContent = label
-          }
 
           const video = videos.current[i]
           // A fully collapsed strip is solid colour on top: its video isn't drawn at all.
@@ -416,7 +403,7 @@ export default function Work() {
                     <div aria-hidden="true" className="absolute inset-0 opacity-[var(--strip)]" style={{ background: project.color }} />
                   </Link>
 
-                  {/* The fill card's selection: name above, black border, handles, live size. */}
+                  {/* The fill card's selection: name above, black border, handles. */}
                   <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[var(--sel)]">
                     <div className="absolute bottom-full left-0 mb-2 flex items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink group-data-[vertical=true]/row:hidden">
                       <span className="text-faint tabular-nums">{String(i + 1).padStart(2, '0')}</span>
@@ -431,12 +418,6 @@ export default function Work() {
                         style={{ left: `${x}%`, top: `${y}%` }}
                       />
                     ))}
-                    <span
-                      data-size
-                      className="absolute top-full left-1/2 mt-2.5 -translate-x-1/2 rounded-[4px] group-data-[vertical=true]/row:hidden bg-ink px-[6px] py-[3px] font-hero text-[11px] leading-none font-medium whitespace-nowrap text-white tabular-nums"
-                    >
-                      1920 × 1080
-                    </span>
                   </div>
                 </div>
               ))}
@@ -453,10 +434,6 @@ export default function Work() {
                   style={{ left: `${x}%`, top: `${y}%` }}
                 />
               ))}
-              <span
-                data-draw-size
-                className="absolute top-full left-1/2 mt-2.5 -translate-x-1/2 rounded-[4px] bg-ink px-[6px] py-[3px] font-hero text-[11px] leading-none font-medium whitespace-nowrap text-white tabular-nums"
-              />
             </div>
 
             {/* Anukriti's multiplayer cursor, which draws the frame. */}
@@ -504,7 +481,7 @@ export default function Work() {
               ref={openBtn}
               href={caseStudyHref(PROJECTS[0].slug)}
               aria-label={`Open project: ${PROJECTS[0].title}`}
-              className="group/btn absolute top-full right-0 z-[1] mt-2.5 inline-flex flex-none items-center gap-2 rounded-full bg-ink px-4 py-[9px] text-[13px] leading-none font-medium whitespace-nowrap text-white no-underline transition-[background-color] duration-200 ease-[ease] hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:transition-none max-[640px]:px-3 max-[640px]:py-2 max-[640px]:text-[13px]"
+              className="group/btn absolute top-full right-0 z-[1] mt-2.5 inline-flex flex-none items-center gap-2 bg-ink px-4 py-[9px] text-[13px] leading-none font-medium whitespace-nowrap text-white no-underline transition-[background-color] duration-200 ease-[ease] hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:transition-none max-[640px]:px-3 max-[640px]:py-2 max-[640px]:text-[13px]"
             >
               Open project
               <svg
@@ -526,7 +503,7 @@ export default function Work() {
       <div
         ref={cursor}
         aria-hidden="true"
-        className="pointer-events-none invisible fixed top-0 left-0 z-[60] flex items-center gap-2 rounded-[2px] bg-ink px-5 py-3 text-[14px] leading-none font-medium tracking-[0.01em] text-white opacity-0 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.5)]"
+        className="pointer-events-none invisible fixed top-0 left-0 z-[60] flex items-center gap-2 bg-ink px-5 py-3 text-[14px] leading-none font-medium tracking-[0.01em] text-white opacity-0 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.5)]"
       >
         Open
         <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
