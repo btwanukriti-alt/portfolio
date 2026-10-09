@@ -40,12 +40,11 @@ const SEGMENT_STYLE = {
   next: 'bg-ink',
 }
 
-// Written from the resume for now (summary, experience, education and skills).
 const ABOUT = [
-  "I'm a UI/UX designer studying Visual Communication at St Joseph's University, Bengaluru, and I design end-to-end digital products for startups and growing teams.",
-  "I've designed across mobile apps, web dashboards and enterprise platforms: Zync, a consumer fitness app; Dhondi, a group-level college ERP; and a multi-platform SSH client with an AI terminal assistant.",
-  'I own the full design lifecycle, from concept and wireframes to high-fidelity Figma prototypes, and work closely with developers and stakeholders to ship products that are both functional and delightful.',
-  "I like taking things all the way to launch: at Pulsefit I built the company website end-to-end in WordPress, from design system to deployment. My everyday tools are Figma, Illustrator and Photoshop.",
+  'I design SaaS products, and no two have been alike: a gym CRM, a college ERP, an SSH client for engineers, a trading analytics platform and a fitness app. B2B and B2C, desktop and mobile.',
+  'I learn each industry before I design for it, from the team that knows it and the products its users already rely on.',
+  "I design AI features, and I design with AI. I've designed an AI strategy lab and an AI terminal assistant, and I built this website and its product videos with Claude.",
+  'I trained in Visual Communication: branding, illustration, photography, film and print. On most projects I also design the logo, the visual system and the marketing website.',
 ]
 
 const pct = (x: number) => `${(x / TRACK) * 100}%`
