@@ -19,6 +19,30 @@ export const getLenis = () => lenis
 // after other code has changed styles forces a style recalculation).
 export const pageScroll = () => (lenis ? lenis.scroll : window.scrollY)
 
+// Resting points: a section's title marked data-rest comes to rest this far below the top of the
+// window (the fixed header, 72px, plus a gap). data-rest="n" adds n px for anything drawn above
+// the title (a label, a comment pin).
+const HEADER = 72
+const restGap = () => (window.innerWidth < 720 ? 20 : 28)
+// Measured from layout offsets, so reveal animations (which move things by transform) don't count.
+const docTop = (el: HTMLElement | null) => {
+  let y = 0
+  for (; el; el = el.offsetParent as HTMLElement | null) y += el.offsetTop
+  return y
+}
+const restOf = (el: HTMLElement) =>
+  Math.min(
+    docTop(el) - HEADER - restGap() - Number(el.dataset.rest || 0),
+    // A section near the end can't rest higher than the page can scroll.
+    document.documentElement.scrollHeight - window.innerHeight,
+  )
+// The resting point for a section (or anything inside one), if it has a marked title.
+export function restingPoint(target: Element): number | null {
+  const section = target.closest('section') ?? target
+  const title = section.querySelector<HTMLElement>('[data-rest]')
+  return title ? Math.max(0, restOf(title)) : null
+}
+
 // Return false from the interceptor to keep Lenis from handling that input (call preventDefault
 // yourself if the native scroll should not happen either).
 export function setScrollInterceptor(fn: Interceptor) {
@@ -65,8 +89,11 @@ export default function SmoothScroll() {
       if (!el) return
       e.preventDefault()
       e.stopPropagation()
-      history.replaceState(null, '', url.hash)
-      if (lenis) lenis.scrollTo(el, { duration: 1.2, easing: (x) => 1 - Math.pow(1 - x, 4), force: true })
+      // The address stays as it is: only moving to another page changes it.
+      const rest = restingPoint(el)
+      const to = rest ?? el
+      if (lenis) lenis.scrollTo(to, { duration: 1.2, easing: (x) => 1 - Math.pow(1 - x, 4), force: true })
+      else if (rest !== null) window.scrollTo({ top: rest, behavior: reducedMotion() ? 'auto' : 'smooth' })
       else el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' })
     }
     document.addEventListener('click', onClick, true)
@@ -74,6 +101,48 @@ export default function SmoothScroll() {
   }, [])
 
   // Route changes start at the top; keep Lenis's position in step with the new page.
+  // When scrolling comes to rest in the upper half of a section with a marked title (or just above
+  // it), the page glides to that section's resting point, so its title sits clear of the header.
+  useEffect(() => {
+    if (reducedMotion()) return
+    let timer = 0
+    let gliding = false
+    const settle = () => {
+      if (gliding) return
+      const y = window.scrollY
+      const vh = window.innerHeight
+      for (const title of document.querySelectorAll<HTMLElement>('[data-rest]')) {
+        const section = title.closest('section')
+        if (!section) continue
+        const top = docTop(section)
+        const rest = Math.max(0, restOf(title))
+        // From a little above the resting point down to the section's halfway mark.
+        const half = top + section.offsetHeight / 2
+        if (y < rest - vh * 0.3 || y > Math.max(rest, half)) continue
+        if (Math.abs(y - rest) < 4) return
+        gliding = true
+        const done = () => {
+          gliding = false
+        }
+        if (lenis) lenis.scrollTo(rest, { duration: 0.6, easing: (x) => 1 - Math.pow(1 - x, 3), onComplete: done })
+        else {
+          window.scrollTo({ top: rest, behavior: 'smooth' })
+          window.setTimeout(done, 700)
+        }
+        return
+      }
+    }
+    const onScroll = () => {
+      window.clearTimeout(timer)
+      if (!gliding) timer = window.setTimeout(settle, 180)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [])
+
   // Arriving with a hash (/#work from a case study) lands on that section once the page has laid out.
   useEffect(() => {
     const hash = window.location.hash
@@ -86,8 +155,12 @@ export default function SmoothScroll() {
       ScrollTrigger.refresh()
       const el = document.getElementById(decodeURIComponent(hash.slice(1)))
       if (!el) return
-      if (lenis) lenis.scrollTo(el, { immediate: true, force: true })
+      const rest = restingPoint(el)
+      if (lenis) lenis.scrollTo(rest ?? el, { immediate: true, force: true })
+      else if (rest !== null) window.scrollTo(0, rest)
       else el.scrollIntoView()
+      // Land there, then drop the #section from the address: it shows just the page.
+      history.replaceState(history.state, '', window.location.pathname + window.location.search)
     }, 120)
     return () => window.clearTimeout(id)
   }, [pathname])

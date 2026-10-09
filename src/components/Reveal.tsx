@@ -18,10 +18,12 @@ type RevealProps = {
   style?: CSSProperties
   children?: ReactNode
   id?: string
+  // Marks this block as its section's resting point (see SmoothScroll), with room above it in px.
+  rest?: number
 }
 
 // A block that rises and fades in.
-export function Reveal({ as = 'div', delay = 0, className, style, children, id }: RevealProps) {
+export function Reveal({ as = 'div', delay = 0, className, style, children, id, rest }: RevealProps) {
   const ref = useRef<HTMLElement>(null)
 
   useGSAP(() => {
@@ -40,7 +42,7 @@ export function Reveal({ as = 'div', delay = 0, className, style, children, id }
 
   const Tag = as as ElementType
   return (
-    <Tag ref={ref} id={id} className={`invisible ${className ?? ''}`} style={style}>
+    <Tag ref={ref} id={id} className={`invisible ${className ?? ''}`} style={style} data-rest={rest}>
       {children}
     </Tag>
   )

@@ -124,7 +124,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       {
         label: 'Brand',
         cards: [
-          ui('logo', 4824, 2748, 'The Zync logo on its construction grid, with measurements and clear space', 'col-span-12', 'max-w-[78%]'),
+          ui('logo', 4824, 2748, 'The Zync logo on its construction grid, with measurements and clear space', 'min-[901px]:col-span-12', 'max-w-[78%]'),
           ui('icon', 2484, 2448, 'The Zync app icon inside concentric squares', 'min-[901px]:col-span-4'),
           block('palette', 'The Zync colour palette: primary, deep, accent and the tracker colours', 'min-[901px]:col-span-8'),
         ],
@@ -155,7 +155,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
           ui('phone-water', 1542, 2904, 'The Hydration screen with the intake ring and glass sizes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
           ui('phone-food', 1542, 2904, 'The Food log screen with the calorie gauge, macros and meals', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
           block('hydration', 'The hydration ring with quick amounts and the glass stepper', 'min-[901px]:col-span-4'),
-          block('food', 'The food log: 1,385 of 2,250 cal, macros and the meals logged today', 'col-span-12'),
+          block('food', 'The food log: 1,385 of 2,250 cal, macros and the meals logged today', 'min-[901px]:col-span-12'),
         ],
       },
       {
@@ -229,8 +229,8 @@ export const GALLERIES: Record<string, GalleryConfig> = {
             'min-[901px]:col-span-4',
           ),
           cui('laptop-staff', 'The staff overview: totals with trends, attendance by college, alerts and most days absent', 'min-[901px]:col-span-8', 'tint', 'fill'),
-          cblock('attendance-table', 'The employee attendance register with status tabs, division, check-in and check-out times and status', 'col-span-12', 'plate'),
-          cblock('profile', 'An employee profile: ID, tabs, work experience and education', 'col-span-12', 'tint'),
+          cblock('attendance-table', 'The employee attendance register with status tabs, division, check-in and check-out times and status', 'min-[901px]:col-span-12', 'plate'),
+          cblock('profile', 'An employee profile: ID, tabs, work experience and education', 'min-[901px]:col-span-12', 'tint'),
         ],
       },
     ],

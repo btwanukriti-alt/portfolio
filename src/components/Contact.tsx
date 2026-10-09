@@ -247,7 +247,7 @@ export default function Contact({ current }: { current?: string } = {}) {
         aria-labelledby="contact-heading"
         className="mx-auto max-w-[var(--max)] bg-paper px-[var(--gutter)] pt-[clamp(56px,9vh,104px)] font-body"
       >
-        <Reveal className="relative mt-6">
+        <Reveal className="relative mt-6" rest={22}>
           {/* Selection: the frame's name, a border with handles, and its size. */}
           <span className="absolute bottom-full left-0 mb-2 text-[12px] leading-none font-medium" style={{ color: SELECT }}>
             Let&apos;s build

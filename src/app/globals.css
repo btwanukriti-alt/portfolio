@@ -106,6 +106,14 @@
 }
 
 /* Hero text caret. */
+/* The hero header drops in on its own (CSS), so it paints with the first frame, before scripts. */
+@keyframes header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 @keyframes caret-blink {
   0%,
   50% {

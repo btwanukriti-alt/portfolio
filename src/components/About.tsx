@@ -45,7 +45,7 @@ export default function About() {
   const comment = useRef<HTMLHeadingElement>(null)
 
   // Anukriti's comment pin pops in, a cursor comes out of it and types the title, then the pin
-  // and cursor go. Once, when the section arrives.
+  // and cursor go.
   useGSAP(
     () => {
       const h = comment.current
@@ -62,19 +62,22 @@ export default function About() {
       typed.textContent = ''
       gsap.set(pin, { autoAlpha: 0, scale: 0.6 })
       gsap.set(bar, { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 0%' })
+      // Starts as soon as the heading comes on screen (and plays again after scrolling back above
+      // it), with quick beats before the typing, so it's under way while the title is in view.
       gsap
-        .timeline({ scrollTrigger: { trigger: h, start: 'top 70%', once: true } })
-        .to(pin, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' })
-        .to(bar, { autoAlpha: 1, scaleY: 1, duration: 0.3, ease: 'power2.out' }, '+=0.15')
+        .timeline({ scrollTrigger: { trigger: h, start: 'top bottom', toggleActions: 'restart none none reset' } })
+        .set(typed, { textContent: '' })
+        .to(pin, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(1.6)' })
+        .to(bar, { autoAlpha: 1, scaleY: 1, duration: 0.2, ease: 'power2.out' }, '-=0.1')
         .to(chars, {
           n: TITLE.length,
-          duration: TITLE.length * 0.065,
+          duration: TITLE.length * 0.05,
           ease: 'none',
           onUpdate: () => {
             typed.textContent = TITLE.slice(0, Math.round(chars.n))
           },
-        }, '+=0.1')
-        .to([pin, bar], { autoAlpha: 0, duration: 0.4, ease: 'power1.out' }, '+=0.6')
+        }, '+=0.05')
+        .to([pin, bar], { autoAlpha: 0, duration: 0.4, ease: 'power1.out' }, '+=0.7')
     },
     { scope: comment },
   )
@@ -110,6 +113,8 @@ export default function About() {
         <h2
           ref={comment}
           id="about-heading"
+          // Resting point: room above for the comment pin.
+          data-rest="36"
           aria-label={TITLE}
           className="relative m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] whitespace-nowrap text-ink"
         >
