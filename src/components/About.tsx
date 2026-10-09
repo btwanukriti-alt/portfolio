@@ -171,13 +171,21 @@ export default function About() {
             <span
               data-dot
               aria-hidden="true"
-              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
-              style={{ background: SELECT }}
-            />
+              // The open spot: a larger, hollow violet ring with a soft pulse around it.
+              className="invisible absolute top-0 -left-[29px] size-[18px] rounded-full border-[3px] bg-white min-[901px]:-top-[29px] min-[901px]:-left-[2px]"
+              style={{ borderColor: SELECT }}
+            >
+              <span
+                className="absolute -inset-[6px] animate-ping rounded-full opacity-40 [animation-duration:2.2s] motion-reduce:animate-none"
+                style={{ background: SELECT }}
+              />
+            </span>
             <div data-card className="invisible">
               {/* Lines up with the roles (under their year lines). */}
-              <p className="m-0 text-[16px] min-[901px]:pt-[23px] leading-[1.25] font-semibold tracking-[-0.01em]" style={{ color: SELECT }}>
-                Looking for my next challenge.
+              <p className="m-0 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink min-[901px]:pt-[23px]">
+                Looking for my
+                <br />
+                next challenge.
               </p>
             </div>
           </li>
