@@ -54,7 +54,7 @@ export default function About() {
       gsap.set(pin, { autoAlpha: 0, scale: 0.6 })
       gsap.set(bar, { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 0%' })
       gsap
-        .timeline({ scrollTrigger: { trigger: h, start: 'top 85%', once: true } })
+        .timeline({ scrollTrigger: { trigger: h, start: 'top 70%', once: true } })
         .to(pin, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' })
         .to(bar, { autoAlpha: 1, scaleY: 1, duration: 0.3, ease: 'power2.out' }, '+=0.15')
         .to(chars, {
@@ -81,7 +81,7 @@ export default function About() {
         gsap.set([...cards, ...dots], { autoAlpha: 1, y: 0, scale: 1 })
         return
       }
-      const scrollTrigger = { trigger: timeline.current, start: 'top 82%', once: true }
+      const scrollTrigger = { trigger: timeline.current, start: 'top 75%', once: true }
       gsap.to(line, { scale: 1, duration: 1.4, ease: 'power2.inOut', scrollTrigger })
       gsap.fromTo(dots, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out', stagger: 0.22, delay: 0.15, scrollTrigger })
       gsap.fromTo(cards, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12, delay: 0.25, scrollTrigger })
@@ -134,7 +134,7 @@ export default function About() {
       </div>
 
       {/* Timeline: a slim line through grey dots, each role in a few words under its dot, ending at
-          the open spot (green). Down the left on narrow screens. */}
+          the open spot (violet). Down the left on narrow screens. */}
       <div ref={timeline}>
         <p className="m-0 mb-5 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">Experience</p>
         <ol aria-label="Career timeline" className="relative m-0 grid list-none grid-cols-1 gap-6 p-0 pl-7 min-[901px]:grid-cols-5 min-[901px]:gap-6 min-[901px]:pt-7 min-[901px]:pl-0">
@@ -171,23 +171,22 @@ export default function About() {
             <span
               data-dot
               aria-hidden="true"
-              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
-              style={{ background: SELECT }}
-            />
+              // The open spot: a larger, hollow violet ring with a soft pulse around it.
+              className="invisible absolute top-0 -left-[29px] size-[18px] rounded-full border-[3px] bg-white min-[901px]:-top-[29px] min-[901px]:-left-[2px]"
+              style={{ borderColor: SELECT }}
+            >
+              <span
+                className="absolute -inset-[6px] animate-ping rounded-full opacity-40 [animation-duration:2.2s] motion-reduce:animate-none"
+                style={{ background: SELECT }}
+              />
+            </span>
             <div data-card className="invisible">
-              <p className="m-0 flex items-center gap-1.5 text-[13px] leading-none font-semibold" style={{ color: SELECT }}>
-                <span className="size-[7px] animate-pulse rounded-full motion-reduce:animate-none" style={{ background: SELECT }} />
-                Now · Open to work
+              {/* Lines up with the roles (under their year lines). */}
+              <p className="m-0 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink min-[901px]:pt-[23px]">
+                Looking for my
+                <br />
+                next challenge.
               </p>
-              <a
-                href="#reach-out"
-                className="group mt-2.5 flex w-fit items-center gap-1.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink no-underline underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF]"
-              >
-                Your team, next?
-                <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-[3px]">
-                  →
-                </span>
-              </a>
             </div>
           </li>
         </ol>
