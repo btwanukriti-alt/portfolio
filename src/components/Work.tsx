@@ -4,18 +4,15 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
 import { gsap, ScrollTrigger, useGSAP, reducedMotion } from '@/lib/gsap'
-import { getLenis, setScrollInterceptor } from './SmoothScroll'
+import { getLenis, pageScroll } from './SmoothScroll'
 
 // Work: the projects as a Figma auto-layout row. One card is set to "fill" and takes the room;
 // the others are thin strips of solid colour (each showcase's background) on either side. The
-// section pins for a stretch of scrolling per project, and each scroll gesture moves one project:
-// the fill moves over on its own, the next card widening to fill while the one before compacts
-// back to a strip. The fill card carries the black selection
-// (border, handles, live size), plays its looping showcase, and over it the pointer becomes a
-// black "Open" label; clicking a strip scrolls to that project.
-//
-// The first time the section arrives, the page is held still while its heading types in at the
-// centre and a Figma cursor drags the row's frame out from the top-left corner.
+// section pins while you scroll through it, and the fill follows the scroll continuously: the next
+// card widens as the one before compacts back to a strip, like a horizontal swipe. When the scroll
+// comes to rest, the nearest project eases fully into place. The fill card carries the black
+// selection (border, handles, live size), plays its looping showcase once settled, and over it the
+// pointer becomes a black "Open" label; clicking a strip scrolls to that project.
 
 // Selection handles: corners and edge midpoints (x%, y%).
 const HANDLES = [
@@ -36,9 +33,9 @@ const WORK_TITLE = "What I've designed."
 
 const N = PROJECTS.length
 // Scrolling per project, as a share of the window height.
-const SEGMENT = 0.7
-// While a scroll keeps going, the next project after this long.
-const REPEAT_MS = 650
+const SEGMENT = 0.55
+// After the scroll rests this long, the nearest project eases into place.
+const SETTLE_MS = 140
 
 // The showcases' stage sizes. A landscape window gets 16:9 cards; a portrait one (phones,
 // tablets held upright) gets 9:16 cards, and the showcases inside switch to their portrait cut.
@@ -80,23 +77,12 @@ function rowFor(vw: number, vh: number): Row {
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 
-// Holds the page still (no wheel, touch or key scrolling) while the frame draws.
-function lockScroll(on: boolean) {
-  const lenis = getLenis()
-  document.documentElement.style.overflow = on ? 'hidden' : ''
-  if (on) lenis?.stop()
-  else lenis?.start()
-}
-
-// Puts the page at project i's stretch of the pinned section, instantly (stopping any momentum):
-// the stage doesn't move, so only the fill animates. With glide, the page eases there instead
-// (for arriving from just outside the section, where the move can be seen).
-function jumpTo(track: HTMLElement, i: number, glide = false) {
+// Scrolls the page to project i's place in the pinned section.
+function scrollToProject(track: HTMLElement, i: number, duration = 0.6) {
   const y = track.getBoundingClientRect().top + window.scrollY + i * SEGMENT * window.innerHeight
   const lenis = getLenis()
-  if (lenis && glide) lenis.scrollTo(y, { duration: 0.6, easing: (x) => 1 - Math.pow(1 - x, 3), force: true })
-  else if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
-  else window.scrollTo({ top: y, behavior: 'instant' })
+  if (lenis) lenis.scrollTo(y, { duration, easing: (x) => 1 - Math.pow(1 - x, 3), force: true })
+  else window.scrollTo({ top: y, behavior: 'smooth' })
 }
 
 export default function Work() {
@@ -160,15 +146,14 @@ export default function Work() {
   const goTo = (e: React.MouseEvent, i: number) => {
     if (i === activeRef.current || !track.current) return
     e.preventDefault()
-    jumpTo(track.current, i)
+    scrollToProject(track.current, i)
   }
 
-  // Driven by ScrollTrigger (in step with the smooth scroll): the fill passes along the row with
-  // the scroll, and only the fill card's video plays.
+  // Driven by ScrollTrigger (in step with the smooth scroll): the fill follows the scroll along the
+  // row, and only the settled fill card's video plays.
   useGSAP(
     () => {
       let row = rowFor(window.innerWidth, window.innerHeight)
-      const drawn = true
 
       const layout = () => {
         row = rowFor(window.innerWidth, window.innerHeight)
@@ -183,12 +168,9 @@ export default function Work() {
         f.dataset.vertical = String(row.vertical)
       }
 
-      // The fill's position along the row (0 = first project filling). It isn't scrubbed by the
-      // scroll: once a scroll heads for the next project, the fill moves there on its own, quickly
-      // and smoothly, and the card it leaves compacts back to a strip.
+      // The fill's position along the row (0 = first project filling), read from the scroll.
       const shown = { pos: 0 }
       let onScreen = false
-      let fillTween: gsap.core.Tween | null = null
       let moving = false
 
       const render = () => {
@@ -198,20 +180,30 @@ export default function Work() {
           const fill = clamp01(1 - Math.abs(shown.pos - i))
           const full = row.vertical ? row.fillH : row.fillW
           const extent = row.strip + fill * (full - row.strip)
-          card.style.width = row.vertical ? '100%' : `${extent}px`
-          card.style.height = row.vertical ? `${extent}px` : '100%'
-          card.style.setProperty('--strip', String(clamp01((1 - fill) * 1.8)))
-          card.style.setProperty('--sel', String(clamp01((fill - 0.7) / 0.3)))
+          const w = row.vertical ? '100%' : `${extent.toFixed(1)}px`
+          const h = row.vertical ? `${extent.toFixed(1)}px` : '100%'
+          if (card.style.width !== w) card.style.width = w
+          if (card.style.height !== h) card.style.height = h
+          const strip = clamp01((1 - fill) * 1.8).toFixed(3)
+          const sel = clamp01((fill - 0.7) / 0.3).toFixed(3)
+          if (card.style.getPropertyValue('--strip') !== strip) card.style.setProperty('--strip', strip)
+          if (card.style.getPropertyValue('--sel') !== sel) card.style.setProperty('--sel', sel)
           const size = card.querySelector<HTMLElement>('[data-size]')
           if (size) {
             const stage = stageSize(row.portrait)
             const grown = fill > 0.99 ? 1 : extent / full
-            size.textContent = row.vertical
+            const label = row.vertical
               ? `${stage.w} × ${Math.round(stage.h * grown)}`
               : `${Math.round(stage.w * grown)} × ${stage.h}`
+            if (size.textContent !== label) size.textContent = label
           }
 
           const video = videos.current[i]
+          // A fully collapsed strip is solid colour on top: its video isn't drawn at all.
+          if (video) {
+            const vis = fill > 0.005 ? '' : 'hidden'
+            if (video.style.visibility !== vis) video.style.visibility = vis
+          }
           // Only the settled fill card plays: the one leaving pauses at once, the one arriving
           // starts once it has opened, so nothing heavy runs while the cards move.
           const play = onScreen && !moving && i === activeRef.current
@@ -240,32 +232,47 @@ export default function Work() {
       }
       setOpen(0)
 
-      let prevTop = Infinity
+      let settle = 0
+      let lastPos = 0
+      let dir = 0 // the way the scroll was last heading through the row: 1 on, -1 back
+      const settleNow = () => {
+        settle = 0
+        const t = track.current
+        if (!t) return
+        const vh = window.innerHeight
+        const at = -t.getBoundingClientRect().top / (SEGMENT * vh)
+        // Only inside the pinned stretch, and only if it isn't already in place.
+        if (at <= 0.01 || at >= N - 1.01) return
+        // A swipe that has started toward the next project finishes there; one that barely moved
+        // eases back.
+        const base = Math.floor(at)
+        const frac = at - base
+        const target = dir > 0 ? (frac > 0.12 ? base + 1 : base) : dir < 0 ? (frac < 0.88 ? base : base + 1) : Math.round(at)
+        if (Math.abs(at - target) > 0.01) scrollToProject(t, target, 0.45)
+      }
+
+      // The track's place on the page, measured on layout changes rather than every frame.
+      let trackTop = 0
+      let trackH = 0
+      const measure = () => {
+        const t = track.current
+        if (!t) return
+        trackTop = t.getBoundingClientRect().top + window.scrollY
+        trackH = t.offsetHeight
+      }
 
       const update = (): void => {
         const t = track.current
         if (!t) return
-        let r = t.getBoundingClientRect()
+        const top = trackTop - pageScroll()
+        const r = { top, bottom: top + trackH }
         const vh = window.innerHeight
         if (!vh) return // a window with no height yet (an embedded preview while it loads)
-
-
-        // Arriving with momentum (a flick from above or below) lands on the first or last
-        // project instead of sailing past the ones in between. The stage is pinned throughout,
-        // so the correction can't be seen. (Read the position again after a jump: this runs
-        // inside ScrollTrigger's update, so the jump doesn't call it back.)
-        const span = (N - 1) * SEGMENT * vh
-        const pinned = r.top <= 0 && -r.top <= span
-        // (A couple of pixels of slack: positions land on sub-pixels.)
-        if (pinned && prevTop > 2 && -r.top > 2) jumpTo(t, 0)
-        else if (pinned && prevTop < -span - 2 && -r.top < span - 2) jumpTo(t, N - 1)
-        r = t.getBoundingClientRect()
-        prevTop = r.top
-        // Scroll progress in projects (0 = the first project's stretch).
-        const pos = -r.top / (SEGMENT * vh)
+        // Scroll progress in projects, followed directly (the page scroll is already smoothed).
+        const pos = Math.min(N - 1, Math.max(0, -r.top / (SEGMENT * vh)))
         onScreen = r.bottom > 0 && r.top < vh
         // Off screen, the stage (a fixed, viewport-sized box) skips rendering altogether, so its
-        // cards and videos cost nothing while the hero above is scrolling.
+        // cards and videos cost nothing while the rest of the page scrolls.
         const st = stage.current
         if (st) st.style.contentVisibility = onScreen ? '' : 'hidden'
         // The pointer can be left "over" a card that has scrolled away: drop the Open label.
@@ -273,34 +280,28 @@ export default function Work() {
           hovered.current = -1
           setCursor(false)
         }
-
-        // Each project owns a stretch of scroll (one scroll gesture moves one stretch, below);
-        // the fill moves over on its own.
-        const next = Math.min(N - 1, Math.max(0, Math.floor(pos + 0.65)))
+        if (Math.abs(pos - lastPos) > 0.001) dir = pos > lastPos ? 1 : -1
+        lastPos = pos
+        shown.pos = pos
+        moving = Math.abs(pos - Math.round(pos)) > 0.02
+        const next = Math.round(pos)
         if (next !== activeRef.current) {
           activeRef.current = next
           setOpen(next)
           if (hovered.current >= 0) setCursor(hovered.current === next)
-          fillTween?.kill()
-          moving = true
-          fillTween = gsap.to(shown, {
-            pos: next,
-            duration: reducedMotion() ? 0 : Math.min(1.1, 0.8 + 0.1 * (Math.abs(next - shown.pos) - 1)),
-            ease: 'power3.inOut',
-            onUpdate: render,
-            onComplete: () => {
-              moving = false
-              render()
-            },
-          })
         }
         render()
+        // When the scroll rests between two projects, ease the nearest one into place.
+        clearTimeout(settle)
+        if (onScreen && moving && !reducedMotion()) settle = window.setTimeout(settleNow, SETTLE_MS)
       }
 
       layout()
+      measure()
       update()
       const onResize = () => {
         layout()
+        measure()
         update()
       }
       window.addEventListener('resize', onResize)
@@ -313,62 +314,9 @@ export default function Work() {
         onRefresh: onResize,
       })
 
-      // One scroll, one project. While the stage is pinned, each wheel or swipe gesture moves
-      // the fill exactly one project (the page jumps straight to that project's stretch, so the
-      // cards answer at once) and the rest of the gesture, trackpad momentum included, is
-      // swallowed. Past the first or last project, the page scrolls on as usual.
-      let lastEvent = 0
-      let lastStep = -Infinity
-      let stepped = false
-      const releaseInterceptor = setScrollInterceptor(({ event, deltaY }) => {
-        const t = track.current
-        if (!t) return true
-        // Held still by the intro.
-        if (document.documentElement.style.overflow === 'hidden') return false
-        if (event.type !== 'wheel' && event.type !== 'touchmove') return true
-        const top = t.getBoundingClientRect().top
-        const vh = window.innerHeight
-        const span = (N - 1) * SEGMENT * vh
-        const dir = Math.sign(deltaY)
-        const now = event.timeStamp
-        const newGesture = now - lastEvent > 200
-        const step = (i: number, glide = false) => {
-          if (event.cancelable) event.preventDefault()
-          lastEvent = now
-          stepped = true
-          lastStep = now
-          jumpTo(t, i, glide)
-          return false
-        }
-
-        // Scrolling back in from just outside glides onto the nearest end project in one go.
-        if (newGesture && drawn && dir > 0 && top > 2 && top < vh * 0.6) return step(0, true)
-        if (newGesture && dir < 0 && -top > span + 2 && -top < span + vh * 0.6) return step(N - 1, true)
-        if (top > 2 || -top > span + 2) return true
-
-        lastEvent = now
-        if (newGesture) stepped = false
-        // Scrolling that keeps going (a spinning wheel, a long trackpad drag) carries on through
-        // the projects, one every REPEAT_MS, and out the far end, so passing through never feels
-        // stuck. A single flick's fading momentum (small deltas) still moves just one.
-        if (stepped && now - lastStep > REPEAT_MS && Math.abs(deltaY) > 25) stepped = false
-        if (stepped) {
-          if (event.cancelable) event.preventDefault()
-          return false
-        }
-        const target = activeRef.current + dir
-        if (!dir || target < 0 || target > N - 1) return true
-        if (now - lastStep < 550) {
-          if (event.cancelable) event.preventDefault()
-          return false
-        }
-        return step(target)
-      })
-
       return () => {
-        releaseInterceptor()
+        clearTimeout(settle)
         window.removeEventListener('resize', onResize)
-        lockScroll(false)
       }
     },
     { scope: section },
