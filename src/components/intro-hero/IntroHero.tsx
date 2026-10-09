@@ -230,7 +230,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const relayout = () => {
       measureRoot()
       layout = computeLayout(space.clientWidth, space.clientHeight)
-      spots = scatterSpots(N, layout.mobile)
+      spots = scatterSpots(layout.mobile ? N / 2 : N, layout.mobile)
       for (const el of tiles.current) {
         if (!el) continue
         el.style.width = `${layout.tileW}px`
@@ -328,10 +328,14 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         const near = (Math.sin(theta) + 1) / 2
         const reveal = lerp(clamp(st.show * 1.8 - near * 0.8), st.front, smooth((near - 0.5) / 0.2))
         orbit.o *= i < 3 && flying ? (flight[i].v >= 1 ? 1 : 0) : reveal
-        const ring = ringPose(L, i, N, ringTurn)
+        // On a phone the ring and the scatter hold half the screens (every other one, the rest fade
+        // out as the ring forms), so they have room around the text instead of piling up.
+        const ri = L.mobile ? i >> 1 : i
+        const ring = ringPose(L, ri, L.mobile ? N / 2 : N, ringTurn)
         ring.x += mouse.x * 10
         ring.y += mouse.y * 8
-        let p = mixPose(mixPose(orbit, ring, a), scatterPose(L, spots[i], now, mouse.x, mouse.y), b)
+        let p = mixPose(mixPose(orbit, ring, a), scatterPose(L, spots[ri], now, mouse.x, mouse.y), b)
+        if (L.mobile && i % 2) p = { ...p, o: p.o * (1 - smooth(a * 1.6)) }
         const h = hover[i].value
         if (h > 0.001) p = { ...p, s: p.s * (1 + 0.08 * h), o: p.o + (1 - p.o) * h }
         // Depth reads through size, opacity and stacking only: a per-frame blur() repainted every

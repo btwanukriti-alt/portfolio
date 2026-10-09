@@ -154,7 +154,7 @@ export function ringPose(L: Layout, i: number, n: number, turn: number): Pose {
         ? L.w * 0.39
         : Math.min(Math.max(Math.min(L.w * 0.3, L.h * 0.52), clearOfHeadline), L.w / 2 - tileHalf - 12)
   const ry = short ? L.h * 0.4 : L.mobile ? L.h * 0.33 : L.h * 0.37
-  return { x: L.cx + Math.cos(a) * rx, y: L.h / 2 + Math.sin(a) * ry, s: L.mobile ? 0.58 : 0.6, o, blur: 0, z: 0 }
+  return { x: L.cx + Math.cos(a) * rx, y: L.h / 2 + Math.sin(a) * ry, s: L.mobile ? 0.7 : 0.6, o, blur: 0, z: 0 }
 }
 
 export type Spot = { x: number; y: number; d: number; seed: number }
@@ -174,7 +174,7 @@ export function scatterSpots(n: number, mobile: boolean): Spot[] {
   const clearX = mobile ? 0.5 : 0.33
   const clearY = mobile ? 0.17 : 0.22
   const aspect = mobile ? 0.5 : 1.6
-  let minDist = mobile ? 0.15 : 0.16
+  let minDist = mobile ? 0.24 : 0.16
   // Rejection sampling, loosening the spacing until everything fits.
   for (let tries = 1; spots.length < n; tries++) {
     if (tries % 800 === 0) minDist *= 0.9
@@ -193,7 +193,7 @@ export function scatterPose(L: Layout, spot: Spot, time: number, mx: number, my:
   return {
     x: spot.x * L.w + Math.sin(t * 0.35 + spot.seed) * 12 * drift + mx * 26 * drift,
     y: spot.y * L.h + Math.cos(t * 0.29 + spot.seed * 1.3) * 10 * drift + my * 18 * drift,
-    s: (L.mobile ? 0.5 : 0.48) + spot.d * 0.7,
+    s: L.mobile ? 0.6 + spot.d * 0.35 : 0.48 + spot.d * 0.7,
     o: 0.6 + spot.d * 0.4,
     blur: (1 - spot.d) * 1.3,
     z: spot.d * 100 - 50,

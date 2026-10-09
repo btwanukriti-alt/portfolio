@@ -113,6 +113,8 @@ export default function About() {
         <h2
           ref={comment}
           id="about-heading"
+          // Resting point: room above for the comment pin.
+          data-rest="36"
           aria-label={TITLE}
           className="relative m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] whitespace-nowrap text-ink"
         >
