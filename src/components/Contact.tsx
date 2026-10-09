@@ -8,8 +8,8 @@ import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
 import { EMAIL, LINKEDIN } from '@/data/site'
 
-// Contact footer: a black frame, selected like a Figma layer, that says "Let's BUILD". The D is
-// drawn with the pen tool, its curve dragged out by a handle, then let go so it shakes back.
+// Contact footer: a black frame, selected like a Figma layer, that says "Let's BUILD". The D's
+// curve is shaped with the pen tool: its straight edge is pulled out by a handle into the bowl.
 const SELECT = '#7B61FF'
 const HANDLES = [
   [0, 0],
@@ -22,8 +22,11 @@ const HANDLES = [
   [100, 100],
 ]
 
-// The D's outline in a 100-unit box; `b` pushes the bowl out (the dragged handle).
-const outer = (b: number) => `M0 0H38C${70 + b} 0 ${88 + b} 20 ${88 + b} 50C${88 + b} 80 ${70 + b} 100 38 100H0Z`
+// The D's outline in a 100-unit box; `k` is how far the bowl is pulled out: 0 a straight edge,
+// 1 the letter's curve (the dragged handle sits at x = 38 + 50k).
+const outer = (k: number) =>
+  `M0 0H38C${38 + 32 * k} 0 ${38 + 50 * k} 20 ${38 + 50 * k} 50C${38 + 50 * k} 80 ${38 + 32 * k} 100 38 100H0Z`
+const bowlX = (k: number) => 38 + 50 * k
 const NODES = [
   [0, 0],
   [38, 0],
@@ -44,9 +47,9 @@ function PenIcon() {
   )
 }
 
-// "Let's BUILD": the apostrophe is the pen tool. When the frame comes into view it flies over,
-// traces the D point by point, drags the curve out, lets go (the D shakes back and fills), then
-// returns to its place. About 2s.
+// "Let's BUILD": the apostrophe is the pen tool. When the frame comes into view it glides over to
+// the D, takes the handle on its straight edge and pulls it out into the curve; the letter fills
+// and the pen glides back to its place. Calm, about 3.5s.
 function BuildHeading() {
   const root = useRef<HTMLHeadingElement>(null)
 
@@ -79,8 +82,9 @@ function BuildHeading() {
         })
       }
 
-      // at: home (0) to the D (1); hop: progress of the current jump, for a cartoon arc.
-      const state = { b: 0, t: 0, at: 0, hop: 0 }
+      // k: the bowl (0 straight, 1 curved); at: home (0) to the handle (1); hop: progress of the
+      // current glide, for a soft arc.
+      const state = { k: 0, at: 0, hop: 0 }
       // Screen position of a point in the D's 100-unit space.
       const toScreen = (x: number, y: number) => {
         const m = svg.getScreenCTM()
@@ -90,47 +94,46 @@ function BuildHeading() {
       const placePen = (x: number, y: number) => {
         const r = home.getBoundingClientRect()
         const nib = { x: r.left + r.width / 2, y: r.bottom }
-        const arc = -Math.sin(Math.PI * state.hop) * r.height * 1.6
+        const arc = -Math.sin(Math.PI * state.hop) * r.height * 0.8
         gsap.set(pen, { x: (x - nib.x) * state.at, y: (y - nib.y) * state.at + arc })
       }
-      let len = 0
+      const curveNode = nodes[2] as SVGRectElement
       const update = () => {
-        outline.setAttribute('d', outer(state.b))
-        handle.setAttribute('transform', `translate(${state.b} 0)`)
-        // While drawing, the nib follows the outline; while dragging, it holds the handle.
-        const p = state.t < 1 ? outline.getPointAtLength(len * state.t) : { x: 88 + state.b, y: 18 }
-        const s = toScreen(p.x, p.y)
+        const x = bowlX(state.k)
+        outline.setAttribute('d', outer(state.k))
+        handle.setAttribute('transform', `translate(${x - 88} 0)`)
+        curveNode.setAttribute('x', String(x - 3))
+        // The nib holds the handle's knob.
+        const s = toScreen(x, 18)
         placePen(s.x, s.y)
       }
 
-      // The pen's slot between t and s: it closes up when the pen leaves and pops open when it lands.
+      // The pen's slot between t and s: it closes when the pen leaves and opens when it returns.
       const slot = { width: 0, margin: 0 }
-      const hopTo = (at: number) => ({ at, duration: 0.45, ease: 'back.out(1.7)' })
+      const glideTo = (at: number) => ({ at, duration: 0.8, ease: 'power2.inOut' })
 
       const tl = gsap.timeline({ paused: true, onUpdate: update })
       tl
-        // Leave with a wiggle and hop over to the D while the gap behind it closes.
-        .to(pen, { rotation: -22, duration: 0.12, ease: 'power2.out' })
-        .to(state, hopTo(1))
-        .fromTo(state, { hop: 0 }, { hop: 1, duration: 0.45, ease: 'none' }, '<')
-        .to(pen, { rotation: 0, duration: 0.45, ease: 'elastic.out(1, 0.45)' }, '<')
-        .to(home, { width: 0, marginLeft: 0, marginRight: 0, duration: 0.35, ease: 'back.in(1.6)' }, '<0.05')
-        // Trace the outline (0.6s), dropping a point at each corner.
-        .to(state, { t: 1, duration: 0.6, ease: 'none' })
-        .to(outline, { strokeDashoffset: 0, duration: 0.6, ease: 'none' }, '<')
-        .to(nodes, { opacity: 1, duration: 0.05, stagger: 0.12 }, '<')
-        // Grab the curve's handle and pull (0.25s), then let go: it shakes back (0.55s) and the
-        // letter fills in.
-        .set(handle, { opacity: 1 })
-        .to(state, { b: 18, duration: 0.25, ease: 'power2.out' })
-        .to(state, { b: 0, duration: 0.55, ease: 'elastic.out(1.1, 0.3)' })
-        .to(real, { opacity: 1, duration: 0.25 }, '<0.2')
-        .to([outline, nodes, handle], { opacity: 0, duration: 0.25 }, '<0.1')
-        // Hop back; the gap pops open to make room and the pen lands with a squash.
-        .to(state, hopTo(0), '<')
-        .fromTo(state, { hop: 0 }, { hop: 1, duration: 0.45, ease: 'none' }, '<')
-        .to(home, { width: () => slot.width, marginLeft: () => slot.margin, marginRight: () => slot.margin, duration: 0.5, ease: 'elastic.out(1.1, 0.45)' }, '<0.25')
-        .fromTo(pen, { scaleY: 0.75, scaleX: 1.2 }, { scaleY: 1, scaleX: 1, duration: 0.4, ease: 'elastic.out(1.2, 0.35)', transformOrigin: '50% 100%', immediateRender: false }, '<0.15')
+        // Tilt a little and glide over to the D's straight edge while the gap behind closes.
+        .to(pen, { rotation: -10, duration: 0.3, ease: 'power2.out' })
+        .to(state, glideTo(1), '<0.1')
+        .fromTo(state, { hop: 0 }, { hop: 1, duration: 0.8, ease: 'none' }, '<')
+        .to(pen, { rotation: 0, duration: 0.6, ease: 'power2.inOut' }, '<0.2')
+        .to(home, { width: 0, marginLeft: 0, marginRight: 0, duration: 0.6, ease: 'power2.inOut' }, '<')
+        // The D appears as a selected path with a straight edge, its points and the handle.
+        .to(outline, { opacity: 1, duration: 0.35, ease: 'power1.out' }, '-=0.2')
+        .to(nodes, { opacity: 1, duration: 0.2, stagger: 0.05, ease: 'power1.out' }, '<')
+        .to(handle, { opacity: 1, duration: 0.25, ease: 'power1.out' }, '<0.15')
+        // Pull the handle out: the edge bends into the bowl, a touch past, and settles.
+        .to(state, { k: 1.04, duration: 0.9, ease: 'power2.inOut' }, '+=0.1')
+        .to(state, { k: 1, duration: 0.35, ease: 'sine.out' })
+        // The letter fills in as the path's points fade.
+        .to(real, { opacity: 1, duration: 0.45, ease: 'power1.out' }, '-=0.1')
+        .to([outline, nodes, handle], { opacity: 0, duration: 0.4, ease: 'power1.out' }, '<0.1')
+        // Glide back; the gap opens to make room.
+        .to(state, glideTo(0), '<0.1')
+        .fromTo(state, { hop: 0 }, { hop: 1, duration: 0.8, ease: 'none' }, '<')
+        .to(home, { width: () => slot.width, marginLeft: () => slot.margin, marginRight: () => slot.margin, duration: 0.6, ease: 'power2.out' }, '<0.25')
         // Back to the stylesheet's em sizes, so the slot keeps scaling with the type.
         .set(home, { clearProps: 'width,marginLeft,marginRight' })
 
@@ -141,10 +144,9 @@ function BuildHeading() {
         const cs = getComputedStyle(home)
         slot.width = parseFloat(cs.width)
         slot.margin = parseFloat(cs.marginLeft)
-        len = outline.getTotalLength()
         gsap.set(real, { opacity: 0 })
-        gsap.set(outline, { strokeDasharray: len, strokeDashoffset: len, opacity: 1 })
-        gsap.set([nodes, handle], { opacity: 0 })
+        gsap.set([outline, nodes, handle], { opacity: 0 })
+        update()
         // Play once the visitor is actually at the frame: (nearly) all of it on screen, or as
         // much of it as fits when it's taller than the window.
         const frame = h.closest<HTMLElement>('[data-frame]') ?? h
@@ -189,7 +191,7 @@ function BuildHeading() {
           <span className="relative">
             <span data-real>D</span>
             <svg data-d viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute top-0 left-0 overflow-visible">
-              <path data-outline d={outer(0)} fill="none" stroke={SELECT} strokeWidth="1.5" vectorEffect="non-scaling-stroke" opacity="0" />
+              <path data-outline d={outer(1)} fill="none" stroke={SELECT} strokeWidth="1.5" vectorEffect="non-scaling-stroke" opacity="0" />
               {NODES.map(([x, y]) => (
                 <rect key={`${x}-${y}`} data-node x={x - 3} y={y - 3} width="6" height="6" fill="#fff" stroke={SELECT} strokeWidth="1" vectorEffect="non-scaling-stroke" opacity="0" />
               ))}
