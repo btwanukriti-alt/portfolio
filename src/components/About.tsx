@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import { Reveal } from './Reveal'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
@@ -17,6 +17,15 @@ const CHIPS = ['UX & UI', 'Branding', 'Websites', 'Motion', 'AI features']
 type Stop = { year: string; role: string; company: string; kind: string; dot: string }
 
 // From the resume (Anukriti Mishra_ UI UX Designer.pdf).
+// How each of the five stops lines up with its dot on wide screens.
+const ALIGN = [
+  { item: 'min-[901px]:text-left', dot: 'min-[901px]:left-0' },
+  { item: 'min-[901px]:-translate-x-1/2 min-[901px]:text-center', dot: 'min-[901px]:left-1/2 min-[901px]:-translate-x-1/2' },
+  { item: 'min-[901px]:-translate-x-1/2 min-[901px]:text-center', dot: 'min-[901px]:left-1/2 min-[901px]:-translate-x-1/2' },
+  { item: 'min-[901px]:-translate-x-1/2 min-[901px]:text-center', dot: 'min-[901px]:left-1/2 min-[901px]:-translate-x-1/2' },
+  { item: 'min-[901px]:-translate-x-full min-[901px]:text-right', dot: 'min-[901px]:left-auto min-[901px]:right-0' },
+]
+
 const STOPS: Stop[] = [
   { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', dot: '#4F86E8', kind: 'Internship' },
   { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', dot: '#F28C28', kind: 'Internship' },
@@ -133,46 +142,50 @@ export default function About() {
         </Reveal>
       </div>
 
-      {/* Timeline: a slim line through grey dots, each role in a few words under its dot, ending at
+      {/* Timeline: a slim black line through coloured dots, each role in a few words under its dot, ending at
           the open spot (violet). Down the left on narrow screens. */}
       <div ref={timeline}>
         <p className="m-0 mb-5 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">Experience</p>
-        <ol aria-label="Career timeline" className="relative m-0 grid list-none grid-cols-1 gap-6 p-0 pl-7 min-[901px]:grid-cols-5 min-[901px]:gap-6 min-[901px]:pt-7 min-[901px]:pl-0">
+        {/* Wide screens: the five stops sit at even intervals along the line (0, 25, 50, 75, 100%),
+            each label aligned to its dot: the first to the left, the middle three centred, the open
+            spot to the right, at the line's end. */}
+        <ol aria-label="Career timeline" className="relative m-0 flex list-none flex-col gap-7 p-0 pl-7 min-[901px]:block min-[901px]:h-[132px] min-[901px]:pl-0">
           <span
             data-line
             aria-hidden="true"
             className="absolute top-[6px] left-0 hidden h-[2px] w-full origin-left scale-x-0 rounded-full bg-ink min-[901px]:block"
-            
           />
           <span
             data-line
             aria-hidden="true"
             className="absolute top-1 bottom-1 left-[6px] w-[2px] origin-top scale-y-0 rounded-full bg-ink min-[901px]:hidden"
-            
           />
-          {STOPS.map((stop) => (
-            <li key={stop.company} className="relative">
-              <span
-                data-dot
-                aria-hidden="true"
-                className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
-                style={{ background: stop.dot }}
-              />
-              <div data-card className="invisible">
-                <p className="m-0 text-[13px] leading-none font-medium text-faint tabular-nums">
-                  {stop.year} · {stop.kind}
-                </p>
-                <p className="m-0 mt-2.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">{stop.role}</p>
-                <p className="m-0 mt-1 text-[14px] leading-[1.3] text-muted">{stop.company}</p>
-              </div>
-            </li>
-          ))}
-          <li className="relative">
+          {STOPS.map((stop, i) => {
+            const align = ALIGN[i]
+            return (
+              <li key={stop.company} className={`relative min-[901px]:absolute min-[901px]:top-9 min-[901px]:left-[var(--x)] min-[901px]:w-[19%] ${align.item}`} style={{ '--x': `${i * 25}%` } as CSSProperties}>
+                <span
+                  data-dot
+                  aria-hidden="true"
+                  className={`invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[34px] ${align.dot}`}
+                  style={{ background: stop.dot }}
+                />
+                <div data-card className="invisible">
+                  <p className="m-0 text-[13px] leading-none font-medium text-faint tabular-nums">
+                    {stop.year} · {stop.kind}
+                  </p>
+                  <p className="m-0 mt-2.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">{stop.role}</p>
+                  <p className="m-0 mt-1 text-[14px] leading-[1.3] text-muted">{stop.company}</p>
+                </div>
+              </li>
+            )
+          })}
+          <li className={`relative min-[901px]:absolute min-[901px]:top-9 min-[901px]:left-full min-[901px]:w-[19%] ${ALIGN[4].item}`}>
             <span
               data-dot
               aria-hidden="true"
-              // The open spot: a larger, hollow violet ring with a soft pulse around it.
-              className="invisible absolute top-0 -left-[29px] size-[18px] rounded-full border-[3px] bg-white min-[901px]:-top-[29px] min-[901px]:-left-[2px]"
+              // The open spot: a larger, hollow violet ring with a soft pulse, at the end of the line.
+              className="invisible absolute top-0 -left-[29px] size-[18px] rounded-full border-[3px] bg-white min-[901px]:-top-[36px] min-[901px]:right-[-1px] min-[901px]:left-auto"
               style={{ borderColor: SELECT }}
             >
               <span
@@ -181,8 +194,8 @@ export default function About() {
               />
             </span>
             <div data-card className="invisible">
-              {/* Lines up with the roles (under their year lines). */}
-              <p className="m-0 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink min-[901px]:pt-[23px]">
+              <p className="m-0 text-[13px] leading-none font-medium text-faint">Now · Open to roles</p>
+              <p className="m-0 mt-2.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">
                 Looking for my
                 <br />
                 next challenge.
