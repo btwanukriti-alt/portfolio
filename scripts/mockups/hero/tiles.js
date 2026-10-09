@@ -6,16 +6,19 @@ const PHONES = { side: 180, mid: 210 } // the phone trio
 window.TILESPEC = [
   { id: 't01', tex: 'p01', dark: 1, screen: 'ja-footprint' },
   { id: 't02', tex: 'p02', screen: 'app-site', bezel: 'dark' },
-  { id: 't03', tex: 'p03', dark: 1, screen: 'ssh2-performance' },
+  { id: 't03', tex: 'p03', dark: 1, screen: 'sshL-performance' },
   { id: 't04', tex: 'p04', phones: ['zy-food', 'zy-home', 'zy-water'] },
   { id: 't05', tex: 'p05', screen: 'col-finance-s' },
-  { id: 't06', tex: 'p06', dark: 1, screen: 'ja-chat' },
+  { id: 't06', tex: 'p06', dark: 1, screen: 'jaL-chat', zoom: 1.35, pos: '0 0' },
   { id: 't07', tex: 'p07', screen: 'pf-createlead' },
-  { id: 't08', tex: 'p08', dark: 1, screen: 'ssh2-signin' },
+  { id: 't08', tex: 'p08', dark: 1, screen: 'sshL-signin' },
   { id: 't09', tex: 'p09', phonesH: ['zr-signup', 'zr-workout', 'zr-sleep'] },
-  { id: 't11', tex: 'p10', dark: 1, screen: 'ssh2-sftp' },
+  { id: 't10', tex: 'p16', screen: 'pf-features' },
+  { id: 't11', tex: 'p10', dark: 1, screen: 'sshL-sftp', zoom: 1.35, pos: '0 0' },
+  { id: 't12', tex: 'p18', phonesH: ['zr-hydration', 'zr-activity', 'zr-food'] },
   { id: 't13', tex: 'p11', screen: 'pf-pricing', bezel: 'dark' },
   { id: 't14', tex: 'p14', screen: 'col-drawer-s' },
+  { id: 't15', tex: 'p15', dark: 1, screen: 'sshL-key_manager', zoom: 1.35, pos: '0 0' },
   { id: 't16', tex: 'p12', phonesH: ['zr-events', 'zr-profile', 'zr-explore'] },
 ]
 const A = (s) => `a/${s}.png`
@@ -24,7 +27,7 @@ function screenDev(t) {
   const b = 12
   const h = Math.round((w - 2 * b) / 1.6)
   const dk = t.dark || t.bezel === 'dark'
-  return `<div class="dev scr ${dk ? 'dk' : 'lt'}" style="left:${x}px;top:${y}px;width:${w}px;padding:${b}px;border-radius:22px"><div class="sc" style="height:${h}px;background-image:url(${A(t.screen)})"></div></div>`
+  return `<div class="dev scr ${dk ? 'dk' : 'lt'}" style="left:${x}px;top:${y}px;width:${w}px;padding:${b}px;border-radius:22px"><div class="sc" style="height:${h}px;background-image:url(${A(t.screen)})${t.zoom ? `;background-size:${t.zoom * 100}% auto;background-position:${t.pos}` : ''}"></div></div>`
 }
 function phonesDev(t, which) {
   const [l, m, r] = t.phones

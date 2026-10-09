@@ -15,6 +15,8 @@ case study, every device the same size, on its own pattern in colours chosen for
    - SSH client also `signin`, `sftp` as `ssh2-*.png`; Jaadu `jaadu-video/screens/chat.jpg` as
      `ja-chat.png`; Zync `zync-refined/` screens as `zr-*.png` (framed in HTML).
    - `python3 scripts/mockups/hero/prep.py` collects Jaadu and Zync.
+   - Dark screens are lifted out of black into their brand's dark colour: `python3 lift.py
+     ssh2-x.png sshL-x.png '#2A2160'` (SSH), `'#0F205E' 0.85` (Jaadu).
 2. Patterns: `python3 textures.py a/` writes `p01..p16.png` (space, paper cut-outs, grain,
    sunburst, watercolour, halftone, Memphis, topographic, terrazzo, synthwave, op-art ripples,
    groovy waves, pixel mosaic, hills, aurora, Bauhaus). The newer ones are softened toward their ground.
