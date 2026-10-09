@@ -40,6 +40,7 @@ const EMAIL = `mailto:${CONTACT_EMAIL}`
 
 // The screens' drawn width (scene.ts tileW), for picking the image size.
 const TILE_SIZES = '(max-width: 719px) 124px, 236px'
+const CARD_SIZES = '(max-width: 719px) 80vw, 420px'
 
 const LINE_1 = 'Hello, I am Anukriti.'
 const LINE_2 = 'Experience Designer'
@@ -114,12 +115,12 @@ const TOOLS: { id: string; label: string; icon: ReactNode }[] = [
 
 type Engine = { hover: (index: number, on: boolean) => void }
 
-// A text layer: an invisible copy reserves the full width so typing grows from the left without
+// A text layer: a transparent copy (painted at once, so the page counts as loaded) reserves the full width so typing grows from the left without
 // shifting the layout; the typed text and caret sit on top.
 function TypedLine({ text, lineRef }: { text: string; lineRef: RefObject<HTMLDivElement | null> }) {
   return (
     <div ref={lineRef} className={`relative ${lineType}`}>
-      <span className="invisible" aria-hidden>
+      <span className="text-ink/[0.002] select-none" aria-hidden>
         {text}
       </span>
       <span className="absolute inset-0 text-left" aria-hidden>
@@ -387,7 +388,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           gsap.set(card, { x: c.x, y: c.y, scale: 1, zIndex: 198 })
           card.style.visibility = card.style.opacity === '0' ? 'hidden' : 'inherit'
           const flip = card.firstElementChild?.nextElementSibling as HTMLElement | null
-          if (flip) flip.style.transform = ''
+          if (flip) flip.style.transform = 'none'
           turn[k].v = 0
         })
       }
@@ -447,7 +448,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         // Reduced motion: the finished state, screens waiting around the centre.
         Object.assign(st, { gap: SPREAD_GAP, amp: 0.42, hint: 1, show: 1, front: 1 })
         baseAngle = 0
-        gsap.set([l1, l2], { autoAlpha: 0 })
+        gsap.set([l1, l2, ...deck], { autoAlpha: 0 })
         gsap.set(finaleEl, { autoAlpha: 1 })
         return
       }
@@ -517,6 +518,21 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       gsap.set([selSize, selLabel, selFrame, guideEl], { autoAlpha: 0 })
       // The cards wait, stacked on the middle slot, hidden; their drawings are built hidden too.
       gsap.set(deck, { autoAlpha: 0, x: frame.x, y: frame.y, width: cw, height: ch })
+      // The cards arrive from the server turned over and all but invisible, so their screenshots
+      // paint (and the browser counts the page as loaded) straight away, not when the cards turn
+      // over seconds later. Once painted, they hide and face front until their moment.
+      const flips = deck.map((c) => c.querySelector<HTMLElement>('[data-flip]')!)
+      gsap.set(deck, { autoAlpha: 0.004 })
+      for (const f of flips) f.style.transform = 'rotateY(180deg)'
+      const shots = deck.map((c) => c.querySelector('img')!.decode().catch(() => {}))
+      const hideBacks = () => {
+        if (!alive || flips[0].style.transform === 'none') return
+        // Only if the cards are still waiting; once they're out they keep their fronts.
+        if (Number(gsap.getProperty(deck[0], 'opacity')) < 0.01) gsap.set(deck, { autoAlpha: 0 })
+        for (const f of flips) f.style.transform = 'none'
+      }
+      Promise.all(shots).then(() => requestAnimationFrame(() => requestAnimationFrame(hideBacks)))
+      setTimeout(hideBacks, 2500)
       gsap.set(names, { autoAlpha: 0, y: 4 })
       gsap.set(chip, { autoAlpha: 0 })
       const art = disciplinesTimeline(chromeEl).timeScale(ART_SPEED) // plays by time (see the tick)
@@ -575,7 +591,8 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         // 3. Frame tool. The first line fades; the cursor grabs the corner and drags the text box,
         //    in place, into a card.
         .set(caret2, { visibility: 'hidden' }, reshapeAt - 0.3)
-        .to(l1, { autoAlpha: 0, y: -10, duration: 0.55, ease: 'power2.out' }, reshapeAt - 0.45)
+        // The greeting stays until the text box starts turning into the card.
+        .to(l1, { autoAlpha: 0, y: -10, duration: 0.45, ease: 'power2.out' }, reshapeAt)
         .to(pointer, { x: textBox.x + textBox.w, y: textBox.y + textBox.h, duration: 0.45, ease: 'power3.inOut', onUpdate: drawCursor }, reshapeAt - 0.5)
         .to(pointer, { s: 0.88, duration: 0.08, ease: 'power2.out', onUpdate: drawCursor }, reshapeAt - 0.06)
         .to(l2, { autoAlpha: 0, scale: 0.96, duration: 0.3, ease: 'power2.in' }, reshapeAt)
@@ -711,7 +728,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
                 cards.current[k] = el
               }}
               aria-hidden
-              className="invisible absolute top-0 left-0 opacity-0 [perspective:1600px]"
+              className="absolute top-0 left-0 aspect-[3/2] w-[min(80vw,420px)] [transform:translate(calc(50vw-50%),calc(50svh-50%))] opacity-[0.004] [perspective:1600px]"
               style={{ zIndex: 198 }}
             >
               <span
@@ -720,7 +737,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               >
                 {name}
               </span>
-              <div data-flip className="relative h-full w-full [transform-style:preserve-3d]">
+              <div data-flip className="relative h-full w-full [transform-style:preserve-3d] [transform:rotateY(180deg)]">
                 <div data-front className="absolute inset-0 overflow-hidden border border-line bg-paper [backface-visibility:hidden]">
                   <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="block h-full w-full">
                     <Art />
@@ -730,7 +747,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
                   data-back
                   className="absolute inset-0 overflow-hidden bg-soft shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
                 >
-                  <img src={TILES[k].src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
+                  <img src={TILES[k].src} srcSet={`${TILES[k].small} 420w, ${TILES[k].src} 840w`} sizes={CARD_SIZES} fetchPriority="high" alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
                 </div>
               </div>
               {/* Selected: a black border and handles, kept until the card lifts off. */}
@@ -828,7 +845,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
             onBlur={() => engine.current?.hover(i, false)}
             className="pointer-events-none absolute top-0 left-0 block origin-center overflow-hidden rounded-[8px] bg-soft opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <img src={tile.src} srcSet={`${tile.small} 420w, ${tile.src} 840w`} sizes={TILE_SIZES} alt="" draggable={false} decoding="async" className="block h-full w-full max-w-none object-cover" />
+            <img src={tile.src} srcSet={`${tile.small} 420w, ${tile.src} 840w`} sizes={TILE_SIZES} fetchPriority="low" alt="" draggable={false} decoding="async" className="block h-full w-full max-w-none object-cover" />
           </Link>
         ))}
       </div>
