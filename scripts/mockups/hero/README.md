@@ -1,6 +1,6 @@
 # Hero tiles (full UX frames)
 
-Source for `public/hero/tiles/tNN.jpg` (the patterned ground) and `tNN-pop.webp` (the device
+Source for `public/hero/screens/tNN.jpg` (the patterned ground) and `tNN-pop.webp` (the device
 alone, which the hero lifts out of the tile on a loop). Every tile holds one full screen from a
 case study, every device the same size, on its own pattern in colours chosen for that screen.
 
@@ -20,7 +20,7 @@ case study, every device the same size, on its own pattern in colours chosen for
    groovy waves, pixel mosaic, hills, aurora, Bauhaus). The newer ones are softened toward their ground.
 3. `node render.mjs <abs path to this folder> <out dir>` writes `tNN.jpg`, `tNN-full.png`,
    `tNN-pop.png` and `meta.json` (pop box as a share of the 900 x 600 tile).
-4. Resize to 840 x 560 (pop by the same factor, WebP) into `public/hero/tiles/`, and copy the
+4. Resize to 840 x 560 (pop by the same factor, WebP) into `public/hero/screens/`, and copy the
    `meta.json` boxes into `src/components/intro-hero/tiles.ts`.
 
 Layouts live in `tiles.js` (`TILESPEC`). Every name and number in the screens is sample data.
