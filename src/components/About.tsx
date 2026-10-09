@@ -171,8 +171,8 @@ export default function About() {
             <span
               data-dot
               aria-hidden="true"
-              // The open spot: a larger, hollow violet ring with a soft pulse around it.
-              className="invisible absolute top-0 -left-[29px] size-[18px] rounded-full border-[3px] bg-white min-[901px]:-top-[29px] min-[901px]:-left-[2px]"
+              // The open spot: a larger, hollow violet ring with a soft pulse, at the end of the line.
+              className="invisible absolute top-0 -left-[29px] size-[18px] rounded-full border-[3px] bg-white min-[901px]:-top-[29px] min-[901px]:right-[-1px] min-[901px]:left-auto"
               style={{ borderColor: SELECT }}
             >
               <span
@@ -182,7 +182,7 @@ export default function About() {
             </span>
             <div data-card className="invisible">
               {/* Lines up with the roles (under their year lines). */}
-              <p className="m-0 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink min-[901px]:pt-[23px]">
+              <p className="m-0 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink min-[901px]:pt-[23px] min-[901px]:text-right">
                 Looking for my
                 <br />
                 next challenge.
