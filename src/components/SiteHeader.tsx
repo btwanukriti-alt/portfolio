@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import NavBar from './NavBar'
+import { pageScroll } from './SmoothScroll'
 
 // Fixed, minimal header shared by every page. It tucks away while scrolling down and comes back
 // on the way up; it also stays out of the way while the glasses are on (html[data-glasses]).
@@ -37,7 +38,7 @@ export default function SiteHeader({ afterHero = false }: { afterHero?: boolean 
     }
     const update = () => {
       frame = 0
-      const y = window.scrollY
+      const y = pageScroll()
       setScrolled(y > 8)
       // The home hero is pinned for a few screens and has its own header: stay away until it ends.
       if (under.size) setHidden(true)
