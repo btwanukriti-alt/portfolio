@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { RESUME } from '@/data/site'
+import Logo from './Logo'
 
 // The header row shared by the landing hero and every other page: name on the left, Work, About
 // and Contact in the middle, Replay (quiet) and Resume (the one black button) on the right.
@@ -21,8 +22,8 @@ export default function NavBar({ home = false, onReplay }: { home?: boolean; onR
 
   return (
     <div className="mx-auto grid h-[72px] max-w-[var(--max)] grid-cols-[1fr_auto] items-center gap-6 px-[var(--gutter)] font-hero text-[14px] text-ink min-[721px]:grid-cols-[1fr_auto_1fr]">
-      <Link href={home ? '#welcome' : '/'} className={`justify-self-start text-[16px] leading-none font-medium tracking-[-0.02em] whitespace-nowrap text-ink no-underline ${focus}`}>
-        Anukriti Mishra
+      <Link href={home ? '#welcome' : '/'} className={`justify-self-start text-ink no-underline ${focus}`}>
+        <Logo className="block h-[22px] w-auto" />
       </Link>
 
       <nav aria-label="Primary" className="hidden items-center gap-8 min-[721px]:flex">
