@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { Reveal } from './Reveal'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
-// About: a headline with an empty Figma frame for the blank canvas, the disciplines as coloured
+// About: "The story so far" with "so far" as a Figma frame, the disciplines as coloured
 // chips, a slim career timeline on a gradient line, and four short notes. Roles from the resume.
 
 const SELECT = '#7B61FF'
@@ -70,9 +70,9 @@ export default function About() {
         </Reveal>
         <div>
           <Reveal as="h2" id="about-heading" className="m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] text-ink">
-            I take products from a{' '}
+            The story{' '}
             <span className="relative inline-block">
-              {/* An empty Figma frame: the blank canvas everything starts on. */}
+              {/* "so far" selected like a Figma frame. */}
               <span aria-hidden="true" className="absolute -inset-x-[0.1em] inset-y-[0.04em]">
                 <span className="absolute inset-0 border-[1.5px] border-dashed" style={{ borderColor: SELECT }} />
                 {[
@@ -94,9 +94,9 @@ export default function About() {
                   Frame 1
                 </span>
               </span>
-              blank canvas
+              so far
             </span>
-            <br /> to launch day.
+            .
           </Reveal>
           <Reveal as="ul" delay={150} className="m-0 mt-[clamp(24px,3vw,36px)] flex list-none flex-wrap gap-2.5 p-0">
             {CHIPS.map((c) => (
