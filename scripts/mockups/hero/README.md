@@ -1,8 +1,7 @@
 # Hero tiles (full UX frames)
 
-Source for `public/hero/screens/tNN.jpg` (the patterned ground) and `tNN-pop.webp` (the device
-alone, which the hero lifts out of the tile on a loop). Every tile holds one full screen from a
-case study, every device the same size, on its own pattern in colours chosen for that screen.
+Source for `public/hero/screens/sNN.jpg`, one still image per hero tile: a full screen from a
+case study in a device mockup, on its own pattern in colours chosen for that screen.
 
 1. Screens into `a/`:
    - Pulsefit: build a page from `../pulsefit/ui.css`, `site.css`, `pulsefit/sprite.html`, an empty
@@ -19,8 +18,7 @@ case study, every device the same size, on its own pattern in colours chosen for
    sunburst, watercolour, halftone, Memphis, topographic, terrazzo, synthwave, op-art ripples,
    groovy waves, pixel mosaic, hills, aurora, Bauhaus). The newer ones are softened toward their ground.
 3. `node render.mjs <abs path to this folder> <out dir>` writes `tNN.jpg`, `tNN-full.png`,
-   `tNN-pop.png` and `meta.json` (pop box as a share of the 900 x 600 tile).
-4. Resize to 840 x 560 (pop by the same factor, WebP) into `public/hero/screens/`, and copy the
-   `meta.json` boxes into `src/components/intro-hero/tiles.ts`.
+   `tNN-pop.png` and `meta.json` (only `tNN-full.png` is used).
+4. Resize each `tNN-full.png` to 840 x 560 JPEG as `public/hero/screens/sNN.jpg`.
 
 Layouts live in `tiles.js` (`TILESPEC`). Every name and number in the screens is sample data.
