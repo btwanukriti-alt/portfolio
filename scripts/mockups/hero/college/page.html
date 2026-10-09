@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="../../college/styles.css">
+<style>:root{--display:'Bricolage Grotesque','Figtree',sans-serif;--ui:'Figtree',sans-serif}*{box-sizing:border-box}body{margin:0;background:#fff;font-family:var(--ui)}#lib>div{width:1200px;margin-bottom:40px}</style>
+</head><body><div id="lib"></div><script src="../../college/screens.js"></script><script>
+const lib=document.getElementById('lib');const mount=(id,html)=>{const d=document.createElement('div');d.id=id;d.innerHTML=html;lib.appendChild(d)};
+mount('s-fin',finance());mount('s-staff',staff());mount('s-d3',stackDrawer('programme'));mount('s-d2',stackDrawer('college'));
+</script></body></html>
