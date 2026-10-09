@@ -50,7 +50,7 @@ export function computeLayout(w: number, h: number): Layout {
     face.x + (p.x / FACE_W) * faceW,
     face.y + (p.y / FACE_H) * faceH,
   ]
-  const tileW = mobile ? clamp(w * 0.27, 86, 136) : clamp(w * 0.145, 150, 236)
+  const tileW = mobile ? clamp(w * 0.26, 84, 124) : clamp(w * 0.145, 150, 236)
   return {
     w,
     h,
@@ -105,12 +105,13 @@ export function orbitPose(L: Layout, theta: number, amp: number, origin?: Origin
     const p = mixPose({ ...from, o: 1 }, start, easeInOutCubic(k))
     return { ...p, o: p.o * Math.min(1, k / 0.12) }
   }
-  const rx = L.mobile ? L.w * 0.44 : Math.min(L.w * 0.44, L.face.w * 0.9)
+  const rx = L.mobile ? L.w * 0.36 : Math.min(L.w * 0.44, L.face.w * 0.9)
   // Tilt: nearly edge-on during the pass (so the front of the circle runs across the eyes), more
   // open once it idles so it reads as a ring. Front low, back high.
   const calm = clamp((1 - amp) / 0.58)
-  const ry = L.h * lerp(0.04, L.mobile ? 0.3 : 0.27, calm)
-  const depth = (L.mobile ? 360 : 690) * amp
+  // On a phone the circle stays open even mid-pass, so the screens don't pile up on each other.
+  const ry = L.h * lerp(L.mobile ? 0.11 : 0.04, L.mobile ? 0.3 : 0.27, calm)
+  const depth = (L.mobile ? 300 : 690) * amp
   const sin = Math.sin(theta)
   const z = sin * depth
   const persp = PERSPECTIVE / (PERSPECTIVE - z)

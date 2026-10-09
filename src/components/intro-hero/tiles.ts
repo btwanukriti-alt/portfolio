@@ -2,9 +2,15 @@
 // mockup on its own pattern, as one still image (public/hero/screens/, 840 x 560; generator in
 // scripts/mockups/hero/). Each links to its project. Ordered so light and dark screens alternate.
 
-export type Tile = { src: string; slug?: string; label: string }
+// small: a 420 x 280 copy for phones, where the screens are drawn small.
+export type Tile = { src: string; small: string; slug?: string; label: string }
 
-const tile = (n: string, slug: string, label: string): Tile => ({ src: `/hero/screens/${n}.jpg`, slug, label })
+const tile = (n: string, slug: string, label: string): Tile => ({
+  src: `/hero/screens/${n}.jpg`,
+  small: `/hero/screens/${n}-m.jpg`,
+  slug,
+  label,
+})
 
 export const TILES: Tile[] = [
   tile('s01', 'jaadu-2', 'Jaadu 2.0'),

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'rea
 import Link from 'next/link'
 import { caseStudyHref } from '@/data/projects'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
-import { getLenis } from '../SmoothScroll'
+import { getLenis, pageScroll } from '../SmoothScroll'
 import NavBar from '../NavBar'
 import { EMAIL as CONTACT_EMAIL } from '@/data/site'
 import {
@@ -38,6 +38,9 @@ import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 
 const EMAIL = `mailto:${CONTACT_EMAIL}`
 
+// The screens' drawn width (scene.ts tileW), for picking the image size.
+const TILE_SIZES = '(max-width: 719px) 124px, 236px'
+
 const LINE_1 = 'Hello, I am Anukriti.'
 const LINE_2 = 'Experience Designer'
 const HEADLINE = 'The app. The website. The brand. The motion. One designer.'
@@ -52,7 +55,8 @@ const GUIDE = '#FF2D78'
 // The discipline cards, left to right (top to bottom when stacked): UX, branding, motion. The
 // middle one is the card the text box becomes. Each lifts into the ring as screenshot k: the three
 // land side by side on its front, the left one leading, with the rest of the ring behind them.
-const LIFT = 1.35 // seconds each card takes to fly into the ring
+const FLIP = 0.75 // seconds each card takes to turn over to its screenshot, in place
+const LIFT = 1.2 // seconds each card then takes to fly into the ring
 // The card drawings play at this speed (1 = as authored, 2.8s).
 const ART_SPEED = 0.85
 
@@ -61,9 +65,9 @@ const N = TILES.length
 const CHAIN_GAP = 0.2 // radians between screenshots while they stream out
 const SPREAD_GAP = (Math.PI * 2) / N
 const IDLE_SPEED = 0.14
-// Scroll: the hero is pinned for 2.3 extra screens. Stage 1 (ring + headline) takes the first,
-// stage 2 (scatter + About) the second, then a short hold.
-const SCROLL_STAGES = 2.3
+// Scroll: the hero is pinned for 1.8 extra screens. Stage 1 (ring + headline) takes the first,
+// stage 2 (scatter + About) the rest, then a short hold.
+const SCROLL_STAGES = 1.8
 const HERO_HEIGHT = `${(1 + SCROLL_STAGES) * 100}svh`
 // Where the ring's angle starts as the cards lift: screenshot 1 (the middle card) faces the viewer
 // and 0 and 2 sit either side of it; whole turns ahead keep every angle positive.
@@ -199,7 +203,9 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     let seq: { drawAt: number; art: gsap.core.Timeline } | null = null
     let artOn = false
     let origin: Origin | undefined
-    // The cards' flight into the ring: 0 on the canvas, 1 landed (the screenshot takes over).
+    // The cards turn over in place (turn: 0 drawing, 1 screenshot), then fly into the ring
+    // (flight: 0 on the canvas, 1 landed, the screenshot takes over).
+    const turn = [{ v: 0 }, { v: 0 }, { v: 0 }]
     const flight = [{ v: 0 }, { v: 0 }, { v: 0 }]
     let cardSlot: { x: number; y: number; w: number; h: number }[] = []
     const hover = TILES.map(() => new Spring(0, 0, 220, 22))
@@ -294,7 +300,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       // Scroll progress through the pinned hero, in screens. The page scroll is already smoothed
       // (Lenis), so this follows it directly; easing it again made the screens trail the scroll.
       const span = rootH - window.innerHeight
-      scroll = span > 0 ? clamp((window.scrollY - rootTop) / span) * SCROLL_STAGES : 0
+      scroll = span > 0 ? clamp((pageScroll() - rootTop) / span) * SCROLL_STAGES : 0
       // The card drawings start once the cards are out.
       if (tl && seq && !artOn && tl.time() >= seq.drawAt) {
         artOn = true
@@ -304,7 +310,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       lastAngle = baseAngle + st.spin + idle
       const flying = st.fly > 0.5
       const a = smooth(scroll)
-      const b = smooth((scroll - 1.15) / 0.95)
+      const b = smooth((scroll - 0.95) / 0.75)
 
       mouse.x += (mouse.tx - mouse.x) * Math.min(1, dt * 3)
       mouse.y += (mouse.ty - mouse.y) * Math.min(1, dt * 3)
@@ -365,7 +371,9 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           card.style.transform = `translate3d(${m.x - c.w / 2}px,${m.y - c.h / 2}px,0) scale(${scale})`
           card.style.zIndex = String(Math.round(200 + (to.z * f) / 8 + 1))
           const flip = card.firstElementChild?.nextElementSibling as HTMLElement | null
-          if (flip) flip.style.transform = `rotateY(${180 * f}deg) rotateX(${Math.sin(Math.PI * f) * 14}deg)`
+          const u = turn[k].v
+          // Turning over lifts the card a touch toward the viewer.
+          if (flip) flip.style.transform = `rotateY(${180 * u}deg) scale(${1 + 0.06 * Math.sin(Math.PI * u)})`
         })
       } else if (wasFlying) {
         // Scrolled back to before the lift: the cards return to their places on the canvas.
@@ -376,6 +384,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           card.style.visibility = card.style.opacity === '0' ? 'hidden' : 'inherit'
           const flip = card.firstElementChild?.nextElementSibling as HTMLElement | null
           if (flip) flip.style.transform = ''
+          turn[k].v = 0
         })
       }
 
@@ -487,8 +496,9 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       const RESHAPE = 0.95
       const dupAt = reshapeAt + RESHAPE - 0.2 // ⌘D: the copies snap out
       const drawAt = dupAt + 0.25 // the cards draw their disciplines
-      const liftAt = drawAt + 2.8 / ART_SPEED + 0.7 // the drawings play, a hold, then they lift into the ring
-      const landed = liftAt + 0.2 + LIFT // the last card lands
+      const liftAt = drawAt + 2.8 / ART_SPEED + 0.7 // the drawings play, a hold, then they turn over
+      const moveAt = liftAt + FLIP + 0.24 + 0.25 // all three show their screenshots, then rearrange
+      const landed = moveAt + 0.24 + LIFT // the last card lands
       const settleAt = landed + 1.1
 
       const followCorner = () => {
@@ -581,18 +591,21 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         .to(pointer, { x: '+=150', y: '+=120', duration: 0.8, ease: 'power2.in', onUpdate: drawCursor }, dupAt + 0.5)
         .to(cur, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, dupAt + 0.75)
 
-        // 5. The cards lift off into a 3D ring: the left one first, each turning over to its
-        //    screenshot in flight and landing on the ring's front, while the rest of the ring
-        //    appears around and behind them and starts to turn.
+        // 5. The cards turn over, in place and one after another, to their screenshots; then
+        //    they rearrange, flying into a 3D ring, the left one first, landing on its front
+        //    while the rest of the ring appears around and behind them and starts to turn.
         .to([...names, ...rings], { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, liftAt - 0.15)
         .set(st, { fly: 1, gap: SPREAD_GAP }, liftAt)
-        .to(flight[0], { v: 1, duration: LIFT, ease: 'power3.inOut' }, liftAt)
-        .to(flight[1], { v: 1, duration: LIFT, ease: 'power3.inOut' }, liftAt + 0.1)
-        .to(flight[2], { v: 1, duration: LIFT, ease: 'power3.inOut' }, liftAt + 0.2)
-        .to(st, { show: 1, duration: 1.4, ease: 'power2.inOut' }, liftAt + 0.25)
+        .to(turn[0], { v: 1, duration: FLIP, ease: 'power2.inOut' }, liftAt)
+        .to(turn[1], { v: 1, duration: FLIP, ease: 'power2.inOut' }, liftAt + 0.12)
+        .to(turn[2], { v: 1, duration: FLIP, ease: 'power2.inOut' }, liftAt + 0.24)
+        .to(flight[0], { v: 1, duration: LIFT, ease: 'power3.inOut' }, moveAt)
+        .to(flight[1], { v: 1, duration: LIFT, ease: 'power3.inOut' }, moveAt + 0.12)
+        .to(flight[2], { v: 1, duration: LIFT, ease: 'power3.inOut' }, moveAt + 0.24)
+        .to(st, { show: 1, duration: 1.4, ease: 'power2.inOut' }, moveAt + 0.2)
         .to(st, { front: 1, duration: 0.45, ease: 'power2.out' }, landed)
-        // The ring turns as they lift, briskly at first...
-        .to(st, { spin: 3.4, duration: settleAt + 2.6 - (liftAt + 0.1), ease: 'power2.inOut' }, liftAt + 0.1)
+        // The ring turns as they fly, briskly at first...
+        .to(st, { spin: 3.4, duration: settleAt + 2.6 - (moveAt + 0.1), ease: 'power2.inOut' }, moveAt + 0.1)
         // ...and calms down.
         .to(st, { amp: 0.42, duration: 2.8, ease: 'power2.out' }, settleAt - 0.2)
         .to(bar, { autoAlpha: 0, y: 16, duration: 0.6, ease: 'power2.in' }, settleAt + 0.6)
@@ -808,7 +821,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
             onBlur={() => engine.current?.hover(i, false)}
             className="pointer-events-none absolute top-0 left-0 block origin-center overflow-hidden rounded-[8px] bg-soft opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <img src={tile.src} alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
+            <img src={tile.src} srcSet={`${tile.small} 420w, ${tile.src} 840w`} sizes={TILE_SIZES} alt="" draggable={false} decoding="async" className="block h-full w-full max-w-none object-cover" />
           </Link>
         ))}
       </div>
