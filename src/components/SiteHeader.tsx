@@ -14,30 +14,54 @@ export default function SiteHeader({ afterHero = false }: { afterHero?: boolean 
   useEffect(() => {
     let last = window.scrollY
     let frame = 0
-    const overFullscreen = () =>
-      [...document.querySelectorAll('[data-fullscreen]')].some((el) => {
-        const r = el.getBoundingClientRect()
-        return r.top <= 1 && r.bottom > 72
-      })
+    // What sits under the header's band (the top 72px): the home hero, or a full-screen section
+    // (data-fullscreen). An IntersectionObserver reports it without measuring layout on every
+    // scroll frame, which forced a style recalculation each frame and made scrolling stutter.
+    const under = new Set<Element>()
+    let io: IntersectionObserver | null = null
+    const watch = () => {
+      io?.disconnect()
+      under.clear()
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) under.add(e.target)
+            else under.delete(e.target)
+          }
+          update()
+        },
+        { rootMargin: `0px 0px ${72 - window.innerHeight}px 0px` },
+      )
+      const hero = afterHero ? document.getElementById('welcome') : null
+      for (const el of [hero, ...document.querySelectorAll('[data-fullscreen]')]) if (el) io.observe(el)
+    }
     const update = () => {
       frame = 0
       const y = window.scrollY
       setScrolled(y > 8)
       // The home hero is pinned for a few screens and has its own header: stay away until it ends.
-      const hero = afterHero ? document.getElementById('welcome') : null
-      const overHero = hero ? hero.getBoundingClientRect().bottom > 72 : false
-      if (overHero || overFullscreen()) setHidden(true)
+      if (under.size) setHidden(true)
       else if (Math.abs(y - last) > 6) setHidden(y > last && y > 120)
       last = y
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)
     }
+    let height = window.innerHeight
+    const onResize = () => {
+      if (window.innerHeight === height) return
+      height = window.innerHeight
+      watch()
+    }
+    watch()
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
     return () => {
       cancelAnimationFrame(frame)
+      io?.disconnect()
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
     }
   }, [afterHero])
 

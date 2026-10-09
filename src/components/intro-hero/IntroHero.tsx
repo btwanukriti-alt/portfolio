@@ -212,7 +212,17 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const t0 = performance.now()
     let lastText = ''
 
+    // The pinned section's place on the page, measured on resize rather than every frame.
+    let rootTop = 0
+    let rootH = 0
+    const measureRoot = () => {
+      rootTop = root.getBoundingClientRect().top + window.scrollY
+      rootH = root.offsetHeight
+    }
+    // Last values written to each tile, so a frame only touches what changed.
+    const last = TILES.map(() => ({ t: '', o: '', z: '', on: -1 }))
     const relayout = () => {
+      measureRoot()
       layout = computeLayout(space.clientWidth, space.clientHeight)
       spots = scatterSpots(N, layout.mobile)
       for (const el of tiles.current) {
@@ -223,6 +233,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     }
     const resize = new ResizeObserver(relayout)
     resize.observe(space)
+    resize.observe(root)
     relayout()
 
     // Skip the per-frame work while the hero is out of view.
@@ -280,11 +291,10 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       const dt = deltaMs / 1000
       for (const s of hover) s.step(dt)
 
-      // Scroll progress through the pinned hero, in screens, eased a touch for a smoother feel.
-      const r = root.getBoundingClientRect()
-      const span = r.height - window.innerHeight
-      const target = span > 0 ? clamp(-r.top / span) * SCROLL_STAGES : 0
-      scroll = reduce ? target : scroll + (target - scroll) * Math.min(1, dt * 7)
+      // Scroll progress through the pinned hero, in screens. The page scroll is already smoothed
+      // (Lenis), so this follows it directly; easing it again made the screens trail the scroll.
+      const span = rootH - window.innerHeight
+      scroll = span > 0 ? clamp((window.scrollY - rootTop) / span) * SCROLL_STAGES : 0
       // The card drawings start once the cards are out.
       if (tl && seq && !artOn && tl.time() >= seq.drawAt) {
         artOn = true
@@ -317,13 +327,22 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         ring.y += mouse.y * 8
         let p = mixPose(mixPose(orbit, ring, a), scatterPose(L, spots[i], now, mouse.x, mouse.y), b)
         const h = hover[i].value
-        if (h > 0.001) p = { ...p, s: p.s * (1 + 0.08 * h), o: p.o + (1 - p.o) * h, blur: p.blur * (1 - h) }
-        el.style.transform = `translate3d(${p.x - L.tileW / 2}px,${p.y - L.tileH / 2}px,0) scale(${p.s})`
-        el.style.opacity = String(p.o)
-        el.style.filter = p.blur > 0.25 ? `blur(${p.blur.toFixed(2)}px)` : 'none'
-        el.style.zIndex = String(h > 0.3 ? 390 : Math.round(200 + p.z / 8 + (p.z >= 0 ? 1 : -1)))
-        el.style.pointerEvents = p.o > 0.3 ? '' : 'none'
-        el.tabIndex = p.o > 0.3 ? 0 : -1
+        if (h > 0.001) p = { ...p, s: p.s * (1 + 0.08 * h), o: p.o + (1 - p.o) * h }
+        // Depth reads through size, opacity and stacking only: a per-frame blur() repainted every
+        // screen on every frame and was the main cause of scroll lag.
+        const w = last[i]
+        const t = `translate3d(${(p.x - L.tileW / 2).toFixed(1)}px,${(p.y - L.tileH / 2).toFixed(1)}px,0) scale(${p.s.toFixed(4)})`
+        if (t !== w.t) el.style.transform = w.t = t
+        const o = p.o.toFixed(3)
+        if (o !== w.o) el.style.opacity = w.o = o
+        const z = String(h > 0.3 ? 390 : Math.round(200 + p.z / 8 + (p.z >= 0 ? 1 : -1)))
+        if (z !== w.z) el.style.zIndex = w.z = z
+        const on = p.o > 0.3 ? 1 : 0
+        if (on !== w.on) {
+          w.on = on
+          el.style.pointerEvents = on ? '' : 'none'
+          el.tabIndex = on ? 0 : -1
+        }
       })
 
       // The cards in flight: from their place on the canvas to screenshot k's place in the

@@ -264,6 +264,10 @@ export default function Work() {
         // Scroll progress in projects (0 = the first project's stretch).
         const pos = -r.top / (SEGMENT * vh)
         onScreen = r.bottom > 0 && r.top < vh
+        // Off screen, the stage (a fixed, viewport-sized box) skips rendering altogether, so its
+        // cards and videos cost nothing while the hero above is scrolling.
+        const st = stage.current
+        if (st) st.style.contentVisibility = onScreen ? '' : 'hidden'
         // The pointer can be left "over" a card that has scrolled away: drop the Open label.
         if (!onScreen && hovered.current >= 0) {
           hovered.current = -1
