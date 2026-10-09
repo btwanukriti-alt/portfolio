@@ -89,7 +89,7 @@ export default function SmoothScroll() {
       if (!el) return
       e.preventDefault()
       e.stopPropagation()
-      history.replaceState(null, '', url.hash)
+      // The address stays as it is: only moving to another page changes it.
       const rest = restingPoint(el)
       const to = rest ?? el
       if (lenis) lenis.scrollTo(to, { duration: 1.2, easing: (x) => 1 - Math.pow(1 - x, 4), force: true })
@@ -159,6 +159,8 @@ export default function SmoothScroll() {
       if (lenis) lenis.scrollTo(rest ?? el, { immediate: true, force: true })
       else if (rest !== null) window.scrollTo(0, rest)
       else el.scrollIntoView()
+      // Land there, then drop the #section from the address: it shows just the page.
+      history.replaceState(history.state, '', window.location.pathname + window.location.search)
     }, 120)
     return () => window.clearTimeout(id)
   }, [pathname])

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import Link from 'next/link'
 import { caseStudyHref } from '@/data/projects'
-import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
+import { gsap, reducedMotion } from '@/lib/gsap'
 import { getLenis, pageScroll } from '../SmoothScroll'
 import NavBar from '../NavBar'
 import { EMAIL as CONTACT_EMAIL, LINKEDIN } from '@/data/site'
@@ -817,6 +817,9 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               tiles.current[i] = el
             }}
             href={tile.slug ? caseStudyHref(tile.slug) : '#work'}
+            // Not prefetched: sixteen case-study pages (and their first images) loading under the
+            // hero slowed the first paint on phones. They load on tap.
+            prefetch={false}
             aria-label={tile.label}
             tabIndex={-1}
             onPointerEnter={() => engine.current?.hover(i, true)}
@@ -901,15 +904,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
 export default function IntroHero() {
   const [run, setRun] = useState(0)
   const section = useRef<HTMLElement>(null)
-  const header = useRef<HTMLElement>(null)
-
-  useGSAP(() => {
-    gsap.fromTo(
-      header.current,
-      { autoAlpha: 0, y: -10 },
-      { autoAlpha: 1, y: 0, duration: reducedMotion() ? 0 : 1, delay: 0.4, ease: 'expo.out' },
-    )
-  })
 
   // Replay from the top.
   const replay = () => {
@@ -923,7 +917,7 @@ export default function IntroHero() {
     <section ref={section} id="welcome" aria-label="Introduction" className="relative bg-paper" style={{ height: HERO_HEIGHT }}>
       <h1 className="sr-only">Anukriti Mishra, experience designer</h1>
       <div className="sticky top-0 h-svh min-h-[320px] overflow-hidden">
-        <header ref={header} className="invisible absolute inset-x-0 top-0 z-[500]">
+        <header className="absolute inset-x-0 top-0 z-[500] animate-[header-in_1s_var(--ease-out-expo)_0.2s_both] motion-reduce:animate-none">
           <NavBar home onReplay={replay} />
         </header>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
 import { gsap, ScrollTrigger, useGSAP, reducedMotion } from '@/lib/gsap'
@@ -100,6 +100,24 @@ export default function Work() {
   const cursor = useRef<HTMLDivElement>(null)
   const hovered = useRef(-1)
   const follow = useRef<{ x: (v: number) => void; y: (v: number) => void } | null>(null)
+
+  // The showcase videos are heavy (several hundred KB each): they load only once the section is
+  // within about a screen and a half, not with the page.
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = section.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return
+        setNear(true)
+        io.disconnect()
+      },
+      { rootMargin: '150% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   // The "Open" cursor: eased toward the pointer, shown while it's over the fill card.
   useGSAP(() => {
@@ -380,7 +398,7 @@ export default function Work() {
                           videos.current[i] = el
                         }}
                         className="pointer-events-none absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 group-data-[vertical=true]/row:top-1/2 group-data-[vertical=true]/row:left-0 group-data-[vertical=true]/row:h-[var(--fill-h)] group-data-[vertical=true]/row:w-full group-data-[vertical=true]/row:translate-x-0 group-data-[vertical=true]/row:-translate-y-1/2 border-0"
-                        src={project.showcase}
+                        src={near ? project.showcase : undefined}
                         title={`${project.title} showcase`}
                         loading="lazy"
                         tabIndex={-1}
