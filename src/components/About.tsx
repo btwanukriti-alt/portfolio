@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { Fragment, useRef } from 'react'
 import { Reveal, SplitReveal } from './Reveal'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
@@ -19,17 +19,20 @@ type Stop = {
 // From the resume (Anukriti Mishra_ UI UX Designer.pdf).
 const STOPS: Stop[] = [
   { x: 40, year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', state: 'past' },
-  { x: 325, year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', state: 'past' },
-  { x: 610, year: '2025', role: 'UI/UX Intern', company: 'Gamalabs', state: 'past' },
-  { x: 895, year: '2026', role: 'Visual Communication Graduate', company: "St Joseph's University", state: 'current' },
-  { x: 1140, year: '20??', state: 'next' },
+  { x: 300, year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', state: 'past' },
+  { x: 560, year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', state: 'past' },
+  { x: 820, year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', state: 'past' },
+  { x: 1140, year: 'Now', role: 'Open spot', company: 'Looking for my next challenge', state: 'next' },
 ]
+
+// Graduation runs alongside the career, so it sits under the line as a quiet tag, not a stop.
+const GRADUATION = { x: 980, year: '2026', label: 'Graduated', detail: "Visual Communication, St Joseph's University" }
 
 // Track segments: dotted "studying" lead-in, solid past, then the stretch toward what's next.
 const SEGMENTS = [
   { kind: 'studying', from: 0, to: 40 },
-  { kind: 'past', from: 40, to: 895 },
-  { kind: 'next', from: 895, to: 1140 },
+  { kind: 'past', from: 40, to: 980 },
+  { kind: 'next', from: 980, to: 1140 },
 ] as const
 
 const SEGMENT_STYLE = {
@@ -38,12 +41,11 @@ const SEGMENT_STYLE = {
   next: 'bg-ink',
 }
 
-// Written from the resume for now (summary, experience, education and skills).
 const ABOUT = [
-  "I'm a UI/UX designer studying Visual Communication at St Joseph's University, Bengaluru, and I design end-to-end digital products for startups and growing teams.",
-  "I've designed across mobile apps, web dashboards and enterprise platforms: Zync, a consumer fitness app; Dhondi, a group-level college ERP; and a multi-platform SSH client with an AI terminal assistant.",
-  'I own the full design lifecycle, from concept and wireframes to high-fidelity Figma prototypes, and work closely with developers and stakeholders to ship products that are both functional and delightful.',
-  "I like taking things all the way to launch: at Pulsefit I built the company website end-to-end in WordPress, from design system to deployment. My everyday tools are Figma, Illustrator and Photoshop.",
+  'I design SaaS products, and no two have been alike: a gym CRM, a college ERP, an SSH client for engineers, a trading analytics platform and a fitness app. B2B and B2C, desktop and mobile.',
+  'I learn each industry before I design for it, from the team that knows it and the products its users already rely on.',
+  "I design AI features, and I design with AI. I've designed an AI strategy lab and an AI terminal assistant, and I built this website and its product videos with Claude.",
+  'I trained in Visual Communication: branding, illustration, photography, film and print. On most projects I also design the logo, the visual system and the marketing website.',
 ]
 
 const pct = (x: number) => `${(x / TRACK) * 100}%`
@@ -124,7 +126,7 @@ export default function About() {
         <div
           ref={timeline}
           // Inset from the right so the last stop's label stays inside the column.
-          className="relative mr-16 h-[180px] [--line-y:62px]"
+          className="relative mr-16 h-[200px] [--line-y:62px]"
         >
           <span className="absolute top-0 left-0 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">
             So far
@@ -169,7 +171,16 @@ export default function About() {
                           : 'top-[calc(var(--line-y)-5px)] h-[11px] w-[11px] bg-faint'
                     }`}
                   />
-                  {stop.role ? (
+                  {stop.state === 'next' ? (
+                    <>
+                      <span className="absolute top-[84px] left-1/2 -translate-x-1/2 rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold whitespace-nowrap text-ink">
+                        {stop.role}
+                      </span>
+                      <span className="absolute top-[124px] right-0 left-0 text-[14px] leading-[1.25] font-normal text-muted">
+                        {stop.company}
+                      </span>
+                    </>
+                  ) : (
                     <>
                       <span className="absolute top-[88px] right-0 left-0 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">
                         {stop.role}
@@ -178,15 +189,29 @@ export default function About() {
                         {stop.company}
                       </span>
                     </>
-                  ) : (
-                    <span className="absolute top-[84px] left-1/2 -translate-x-1/2 rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold whitespace-nowrap text-ink">
-                      This spot is open.
-                    </span>
                   )}
                 </li>
               )
             })}
           </ol>
+          <p
+            data-stop
+            data-at={GRADUATION.x / TRACK}
+            className="invisible absolute top-0 bottom-0 m-0 w-[280px] -translate-x-1/2 text-center"
+            style={{ left: pct(GRADUATION.x) }}
+          >
+            <span className="absolute top-7 left-1/2 -translate-x-1/2 text-[13px] leading-none font-medium text-faint tabular-nums">
+              {GRADUATION.year}
+            </span>
+            <span
+              aria-hidden="true"
+              className="absolute top-[calc(var(--line-y)-4px)] left-1/2 h-[9px] w-[9px] -translate-x-1/2 rounded-full border border-faint bg-paper"
+            />
+            <span className="absolute top-[148px] right-0 left-0 text-[13px] leading-[1.35] font-medium text-muted">
+              {GRADUATION.label}
+              <span className="block font-normal text-faint">{GRADUATION.detail}</span>
+            </span>
+          </p>
         </div>
       </div>
 
@@ -204,44 +229,64 @@ export default function About() {
           {STOPS.map((stop) => {
             const current = stop.state === 'current'
             return (
-              <li
-                key={stop.x}
-                data-vstop
-                aria-current={current ? 'step' : undefined}
-                className="invisible relative pb-8 last:pb-0"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`absolute top-[3px] rounded-full ${
-                    current
-                      ? '-left-[33px] h-[15px] w-[15px] bg-ink shadow-[0_0_0_5px_rgba(11,11,12,0.1)]'
-                      : stop.state === 'next'
-                        ? '-left-[31px] h-[11px] w-[11px] border-[1.5px] border-ink bg-white'
-                        : '-left-[31px] h-[11px] w-[11px] bg-faint'
-                  }`}
-                />
-                <span
-                  className={`inline-block leading-none tabular-nums ${
-                    current
-                      ? 'rounded-full bg-ink px-[10px] py-1 text-[12px] font-semibold text-white'
-                      : 'text-[13px] font-medium text-muted'
-                  }`}
-                >
-                  {stop.year}
-                </span>
-                {stop.role ? (
-                  <>
-                    <span className="mt-3 block text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">
-                      {stop.role}
+              <Fragment key={stop.x}>
+                {/* Graduation sits between the last internship and the open spot. */}
+                {stop.state === 'next' && (
+                  <li data-vstop className="invisible relative pb-8">
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-[3px] -left-[30px] h-[9px] w-[9px] rounded-full border border-faint bg-paper"
+                    />
+                    <span className="inline-block text-[13px] leading-none font-medium text-faint tabular-nums">
+                      {GRADUATION.year}
                     </span>
-                    <span className="mt-1 block text-[14px] leading-[1.25] font-normal text-muted">{stop.company}</span>
-                  </>
-                ) : (
-                  <span className="mt-3 block w-fit rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold text-ink">
-                    This spot is open.
-                  </span>
+                    <span className="mt-2 block text-[14px] leading-[1.35] font-medium text-muted">
+                      {GRADUATION.label}
+                      <span className="block font-normal text-faint">{GRADUATION.detail}</span>
+                    </span>
+                  </li>
                 )}
-              </li>
+                <li
+                  data-vstop
+                  aria-current={current ? 'step' : undefined}
+                  className="invisible relative pb-8 last:pb-0"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`absolute top-[3px] rounded-full ${
+                      current
+                        ? '-left-[33px] h-[15px] w-[15px] bg-ink shadow-[0_0_0_5px_rgba(11,11,12,0.1)]'
+                        : stop.state === 'next'
+                          ? '-left-[31px] h-[11px] w-[11px] border-[1.5px] border-ink bg-white'
+                          : '-left-[31px] h-[11px] w-[11px] bg-faint'
+                    }`}
+                  />
+                  <span
+                    className={`inline-block leading-none tabular-nums ${
+                      current
+                        ? 'rounded-full bg-ink px-[10px] py-1 text-[12px] font-semibold text-white'
+                        : 'text-[13px] font-medium text-muted'
+                    }`}
+                  >
+                    {stop.year}
+                  </span>
+                  {stop.state === 'next' ? (
+                    <>
+                      <span className="mt-3 block w-fit rounded-full border border-ink px-[14px] py-2 text-[13px] leading-none font-semibold text-ink">
+                        {stop.role}
+                      </span>
+                      <span className="mt-2 block text-[14px] leading-[1.25] font-normal text-muted">{stop.company}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="mt-3 block text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">
+                        {stop.role}
+                      </span>
+                      <span className="mt-1 block text-[14px] leading-[1.25] font-normal text-muted">{stop.company}</span>
+                    </>
+                  )}
+                </li>
+              </Fragment>
             )
           })}
         </ol>
