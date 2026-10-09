@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'Anukriti Mishra | Experience Designer', template: '%s | Anukriti Mishra' },
   description: DESCRIPTION,
-  icons: { icon: '/favicon.svg' },
+  icons: { icon: '/favicon.svg', apple: '/apple-touch-icon.png' },
   openGraph: {
     type: 'website',
     url: '/',
