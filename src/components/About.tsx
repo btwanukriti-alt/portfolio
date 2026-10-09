@@ -194,7 +194,7 @@ export default function About() {
               />
             </span>
             <div data-card className="invisible">
-              <p className="m-0 text-[13px] leading-none font-medium text-faint">Now · Open</p>
+              <p className="m-0 text-[13px] leading-none font-medium text-faint">Now · Open to roles</p>
               <p className="m-0 mt-2.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">
                 Looking for my
                 <br />
