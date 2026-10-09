@@ -4,28 +4,24 @@ import { useRef } from 'react'
 import { Reveal } from './Reveal'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
-// About: a headline with an empty Figma frame for the blank canvas, the disciplines as coloured
-// chips, a slim career timeline on a gradient line, and four short notes. Roles from the resume.
+// About: the title typed by Anukriti's comment cursor, the disciplines as quiet chips, a
+// slim career timeline, and four short notes. Roles from the resume.
 
 const SELECT = '#7B61FF'
 
-// The disciplines around the product, in the work cards' pastel palette.
-const CHIPS = [
-  { label: 'UX & UI', bg: '#DCCFFF', fg: '#3E2B94' },
-  { label: 'Branding', bg: '#FFE4D3', fg: '#8A3B12' },
-  { label: 'Websites', bg: '#CFDDFF', fg: '#12326E' },
-  { label: 'Motion', bg: '#C9EEDC', fg: '#0C5A3E' },
-  { label: 'AI features', bg: '#FFE8EE', fg: '#9E1F45' },
-]
+const TITLE = 'The story so far.'
+
+// The disciplines, as quiet chips under the heading.
+const CHIPS = ['UX & UI', 'Branding', 'Websites', 'Motion', 'AI features']
 
 type Stop = { year: string; role: string; company: string; kind: string; dot: string }
 
-// From the resume (Anukriti Mishra_ UI UX Designer.pdf). Each stop takes a colour from the palette.
+// From the resume (Anukriti Mishra_ UI UX Designer.pdf).
 const STOPS: Stop[] = [
-  { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', kind: 'Internship', dot: '#4F86E8' },
-  { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', kind: 'Internship', dot: '#F28C28' },
-  { year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', kind: 'Internship', dot: SELECT },
-  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', kind: 'Freelance', dot: '#1A9E6E' },
+  { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', dot: '#4F86E8', kind: 'Internship' },
+  { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', dot: '#F28C28', kind: 'Internship' },
+  { year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', dot: '#F5577D', kind: 'Internship' },
+  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', dot: '#1A9E6E', kind: 'Freelance' },
 ]
 
 const ABOUT = [
@@ -37,6 +33,42 @@ const ABOUT = [
 
 export default function About() {
   const timeline = useRef<HTMLDivElement>(null)
+  const comment = useRef<HTMLHeadingElement>(null)
+
+  // Anukriti's comment pin pops in, a cursor comes out of it and types the title, then the pin
+  // and cursor go. Once, when the section arrives.
+  useGSAP(
+    () => {
+      const h = comment.current
+      if (!h) return
+      const typed = h.querySelector<HTMLElement>('[data-typed]')!
+      const cursor = h.querySelector<HTMLElement>('[data-cursor]')!
+      const pin = h.querySelector<HTMLElement>('[data-pin]')!
+      const bar = cursor.querySelector<HTMLElement>('i')!
+      if (reducedMotion()) {
+        cursor.style.display = 'none'
+        return
+      }
+      const chars = { n: 0 }
+      typed.textContent = ''
+      gsap.set(pin, { autoAlpha: 0, scale: 0.6 })
+      gsap.set(bar, { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 0%' })
+      gsap
+        .timeline({ scrollTrigger: { trigger: h, start: 'top 85%', once: true } })
+        .to(pin, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' })
+        .to(bar, { autoAlpha: 1, scaleY: 1, duration: 0.3, ease: 'power2.out' }, '+=0.15')
+        .to(chars, {
+          n: TITLE.length,
+          duration: TITLE.length * 0.065,
+          ease: 'none',
+          onUpdate: () => {
+            typed.textContent = TITLE.slice(0, Math.round(chars.n))
+          },
+        }, '+=0.1')
+        .to([pin, bar], { autoAlpha: 0, duration: 0.4, ease: 'power1.out' }, '+=0.6')
+    },
+    { scope: comment },
+  )
 
   // The gradient line draws across (down, on narrow screens) and the cards rise in after it.
   useGSAP(
@@ -63,82 +95,71 @@ export default function About() {
       aria-labelledby="about-heading"
       className="mx-auto flex max-w-[var(--max)] flex-col gap-[clamp(48px,7vh,88px)] border-t border-line bg-paper px-[var(--gutter)] py-[clamp(80px,13vh,150px)]"
     >
-      {/* Heading: "products" is selected like a Figma layer; the chips are everything around it. */}
-      <div className="grid grid-cols-1 gap-6 min-[901px]:grid-cols-[minmax(160px,1fr)_3fr] min-[901px]:items-start">
-        <Reveal as="p" className="m-0 text-[15px] leading-none font-medium text-muted min-[901px]:pt-[18px]">
-          About <span className="text-faint">(02)</span>
-        </Reveal>
-        <div>
-          <Reveal as="h2" id="about-heading" className="m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] text-ink">
-            I take products from a{' '}
-            <span className="relative inline-block">
-              {/* An empty Figma frame: the blank canvas everything starts on. */}
-              <span aria-hidden="true" className="absolute -inset-x-[0.1em] inset-y-[0.04em]">
-                <span className="absolute inset-0 border-[1.5px] border-dashed" style={{ borderColor: SELECT }} />
-                {[
-                  [0, 0],
-                  [100, 0],
-                  [0, 100],
-                  [100, 100],
-                ].map(([x, y]) => (
-                  <span
-                    key={`${x}-${y}`}
-                    className="absolute size-[clamp(6px,0.6vw,9px)] -translate-x-1/2 -translate-y-1/2 border-[1.5px] bg-white"
-                    style={{ left: `${x}%`, top: `${y}%`, borderColor: SELECT }}
-                  />
-                ))}
-                <span
-                  className="absolute top-0 left-full ml-[0.35em] rounded-[3px] px-[6px] py-[3px] text-[clamp(10px,0.8vw,12px)] leading-none font-medium tracking-normal whitespace-nowrap text-white"
-                  style={{ background: SELECT }}
-                >
-                  Frame 1
-                </span>
-              </span>
-              blank canvas
-            </span>
-            <br /> to launch day.
-          </Reveal>
-          <Reveal as="ul" delay={150} className="m-0 mt-[clamp(24px,3vw,36px)] flex list-none flex-wrap gap-2.5 p-0">
-            {CHIPS.map((c) => (
-              <li
-                key={c.label}
-                className="rounded-full px-4 py-2.5 text-[clamp(13px,1vw,15px)] leading-none font-medium"
-                style={{ background: c.bg, color: c.fg }}
+      {/* Heading, centred: Anukriti's comment pin brings a cursor that types the title. The
+          disciplines follow as quiet chips. */}
+      <div className="flex flex-col items-center text-center">
+        <h2
+          ref={comment}
+          id="about-heading"
+          aria-label={TITLE}
+          className="relative m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] whitespace-nowrap text-ink"
+        >
+          {/* An invisible copy holds the width; the typed text, the cursor and its comment pin sit
+              on top. */}
+          <span aria-hidden="true" className="invisible">
+            {TITLE}
+          </span>
+          <span aria-hidden="true" className="absolute inset-0 text-left">
+            <span data-typed>{TITLE}</span>
+            <span data-cursor className="relative inline-block h-[0.82em] w-0 translate-y-[0.1em] align-baseline">
+              <i className="absolute top-0 left-[0.03em] h-full w-[3px]" style={{ background: SELECT }} />
+              {/* Anukriti's comment pin, riding on the cursor. */}
+              <span
+                data-pin
+                className="absolute bottom-full left-[0.03em] mb-[6px] origin-bottom-left rounded-[14px] rounded-bl-none px-[10px] py-[6px] text-[clamp(12px,0.95vw,14px)] leading-none font-semibold tracking-normal whitespace-nowrap text-white shadow-[0_6px_16px_-6px_rgba(123,97,255,.7)]"
+                style={{ background: SELECT }}
               >
-                {c.label}
-              </li>
-            ))}
-          </Reveal>
-        </div>
+                Anukriti
+              </span>
+            </span>
+          </span>
+        </h2>
+        <Reveal as="ul" delay={150} className="m-0 mt-[clamp(24px,3vw,36px)] flex list-none flex-wrap justify-center gap-2.5 p-0">
+          {CHIPS.map((label) => (
+            <li key={label} className="rounded-full border border-line px-4 py-2.5 text-[clamp(13px,1vw,15px)] leading-none font-medium text-muted">
+              {label}
+            </li>
+          ))}
+        </Reveal>
       </div>
 
-      {/* Timeline: a slim gradient line through coloured dots, each role in a few words under its
-          dot, ending at an open spot. Down the left on narrow screens. */}
+      {/* Timeline: a slim line through grey dots, each role in a few words under its dot, ending at
+          the open spot (green). Down the left on narrow screens. */}
       <div ref={timeline}>
         <p className="m-0 mb-5 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">Experience</p>
         <ol aria-label="Career timeline" className="relative m-0 grid list-none grid-cols-1 gap-6 p-0 pl-7 min-[901px]:grid-cols-5 min-[901px]:gap-6 min-[901px]:pt-7 min-[901px]:pl-0">
           <span
             data-line
             aria-hidden="true"
-            className="absolute top-[6px] left-0 hidden h-[2px] w-full origin-left scale-x-0 rounded-full min-[901px]:block"
-            style={{ background: `linear-gradient(90deg, #4F86E8, #F28C28 30%, ${SELECT} 55%, #1A9E6E 78%, #0b0b0c)` }}
+            className="absolute top-[6px] left-0 hidden h-[2px] w-full origin-left scale-x-0 rounded-full bg-ink min-[901px]:block"
+            
           />
           <span
             data-line
             aria-hidden="true"
-            className="absolute top-1 bottom-1 left-[6px] w-[2px] origin-top scale-y-0 rounded-full min-[901px]:hidden"
-            style={{ background: `linear-gradient(180deg, #4F86E8, #F28C28 30%, ${SELECT} 55%, #1A9E6E 78%, #0b0b0c)` }}
+            className="absolute top-1 bottom-1 left-[6px] w-[2px] origin-top scale-y-0 rounded-full bg-ink min-[901px]:hidden"
+            
           />
           {STOPS.map((stop) => (
             <li key={stop.company} className="relative">
               <span
                 data-dot
                 aria-hidden="true"
-                className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[27px] min-[901px]:left-0"
+                className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
                 style={{ background: stop.dot }}
               />
               <div data-card className="invisible">
-                <p className="m-0 text-[13px] leading-none font-semibold tabular-nums" style={{ color: stop.dot }}>
+                <p className="m-0 text-[13px] leading-none font-medium text-faint tabular-nums">
                   {stop.year} · {stop.kind}
                 </p>
                 <p className="m-0 mt-2.5 text-[16px] leading-[1.25] font-semibold tracking-[-0.01em] text-ink">{stop.role}</p>
@@ -150,11 +171,12 @@ export default function About() {
             <span
               data-dot
               aria-hidden="true"
-              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white bg-ink shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[27px] min-[901px]:left-0"
+              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
+              style={{ background: SELECT }}
             />
             <div data-card className="invisible">
-              <p className="m-0 flex items-center gap-1.5 text-[13px] leading-none font-semibold text-[#1A9E6E]">
-                <span className="size-[7px] animate-pulse rounded-full bg-[#1A9E6E] motion-reduce:animate-none" />
+              <p className="m-0 flex items-center gap-1.5 text-[13px] leading-none font-semibold" style={{ color: SELECT }}>
+                <span className="size-[7px] animate-pulse rounded-full motion-reduce:animate-none" style={{ background: SELECT }} />
                 Now · Open to work
               </p>
               <a
