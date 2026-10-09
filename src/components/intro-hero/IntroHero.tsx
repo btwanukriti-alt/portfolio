@@ -6,7 +6,7 @@ import { caseStudyHref } from '@/data/projects'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 import { getLenis, pageScroll } from '../SmoothScroll'
 import NavBar from '../NavBar'
-import { EMAIL as CONTACT_EMAIL } from '@/data/site'
+import { EMAIL as CONTACT_EMAIL, LINKEDIN } from '@/data/site'
 import {
   Spring,
   clamp,
@@ -854,6 +854,14 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               className="rounded-full border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Email me
+            </a>
+            <a
+              href={LINKEDIN}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              LinkedIn
             </a>
           </div>
         </div>

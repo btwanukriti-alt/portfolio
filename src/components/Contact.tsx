@@ -223,6 +223,10 @@ function Shapes() {
   )
 }
 
+// Text links on the black frame.
+const ctaLink =
+  'text-white/80 no-underline underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF]'
+
 // Square icon buttons, like the Resume button.
 const iconButton =
   'grid size-10 place-items-center border border-line text-ink no-underline transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent'
@@ -265,6 +269,15 @@ export default function Contact({ current }: { current?: string } = {}) {
                     →
                   </span>
                 </a>
+                {/* The address itself, and LinkedIn, for anyone without a mail app set up. */}
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[15px] leading-none font-medium">
+                  <a href={`mailto:${EMAIL}`} className={ctaLink}>
+                    {EMAIL}
+                  </a>
+                  <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className={ctaLink}>
+                    LinkedIn ↗
+                  </a>
+                </div>
               </div>
             </div>
             {HANDLES.map(([x, y]) => (
