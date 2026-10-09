@@ -264,7 +264,7 @@ export default function Contact({ current }: { current?: string } = {}) {
                   href={`mailto:${EMAIL}`}
                   className="group inline-flex items-center gap-2.5 bg-white px-6 py-4 text-[16px] leading-none font-medium text-ink no-underline [transition:translate_300ms_var(--ease-out-expo),box-shadow_300ms_var(--ease-out-expo)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[3px_3px_0_#7B61FF] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF] motion-reduce:transition-none"
                 >
-                  Start a project
+                  Drop me a line
                   <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-[3px]">
                     →
                   </span>
