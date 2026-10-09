@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import Link from 'next/link'
 import { caseStudyHref } from '@/data/projects'
 import { gsap, reducedMotion } from '@/lib/gsap'
@@ -31,7 +31,7 @@ import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 // card; two quick duplicates (⌘D) snap out either side of it (above and below on a phone held
 // upright). The three cards draw UX, branding and motion, then lift off in 3D, turning over to UI
 // screenshots as they fly, onto the front of a 3D ring of screenshots that appears around them;
-// the ring turns and settles. Then "Let's build something" fades in. A floating Figma toolbar follows along (Text, Frame, Move).
+// the ring turns and settles. Then "Let's build something" fades in.
 // The whole intro plays by itself on load. Scrolling (the hero stays pinned) then gathers the
 // screens into a ring around the headline, then scatters them at different depths around a short
 // About paragraph.
@@ -98,21 +98,6 @@ const HANDLES = [
   [0, 50],
 ]
 
-// Figma's floating toolbar (UI3). The intro switches the active tool as it goes.
-const icon = (path: ReactNode) => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-    {path}
-  </svg>
-)
-const TOOLS: { id: string; label: string; icon: ReactNode }[] = [
-  { id: 'move', label: 'Move', icon: icon(<path d="M4.5 3 L4.5 14 L7.5 11.2 L9.6 15.6 L11.4 14.8 L9.4 10.5 L13.3 10.5 Z" fill="currentColor" stroke="none" />) },
-  { id: 'frame', label: 'Frame', icon: icon(<path d="M6 2.5v13M12 2.5v13M2.5 6h13M2.5 12h13" />) },
-  { id: 'rect', label: 'Rectangle', icon: icon(<rect x="3.5" y="3.5" width="11" height="11" rx="1" />) },
-  { id: 'pen', label: 'Pen', icon: icon(<path d="M9 2.5 L13.5 9.5 L9 15.5 L4.5 9.5 Z M9 2.5v6.2" />) },
-  { id: 'text', label: 'Text', icon: icon(<path d="M4 4h10M9 4v10.5M7.2 14.5h3.6" />) },
-  { id: 'comment', label: 'Comment', icon: icon(<path d="M4 13.5 L3.2 15.6 L6 14.6 A6 6 0 1 0 4 13.5 Z" />) },
-]
-
 type Engine = { hover: (index: number, on: boolean) => void }
 
 // A text layer: a transparent copy (painted at once, so the page counts as loaded) reserves the full width so typing grows from the left without
@@ -147,7 +132,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
   const selection = useRef<HTMLDivElement>(null)
   const guide = useRef<HTMLDivElement>(null)
   const cursor = useRef<HTMLDivElement>(null)
-  const toolbar = useRef<HTMLDivElement>(null)
   const chrome = useRef<HTMLDivElement>(null)
   const cards = useRef<(HTMLDivElement | null)[]>([])
   const shortcut = useRef<HTMLSpanElement>(null)
@@ -166,13 +150,12 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const sel = selection.current
     const guideEl = guide.current
     const cur = cursor.current
-    const bar = toolbar.current
     const chromeEl = chrome.current
     const chip = shortcut.current
     const deck = cards.current.filter((c): c is HTMLDivElement => !!c)
     if (
       !root || !space || !introEl || !aboutEl || !hintEl || !centreEl || !l1 || !l2 || !finaleEl ||
-      !sel || !guideEl || !cur || !bar || !chromeEl || !chip || deck.length !== 3
+      !sel || !guideEl || !cur || !chromeEl || !chip || deck.length !== 3
     )
       return
     const reduce = reducedMotion()
@@ -190,7 +173,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const selSize = sel.querySelector<HTMLElement>('[data-size]')!
     const selHandles = [...sel.querySelectorAll<HTMLElement>('[data-handle]')]
     const guideLabel = guideEl.querySelector<HTMLElement>('[data-gap]')!
-    const toolButtons = [...bar.querySelectorAll<HTMLElement>('[data-tool]')]
 
     // Animated values: the intro timeline tweens these; the ticker reads them every frame.
     // show: the orbit's screenshots stay hidden until the frame hands over.
@@ -416,9 +398,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const drawCursor = () => {
       cur.style.transform = `translate3d(${pointer.x - 3}px,${pointer.y - 2}px,0) scale(${pointer.s})`
     }
-    const setTool = (id: string) => {
-      for (const b of toolButtons) b.dataset.active = b.dataset.tool === id ? 'true' : 'false'
-    }
     const typeInto = (el: HTMLElement, text: string) => {
       let shown = -1
       return (n: number) => {
@@ -536,9 +515,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       gsap.set(names, { autoAlpha: 0, y: 4 })
       gsap.set(chip, { autoAlpha: 0 })
       const art = disciplinesTimeline(chromeEl).timeScale(ART_SPEED) // plays by time (see the tick)
-      gsap.set(bar, { autoAlpha: 1, y: 0 })
       gsap.set(caret1, { visibility: 'visible' })
-      setTool('text')
       pointer.x = L.w * (L.mobile ? 0.82 : 0.72)
       pointer.y = L.h * 0.88
       drawCursor()
@@ -551,16 +528,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       })
       guideLabel.textContent = String(gap)
 
-      // The tool in use, read from the playhead so it is right in either direction.
-      const toolAt = (t: number) => (t < reshapeAt - 0.6 ? 'text' : t < dupAt + 0.4 ? 'frame' : 'move')
-      let tool = 'text'
-      tl = gsap.timeline({
-        paused: true,
-        onUpdate: () => {
-          const next = toolAt(tl!.time())
-          if (next !== tool) setTool((tool = next))
-        },
-      })
+      tl = gsap.timeline({ paused: true })
       tl
         // 1. "Hello, I am Anukriti." types in (the caret stops blinking while it types).
         .set(caret1, { animation: 'none' }, typeStart - 0.15)
@@ -629,7 +597,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         .to(st, { spin: 3.4, duration: settleAt + 2.6 - (moveAt + 0.1), ease: 'power2.inOut' }, moveAt + 0.1)
         // ...and calms down.
         .to(st, { amp: 0.42, duration: 2.8, ease: 'power2.out' }, settleAt - 0.2)
-        .to(bar, { autoAlpha: 0, y: 16, duration: 0.6, ease: 'power2.in' }, settleAt + 0.6)
 
         // 5. Once the screens have settled: the call to action.
         .fromTo(finaleEl, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out' }, settleAt + 1.2)
@@ -677,7 +644,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
             </p>
             <a
               href={EMAIL}
-              className="pointer-events-auto inline-flex items-center gap-2.5 rounded-[12px] bg-ink px-6 py-[15px] font-hero text-[17px] leading-none font-normal tracking-[-0.01em] whitespace-nowrap text-white transition-[background-color,translate] duration-300 hover:-translate-y-px hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7B61FF]"
+              className="pointer-events-auto inline-flex items-center gap-2.5 bg-ink px-6 py-[15px] font-hero text-[17px] leading-none font-normal tracking-[-0.01em] whitespace-nowrap text-white transition-[background-color,translate] duration-300 hover:-translate-y-px hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7B61FF]"
             >
               Let&apos;s build something
               <span aria-hidden className="text-[15px]">
@@ -690,7 +657,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           {LINE_1} {LINE_2}
         </h2>
 
-        {/* Figma UI: selection, spacing guide, cursor and toolbar. */}
+        {/* Figma UI: selection, spacing guide and cursor. */}
         <div ref={chrome} className="pointer-events-none absolute inset-0">
           {/* Selection: marquee while drawing, then handles and a size tag; reshapes into the frame. */}
           <div ref={selection} aria-hidden className="pointer-events-none invisible absolute top-0 left-0 opacity-0">
@@ -804,27 +771,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
             </span>
           </div>
 
-          {/* Figma's floating toolbar. */}
-          <div
-            ref={toolbar}
-            aria-hidden
-            className="invisible absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-[14px] bg-white p-1.5 opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06),0_6px_24px_-6px_rgba(0,0,0,.18)]"
-            style={{ zIndex: 450 }}
-          >
-            {TOOLS.map((tool, i) => (
-              <span key={tool.id} className="contents">
-                {i === 4 && <span className="mx-1 h-5 w-px bg-[#0000001a]" />}
-                <span
-                  data-tool={tool.id}
-                  data-active="false"
-                  title={tool.label}
-                  className="grid size-8 place-items-center rounded-[8px] text-[#1e1e1e] transition-colors duration-200 data-[active=true]:bg-[#111] data-[active=true]:text-white"
-                >
-                  {tool.icon}
-                </span>
-              </span>
-            ))}
-          </div>
         </div>
 
         {TILES.map((tile, i) => (
@@ -869,13 +815,13 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           <div data-fade="0.55" className="mt-8 [@media(max-height:500px)]:mt-5 flex flex-wrap items-center justify-center gap-2.5 opacity-0">
             <a
               href="#work"
-              className="rounded-full bg-ink px-5 py-3 font-hero text-[14px] leading-none font-medium text-white transition-colors hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="bg-ink px-5 py-3 font-hero text-[14px] leading-none font-medium text-white transition-colors hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               See my work
             </a>
             <a
               href={EMAIL}
-              className="rounded-full border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Email me
             </a>
@@ -883,7 +829,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               href={LINKEDIN}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               LinkedIn
             </a>
@@ -907,7 +853,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       <div
         ref={hint}
         aria-hidden
-        className="pointer-events-none absolute bottom-[92px] left-1/2 z-[400] flex -translate-x-1/2 flex-col items-center gap-2 font-hero-mono text-[10px] tracking-[0.16em] text-muted uppercase opacity-0"
+        className="pointer-events-none absolute bottom-6 left-1/2 z-[400] flex -translate-x-1/2 flex-col items-center gap-2 font-hero-mono text-[10px] tracking-[0.16em] text-muted uppercase opacity-0"
       >
         Scroll
         <span className="relative block h-7 w-px overflow-hidden bg-[#0d0d0c1a]">
