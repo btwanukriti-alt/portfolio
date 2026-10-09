@@ -14,11 +14,10 @@ case study, every device the same size, on its own pattern in colours chosen for
      `site.js`, render `app-createlead`, `app-pricing` as `pf-createlead.png`, `pf-pricing.png`.
    - SSH client also `signin`, `sftp` as `ssh2-*.png`; Jaadu `jaadu-video/screens/chat.jpg` as
      `ja-chat.png`; Zync `zync-refined/` screens as `zr-*.png` (framed in HTML).
-   - Logos: `public/brand/` marks copied as `mark-pf.svg`, `mark-zy.png`, `mark-ssh.png`.
    - `python3 scripts/mockups/hero/prep.py` collects Jaadu and Zync.
 2. Patterns: `python3 textures.py a/` writes `p01..p16.png` (space, paper cut-outs, grain,
    sunburst, watercolour, halftone, Memphis, topographic, terrazzo, synthwave, op-art ripples,
-   groovy waves, pixel mosaic, hills, aurora, Bauhaus, concentric squares, pinstripes). The newer ones are softened toward their ground.
+   groovy waves, pixel mosaic, hills, aurora, Bauhaus). The newer ones are softened toward their ground.
 3. `node render.mjs <abs path to this folder> <out dir>` writes `tNN.jpg`, `tNN-full.png`,
    `tNN-pop.png` and `meta.json` (pop box as a share of the 900 x 600 tile).
 4. Resize to 840 x 560 (pop by the same factor, WebP) into `public/hero/tiles/`, and copy the

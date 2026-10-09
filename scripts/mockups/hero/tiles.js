@@ -13,12 +13,9 @@ window.TILESPEC = [
   { id: 't07', tex: 'p07', screen: 'pf-createlead' },
   { id: 't08', tex: 'p08', dark: 1, screen: 'ssh2-signin' },
   { id: 't09', tex: 'p09', phonesH: ['zr-signup', 'zr-workout', 'zr-sleep'] },
-  { id: 't10', tex: 'p17', logo: { icon: 'pf', name: 'Pulsefit', font: '600 64px Poppins', color: '#14171F' } },
   { id: 't11', tex: 'p10', dark: 1, screen: 'ssh2-sftp' },
-  { id: 't12', tex: 'p18', logo: { icon: 'zy', name: 'Zync', font: '700 66px Montserrat', color: '#1B1340' } },
   { id: 't13', tex: 'p11', screen: 'pf-pricing', bezel: 'dark' },
   { id: 't14', tex: 'p14', screen: 'col-drawer-s' },
-  { id: 't15', tex: 'p15', dark: 1, logo: { icon: 'ssh' } },
   { id: 't16', tex: 'p12', phonesH: ['zr-events', 'zr-profile', 'zr-explore'] },
 ]
 const A = (s) => `a/${s}.png`
@@ -47,24 +44,7 @@ function phonesHtml(t, which) {
   if (which === 'side') return ph(l, 450 - PHONES.mid / 2 - PHONES.side + 26, PHONES.side, 30) + ph(r, 450 + PHONES.mid / 2 - 26, PHONES.side, 30)
   return ph(m, 450 - PHONES.mid / 2, PHONES.mid, 14)
 }
-// A logo tile: the app icon (rebuilt clean: gradient square + white mark, or white square +
-// colour mark) with the wordmark under it. The SSH client is under NDA, so no name.
-const ICONS = {
-  pf: `<div class="ico" style="background:#fff;box-shadow:inset 0 0 0 1.5px rgba(20,23,31,.06)"><img src="a/mark-pf.svg" style="width:46%"></div>`,
-  zy: `<div class="ico" style="background:linear-gradient(145deg,#8F78FF,#5233D6)"><img src="a/mark-zy.png" style="width:48%"></div>`,
-  ssh: `<div class="ico" style="background:linear-gradient(145deg,#A567FF,#5B2BD9)"><img src="a/mark-ssh.png" style="width:58%"></div>`,
-}
-function logoDev(t) {
-  const l = t.logo
-  const name = l.name ? `<div class="wm" style="font:${l.font},sans-serif;color:${l.color}">${l.name}</div>` : ''
-  return `<div class="dev logo" style="left:0;width:900px;top:${l.name ? 120 : 165}px">${ICONS[l.icon]}${name}</div>`
-}
 window.buildTile = (t, mode) => {
-  if (t.logo) {
-    const ground = mode === 'pop' ? '' : `<div class="gr" style="background-image:url(${A(t.tex)})"></div><div class="cs" style="left:360px;width:180px;top:${t.logo.name ? 330 : 375}px"></div>`
-    const pop = mode === 'base' ? '' : `<div class="pop">${logoDev(t)}</div>`
-    return `<div class="tile ${mode}" id="${t.id}-${mode}">${ground}${pop}</div>`
-  }
   if (t.phonesH) { t = { ...t, phones: t.phonesH }; t.html = 1 }
   const isPh = !!t.phones
   const shadow = isPh

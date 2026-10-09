@@ -325,8 +325,6 @@ aurora('p13', '#050A24', '#1D7F86', '#4A35A0', 13)                     # Jaadu a
 hills('p14', '#BFD3F7', '#F6E2B3', '#F2C14E', ['#6E9BF0', '#2653CF', '#12326E'], 14)  # College drawer
 grid('p15', '#110F1D', '#2A2545', '#4B3A9C', 15)                        # SSH add host
 bauhaus('p16', '#E9EEF8', ['#C9D8F7', '#F6E2B3', '#AFC3EE', '#DCE6F7', '#BFD0F2'], 16)  # College drawer (Engineering)
-squares('p17', '#EEF3FF', '#D3DFFB', 17)                                # Pulsefit logo
-pinstripes('p18', '#F1EDFF', '#D9CFFF', '#FFFFFF', 18)                 # Zync logo
 
 for n, base, amt in [('p06', '#0A0F33', 0.35), ('p07', '#EEF3FF', 0.35), ('p08', '#130F24', 0.25), ('p10', '#0E0D16', 0.3), ('p11', '#FFF1D3', 0.35), ('p12', '#F7EFF8', 0.3), ('p16', '#E9EEF8', 0.35)]:
     soften(n, base, amt)

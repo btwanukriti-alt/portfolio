@@ -12,10 +12,6 @@ body{margin:0;background:transparent}
 .phone{background:#0B0C10;box-shadow:inset 0 0 0 2px #34363F;box-sizing:border-box}
 .psc{position:relative;width:100%;height:100%;background-size:100% auto;background-position:top center;background-repeat:no-repeat;background-color:#fff;overflow:hidden}
 .isl{position:absolute;left:50%;background:#000;border-radius:99px}
-.logo{display:flex;flex-direction:column;align-items:center;gap:26px}
-.ico{width:220px;height:220px;border-radius:52px;display:grid;place-items:center}
-.ico img{display:block}
-.wm{letter-spacing:-.02em;line-height:1}
 </style></head><body><div id="root"></div><script src="tiles.js"></script><script>
 const mode=new URLSearchParams(location.search).get('mode')||'full'
 root.innerHTML=TILESPEC.map(t=>buildTile(t,mode)).join('')
