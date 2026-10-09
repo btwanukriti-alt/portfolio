@@ -19,19 +19,20 @@ type Stop = {
 // From the resume (Anukriti Mishra_ UI UX Designer.pdf).
 const STOPS: Stop[] = [
   { x: 40, year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', state: 'past' },
-  { x: 325, year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', state: 'past' },
-  { x: 610, year: '2025', role: 'UI/UX Intern', company: 'Gamalabs', state: 'past' },
+  { x: 300, year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', state: 'past' },
+  { x: 560, year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', state: 'past' },
+  { x: 820, year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', state: 'past' },
   { x: 1140, year: 'Now', role: 'Open spot', company: 'Looking for my next challenge', state: 'next' },
 ]
 
 // Graduation runs alongside the career, so it sits under the line as a quiet tag, not a stop.
-const GRADUATION = { x: 895, year: '2026', label: 'Graduated', detail: "Visual Communication, St Joseph's University" }
+const GRADUATION = { x: 980, year: '2026', label: 'Graduated', detail: "Visual Communication, St Joseph's University" }
 
 // Track segments: dotted "studying" lead-in, solid past, then the stretch toward what's next.
 const SEGMENTS = [
   { kind: 'studying', from: 0, to: 40 },
-  { kind: 'past', from: 40, to: 895 },
-  { kind: 'next', from: 895, to: 1140 },
+  { kind: 'past', from: 40, to: 980 },
+  { kind: 'next', from: 980, to: 1140 },
 ] as const
 
 const SEGMENT_STYLE = {
@@ -125,7 +126,7 @@ export default function About() {
         <div
           ref={timeline}
           // Inset from the right so the last stop's label stays inside the column.
-          className="relative mr-16 h-[180px] [--line-y:62px]"
+          className="relative mr-16 h-[200px] [--line-y:62px]"
         >
           <span className="absolute top-0 left-0 text-[11px] leading-none font-semibold tracking-[0.12em] text-faint uppercase">
             So far
@@ -206,7 +207,7 @@ export default function About() {
               aria-hidden="true"
               className="absolute top-[calc(var(--line-y)-4px)] left-1/2 h-[9px] w-[9px] -translate-x-1/2 rounded-full border border-faint bg-paper"
             />
-            <span className="absolute top-[88px] right-0 left-0 text-[13px] leading-[1.35] font-medium text-muted">
+            <span className="absolute top-[148px] right-0 left-0 text-[13px] leading-[1.35] font-medium text-muted">
               {GRADUATION.label}
               <span className="block font-normal text-faint">{GRADUATION.detail}</span>
             </span>
