@@ -50,7 +50,7 @@ export function computeLayout(w: number, h: number): Layout {
     face.x + (p.x / FACE_W) * faceW,
     face.y + (p.y / FACE_H) * faceH,
   ]
-  const tileW = mobile ? clamp(w * 0.24, 76, 120) : clamp(w * 0.11, 120, 176)
+  const tileW = mobile ? clamp(w * 0.27, 86, 136) : clamp(w * 0.145, 150, 236)
   return {
     w,
     h,
@@ -105,12 +105,12 @@ export function orbitPose(L: Layout, theta: number, amp: number, origin?: Origin
     const p = mixPose({ ...from, o: 1 }, start, easeInOutCubic(k))
     return { ...p, o: p.o * Math.min(1, k / 0.12) }
   }
-  const rx = L.mobile ? L.w * 0.44 : Math.min(L.w * 0.4, L.face.w * 0.74)
+  const rx = L.mobile ? L.w * 0.44 : Math.min(L.w * 0.44, L.face.w * 0.9)
   // Tilt: nearly edge-on during the pass (so the front of the circle runs across the eyes), more
   // open once it idles so it reads as a ring. Front low, back high.
   const calm = clamp((1 - amp) / 0.58)
-  const ry = L.h * lerp(0.04, L.mobile ? 0.2 : 0.17, calm)
-  const depth = (L.mobile ? 520 : 690) * amp
+  const ry = L.h * lerp(0.04, L.mobile ? 0.3 : 0.27, calm)
+  const depth = (L.mobile ? 360 : 690) * amp
   const sin = Math.sin(theta)
   const z = sin * depth
   const persp = PERSPECTIVE / (PERSPECTIVE - z)
@@ -118,7 +118,7 @@ export function orbitPose(L: Layout, theta: number, amp: number, origin?: Origin
   return {
     x: L.cx + Math.cos(theta) * rx,
     y: L.cy + sin * ry,
-    s: persp * lerp(1, 0.78, calm),
+    s: persp * lerp(1, 0.64, calm),
     o: 0.5 + 0.5 * near,
     blur: Math.max(0, -sin) * 2.4 * amp,
     z,
@@ -144,7 +144,7 @@ export function ringPose(L: Layout, i: number, n: number, turn: number): Pose {
     o = smooth(Math.min(k, 1 - k) / 0.08)
   }
   // Wide enough that tiles passing the headline's ends clear it (it's up to 560 px or 64vw wide).
-  const tileHalf = (L.tileW * 0.66) / 2
+  const tileHalf = (L.tileW * 0.6) / 2
   const clearOfHeadline = Math.min(560, L.w * 0.64) / 2 + tileHalf + 16
   const rx =
     tall || short
@@ -152,8 +152,8 @@ export function ringPose(L: Layout, i: number, n: number, turn: number): Pose {
       : L.mobile
         ? L.w * 0.39
         : Math.min(Math.max(Math.min(L.w * 0.3, L.h * 0.52), clearOfHeadline), L.w / 2 - tileHalf - 12)
-  const ry = short ? L.h * 0.4 : L.mobile ? L.h * 0.31 : L.h * 0.33
-  return { x: L.cx + Math.cos(a) * rx, y: L.h / 2 + Math.sin(a) * ry, s: L.mobile ? 0.62 : 0.66, o, blur: 0, z: 0 }
+  const ry = short ? L.h * 0.4 : L.mobile ? L.h * 0.33 : L.h * 0.37
+  return { x: L.cx + Math.cos(a) * rx, y: L.h / 2 + Math.sin(a) * ry, s: L.mobile ? 0.58 : 0.6, o, blur: 0, z: 0 }
 }
 
 export type Spot = { x: number; y: number; d: number; seed: number }

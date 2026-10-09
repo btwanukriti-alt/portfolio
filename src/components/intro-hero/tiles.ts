@@ -1,5 +1,5 @@
 // The UX screens that orbit the hero text: full frames from each case study, every device
-// the same size, each on its own textured pattern in colours that suit that screen (public/hero/tiles/, 960 x 640; generator in scripts/mockups/hero/).
+// the same size, each on its own textured pattern in colours that suit that screen (public/hero/screens/, 960 x 640; generator in scripts/mockups/hero/).
 // Each tile is two layers: the ground with any background devices (src), and the foreground
 // device on its own (pop), which lifts out of the tile in a loop. pop.x/y/w/h place it, as a
 // share of the tile's width and height. Each links to its project.
@@ -9,8 +9,8 @@ export type Pop = { src: string; x: number; y: number; w: number; h: number }
 export type Tile = { src: string; pop: Pop; slug?: string; label: string }
 
 const tile = (n: string, slug: string, label: string, x: number, y: number, w: number, h: number): Tile => ({
-  src: `/hero/tiles/${n}.jpg`,
-  pop: { src: `/hero/tiles/${n}-pop.webp`, x, y, w, h },
+  src: `/hero/screens/${n}.jpg`,
+  pop: { src: `/hero/screens/${n}-pop.webp`, x, y, w, h },
   slug,
   label,
 })

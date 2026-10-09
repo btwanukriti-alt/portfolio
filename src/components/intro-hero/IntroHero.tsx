@@ -357,7 +357,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
           const weight = lerp(lerp(0.35, 1, near), 1, a)
           const loop = popOn > 0.001 ? popCycle((now / 1000 / POP_PERIOD + i * 0.618034) % 1) * weight * popOn : 0
           const up = Math.max(loop, h)
-          popEl.style.transform = `translate3d(0,${(-up * 14).toFixed(2)}%,0) scale(${(1 + 0.2 * up).toFixed(4)})`
+          popEl.style.transform = `translate3d(0,${(-up * 9).toFixed(2)}%,0) scale(${(1 + 0.12 * up).toFixed(4)})`
           popEl.style.filter = `drop-shadow(0 ${(2 + up * 12).toFixed(1)}px ${(3 + up * 12).toFixed(1)}px rgba(8,10,30,${(0.18 + up * 0.32).toFixed(3)}))`
         }
         el.style.opacity = String(p.o)
