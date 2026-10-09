@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { Reveal } from './Reveal'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 
-// About: the title as a Figma comment that types itself out, the disciplines as quiet chips, a
+// About: the title typed by Anukriti's comment cursor, the disciplines as quiet chips, a
 // slim career timeline, and four short notes. Roles from the resume.
 
 const SELECT = '#7B61FF'
@@ -14,14 +14,14 @@ const TITLE = 'The story so far.'
 // The disciplines, as quiet chips under the heading.
 const CHIPS = ['UX & UI', 'Branding', 'Websites', 'Motion', 'AI features']
 
-type Stop = { year: string; role: string; company: string; kind: string }
+type Stop = { year: string; role: string; company: string; kind: string; dot: string }
 
 // From the resume (Anukriti Mishra_ UI UX Designer.pdf).
 const STOPS: Stop[] = [
-  { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', kind: 'Internship' },
-  { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', kind: 'Internship' },
-  { year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', kind: 'Internship' },
-  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', kind: 'Freelance' },
+  { year: '2024', role: 'UI/UX Design Intern', company: 'IAS Sathi', dot: '#4F86E8', kind: 'Internship' },
+  { year: '2024', role: 'UI/UX Design Intern', company: 'Pulsefit', dot: '#F28C28', kind: 'Internship' },
+  { year: '2025', role: 'UI/UX Design Intern', company: 'Gamalabs', dot: '#F5577D', kind: 'Internship' },
+  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', dot: '#1A9E6E', kind: 'Freelance' },
 ]
 
 const ABOUT = [
@@ -33,35 +33,39 @@ const ABOUT = [
 
 export default function About() {
   const timeline = useRef<HTMLDivElement>(null)
-  const comment = useRef<HTMLDivElement>(null)
+  const comment = useRef<HTMLHeadingElement>(null)
 
-  // The comment pops in and its title types itself out, once, when the section arrives.
+  // Anukriti's comment pin pops in, a cursor comes out of it and types the title, then the pin
+  // and cursor go. Once, when the section arrives.
   useGSAP(
     () => {
-      const box = comment.current
-      if (!box) return
-      const typed = box.querySelector<HTMLElement>('[data-typed]')!
-      const caret = box.querySelector<HTMLElement>('[data-caret]')!
+      const h = comment.current
+      if (!h) return
+      const typed = h.querySelector<HTMLElement>('[data-typed]')!
+      const cursor = h.querySelector<HTMLElement>('[data-cursor]')!
+      const pin = h.querySelector<HTMLElement>('[data-pin]')!
+      const bar = cursor.querySelector<HTMLElement>('i')!
       if (reducedMotion()) {
-        caret.style.display = 'none'
+        cursor.style.display = 'none'
         return
       }
       const chars = { n: 0 }
       typed.textContent = ''
-      gsap.set(box, { autoAlpha: 0, y: 16, scale: 0.97, transformOrigin: '0% 0%' })
+      gsap.set(pin, { autoAlpha: 0, scale: 0.6 })
+      gsap.set(bar, { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 0%' })
       gsap
-        .timeline({ scrollTrigger: { trigger: box, start: 'top 85%', once: true } })
-        .to(box, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6, ease: 'power3.out' })
-        .set(caret, { animation: 'none' })
+        .timeline({ scrollTrigger: { trigger: h, start: 'top 85%', once: true } })
+        .to(pin, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' })
+        .to(bar, { autoAlpha: 1, scaleY: 1, duration: 0.3, ease: 'power2.out' }, '+=0.15')
         .to(chars, {
           n: TITLE.length,
-          duration: TITLE.length * 0.06,
+          duration: TITLE.length * 0.065,
           ease: 'none',
           onUpdate: () => {
             typed.textContent = TITLE.slice(0, Math.round(chars.n))
           },
-        }, '+=0.15')
-        .set(caret, { animation: '' })
+        }, '+=0.1')
+        .to([pin, bar], { autoAlpha: 0, duration: 0.4, ease: 'power1.out' }, '+=0.6')
     },
     { scope: comment },
   )
@@ -91,43 +95,35 @@ export default function About() {
       aria-labelledby="about-heading"
       className="mx-auto flex max-w-[var(--max)] flex-col gap-[clamp(48px,7vh,88px)] border-t border-line bg-paper px-[var(--gutter)] py-[clamp(80px,13vh,150px)]"
     >
-      {/* Heading, centred, as a Figma comment: Anukriti's pin and a bubble in which the title types
-          itself out when the section arrives. The disciplines follow as quiet chips. */}
+      {/* Heading, centred: Anukriti's comment pin brings a cursor that types the title. The
+          disciplines follow as quiet chips. */}
       <div className="flex flex-col items-center text-center">
-        <div ref={comment} className="relative inline-flex items-start gap-3 text-left">
-          {/* The comment pin: a rounded tear with her initials. */}
-          <span
-            aria-hidden="true"
-            className="mt-1 grid size-[clamp(36px,3vw,44px)] flex-none place-items-center rounded-full rounded-bl-none text-[clamp(13px,1vw,15px)] leading-none font-semibold text-white shadow-[0_4px_12px_-4px_rgba(123,97,255,.6)]"
-            style={{ background: SELECT }}
-          >
-            AM
+        <h2
+          ref={comment}
+          id="about-heading"
+          aria-label={TITLE}
+          className="relative m-0 text-[clamp(36px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] whitespace-nowrap text-ink"
+        >
+          {/* An invisible copy holds the width; the typed text, the cursor and its comment pin sit
+              on top. */}
+          <span aria-hidden="true" className="invisible">
+            {TITLE}
           </span>
-          <div className="rounded-[18px] rounded-tl-[6px] bg-white px-[clamp(18px,2vw,28px)] pt-[clamp(12px,1.2vw,16px)] pb-[clamp(16px,1.6vw,22px)] shadow-[0_1px_2px_rgba(11,11,12,.06),0_18px_40px_-16px_rgba(11,11,12,.22)] ring-1 ring-black/5">
-            <p className="m-0 flex items-baseline gap-2 text-[13px] leading-none">
-              <span className="font-semibold text-ink">Anukriti</span>
-              <span className="text-faint">Just now</span>
-            </p>
-            <h2
-              id="about-heading"
-              aria-label="The story so far."
-              className="relative m-0 mt-3 text-[clamp(28px,4.9vw,74px)] leading-[1.04] font-medium tracking-[-0.045em] whitespace-nowrap text-ink"
-            >
-              {/* An invisible copy holds the width; the typed text and caret sit on top. */}
-              <span aria-hidden="true" className="invisible">
-                {TITLE}
+          <span aria-hidden="true" className="absolute inset-0 text-left">
+            <span data-typed>{TITLE}</span>
+            <span data-cursor className="relative inline-block h-[0.82em] w-0 translate-y-[0.1em] align-baseline">
+              <i className="absolute top-0 left-[0.03em] h-full w-[3px]" style={{ background: SELECT }} />
+              {/* Anukriti's comment pin, riding on the cursor. */}
+              <span
+                data-pin
+                className="absolute bottom-full left-[0.03em] mb-[6px] origin-bottom-left rounded-[14px] rounded-bl-none px-[10px] py-[6px] text-[clamp(12px,0.95vw,14px)] leading-none font-semibold tracking-normal whitespace-nowrap text-white shadow-[0_6px_16px_-6px_rgba(123,97,255,.7)]"
+                style={{ background: SELECT }}
+              >
+                Anukriti
               </span>
-              <span aria-hidden="true" className="absolute inset-0">
-                <span data-typed>{TITLE}</span>
-                <i
-                  data-caret
-                  className="ml-[0.04em] inline-block h-[0.82em] w-[3px] translate-y-[0.1em] animate-[caret-blink_1.06s_steps(1)_infinite] align-baseline"
-                  style={{ background: SELECT }}
-                />
-              </span>
-            </h2>
-          </div>
-        </div>
+            </span>
+          </span>
+        </h2>
         <Reveal as="ul" delay={150} className="m-0 mt-[clamp(24px,3vw,36px)] flex list-none flex-wrap justify-center gap-2.5 p-0">
           {CHIPS.map((label) => (
             <li key={label} className="rounded-full border border-line px-4 py-2.5 text-[clamp(13px,1vw,15px)] leading-none font-medium text-muted">
@@ -145,21 +141,22 @@ export default function About() {
           <span
             data-line
             aria-hidden="true"
-            className="absolute top-[6px] left-0 hidden h-[2px] w-full origin-left scale-x-0 rounded-full min-[901px]:block"
-            style={{ background: 'linear-gradient(90deg, var(--color-line), var(--color-faint) 80%, var(--color-ink))' }}
+            className="absolute top-[6px] left-0 hidden h-[2px] w-full origin-left scale-x-0 rounded-full bg-ink min-[901px]:block"
+            
           />
           <span
             data-line
             aria-hidden="true"
-            className="absolute top-1 bottom-1 left-[6px] w-[2px] origin-top scale-y-0 rounded-full min-[901px]:hidden"
-            style={{ background: 'linear-gradient(180deg, var(--color-line), var(--color-faint) 80%, var(--color-ink))' }}
+            className="absolute top-1 bottom-1 left-[6px] w-[2px] origin-top scale-y-0 rounded-full bg-ink min-[901px]:hidden"
+            
           />
           {STOPS.map((stop) => (
             <li key={stop.company} className="relative">
               <span
                 data-dot
                 aria-hidden="true"
-                className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white bg-faint shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[27px] min-[901px]:left-0"
+                className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
+                style={{ background: stop.dot }}
               />
               <div data-card className="invisible">
                 <p className="m-0 text-[13px] leading-none font-medium text-faint tabular-nums">
@@ -174,11 +171,12 @@ export default function About() {
             <span
               data-dot
               aria-hidden="true"
-              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white bg-[#1A9E6E] shadow-[0_0_0_1px_rgba(11,11,12,0.08)] min-[901px]:-top-[27px] min-[901px]:left-0"
+              className="invisible absolute top-[2px] -left-[27px] size-[14px] rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(11,11,12,0.12)] min-[901px]:-top-[27px] min-[901px]:left-0"
+              style={{ background: SELECT }}
             />
             <div data-card className="invisible">
-              <p className="m-0 flex items-center gap-1.5 text-[13px] leading-none font-semibold text-[#1A9E6E]">
-                <span className="size-[7px] animate-pulse rounded-full bg-[#1A9E6E] motion-reduce:animate-none" />
+              <p className="m-0 flex items-center gap-1.5 text-[13px] leading-none font-semibold" style={{ color: SELECT }}>
+                <span className="size-[7px] animate-pulse rounded-full motion-reduce:animate-none" style={{ background: SELECT }} />
                 Now · Open to work
               </p>
               <a
