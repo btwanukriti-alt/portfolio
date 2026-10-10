@@ -117,12 +117,6 @@ export default function GalleryCaseStudy({
           </div>
         </Reveal>
 
-        <Reveal className="mt-[clamp(40px,7vh,80px)] rounded-[28px] bg-[var(--c-tint)] px-[clamp(24px,5vw,72px)] py-[clamp(32px,6vw,72px)]">
-          <p className="m-0 text-[13px] leading-none font-semibold tracking-[0.08em] text-[var(--c-pop)] uppercase">The idea</p>
-          <p className="m-0 mt-4 max-w-[34ch] text-[clamp(20px,2vw,28px)] leading-[1.3] font-semibold tracking-[-0.02em] text-[var(--c-deep)]">
-            {study.standout}
-          </p>
-        </Reveal>
 
         <p className="mx-auto mt-[clamp(56px,9vh,104px)] mb-0 max-w-[var(--max)] text-[14px] leading-[1.5] text-faint">
           {note}
