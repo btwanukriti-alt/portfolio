@@ -12,7 +12,7 @@ import { caseStudyByKey } from '@/data/caseStudies'
 // Case study page (content layout from Figma 125:2): title block, the project's showcase video
 // as the hero (or its still), the problem, then the presentation slides.
 export default function CaseStudy({ project, slides }: { project: Project; slides: string[] }) {
-  if (project.slug === 'college-management') return <CollegeCaseStudy />
+  if (project.slug === 'college-erp') return <CollegeCaseStudy />
   return (
     // overflow-x clip: the full-width video hero spans 100vw, which includes the scrollbar.
     <div className="min-h-screen overflow-x-clip bg-paper">
@@ -203,7 +203,7 @@ function CollegeCaseStudy() {
           </div>
         </Reveal>
       </main>
-      <Contact current="college-management" />
+      <Contact current="college-erp" />
     </div>
   )
 }

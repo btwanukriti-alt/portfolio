@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
     // Stills are pre-sized JPEG exports; serve them as they are.
     unoptimized: true,
   },
+  // Old project links, from before the short slugs, keep working.
+  async redirects() {
+    return [
+      ['bosch-customer-experience', 'gym-crm'],
+      ['college-management', 'college-erp'],
+      ['fitness-tracker', 'zync'],
+      ['jaadu-2', 'jaadu'],
+    ].map(([from, to]) => ({ source: `/work/${from}`, destination: `/work/${to}`, permanent: true }))
+  },
   async headers() {
     return [
       {

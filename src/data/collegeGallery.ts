@@ -5,7 +5,7 @@
 export type CollegeImage = { src: string; width: number; height: number; alt: string; caption: string }
 
 const img = (file: string, height: number, alt: string, caption: string): CollegeImage => ({
-  src: `/case-studies/college-management/${file}`,
+  src: `/case-studies/college-erp/${file}`,
   width: 2400,
   height,
   alt,
