@@ -54,3 +54,15 @@ Whole screens as the main idea; numbered pins and caption pills; tilted or float
 - **No type specimen module, no font showcase.** Fonts stay out of the gallery.
 - **Charts only where they help.** Drop a chart module if she says so; keep heatmaps and tables.
 - **Website:** rebuild it clean (the product name everywhere, no user-count claims, no third-party logos, no stock testimonials).
+
+## 10. THE REFERENCE: Pulsefit v2 (approved 10 Oct 2026). Every project follows this.
+Source: `scripts/mockups/pulsefit/v2/` (index.html, style.css, ui.js, modules.js, render.mjs). Images: `public/case-studies/pulsefit-crm/`.
+- **Pick one real flow** from her selected Figma frames (Pulsefit: spot a lead, convert to member, plan, renew, email). Order the modules along it. Logo module first, website last.
+- **Module = bento row + full frame below.** The row holds a short deep-blue text tile (only as tall as its text unless nothing useful fits) and one or two WHOLE components (a full card or full table, never a single button or row). Below it, the full screen in a browser window on a plate, uncropped. A module with a modal flow drops the full frame and goes full width, with the text tile inside the plate.
+- **Never add filler.** No KPI cards or toasts just to fill space. If nothing adds value, leave the tile full height.
+- **Tooltips only to explain a flow** (Pulsefit: only on lead to member: "Convert opens the member form", "5 of 6 fields come from the lead", "The total updates as you toggle"). Dashed elbow lines, no lines across UI. Never point at a button or selection state just to label it.
+- **Copy: plain, short sentences that say what is on the screen.** Title 3 to 5 words ("Renew expiring plans"). One or two sentences ("This table shows plans ending this week. Click Renew or Remind."). No clever phrasing, no semicolons. Show the copy to her before rendering.
+- **Modern UI:** rebuild the screens from her frames, Inter UI, 16px card radius, 1px borders, soft tags with dots, initials avatars. One filled primary button per view; row actions are secondary (outline) or ghost.
+- **Colour:** ground is a soft blue to lilac wash; plates white to pale blue; text tiles deep brand colour with white text and a yellow step label. No yellow plates, no coloured frame plates. Full-frame plates radius 28, windows radius 12.
+- **Website:** show her original website frame exactly as designed (export at full size with `get_screenshot`, saved from the tool-result blob), no wrapper, no rebuild.
+- **Publishing:** new file names for changed images (`-v2`), or browsers keep the cached old ones.
