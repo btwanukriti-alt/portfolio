@@ -29,7 +29,7 @@ const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
 // "The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
 export const PROJECTS: Project[] = [
   {
-    slug: 'bosch-customer-experience',
+    slug: 'gym-crm',
     title: 'Gym Management CRM',
     name: 'Gym Management CRM',
     description:
@@ -39,12 +39,12 @@ export const PROJECTS: Project[] = [
     problem:
       "The front desk handles calls, walk-ins and messages all day. Leads written on paper got lost. I designed a CRM that keeps every lead in view until it becomes a member.",
     card: '/work/project-3.jpg',
-    hero: caseStudyImage('bosch-customer-experience'),
-    showcase: '/showcase/bosch-customer-experience.html?embed&v=3',
+    hero: caseStudyImage('gym-crm'),
+    showcase: '/showcase/gym-crm.html?embed&v=3',
     color: '#DCCFFF',
   },
   {
-    slug: 'college-management',
+    slug: 'college-erp',
     title: 'College Group ERP',
     name: 'College Group ERP',
     description:
@@ -53,13 +53,13 @@ export const PROJECTS: Project[] = [
     timeline: '3 months',
     problem:
       "A college group had no way to see all its colleges at once. The redesign puts them on one dashboard, with access set by role.",
-    card: '/case-studies/college-management/hero-v2.jpg',
-    hero: '/case-studies/college-management/hero-v2.jpg',
-    showcase: '/showcase/college-management.html?embed&v=5',
+    card: '/case-studies/college-erp/hero-v2.jpg',
+    hero: '/case-studies/college-erp/hero-v2.jpg',
+    showcase: '/showcase/college-erp.html?embed&v=5',
     color: '#FFE4D3',
   },
   {
-    slug: 'fitness-tracker',
+    slug: 'zync',
     title: 'Zync',
     name: 'Gym Member App',
     description:
@@ -69,8 +69,8 @@ export const PROJECTS: Project[] = [
     problem:
       "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
     card: '/case-studies/zync/01-home.jpg',
-    hero: caseStudyImage('fitness-tracker'),
-    showcase: '/showcase/fitness-tracker.html?v=5',
+    hero: caseStudyImage('zync'),
+    showcase: '/showcase/zync.html?v=5',
     color: '#FFE8EE',
   },
   {
@@ -89,7 +89,7 @@ export const PROJECTS: Project[] = [
     color: '#D3F0F5',
   },
   {
-    slug: 'jaadu-2',
+    slug: 'jaadu',
     title: 'Jaadu 2.0',
     name: 'AI Trading Terminal',
     description:
@@ -99,8 +99,8 @@ export const PROJECTS: Project[] = [
     problem:
       "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
     card: '/work/project-1.jpg',
-    hero: caseStudyImage('jaadu-2'),
-    showcase: '/showcase/jaadu-2.html?embed&v=5',
+    hero: caseStudyImage('jaadu'),
+    showcase: '/showcase/jaadu.html?embed&v=5',
     color: '#CFDDFF',
   },
 ]

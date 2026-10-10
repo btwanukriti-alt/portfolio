@@ -55,7 +55,7 @@ for (const arg of process.argv.slice(2)) {
   const html = readFileSync(file, 'utf8')
   const hasStage = /function Stage\(/.test(html) && RENDER_CALL.test(html)
   if (!hasStage && !html.includes('window.__zync')) throw new Error(`${slug}: no Stage or player API found`)
-  const background = slug === 'bosch-customer-experience' ? '#F5F6FA' : '#000'
+  const background = slug === 'gym-crm' ? '#F5F6FA' : '#000'
   const out = (hasStage ? html.replace(RENDER_CALL, embed(background)) : html.replace(/<\/body>(?![\s\S]*<\/body>)/, `${driver}</body>`))
     .replace(/<title>[^<]*<\/title>/, '<title>Showcase</title>')
   writeFileSync(resolve(outDir, `${slug}.html`), out)

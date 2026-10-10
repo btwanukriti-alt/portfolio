@@ -42,14 +42,14 @@ export type GallerySection = { label: string; rows?: 1 | 2 | 3 | 'auto'; cards: 
 type GalleryConfig = { studyKey: string; brand: Brand; note: string; images: GalleryImage[]; sections?: GallerySection[] }
 
 const pf = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
-  src: `/case-studies/pulsefit-crm/${file}`,
+  src: `/case-studies/gym-crm/${file}`,
   width: 2400,
   height,
   alt,
   caption,
 })
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
-  src: `/case-studies/jaadu-2/${file}`,
+  src: `/case-studies/jaadu/${file}`,
   width: 2400,
   height,
   alt,
@@ -58,7 +58,7 @@ const jaadu = (file: string, height: number, alt: string, caption: string): Gall
 
 // Keyed by project slug (src/data/projects.ts); studyKey points at src/data/caseStudies.ts.
 export const GALLERIES: Record<string, GalleryConfig> = {
-  'fitness-tracker': {
+  zync: {
     studyKey: 'zync',
     note: 'Screens are refined for this portfolio, and the figures in them are sample data.',
     brand: {
@@ -70,13 +70,13 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       mark: { src: '/brand/zync-mark.png', ratio: 170 / 188 },
     },
     images: [
-      { src: '/case-studies/fitness-tracker/v2-01-home.jpg', width: 2400, height: 1776, alt: 'The Burned and Consumed calorie cards beside the Home screen on a phone', caption: 'Your day on one screen.' },
-      { src: '/case-studies/fitness-tracker/v2-02-log.jpg', width: 2400, height: 2526, alt: 'The log tiles, the nutrient bars and the water chart, above the food, sleep and water screens', caption: 'Log food, water and sleep.' },
-      { src: '/case-studies/fitness-tracker/v2-03-gym.jpg', width: 2400, height: 1230, alt: 'The QR check-in card and a class in its three states: open, full and booked', caption: 'Check in and book a class.' },
-      { src: '/case-studies/fitness-tracker/v2-04-workout.jpg', width: 2400, height: 1880, alt: 'A plan card, the plan on a phone, and its exercise list with Start workout', caption: 'Follow a workout plan.' },
+      { src: '/case-studies/zync/v2-01-home.jpg', width: 2400, height: 1776, alt: 'The Burned and Consumed calorie cards beside the Home screen on a phone', caption: 'Your day on one screen.' },
+      { src: '/case-studies/zync/v2-02-log.jpg', width: 2400, height: 2526, alt: 'The log tiles, the nutrient bars and the water chart, above the food, sleep and water screens', caption: 'Log food, water and sleep.' },
+      { src: '/case-studies/zync/v2-03-gym.jpg', width: 2400, height: 1230, alt: 'The QR check-in card and a class in its three states: open, full and booked', caption: 'Check in and book a class.' },
+      { src: '/case-studies/zync/v2-04-workout.jpg', width: 2400, height: 1880, alt: 'A plan card, the plan on a phone, and its exercise list with Start workout', caption: 'Follow a workout plan.' },
     ],
   },
-  'college-management': {
+  'college-erp': {
     studyKey: 'college-erp',
     note: 'Screens are rebuilt for this portfolio with sample content. Every figure in them is sample data.',
     brand: {
@@ -87,11 +87,11 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pop: '#4F86E8',
     },
     images: [
-      { src: '/case-studies/college-management/v2-01-problem.jpg', width: 2400, height: 2040, alt: 'The old finance stats page and the 28-column Excel sheet, with the problems marked', caption: 'The old system.' },
-      { src: '/case-studies/college-management/v2-02-dashboard.jpg', width: 2400, height: 3245, alt: 'The group summary banner above the full group finance dashboard', caption: 'One view of every college.' },
-      { src: '/case-studies/college-management/v2-03-drill-down.jpg', width: 2400, height: 2448, alt: 'The hierarchy from group to batch, and the stacked drawers for a college and a programme', caption: 'See it by level, group to batch.' },
-      { src: '/case-studies/college-management/v2-04-staff.jpg', width: 2400, height: 1274, alt: 'The old staff list beside the new attendance screen with status tabs and filters', caption: 'Staff attendance.' },
-      { src: '/case-studies/college-management/v2-05-settlements.jpg', width: 2400, height: 1286, alt: 'The old settlements list beside the new settlements screen with tabs and search', caption: 'Settlements.' },
+      { src: '/case-studies/college-erp/v2-01-problem.jpg', width: 2400, height: 2040, alt: 'The old finance stats page and the 28-column Excel sheet, with the problems marked', caption: 'The old system.' },
+      { src: '/case-studies/college-erp/v2-02-dashboard.jpg', width: 2400, height: 3245, alt: 'The group summary banner above the full group finance dashboard', caption: 'One view of every college.' },
+      { src: '/case-studies/college-erp/v2-03-drill-down.jpg', width: 2400, height: 2448, alt: 'The hierarchy from group to batch, and the stacked drawers for a college and a programme', caption: 'See it by level, group to batch.' },
+      { src: '/case-studies/college-erp/v2-04-staff.jpg', width: 2400, height: 1274, alt: 'The old staff list beside the new attendance screen with status tabs and filters', caption: 'Staff attendance.' },
+      { src: '/case-studies/college-erp/v2-05-settlements.jpg', width: 2400, height: 1286, alt: 'The old settlements list beside the new settlements screen with tabs and search', caption: 'Settlements.' },
     ],
   },
   'ssh-client': {
@@ -114,8 +114,8 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       { src: '/case-studies/ssh-client/v2-06-sessions.jpg', width: 2400, height: 942, alt: 'The active sessions table grouped by day', caption: 'See who is connected.' },
     ],
   },
-  'jaadu-2': {
-    studyKey: 'jaadu-2',
+  jaadu: {
+    studyKey: 'jaadu',
     note: 'Screens are exported from the Figma file. Every figure in them is sample data.',
     brand: {
       accent: '#2653CF',
@@ -135,7 +135,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       jaadu('v2-08-deja.jpg', 1175, 'Déjà Vu showing past matches for today\'s market and what happened next', 'Has this happened before?'),
     ],
   },
-  'bosch-customer-experience': {
+  'gym-crm': {
     studyKey: 'pulsefit-crm',
     note: 'The software and the website are rebuilt for this portfolio with sample content. Every name and figure in them is sample data.',
     brand: {
