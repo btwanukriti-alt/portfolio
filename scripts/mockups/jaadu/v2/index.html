@@ -17,53 +17,53 @@ const M = []
 
 // 1. The terminal
 M.push(['m-terminal', `<div class="row">${win('t1', 'terminal', 1124)}
-<div class="col" style="width:368px">${tile('Trading terminal', 'One screen for one coin', 'The chart sits in the middle. Price stats, the market regime, a watchlist and live trades sit beside it, so nothing opens in a new tab.')}
-${notes(note('t1@.976,.42', 'The gauge reads the market’s mood live, so you know which setups suit it'),
-  note('t1@.976,.66', 'The watchlist keeps other coins one tap away'),
-  note('t1@.976,.88', 'Each trade prints as it happens: green for buys, red for sells'))}</div></div>`])
+<div class="col" style="width:368px">${tile('Trading terminal', 'Everything in one place', 'See the chart, the market mood, your coins and live trades. All on one screen.')}
+${notes(note('t1@.976,.42', 'Shows the market’s mood right now'),
+  note('t1@.976,.66', 'Your coins, one tap away'),
+  note('t1@.976,.88', 'Every trade, live. Green is buy, red is sell.'))}</div></div>`])
 
 // 2. The footprint
-M.push(['m-footprint', wide('Footprint chart', 'See inside every candle', 'A footprint splits each candle into $50 price levels and shows how much was sold and bought at each one. The level where the most money traded turns yellow, so you can see where big players stepped in.') +
+M.push(['m-footprint', wide('Footprint chart', 'See inside every candle', 'Each candle is split by price. You see how much was bought and sold at each price. Yellow shows where the most money went in. That is where the big traders are.') +
   `<div style="position:relative">${footprint(1520)}</div>`])
 
 // 3. Regime and the chart prompt
-M.push(['m-ask', `<div class="row"><div class="col" style="width:600px">${tile('Regime and AI', 'Ask about any point on the chart', 'The regime gauge says what kind of market it is right now. Tap any candle to ask about it. Suggested questions come first, and the answer appears right on the chart.')}
-${cp('rg', 'c-regime', 600)}${notes(note('rg@.5,.97', 'Every mood gets a share, so you can see how sure the read is'))}</div>
-<div class="col" style="width:892px;padding-left:60px">${cap('1 · Tap a candle')}${cp('ps', 'c-prompt-suggested', 760)}${notes(note('ps@.52,.86', 'Suggested questions fit the point you tapped, so you rarely need to type'))}${cap('2 · It reads the chart')}${cp('pg', 'c-prompt-generating', 760)}</div></div>`])
+M.push(['m-ask', `<div class="row"><div class="col" style="width:600px">${tile('Ask AI', 'Ask about any candle', 'Tap a candle and ask a question. The AI reads the chart and answers right there.')}
+${cp('rg', 'c-regime', 600)}${notes(note('rg@.5,.97', 'Shows the market’s mood, with a score for each'))}</div>
+<div class="col" style="width:892px;padding-left:60px">${cap('1 · Tap a candle')}${cp('ps', 'c-prompt-suggested', 760)}${notes(note('ps@.52,.86', 'Pick a question. No typing needed.'))}${cap('2 · Get your answer')}${cp('pg', 'c-prompt-generating', 760)}</div></div>`])
 
 // 4. Alerts
-M.push(['m-alerts', `<div class="row"><div class="col" style="width:1092px">${tile('Alerts', 'Alerts on more than price', 'An alert can watch price, POC, the footprint, volume and the regime together. It fires only when all its conditions hold at the same time.')}
-<div style="position:relative;height:56px">${note('al@.16,.03', 'Mix tools in one alert', '#F2B544', 'left:40px;top:0')}${note('al@.405,.155', '2 of 3 met shows how close it is to firing', '#3DDC97', 'left:330px;top:0')}</div>
+M.push(['m-alerts', `<div class="row"><div class="col" style="width:1092px">${tile('Alerts', 'Alerts that do more', 'Set an alert on price, volume or market mood. Mix them in one alert. You get notified only when all of them happen.')}
+<div style="position:relative;height:56px">${note('al@.16,.03', 'Mix tools in one alert', '#F2B544', 'left:40px;top:0')}${note('al@.405,.155', '2 of 3 done. Almost there.', '#3DDC97', 'left:330px;top:0')}</div>
 ${cp('al', 'c-alert', 1092)}</div>${cp('ca', 'c-create-alert', 400)}</div>
 ${win('a1', 'alerts', 1520)}`])
 
 // 5. Quant Lab: build
 M.push(['m-build', `<div class="row">${win('b1', 'build', 1124)}
-<div class="col" style="width:368px">${tile('Quant Lab · Build', 'Describe a strategy in plain words', 'Type the idea the way you would say it. Quant Lab turns it into a strategy card with entry, exits, sizing and the regime it trades in.')}
-${notes(note('b1@.96,.5', 'The card shows exactly what will run, so you can check it before you trade'),
-  note('b1@.93,.75', 'Run sends it straight to a backtest'))}</div></div>`])
+<div class="col" style="width:368px">${tile('Quant Lab · Build', 'Build a strategy by typing', 'Write your idea in plain words. Quant Lab turns it into a clear strategy card.')}
+${notes(note('b1@.96,.5', 'See exactly what your strategy will do'),
+  note('b1@.93,.75', 'Test it with one click'))}</div></div>`])
 
 // 6. Quant Lab: overnight discoveries
-M.push(['m-overnight', `<div class="tile wide" style="align-items:flex-start"><div><div class="ts">Quant Lab · Overnight Discoveries</div><h3>It finds strategies while you sleep</h3><p style="margin-top:14px">Coming up with a strategy and testing it by hand takes days. Overnight Discoveries does it for you, every night.</p></div>
-<ol style="margin:0"><li><b>You set it up.</b> Pick at least five coins and Intra-day or Swing.</li><li><b>It works overnight.</b> It generates hundreds of strategies and puts each one through three tests: a fast filter, a regime test and an overfitting check.</li><li><b>You wake up to a shortlist.</b> Only the strategies that passed all three tests are left, ready to review.</li></ol></div>
-<div class="row"><div class="col" style="width:746px">${cap('1 · Set it up')}${win('o1', 'overnight-setup', 746)}</div><div class="col" style="width:746px">${cap('2 · It runs overnight')}${win('o2', 'overnight-running', 746)}</div></div>
-${cap('3 · The morning shortlist')}
+M.push(['m-overnight', `<div class="tile wide" style="align-items:flex-start"><div><div class="ts">Quant Lab · Overnight Discoveries</div><h3>Wake up to new strategies</h3><p style="margin-top:14px">Testing strategies by hand takes days. Quant Lab does it for you every night.</p></div>
+<ol style="margin:0"><li><b>Set it up.</b> Pick 5 coins and a trading style.</li><li><b>It works overnight.</b> It creates hundreds of strategies and tests each one 3 times.</li><li><b>Wake up to a shortlist.</b> Only the best strategies are left.</li></ol></div>
+<div class="row"><div class="col" style="width:746px">${cap('1 · Set it up')}${win('o1', 'overnight-setup', 746)}</div><div class="col" style="width:746px">${cap('2 · It works overnight')}${win('o2', 'overnight-running', 746)}</div></div>
+${cap('3 · Your morning shortlist')}
 <div class="row">${win('o3', 'overnight-results', 1124)}
-${side(note('o3@.963,.23', 'Last night 642 ideas went in and 3 survived all three tests'),
-  note('o3@.948,.42', 'Most nights only 0 to 2 survive. Strict tests keep lucky strategies out'),
-  note('o3@.96,.70', 'Each survivor shows its win rate, drawdown and equity curve'),
-  note('o3@.952,.927', 'Save the good ones to the library, or fork one to tweak it'))}</div>`])
+${side(note('o3@.963,.23', '642 ideas tested. Only 3 passed.'),
+  note('o3@.948,.42', 'Most nights, only 0 to 2 pass. Only strong ones get through.'),
+  note('o3@.96,.70', 'See how each one performed'),
+  note('o3@.952,.927', 'Save the ones you like'))}</div>`])
 
 // 7. Library and compare
-M.push(['m-library', wide('Quant Lab · Library', 'Keep the best, then compare them', 'Every saved strategy is a card with the regime it suits, its direction and its win rate. Pick a few and compare them: the best value in each column is highlighted and every equity curve sits on one chart.') +
+M.push(['m-library', wide('Quant Lab · Library', 'Save and compare', 'All your strategies are saved as cards. Pick a few and compare them side by side. The best numbers are highlighted.') +
   `<div class="row"><div class="col" style="width:746px">${cap('Library')}${win('l1', 'library', 746)}</div><div class="col" style="width:746px">${cap('Compare')}${win('l2', 'compare', 746)}</div></div>`])
 
 // 8. Deja vu
 M.push(['m-deja', `<div class="row">${win('d1', 'deja', 1124)}
-<div class="col" style="width:368px">${tile('Quant Lab · Déjà Vu', 'Has this happened before?', 'Describe today’s setup with three filters. Déjà Vu searches years of market history for the closest matches and shows what happened next.')}
-${notes(note('d1@.96,.39', 'Pick the regime, structure and flow, then find look-alikes'),
-  note('d1@.96,.6', 'Today’s chart sits beside the closest match'),
-  note('d1@.96,.8', 'The outcome: of 7 matches, 6 broke out within a week'))}</div></div>`])
+<div class="col" style="width:368px">${tile('Quant Lab · Déjà Vu', 'Has this happened before?', 'Describe today’s market. Déjà Vu finds the same pattern in the past and shows what happened next.')}
+${notes(note('d1@.96,.39', 'Choose what to look for'),
+  note('d1@.96,.6', 'Today, next to the past'),
+  note('d1@.96,.8', '6 out of 7 times, the price broke out'))}</div></div>`])
 
 document.getElementById('root').innerHTML = M.map(([id, h]) => `<div class="mod" id="${id}">${h}</div>`).join('')
 
@@ -72,10 +72,10 @@ document.getElementById('root').innerHTML = M.map(([id, h]) => `<div class="mod"
   const fp = document.getElementById('fp'), wrap = fp.parentElement
   const at = (id, fx, fy) => { const r = document.getElementById(id).getBoundingClientRect(), w = wrap.getBoundingClientRect(); return [r.left - w.left + fx * r.width, r.top - w.top + fy * r.height] }
   wrap.insertAdjacentHTML('beforeend',
-    note('fp-3-2@0,.5', 'Blue: buyers outweighed sellers', '#3157E0', 'left:236px;top:168px') +
-    note('fp-0-4b@1,.5', 'Red: sellers outweighed buyers', '#D2384F', 'left:236px;top:228px') +
-    note('fp-3-4@0,.5', 'Yellow: most money traded here', '#DE9C2E', 'left:236px;top:288px') +
-    note('fp-pill@1,.5', 'Hover a level to see its buys, sells and delta', '#fff', 'left:930px;top:70px;max-width:none;white-space:nowrap'))
+    note('fp-3-2@0,.5', 'Blue: more buying', '#3157E0', 'left:236px;top:168px') +
+    note('fp-0-4b@1,.5', 'Red: more selling', '#D2384F', 'left:236px;top:228px') +
+    note('fp-3-4@0,.5', 'Yellow: most money', '#DE9C2E', 'left:236px;top:288px') +
+    note('fp-pill@1,.5', 'Hover to see the exact numbers', '#fff', 'left:930px;top:70px;max-width:none;white-space:nowrap'))
 })()
 
 // dashed lines from each note to its target
