@@ -2,9 +2,10 @@
 (function(){
 const M = document.getElementById('mods')
 const i = P.i
-const tile = (step, title, desc) => `<div class="tile"><div class="ts">${step}</div><div><h3>${title}</h3><p>${desc}</p></div></div>`
+const FLOW = ['Hosts', 'Keys', 'Terminal', 'Sessions']
+const tile = (step, title, desc, at) => `<div class="tile"><div class="ts">${step}</div><div><h3>${title}</h3><p>${desc}</p></div>${at !== undefined ? `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:auto">${FLOW.map((f, k) => `${k ? `<span style="color:rgba(255,255,255,.45)">${i('chevR', 'width:12px;height:12px')}</span>` : ''}<span style="height:26px;padding:0 10px;border-radius:13px;font:600 12.5px/26px Inter;${k === at ? 'background:#fff;color:#4C1D95' : 'background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)'}">${f}</span>`).join('')}</div>` : ''}</div>`
 const plate = (html, zoom = 1, st = '') => `<div class="plate cell" style="padding:44px;display:grid;place-items:center;${st}"><div style="zoom:${zoom}">${html}</div></div>`
-const browser = (html, w, tab) => `<div class="win" style="width:${w}px"><div class="tb"><i></i><i></i><i></i><span class="tab">${tab}</span></div><div class="fit" data-w="${w}"><div class="inner" style="width:1440px">${html}</div></div></div>`
+const browser = (html, w) => `<div class="win" style="width:${w}px;border-radius:14px"><div class="fit" data-w="${w}"><div class="inner" style="width:${P.W}px">${html}</div></div></div>`
 function mod(id, { cols = '340px 1fr', cells, frame, tab }) {
   const s = document.createElement('div')
   s.className = 'mod'; s.id = id
@@ -51,18 +52,19 @@ function logoModule() {
 
 logoModule()
 mod('m-hosts', {
-  cols: '340px 1fr 430px',
-  cells: [tile('01 · Add', 'Add a server', 'Click + to add a host. Enter its address, port and label.'), plate(`<div style="width:690px">${P.hostsCard(6, 1)}</div>`, .92, 'padding:32px'), plate(P.newHost(), .9, 'padding:28px')],
+  cols: '340px 1fr 1fr',
+  cells: [tile('01 · Hosts', 'All servers as cards', 'Each card shows a server, its IP and status. Click Connect to open it.', 0), plate(`<div style="display:flex;flex-direction:column;gap:20px">${P.HOSTS2.slice(0, 2).map(h => P.hostCard(h, 330)).join('')}</div>`, 1.05, 'padding:36px'), plate(P.newHost2().replace('height:100%', 'height:740px;border-radius:18px;border:0;box-shadow:inset 0 0 0 1px #2A2A31'), .8, 'padding:28px')],
+  frame: P.hostsFrame2(),
 })
 mod('m-health', {
-  cols: '340px 1fr 1fr',
-  cells: [tile('02 · Check', 'Check a server\'s health', 'A host opens on its info, uptime, network and security checks.'), plate(`<div style="width:560px">${P.network()}</div>`, .92, 'padding:32px'), plate(`<div style="width:560px">${P.security()}</div>`, .92, 'padding:32px')],
-  frame: P.overviewFrame(), tab: 'API Gateway',
+  cols: '340px 1fr',
+  cells: [tile('01 · Hosts', 'Check a server\'s health', 'A host opens on its stats: info, network and security checks.', 0), plate(`<div style="display:grid;grid-template-columns:600px 520px;gap:20px;align-items:start">${P.netCard2()}${P.security2()}</div>`, .92, 'padding:32px')],
+  frame: P.overviewFrame2(),
 })
 const key = mod('m-keys', {
   cols: '1fr',
   cells: [`<div class="plate cell flow" style="padding:48px 44px 130px;display:grid;grid-template-columns:445px 445px 445px;justify-content:space-between">
-    <div style="display:flex;flex-direction:column;gap:24px" class="kcol">${tile('03 · Connect', 'Send a key to a server', 'Pick a host and export your key. Each step shows until it connects.')}<div class="kp" style="zoom:.766">${P.kSelect()}</div></div>
+    <div style="display:flex;flex-direction:column;gap:24px" class="kcol">${tile('02 · Keys', 'Send a key to a server', 'Pick a host and export your key. Each step shows until it connects.', 1)}<div class="kp" style="zoom:.766">${P.kSelect()}</div></div>
     <div class="kp">${P.kExport()}</div><div class="kp">${P.kDone()}</div>
     ${['Pick the host', 'Check where the key goes', 'Log in without a password'].map((t, k) => `<span class="pill q${k}" style="position:absolute;bottom:44px">${t}</span>`).join('')}</div>`],
 })
@@ -81,17 +83,17 @@ key._links = box => {
 }
 mod('m-term', {
   cols: '340px 1fr 1fr',
-  cells: [tile('04 · Run', 'Run saved commands', 'Saved commands sit beside the terminal. Open one and click Run, or ask AI.'), plate(P.packages(), .95, 'padding:36px'), plate(P.askAI(), .95, 'padding:36px')],
-  frame: P.termFrame(), tab: 'API Gateway · Terminal',
+  cells: [tile('03 · Terminal', 'Run saved commands', 'Saved commands sit beside the terminal. Open one and click Run, or ask AI.', 2), plate(P.termPanel('cmd'), .9, 'padding:30px'), plate(P.askAI2(), .9, 'padding:30px')],
+  frame: P.termFrame2(),
 })
 mod('m-sessions', {
   cols: '340px 1fr',
-  cells: [tile('05 · Watch', 'See active sessions', 'This table lists open sessions with device, location and key.'), plate(`<div style="width:1040px">${P.sessionsCard()}</div>`, 1, 'padding:40px')],
+  cells: [tile('04 · Sessions', 'See who is connected', 'This table lists open sessions with device, location and key.', 3), plate(P.sessions2(), 1.04, 'padding:36px')],
 })
 
 Promise.all([document.fonts.ready, ...[...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r }))]).then(() => {
   document.querySelectorAll('.fit').forEach(f => {
-    const w = +f.dataset.w, inner = f.firstElementChild, s = w / 1440
+    const w = +f.dataset.w, inner = f.firstElementChild, s = w / P.W
     inner.style.transform = `scale(${s})`
     f.style.height = Math.ceil(inner.offsetHeight * s) + 'px'
   })
