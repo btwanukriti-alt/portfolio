@@ -12,7 +12,7 @@ function mod(id, { cols = '340px 1fr', cells, frame, url }) {
   const s = document.createElement('div')
   s.className = 'mod'; s.id = id
   s.innerHTML = `<div class="bento" style="grid-template-columns:${cols}">${cells.join('')}</div>
-    <div class="plate bot" style="padding:48px;display:flex;justify-content:center">${browser(frame, 1424, url)}</div>`
+    ${frame ? `<div class="plate bot" style="padding:48px;display:flex;justify-content:center">${browser(frame, 1424, url)}</div>` : ''}`
   M.appendChild(s)
   return s
 }
@@ -105,7 +105,6 @@ const conv = mod('m-convert', {
       <span class="pill p1" style="position:absolute;left:56px;top:500px">Convert opens the member form</span>
       <span class="pill p2" style="position:absolute;left:56px;top:640px">5 of 6 fields come from the lead</span>
       <span class="pill p3" style="position:absolute;left:56px;top:780px">The total updates as you toggle</span></div>`],
-  frame: P.convertFrame(), url: 'app.pulsefit.app/leads/2789/convert',
 })
 conv._links = box => {
   const fm = rel(box, box.querySelector('.fm > div')), mx = fm.l - 24
