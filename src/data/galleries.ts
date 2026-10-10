@@ -130,7 +130,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
     },
     images: [
       jaadu('v2-01-terminal.jpg', 1175, 'The trading terminal with the chart, market mood gauge, watchlist and live trades', 'Everything in one place.'),
-      jaadu('v2-02-footprint.jpg', 1416, 'A footprint chart where each candle shows money sold and bought at each price', 'See inside every candle.'),
+      jaadu('v3-02-footprint.jpg', 1416, 'A footprint chart where each candle shows money sold and bought at each price', 'See inside every candle.'),
       jaadu('v2-03-ask.jpg', 1125, 'The market mood gauge and the chart prompt with suggested questions', 'Ask about any candle.'),
       jaadu('v2-04-alerts.jpg', 2555, 'An alert with three conditions, the create alert panel and the full alerts screen', 'Alerts that do more.'),
       jaadu('v2-05-build.jpg', 1176, 'Quant Lab turning a typed idea into a strategy card', 'Build a strategy by typing.'),
