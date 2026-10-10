@@ -1,0 +1,42 @@
+/* Jaadu 2.0 v2: her dark screens on a light grey ground. No plates: components and frames sit on the ground. */
+@font-face{font-family:Geist;font-weight:100 900;src:url(../../../../node_modules/next/dist/next-devtools/server/font/geist-latin.woff2)}
+@font-face{font-family:'Geist Mono';font-weight:100 900;src:url(../../../../node_modules/next/dist/next-devtools/server/font/geist-mono-latin.woff2)}
+*{box-sizing:border-box}
+body{margin:0;background:#D9DDE5;font-family:Geist,system-ui,sans-serif}
+.mod{position:relative;width:1600px;padding:40px;display:flex;flex-direction:column;gap:28px;margin-bottom:40px;
+  background:radial-gradient(1100px 700px at 0% 0%,#E2E7F2 0%,rgba(226,231,242,0) 70%),radial-gradient(900px 700px at 100% 100%,#E6E8EE 0%,rgba(230,232,238,0) 70%),#EEF0F4}
+.row{display:flex;gap:28px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:28px}
+.tile{border-radius:32px;background:radial-gradient(420px 260px at 100% 0%,#1E3FA8 0%,rgba(30,63,168,0) 70%),#0A1240;padding:34px 36px 36px;color:#fff}
+.tile.wide{display:flex;gap:60px;align-items:flex-end}
+.tile.wide>div:first-child{flex:none;width:600px}
+.tile .ts{font:600 14px Geist;letter-spacing:.12em;text-transform:uppercase;color:#7FA2FF;margin-bottom:16px}
+.tile h3{font:500 34px/1.15 Geist;letter-spacing:-.02em;margin:0}
+.tile p{font:400 18px/1.55 Geist;color:#C3CDEB;margin:14px 0 0}
+.tile.wide p{margin:0}
+.tile ol{margin:20px 0 0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:12px}
+.tile ol li{counter-increment:s;font:400 17px/1.5 Geist;color:#C3CDEB;padding-left:40px;position:relative}
+.tile ol li b{color:#fff;font-weight:500}
+.tile ol li:before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:8px;background:rgba(127,162,255,.18);color:#AFC4FF;font:600 14px/26px Geist;text-align:center}
+/* a whole screen, uncut */
+.win{border-radius:14px;overflow:hidden;background:#00022B;box-shadow:0 0 0 1px rgba(10,18,64,.10),0 40px 80px -36px rgba(10,18,64,.55);flex:none}
+.win img{display:block;width:100%}
+/* a component on the ground */
+.cp{display:block;border-radius:16px;filter:drop-shadow(0 24px 30px rgba(10,18,64,.28));flex:none}
+.cap{font:500 15px Geist;letter-spacing:.08em;text-transform:uppercase;color:#5B6788;margin:0 0 -14px 4px}
+/* notes */
+.note{position:relative;z-index:6;display:inline-flex;align-self:flex-start;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:12px 18px 12px 14px;font:500 18px/1.35 Geist;color:#0A1240;box-shadow:0 12px 28px -12px rgba(10,18,64,.35),0 0 0 1px rgba(10,18,64,.06);max-width:400px}
+.note i{width:12px;height:12px;border-radius:50%;background:var(--c,#3D6BFF);flex:none}
+svg.ln{position:absolute;left:0;top:0;z-index:5;pointer-events:none;overflow:visible}
+/* footprint chart, rebuilt */
+.fp{position:relative;border-radius:18px;background:radial-gradient(800px 300px at 30% 0%,rgba(40,80,220,.18),rgba(0,0,0,0) 70%),#00031F;box-shadow:0 0 0 1px rgba(10,18,64,.08),0 30px 60px -28px rgba(10,18,64,.5);overflow:hidden;font-family:'Geist Mono',monospace}
+.fp .pl{position:absolute;left:24px;height:40px;border-radius:12px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);color:#E7ECFF;font:400 17px/40px 'Geist Mono';padding:0 18px;white-space:nowrap}
+.fp .pl b{font-weight:400;color:#8EA0D0}
+.fp .gl{position:absolute;background:rgba(120,150,255,.08)}
+.fp .ax{position:absolute;font:400 14px 'Geist Mono';color:#6F7FAE}
+.fp .c{position:absolute;display:grid;place-items:center;font:500 15px 'Geist Mono';color:#fff;border-radius:2px}
+.fp .wk{position:absolute;width:4px;border-radius:2px}
+.fp .bd{position:absolute;width:12px;border-radius:3px}
+.fp .hv{position:absolute;border:2px solid #fff;border-radius:4px;box-shadow:0 0 0 4px rgba(255,255,255,.18);z-index:3}
+.note.abs{position:absolute}
+.notes{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
