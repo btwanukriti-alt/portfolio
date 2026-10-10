@@ -345,12 +345,12 @@ export const GALLERIES: Record<string, GalleryConfig> = {
     },
     images: [
       pf('01-logo.jpg', 1590, 'The Pulsefit mark on a construction grid, and the logo with its clear space', 'One mark, built on a single slant.'),
-      pf('02-lead-dashboard.jpg', 3335, 'The missed follow-ups and stale leads cards above the full lead dashboard', 'Each alert has its fix.'),
-      pf('03-convert.jpg', 1712, 'The leads table and the convert to member form it opens, with the lead details carried over', 'Lead to member, no retyping.'),
-      pf('04-plans.jpg', 2672, 'Plan categories and two plan cards above the full plans screen', 'Every plan on one card.'),
-      pf('05-members.jpg', 3131, 'The expiring this week table above the full members dashboard', 'Renew before it lapses.'),
-      pf('06-email.jpg', 2795, 'The subscription emails card above the full automated emails screen', 'Emails follow the lifecycle.'),
-      { ...pf('07-website.jpg', 6157, 'The full Pulsefit homepage, as designed', 'The homepage, top to bottom.'), width: 1440 },
+      pf('02-lead-dashboard-v2.jpg', 3335, 'The missed follow-ups and stale leads cards above the full lead dashboard', 'Leads that need a follow-up.'),
+      pf('03-convert-v2.jpg', 1712, 'The leads table and the convert to member form it opens, with the lead details carried over', 'Turn a lead into a member.'),
+      pf('04-plans-v2.jpg', 2672, 'Plan categories and two plan cards above the full plans screen', 'All plans in one place.'),
+      pf('05-members-v2.jpg', 3131, 'The expiring this week table above the full members dashboard', 'Renew expiring plans.'),
+      pf('06-email-v2.jpg', 2795, 'The subscription emails card above the full automated emails screen', 'Automatic emails.'),
+      { ...pf('07-website-full.jpg', 6157, 'The full Pulsefit homepage, as designed', 'The homepage, top to bottom.'), width: 1440 },
     ],
   },
 }
