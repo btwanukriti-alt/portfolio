@@ -119,8 +119,9 @@ conv._links = box => {
 }
 
 mod('m-plans', {
-  cells: [col(tile('03 · Plan', 'Every plan on one card', 'Price with GST, extension and pause days, and who is on it. Colour marks the category.'), cats),
-    plate(`<div style="display:flex;gap:20px">${[0, 4, 6].map(k => P.planCard(P.PLANS[k], 1)).join('')}</div>`, 1, 'min-height:700px')],
+  cols: '330px 380px 1fr',
+  cells: [tile('03 · Plan', 'Every plan on one card', 'Price with GST, extension and pause days, and who is on it. Colour marks the category.'), plate(cats, 1, 'padding:32px'),
+    plate(`<div style="display:flex;gap:20px">${[0, 4].map(k => P.planCard(P.PLANS[k], 1)).join('')}</div>`, 1, 'padding:32px')],
   frame: P.plansFrame(), url: 'app.pulsefit.app/plans',
 })
 
