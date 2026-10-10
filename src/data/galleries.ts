@@ -81,22 +81,6 @@ const cblock = (name: string, label: string, span: string, surface?: Surface): B
 
 const ctext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
 
-// SSH client bento cards: dark screens from public/case-studies/ssh-client/ui/.
-const sui = (file: string, alt: string, span: string, size: [number, number], fit?: 'fill'): BentoCard => ({
-  kind: 'ui',
-  src: `/case-studies/ssh-client/ui/${file}.webp`,
-  width: size[0],
-  height: size[1],
-  alt,
-  span,
-  surface: 'night',
-  fit,
-})
-
-const sblock = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span, surface: 'night' })
-
-const stext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
-
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
   width: 2400,
@@ -247,66 +231,13 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       font: 'var(--font-outfit), var(--font-hanken), sans-serif',
       mark: { src: '/brand/ssh-client-mark.png', ratio: 84 / 80 },
     },
-    images: [],
-    sections: [
-      {
-        label: 'Hosts',
-        rows: 'auto',
-        cards: [
-          sui('hosts', 'The hosts list with each server’s IP, group, tags, status and quick actions', 'min-[901px]:col-span-8 min-[901px]:row-span-2', [1280, 832], 'fill'),
-          stext('Hosts', 'All servers in one list', 'Each row shows status, tags and quick actions, so you can check a server without opening it.', 'min-[901px]:col-span-4'),
-          sblock('ssh-host-card', 'A host card with its IP, live status and a Connect button', 'min-[901px]:col-span-4'),
-        ],
-      },
-      {
-        label: 'Main feature: host stats',
-        rows: 'auto',
-        cards: [
-          sui('overview', 'The API Gateway overview with host info, system metadata and security insights', 'min-[901px]:col-span-7 min-[901px]:row-span-2', [988, 952], 'fill'),
-          stext('Main feature · Host stats', 'A host opens on its stats', 'I made stats the first screen, not the terminal. Uptime, traffic and warnings show before you run anything.', 'min-[901px]:col-span-5'),
-          sblock('ssh-network', 'Live download and upload rates for eth0', 'min-[901px]:col-span-5'),
-        ],
-      },
-      {
-        label: 'Terminal',
-        rows: 'auto',
-        cards: [sui('terminal', 'The terminal beside the Terminal Settings panel with a saved script ready to run', 'min-[901px]:col-span-12', [1280, 832], 'fill')],
-      },
-      {
-        label: 'Main feature: terminal settings',
-        rows: 'auto',
-        cards: [
-          stext('Main feature · Terminal settings', 'Save a script once, run it again', 'Scripts are grouped into packages. Open one to read it, then run it in one click.', 'min-[901px]:col-span-6', 'pop'),
-          sblock('ssh-autocomplete', 'Autocomplete toggle, a suggested command and Ask AI', 'min-[901px]:col-span-6'),
-        ],
-      },
-      {
-        label: 'Packages, command and history',
-        rows: 2,
-        cards: [
-          sui('packages', 'Command packages with devops-kit open', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
-          sui('command', 'The Check Network Load script open with Copy and Run', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
-          sui('history', 'Command history filtered by host and week', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [383, 796]),
-        ],
-      },
-      {
-        label: 'SSH keys',
-        rows: 2,
-        cards: [
-          sui('key-generate', 'Generate Key with the stepper, label, key type and passphrase', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [445, 740]),
-          sui('key-export', 'Exporting the key to a host, with each step ticked off', 'min-[901px]:col-span-4 min-[901px]:row-span-2', [445, 740]),
-          stext('SSH keys', 'A key in four steps', 'Configure, review, export, connect. The stepper shows where you are, and export shows each step as it happens.', 'min-[901px]:col-span-4'),
-          sui('key-done', 'Connection successful after the key is exported', 'min-[901px]:col-span-4', [445, 470]),
-        ],
-      },
-      {
-        label: 'Sessions',
-        rows: 'auto',
-        cards: [
-          stext('Sessions', 'Who is signed in', 'Each session shows the user, device, location, time and key, grouped by day.', 'min-[901px]:col-span-4', 'pop'),
-          sui('sessions', 'Active sessions with user, device, location, duration and key', 'min-[901px]:col-span-8', [1003, 461], 'fill'),
-        ],
-      },
+    images: [
+      { src: '/case-studies/ssh-client/v2-01-logo.jpg', width: 2400, height: 1470, alt: 'The clihub mark on a construction grid, and the logo with its clear space', caption: 'One mark: a C, a security ring and a hub.' },
+      { src: '/case-studies/ssh-client/v2-02-add-host.jpg', width: 2400, height: 2657, alt: 'Two host cards and the New Host panel above the full hosts screen', caption: 'All servers as cards.' },
+      { src: '/case-studies/ssh-client/v2-03-health.jpg', width: 2400, height: 2645, alt: 'The network and security insights cards above the full host overview', caption: 'Check a server’s health.' },
+      { src: '/case-studies/ssh-client/v2-04-keys.jpg', width: 2400, height: 1499, alt: 'Select host, export key and connection successful, linked in order', caption: 'Send a key to a server.' },
+      { src: '/case-studies/ssh-client/v2-05-terminal.jpg', width: 2400, height: 2850, alt: 'The saved command and Ask AI panels above the full terminal screen', caption: 'Run saved commands.' },
+      { src: '/case-studies/ssh-client/v2-06-sessions.jpg', width: 2400, height: 942, alt: 'The active sessions table grouped by day', caption: 'See who is connected.' },
     ],
   },
   'jaadu-2': {
