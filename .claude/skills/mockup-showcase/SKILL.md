@@ -5,6 +5,8 @@ description: Turn Anukriti's case study data into a visual-first portfolio page,
 
 # Mockup showcase
 
+**Read `references/requirements.md` first. It is Anukriti's rule list and overrides anything below that disagrees.**
+
 Continue from `case-study-editor` (copy and decisions) and `src/data/caseStudies.ts` (the content for all five projects, with a visual list per project). This skill is the visual step: mockups, gallery, page.
 
 ## The page
