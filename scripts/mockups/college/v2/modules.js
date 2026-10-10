@@ -16,16 +16,16 @@ const add = (id, html) => { const s = document.createElement('div'); s.className
 
 // 01 The problem: the old finance screens
 const prob = add('m-problem', `<div class="plate flow" style="height:1280px">
-  <div style="position:absolute;left:48px;top:470px;width:420px">${tile('01 · Before', 'The old system', 'Totals had no target. Reports were one 28-column sheet. Colleges could not be compared.')}</div>
+  <div style="position:absolute;left:48px;top:470px;width:420px">${tile('01 · Before', 'The old system', 'Each college had its own page. Group data sat in a 28-column Excel sheet.')}</div>
   <div class="o1" style="position:absolute;right:48px;top:48px">${img('old-stats.png', 960)}</div>
   <div class="o2" style="position:absolute;left:48px;right:48px;top:800px">${img('old-sheet.png', 1424)}</div>
-  <span class="pill bad n1" style="position:absolute;left:48px">No target, so no sense of progress</span>
-  <span class="pill bad n3" style="position:absolute;left:48px">Amounts written out in words</span>
-  <span class="pill bad n2" style="position:absolute;left:48px">Every row looks the same</span>
-  <span class="pill bad n4" style="position:absolute;left:48px;top:736px">28 columns, no totals by level</span></div>`)
+  <span class="pill bad n1" style="position:absolute;left:48px">No group view: one college at a time</span>
+  <span class="pill bad n3" style="position:absolute;left:48px">Totals with no target to read them against</span>
+  <span class="pill bad n2" style="position:absolute;left:48px">Programmes mixed, hard to compare</span>
+  <span class="pill bad n4" style="position:absolute;left:48px;top:736px">Group data in Excel: hard to analyse</span></div>`)
 prob._links = box => {
   const o1 = rel(box, box.querySelector('.o1 img')), o2 = rel(box, box.querySelector('.o2 img')), s = o1.w / 1440
-  ;[['.n1', 700, 196], ['.n3', 430, 343], ['.n2', 130, 549]].forEach(([sel, x, y]) => { const el = box.querySelector(sel); el.style.top = (o1.t + y * s - 22) + 'px'; const p = rel(box, el); line(box, { x: p.r, y: p.t + p.h / 2, c: '#EF4444' }, { x: o1.l + x * s, y: p.t + p.h / 2 }, o1.l + x * s) })
+  ;[['.n1', 330, 46], ['.n3', 700, 196], ['.n2', 130, 601]].forEach(([sel, x, y]) => { const el = box.querySelector(sel); el.style.top = (o1.t + y * s - 22) + 'px'; const p = rel(box, el); line(box, { x: p.r, y: p.t + p.h / 2, c: '#EF4444' }, { x: o1.l + x * s, y: p.t + p.h / 2 }, o1.l + x * s) })
   const p4 = rel(box, box.querySelector('.n4')); line(box, { x: p4.r, y: p4.t + p4.h / 2, c: '#EF4444' }, { x: o2.l + 760, y: o2.t + 70 }, o2.l + 760)
 }
 
@@ -35,29 +35,34 @@ add('m-dash', `<div class="bento" style="grid-template-columns:340px 1fr">${tile
   <div class="plate bot" style="padding:44px;display:flex;justify-content:center">${browser(P.dashboard(), 1432)}</div>`)
 
 // 03 Drill-down in stacked drawers (the main idea)
+const node = (lvl, name, meta, on, last) => `<div class="hn" style="flex:1;border-radius:18px;padding:16px 20px;${on ? 'background:#0B1F3A;color:#fff' : 'background:#fff;box-shadow:0 0 0 1px #DCE3EC'}"><div style="font:600 12px Inter;letter-spacing:.08em;text-transform:uppercase;color:${on ? '#5EEAD4' : '#64748B'}">${lvl}</div><div style="font:600 18px Inter;margin-top:6px">${name}</div><div style="font:400 14px Inter;margin-top:3px;color:${on ? '#C7D4E8' : '#64748B'}">${meta}</div></div>`
+const arrow = `<span style="flex:none;color:#64748B;align-self:center">${i('chevR', 'width:26px;height:26px;stroke-width:2.4')}</span>`
 const drill = add('m-drill', `<div class="plate flow" style="padding:48px">
-  <div class="tile" style="flex-direction:row;align-items:flex-end;gap:48px;padding:34px 40px"><div style="flex:none"><div class="ts" style="margin-bottom:14px">03 · Drill down</div><h3>Group to batch, in drawers</h3></div><p style="margin:0 0 0 auto;max-width:560px">Click a college, then a programme, then a batch. Each opens as a drawer on top.</p></div>
-  ${['The strip shows where you came from', 'Each level opens on top of the last', 'The weakest row is named first', 'Same columns at every level'].map((t, k) => `<span class="pill q${k}" style="position:absolute">${t}</span>`).join('')}
-  <div class="sc" style="margin-top:170px">${browser(P.stack(), 1424)}</div></div>`)
+  <div class="tile" style="flex-direction:row;align-items:flex-end;gap:48px;padding:34px 40px"><div style="flex:none"><div class="ts" style="margin-bottom:14px">03 · Drill down</div><h3>See it by level, group to batch</h3></div><p style="margin:0 0 0 auto;max-width:600px">Pick a college to see its programmes. Pick a programme to see its batches. Each level opens as a drawer on top.</p></div>
+  <div style="display:flex;gap:12px;margin-top:24px">${node('Group', 'Vertex Group', '5 colleges · ₹93.8 Cr received')}${arrow}${node('College', 'Vertex Law College', '4 programmes · 67.2% collected', 1)}${arrow}${node('Programme', 'BA LLB', '4 batches · 58.7% collected', 1)}${arrow}${node('Batch', '2025 batch', '120 students · 33.3% collected')}</div>
+  ${['The strip names the level behind', 'Each level opens as a drawer on top', 'Every level starts with its overview', 'Same columns, so programmes compare'].map((t, k) => `<span class="pill q${k}" style="position:absolute">${t}</span>`).join('')}
+  <div class="sc" style="margin-top:150px">${browser(P.stack(), 1424)}</div></div>`)
 drill._links = box => {
-  const sc = rel(box, box.querySelector('.sc .inner')), s = sc.w / 1440, tl = rel(box, box.querySelector('.tile'))
-  const T = [[218, 520, 0], [520, 60, 1], [900, 455, 0], [1200, 568, 1]]
+  const sc = rel(box, box.querySelector('.sc .inner')), s = sc.w / 1440, top = rel(box, box.querySelectorAll('.hn')[0])
+  const T = [[218, 520, 0], [700, 22, 1], [900, 200, 0], [1200, 568, 1]]
   T.forEach(([x, y, row], k) => {
     const el = box.querySelector('.q' + k), tx = sc.l + x * s
     el.style.left = Math.max(48, Math.min(box.clientWidth - 48 - el.offsetWidth, tx - el.offsetWidth / 2)) + 'px'
-    el.style.top = (tl.b + 24 + row * 66) + 'px'
+    el.style.top = (top.b + 22 + row * 62) + 'px'
     const p = rel(box, el)
     line(box, { x: tx, y: p.b }, { x: tx, y: sc.t + y * s })
   })
 }
 
 // 04 Staff attendance, before and after
-const ba = (id, step, title, desc, before, after, h) => add(id, `<div class="bento" style="grid-template-columns:340px 1fr">${tile(step, title, desc)}
-  <div class="plate" style="padding:64px 48px 48px;display:flex;gap:28px;align-items:center"><div style="position:relative;flex:none">${img(before, 420, 'filter:saturate(.6);opacity:.92')}<span class="chip b" style="left:-10px;top:-17px">Before</span></div>
-   <div style="color:#94A3B8;flex:none">${i('chevR', 'width:30px;height:30px;stroke-width:2.4')}</div>
-   <div style="position:relative;flex:none">${browser(after, 560)}<span class="chip a" style="left:-10px;top:-17px">After</span></div></div></div>`)
-ba('m-staff', '04 · Staff', 'Staff attendance', 'Before: one long list. After: counts by status, filters and clear check-in times.', 'old-staff.png', P.attendance(), 640)
-ba('m-settle', '05 · Settlements', 'Settlements', 'Before: every row looked the same. After: tabs by status, and late ones stand out.', 'old-settle.png', P.settlements(), 640)
+const ba = (id, step, title, desc, before, after, notes, flip) => { const m = add(id, `<div class="bento" style="grid-template-columns:${flip ? '1fr 400px' : '400px 1fr'}"><div style="display:flex;flex-direction:column;gap:24px;${flip ? 'order:2' : ''}">${tile(step, title, desc)}<div class="plate" style="flex:1;padding:44px 28px 28px;display:grid;place-items:center"><div style="position:relative">${img(before, 344, 'filter:saturate(.6);opacity:.92')}<span class="chip b" style="left:-10px;top:-17px">Before</span></div></div></div>
+  <div class="plate flow" style="padding:${48 + 140}px 40px 40px"><div class="af" style="position:relative">${browser(after, 1036)}<span class="chip a" style="left:-10px;top:-17px">After</span></div>
+   ${notes.map(([t], k) => `<span class="pill good r${k}" style="position:absolute">${t}</span>`).join('')}</div></div>`)
+  m._links = box => { const f = rel(box, box.querySelector('.af .inner')), s = f.w / 1440
+    notes.forEach(([t, x, y, row], k) => { const el = box.querySelector('.r' + k), tx = f.l + x * s; el.style.left = Math.max(40, Math.min(box.clientWidth - 40 - el.offsetWidth, tx - el.offsetWidth / 2)) + 'px'; el.style.top = (40 + row * 62) + 'px'; const p = rel(box, el); line(box, { x: tx, y: p.b, c: '#10B981' }, { x: tx, y: f.t + y * s }) }) }
+  return m }
+const staff = ba('m-staff', '04 · Staff', 'Staff attendance', 'Before: one long list. After: status tabs with counts, and filters by college, department and division.', 'old-staff.png', P.attendance(), [['Tabs show each status with its count', 560, 244, 0], ['Filter by college, department and division', 1283, 320, 0]])
+const settle = ba('m-settle', '05 · Settlements', 'Settlements', 'Before: one long list. After: tabs by status, search, and late ones stand out.', 'old-settle.png', P.settlements(), [['Tabs by status, with counts', 443, 300, 0], ['Search by number or bank reference', 800, 368, 1], ['Late settlements stand out', 1280, 465, 0]], 1)
 
 Promise.all([document.fonts.ready, ...[...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r }))]).then(() => {
   document.querySelectorAll('.fit').forEach(f => {
@@ -65,7 +70,7 @@ Promise.all([document.fonts.ready, ...[...document.images].map(im => im.complete
     inner.style.transform = `scale(${s})`
     f.style.height = Math.ceil(inner.offsetHeight * s) + 'px'
   })
-  prob._links(prob.querySelector('.flow')); drill._links(drill.querySelector('.flow'))
+  prob._links(prob.querySelector('.flow')); drill._links(drill.querySelector('.flow')); staff._links(staff.querySelector('.plate.flow')); settle._links(settle.querySelector('.plate.flow'))
   window.READY = true
 })
 })()
