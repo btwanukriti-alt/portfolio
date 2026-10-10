@@ -1,4 +1,6 @@
-// Case-study pages (src/components/story/StoryPage.tsx): one bento template, filled from this file.
+// Case-study page text (title, category, summary, confirmed facts, sample-data note), shown in the gallery layout
+// (src/components/GalleryCaseStudy.tsx). The sections and shots below are kept for the story images; the gallery
+// layout shows the mockup boards from src/data/galleries.ts.
 //
 // Rules the copy follows:
 // - captions describe what the screen shows; nothing here claims research, testing, a launch or a metric;
