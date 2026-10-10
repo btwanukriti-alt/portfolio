@@ -4,7 +4,7 @@
 //   orbit   - a tilted 3D circle around the centre. Tiles stream out of the intro's frame (on the
 //             right), sweep across the front, round the far side and back.
 //   ring    - start of the scroll: an even circle, on the way to the scatter.
-//   scatter - second scroll: scattered around the About paragraph without overlapping, drifting.
+//   scatter - second scroll: scattered at random round an oval about the About paragraph, drifting.
 
 // The formation was laid out around a 1600 x 837 face illustration (the earlier hero); its
 // proportions still set the circle's size and centre line, so the motion stays the same.
@@ -161,36 +161,70 @@ export type Spot = { x: number; y: number; d: number; seed: number }
 
 // Scatter positions (normalised 0..1), clear of the paragraph in the middle. Seeded, so the
 // layout is the same on every visit.
-export function scatterSpots(n: number, mobile: boolean): Spot[] {
-  // Desktop: a balanced scatter, every screen about the same size: six above the paragraph, six
-  // below and two either side, each nudged a little off its spot (never far enough to touch a
-  // neighbour).
+export function scatterSpots(n: number, mobile: boolean, ratio = 1.6): Spot[] {
+  // Desktop: a random scatter round an oval about the paragraph. Each screen gets its own slice
+  // of the oval (so no part crowds) and sits anywhere in it, nearer or further from the middle;
+  // a spot that would touch a screen already placed is drawn again, and if a slice has no room
+  // the whole draw starts over with the next seed.
   if (!mobile) {
-    let seed = 5
+    let seed = 9
     const rand = () => {
       seed = (seed * 16807) % 2147483647
       return seed / 2147483647
     }
-    const row = [0.1, 0.26, 0.42, 0.58, 0.74, 0.9]
-    const base = [
-      ...row.map((x) => [x, 0.21]),
-      [0.1, 0.42],
-      [0.9, 0.42],
-      [0.1, 0.62],
-      [0.9, 0.62],
-      ...row.map((x) => [x, 0.83]),
-    ]
-    // Screens alternate between the top, the sides and the bottom, so neighbours in the list
-    // (the same project often) land apart.
-    const order = [0, 12, 6, 3, 15, 8, 1, 13, 7, 4, 9, 2, 14, 5, 10, 11]
-    return order
-      .slice(0, n)
-      .map((k) => ({
-        x: base[k][0] + (rand() - 0.5) * 0.05,
-        y: base[k][1] + (rand() - 0.5) * 0.07,
-        d: 0.97 + rand() * 0.06,
-        seed: rand() * 10,
-      }))
+    const rx = 0.41 // radii as shares of the window's width and height
+    const ry = 0.36
+    // A screen's footprint (shares of the window, see scatterPose) with a gap.
+    const W = 0.13
+    const H = (0.11 / 1.5) * ratio + 0.035
+    // Arc length round the oval, measured in window heights so the slices are even on screen.
+    const steps = 720
+    const at: number[] = [0]
+    for (let k = 1; k <= steps; k++) {
+      const t = (k / steps) * Math.PI * 2
+      at.push(at[k - 1] + Math.hypot(rx * ratio * Math.sin(t), ry * Math.cos(t)) * ((Math.PI * 2) / steps))
+    }
+    const angleAt = (len: number) => {
+      const want = ((len % at[steps]) + at[steps]) % at[steps]
+      let k = 0
+      while (k < steps - 1 && at[k + 1] < want) k++
+      return (k / steps) * Math.PI * 2
+    }
+    const slice = at[steps] / n
+    const place = () => {
+      const spots: Spot[] = []
+      for (let i = 0; i < n; i++) {
+        let spot: Spot | undefined
+        for (let tries = 0; tries < 400 && !spot; tries++) {
+          // Later tries may reach further along the oval, into the neighbouring slices.
+          const reach = tries < 200 ? 0.7 : 1.6
+          const t = angleAt((i + 0.5 + (rand() - 0.5) * reach) * slice)
+          const r = 0.8 + rand() * 0.42
+          const x = 0.5 + Math.cos(t) * rx * r
+          const y = 0.53 + Math.sin(t) * ry * r
+          if (y < 0.15 || y > 0.91 || x < 0.06 || x > 0.94) continue
+          if (Math.abs(x - 0.5) < 0.3 && Math.abs(y - 0.5) < 0.15) continue
+          if (spots.some((q) => Math.abs(q.x - x) < W && Math.abs(q.y - y) < H)) continue
+          spot = { x, y, d: 0.97 + rand() * 0.06, seed: rand() * 10 }
+        }
+        if (!spot) return undefined
+        spots.push(spot)
+      }
+      return spots
+    }
+    let spots = place()
+    for (let start = 10; !spots && start < 60; start++) {
+      seed = start
+      spots = place()
+    }
+    // A window too short for them all: fall back to even slices on the oval.
+    spots ??= Array.from({ length: n }, (_, i) => {
+      const t = angleAt((i + 0.5) * slice)
+      return { x: 0.5 + Math.cos(t) * rx, y: 0.53 + Math.sin(t) * ry, d: 1, seed: i * 1.7 }
+    })
+    // Neighbours in the list are often the same project: deal them out round the oval.
+    const placed = spots
+    return placed.map((_, i) => placed[(i * 5) % n])
   }
   // mulberry32
   let seed = mobile ? 7 : 3

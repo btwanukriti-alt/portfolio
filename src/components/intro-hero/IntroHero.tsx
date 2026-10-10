@@ -207,7 +207,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const relayout = () => {
       measureRoot()
       layout = computeLayout(space.clientWidth, space.clientHeight)
-      spots = scatterSpots(layout.mobile ? N / 2 : N, layout.mobile)
+      spots = scatterSpots(layout.mobile ? N / 2 : N, layout.mobile, layout.w / layout.h)
       for (const el of tiles.current) {
         if (!el) continue
         el.style.width = `${layout.tileW}px`
