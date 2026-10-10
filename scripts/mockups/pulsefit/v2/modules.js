@@ -88,7 +88,7 @@ logoModule()
 
 mod('m-leads', {
   cols: '340px 1fr 1fr',
-  cells: [tile('01 · Spot', 'Each alert has its fix', 'Stale and missed leads open the day, each row with one quiet action.'),
+  cells: [tile('01 · Spot', 'Leads that need a follow-up', 'The dashboard lists leads you haven\'t contacted. Each row has a Follow up button.'),
     plate(P.taskCard('missed', { hov: 0, w: 440 }), 1.1), plate(P.taskCard('stale', { w: 440 }), 1.1)],
   frame: P.leadDash(), url: 'app.pulsefit.app/leads',
 })
@@ -99,7 +99,7 @@ const tableCard = `<div class="card u" style="width:640px;overflow:hidden"><tabl
 const conv = mod('m-convert', {
   cols: '1fr',
   cells: [`<div class="plate cell flow" style="height:1060px">
-      <div style="position:absolute;left:56px;top:56px;width:560px">${tile('02 · Convert', 'Lead to member, no retyping', 'Convert from the table. The member form opens with the lead\'s details already in.')}</div>
+      <div style="position:absolute;left:56px;top:56px;width:560px">${tile('02 · Convert', 'Turn a lead into a member', 'Select a lead and click Convert. The form fills in with the lead\'s details.')}</div>
       <div class="ft" style="position:absolute;left:56px;top:340px;zoom:.9">${tableCard}</div>
       <div class="fm" style="position:absolute;right:56px;top:56px;zoom:.92">${P.convertModal()}</div>
       <span class="pill p1" style="position:absolute;left:56px;top:800px">Convert opens the member form</span>
@@ -120,19 +120,19 @@ conv._links = box => {
 
 mod('m-plans', {
   cols: '330px 380px 1fr',
-  cells: [tile('03 · Plan', 'Every plan on one card', 'Price with GST, extension and pause days, and who is on it. Colour marks the category.'), plate(cats, 1, 'padding:32px'),
+  cells: [tile('03 · Plan', 'All plans in one place', 'Each card shows the price, tax, pause days and active members.'), plate(cats, 1, 'padding:32px'),
     plate(`<div style="display:flex;gap:20px">${[0, 4].map(k => P.planCard(P.PLANS[k], 1)).join('')}</div>`, 1, 'padding:32px')],
   frame: P.plansFrame(), url: 'app.pulsefit.app/plans',
 })
 
 mod('m-members', {
-  cells: [tile('04 · Keep', 'Renew before it lapses', 'This week\'s renewals, each with its trainer. Renew is the main step; Remind stays quiet.'),
+  cells: [tile('04 · Keep', 'Renew expiring plans', 'This table shows plans ending this week. Click Renew or Remind.'),
     plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch"><span class="ico" style="background:var(--amb-s);color:var(--amb)">${i('refresh')}</span><h3>Expiring this week</h3><span class="cnt" style="background:var(--amb-s);color:var(--amb)">8</span><span class="ct">View all${i('chevR', 'width:14px;height:14px')}</span></div><table class="tbl"><tr><th>Member</th><th>Plan</th><th>Expires</th><th>Trainer</th><th class="r">Next step</th></tr>${P.EXP.map((e, k) => P.expRow(e, k === 0)).join('')}</table></div>`, 1.06)],
   frame: P.membersDash(), url: 'app.pulsefit.app/members',
 })
 
 mod('m-email', {
-  cells: [tile('05 · Nurture', 'Emails follow the lifecycle', 'Each email is sent by a trigger: a new lead, a booked trial, a plan about to expire.'),
+  cells: [tile('05 · Nurture', 'Automatic emails', 'Emails go out on their own, like 5 days before a plan ends.'),
     plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch">${i('refresh', 'color:var(--mut)')}<h3>Subscriptions</h3><span style="font-size:12.5px;color:var(--mut)">3 emails · 3 on</span><span class="ct">${i('plus', 'width:14px;height:14px')}Add</span></div>${P.CAMP.Subscriptions.map(r => P.campRow(r)).join('')}</div>`, 1.06)],
   frame: P.emailFrame(), url: 'app.pulsefit.app/communication',
 })
