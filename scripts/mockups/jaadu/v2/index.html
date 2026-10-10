@@ -1,0 +1,101 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<script src="footprint.js"></script>
+<div id="root"></div>
+<script>
+const S = n => `screens/${n}.png`
+const win = (id, n, w) => `<div class="win" style="width:${w}px"><img id="${id}" src="${S(n)}"></div>`
+const cp = (id, n, w) => `<img class="cp" id="${id}" src="${n}.png" style="width:${w}px">`
+const tile = (ts, h, p, extra = '', style = '') => `<div class="tile" style="${style}"><div class="ts">${ts}</div><h3>${h}</h3>${p ? `<p>${p}</p>` : ''}${extra}</div>`
+const wide = (ts, h, p) => `<div class="tile wide"><div><div class="ts">${ts}</div><h3>${h}</h3></div><p>${p}</p></div>`
+// a note: t = "<id>@fx,fy" (fractions of the target's box); abs = inline style when it is placed absolutely
+const note = (t, txt, c = '#3D6BFF', abs = '') => `<div class="note${abs ? ' abs' : ''}" data-t="${t}" style="--c:${c};${abs}"><i></i>${txt}</div>`
+const notes = (...n) => `<div class="notes">${n.join('')}</div>`
+const side = (...n) => `<div class="notes" style="align-self:stretch;justify-content:space-around;padding:20px 0">${n.join('')}</div>`
+const cap = t => `<div class="cap">${t}</div>`
+const M = []
+
+// 1. The terminal
+M.push(['m-terminal', `<div class="row">${win('t1', 'terminal', 1124)}
+<div class="col" style="width:368px">${tile('Trading terminal', 'Everything in one place', 'See the chart, the market mood, your coins and live trades. All on one screen.')}
+${notes(note('t1@.976,.42', 'Shows the market’s mood right now'),
+  note('t1@.976,.66', 'Your coins, one tap away'),
+  note('t1@.976,.88', 'Every trade, live. Green is buy, red is sell.'))}</div></div>`])
+
+// 2. The footprint
+M.push(['m-footprint', wide('Footprint chart', 'See inside every candle', 'Each candle is split by price. You see how much was bought and sold at each price. Yellow shows where the most money went in. That is where the big traders are.') +
+  `<div style="position:relative">${footprint(1520)}</div>`])
+
+// 3. Regime and the chart prompt
+M.push(['m-ask', `<div class="row"><div class="col" style="width:600px">${tile('Ask AI', 'Ask about any candle', 'Tap a candle and ask a question. The AI reads the chart and answers right there.')}
+${cp('rg', 'c-regime', 600)}${notes(note('rg@.5,.97', 'Shows the market’s mood, with a score for each'))}</div>
+<div class="col" style="width:892px;padding-left:60px">${cap('1 · Tap a candle')}${cp('ps', 'c-prompt-suggested', 760)}${notes(note('ps@.52,.86', 'Pick a question. No typing needed.'))}${cap('2 · Get your answer')}${cp('pg', 'c-prompt-generating', 760)}</div></div>`])
+
+// 4. Alerts
+M.push(['m-alerts', `<div class="row"><div class="col" style="width:1092px">${tile('Alerts', 'Alerts that do more', 'Set an alert on price, volume or market mood. Mix them in one alert. You get notified only when all of them happen.')}
+<div style="position:relative;height:56px">${note('al@.16,.03', 'Mix tools in one alert', '#F2B544', 'left:40px;top:0')}${note('al@.405,.155', '2 of 3 done. Almost there.', '#3DDC97', 'left:330px;top:0')}</div>
+${cp('al', 'c-alert', 1092)}</div>${cp('ca', 'c-create-alert', 400)}</div>
+${win('a1', 'alerts', 1520)}`])
+
+// 5. Quant Lab: build
+M.push(['m-build', `<div class="row">${win('b1', 'build', 1124)}
+<div class="col" style="width:368px">${tile('Quant Lab · Build', 'Build a strategy by typing', 'Write your idea in plain words. Quant Lab turns it into a clear strategy card.')}
+${notes(note('b1@.96,.5', 'See exactly what your strategy will do'),
+  note('b1@.93,.75', 'Test it with one click'))}</div></div>`])
+
+// 6. Quant Lab: overnight discoveries
+M.push(['m-overnight', `<div class="tile wide" style="align-items:flex-start"><div><div class="ts">Quant Lab · Overnight Discoveries</div><h3>Wake up to new strategies</h3><p style="margin-top:14px">Testing strategies by hand takes days. Quant Lab does it for you every night.</p></div>
+<ol style="margin:0"><li><b>Set it up.</b> Pick 5 coins and a trading style.</li><li><b>It works overnight.</b> It creates hundreds of strategies and tests each one 3 times.</li><li><b>Wake up to a shortlist.</b> Only the best strategies are left.</li></ol></div>
+<div class="row"><div class="col" style="width:746px">${cap('1 · Set it up')}${win('o1', 'overnight-setup', 746)}</div><div class="col" style="width:746px">${cap('2 · It works overnight')}${win('o2', 'overnight-running', 746)}</div></div>
+${cap('3 · Your morning shortlist')}
+<div class="row">${win('o3', 'overnight-results', 1124)}
+${side(note('o3@.963,.23', '642 ideas tested. Only 3 passed.'),
+  note('o3@.948,.42', 'Most nights, only 0 to 2 pass. Only strong ones get through.'),
+  note('o3@.96,.70', 'See how each one performed'),
+  note('o3@.952,.927', 'Save the ones you like'))}</div>`])
+
+// 7. Library and compare
+M.push(['m-library', wide('Quant Lab · Library', 'Save and compare', 'All your strategies are saved as cards. Pick a few and compare them side by side. The best numbers are highlighted.') +
+  `<div class="row"><div class="col" style="width:746px">${cap('Library')}${win('l1', 'library', 746)}</div><div class="col" style="width:746px">${cap('Compare')}${win('l2', 'compare', 746)}</div></div>`])
+
+// 8. Deja vu
+M.push(['m-deja', `<div class="row">${win('d1', 'deja', 1124)}
+<div class="col" style="width:368px">${tile('Quant Lab · Déjà Vu', 'Has this happened before?', 'Describe today’s market. Déjà Vu finds the same pattern in the past and shows what happened next.')}
+${notes(note('d1@.96,.39', 'Choose what to look for'),
+  note('d1@.96,.6', 'Today, next to the past'),
+  note('d1@.96,.8', '6 out of 7 times, the price broke out'))}</div></div>`])
+
+document.getElementById('root').innerHTML = M.map(([id, h]) => `<div class="mod" id="${id}">${h}</div>`).join('')
+
+// footprint notes sit in the empty parts of the chart
+;(() => {
+  const fp = document.getElementById('fp'), wrap = fp.parentElement
+  const at = (id, fx, fy) => { const r = document.getElementById(id).getBoundingClientRect(), w = wrap.getBoundingClientRect(); return [r.left - w.left + fx * r.width, r.top - w.top + fy * r.height] }
+  wrap.insertAdjacentHTML('beforeend',
+    note('fp-3-2@0,.5', 'Blue: more buying', '#3157E0', 'left:236px;top:168px') +
+    note('fp-0-4b@1,.5', 'Red: more selling', '#D2384F', 'left:236px;top:228px') +
+    note('fp-3-4@0,.5', 'Yellow: most money', '#DE9C2E', 'left:236px;top:288px') +
+    note('fp-6-7@1.085,1', 'One candle: money sold and bought at each price', '#3DDC97', 'left:880px;top:590px;max-width:none;white-space:nowrap') +
+    note('fp-pill@1,.5', 'Hover to see the exact numbers', '#fff', 'left:930px;top:70px;max-width:none;white-space:nowrap'))
+})()
+
+// dashed lines from each note to its target
+function lines() {
+  document.querySelectorAll('.mod').forEach(m => {
+    const mr = m.getBoundingClientRect()
+    let svg = `<svg class="ln" width="${mr.width}" height="${mr.height}">`
+    m.querySelectorAll('.note[data-t]').forEach(n => {
+      const [id, f] = n.dataset.t.split('@'), [fx, fy] = f.split(',').map(Number)
+      const t = document.getElementById(id).getBoundingClientRect(), r = n.getBoundingClientRect()
+      const tx = t.left - mr.left + fx * t.width, ty = t.top - mr.top + fy * t.height
+      const L = r.left - mr.left, R = r.right - mr.left, T = r.top - mr.top, B = r.bottom - mr.top
+      let sx, sy
+      if (tx < L) { sx = L; sy = (T + B) / 2 } else if (tx > R) { sx = R; sy = (T + B) / 2 } else { sx = tx; sy = ty < T ? T : B }
+      const dark = n.closest('.fp')
+      svg += `<path d="M${sx} ${sy} L${tx} ${ty}" stroke="${dark ? '#C9D4F5' : '#7E8BAE'}" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round" fill="none"/><circle cx="${tx}" cy="${ty}" r="8" fill="${getComputedStyle(n).getPropertyValue('--c')}" stroke="#fff" stroke-width="3"/>`
+    })
+    m.insertAdjacentHTML('beforeend', svg + '</svg>')
+  })
+}
+Promise.all([document.fonts.ready, ...[...document.images].map(i => i.complete ? 0 : new Promise(r => (i.onload = i.onerror = r)))]).then(() => { lines(); window.READY = true })
+</script>

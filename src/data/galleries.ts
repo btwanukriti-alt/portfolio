@@ -120,7 +120,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
   },
   'jaadu-2': {
     studyKey: 'jaadu-2',
-    note: 'Screens and components are exported from the Figma file. Every figure in them is sample data.',
+    note: 'Screens are exported from the Figma file. Every figure in them is sample data.',
     brand: {
       accent: '#2653CF',
       deep: '#00022B',
@@ -129,14 +129,14 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pop: '#5985FF',
     },
     images: [
-      jaadu('01-footprint.jpg', 1140, 'A zoomed footprint chart where each candle is split into price bins, with the hovered bin showing buys, sells and delta', 'The footprint splits each candle into price bins.'),
-      jaadu('02-regime.jpg', 1140, 'The regime gauge showing sideways, breakout, volatile and reversal shares', 'The market regime, read live beside the chart.'),
-      jaadu('03-alerts.jpg', 1170, 'A multi-condition alert with its condition list, and the create-alert panel', 'Alerts combine price, POC, footprint and regime conditions.'),
-      jaadu('04-overnight.jpg', 1860, 'Overnight Discoveries: the falsification funnel, discoveries per night and the surviving strategy cards', 'Quant Lab: set it up, it works overnight, you wake up to a shortlist.'),
-      jaadu('05-library.jpg', 1500, 'The strategy library as cards with regime, direction, win rate and backtest actions', 'Every saved strategy is a card.'),
-      jaadu('06-comparison.jpg', 1875, 'The strategy comparison table with the best value per column highlighted, above the equity curves', 'Strategies compared side by side.'),
-      jaadu('07-deja-vu.jpg', 1140, 'Deja Vu: historical matches, the current setup beside a match, and the outcome distribution', 'Deja Vu finds look-alike setups in market history.'),
-      jaadu('08-chart-prompt.jpg', 1140, 'The chart prompt in its suggested and typing states', 'Ask about any point on the chart.'),
+      jaadu('v2-01-terminal.jpg', 1175, 'The trading terminal with the chart, market mood gauge, watchlist and live trades', 'Everything in one place.'),
+      jaadu('v2-02-footprint.jpg', 1416, 'A footprint chart where each candle shows money sold and bought at each price', 'See inside every candle.'),
+      jaadu('v2-03-ask.jpg', 1125, 'The market mood gauge and the chart prompt with suggested questions', 'Ask about any candle.'),
+      jaadu('v2-04-alerts.jpg', 2555, 'An alert with three conditions, the create alert panel and the full alerts screen', 'Alerts that do more.'),
+      jaadu('v2-05-build.jpg', 1176, 'Quant Lab turning a typed idea into a strategy card', 'Build a strategy by typing.'),
+      jaadu('v2-06-overnight.jpg', 2378, 'Overnight Discoveries in three steps: set up, running, and the morning shortlist', 'Wake up to new strategies.'),
+      jaadu('v2-07-library.jpg', 1127, 'The strategy library and the comparison screen side by side', 'Save and compare.'),
+      jaadu('v2-08-deja.jpg', 1175, 'Déjà Vu showing past matches for today\'s market and what happened next', 'Has this happened before?'),
     ],
   },
   'bosch-customer-experience': {
