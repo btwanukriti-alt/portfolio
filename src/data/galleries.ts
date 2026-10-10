@@ -50,21 +50,6 @@ const pf = (file: string, height: number, alt: string, caption: string): Gallery
   alt,
   caption,
 })
-
-const ui = (file: string, width: number, height: number, alt: string, span: string, fitOrSize?: string): BentoCard => ({
-  kind: 'ui',
-  src: `/case-studies/zync/ui/${file}.webp`,
-  width,
-  height,
-  alt,
-  span,
-  ...(fitOrSize === 'top' ? { fit: 'top' as const } : fitOrSize ? { size: fitOrSize } : {}),
-})
-
-const text = (kicker: string, title: string, body: string, span: string): BentoCard => ({ kind: 'text', kicker, title, text: body, span })
-
-const block = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span })
-
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
   width: 2400,
@@ -86,53 +71,11 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pop: '#F5577D',
       mark: { src: '/brand/zync-mark.png', ratio: 170 / 188 },
     },
-    images: [],
-    // The flow: the brand, then the main feature (Home), then the features around it.
-    sections: [
-      {
-        label: 'Brand',
-        cards: [
-          ui('logo', 4824, 2748, 'The Zync logo on its construction grid, with measurements and clear space', 'min-[901px]:col-span-12', 'max-w-[78%]'),
-          ui('icon', 2484, 2448, 'The Zync app icon inside concentric squares', 'min-[901px]:col-span-4'),
-          block('palette', 'The Zync colour palette: primary, deep, accent and the tracker colours', 'min-[901px]:col-span-8'),
-        ],
-      },
-      {
-        label: 'Main feature: Home',
-        cards: [
-          ui('phone-home', 1542, 2904, 'The Zync Home screen on a phone', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          text('Main feature · Home', 'The whole day on one screen', 'Calories burned and eaten against the goal, steps, BMI and the next class. A member reads the day before the first scroll.', 'min-[901px]:col-span-4'),
-          block('calories', 'The calorie ring: 900 of 1,200 cal burned, split by activity', 'min-[901px]:col-span-4'),
-          block('consumed', 'The Consumed side of the calorie card: 1,385 of 2,250 cal, split into carbs, fat and protein', 'min-[901px]:col-span-8'),
-        ],
-      },
-      {
-        label: 'Gym',
-        cards: [
-          ui('phone-gym', 1542, 2904, 'The Gym tab on a phone, with the check-in card and upcoming classes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          block('checkin', 'The check-in QR card', 'min-[901px]:col-span-4'),
-          text('Gym · Check-in and classes', 'Check in, then book', 'The QR is one tap from the Gym tab. Each class says book, join the waitlist or booked before the tap.', 'min-[901px]:col-span-4'),
-          block('classes', 'Three classes: one to book, one full with a waitlist, one booked', 'min-[901px]:col-span-8'),
-        ],
-      },
-      {
-        label: 'Log: water and food',
-        rows: 3,
-        cards: [
-          text('Log · Water and food', 'Water and food read the same way', 'Today against the goal comes first: a ring for water, a gauge for calories. Quick amounts and meals sit right below.', 'min-[901px]:col-span-4'),
-          ui('phone-water', 1542, 2904, 'The Hydration screen with the intake ring and glass sizes', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          ui('phone-food', 1542, 2904, 'The Food log screen with the calorie gauge, macros and meals', 'min-[901px]:col-span-4 min-[901px]:row-span-2'),
-          block('hydration', 'The hydration ring with quick amounts and the glass stepper', 'min-[901px]:col-span-4'),
-          block('food', 'The food log: 1,385 of 2,250 cal, macros and the meals logged today', 'min-[901px]:col-span-12'),
-        ],
-      },
-      {
-        label: 'Workouts',
-        cards: [
-          ui('phone-workout', 1542, 2904, 'The workout detail screen with duration, session, level and the exercise list', 'min-[901px]:col-span-5 min-[901px]:row-span-2'),
-          block('plans', 'Suggested workout plans with length, session time and tags', 'min-[901px]:col-span-7 min-[901px]:row-span-2'),
-        ],
-      },
+    images: [
+      { src: '/case-studies/fitness-tracker/v2-01-home.jpg', width: 2400, height: 1776, alt: 'The Burned and Consumed calorie cards beside the Home screen on a phone', caption: 'Your day on one screen.' },
+      { src: '/case-studies/fitness-tracker/v2-02-log.jpg', width: 2400, height: 2526, alt: 'The log tiles, the nutrient bars and the water chart, above the food, sleep and water screens', caption: 'Log food, water and sleep.' },
+      { src: '/case-studies/fitness-tracker/v2-03-gym.jpg', width: 2400, height: 1230, alt: 'The QR check-in card and a class in its three states: open, full and booked', caption: 'Check in and book a class.' },
+      { src: '/case-studies/fitness-tracker/v2-04-workout.jpg', width: 2400, height: 1880, alt: 'A plan card, the plan on a phone, and its exercise list with Start workout', caption: 'Follow a workout plan.' },
     ],
   },
   'college-management': {
