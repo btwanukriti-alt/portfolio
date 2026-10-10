@@ -19,8 +19,6 @@ export type Brand = {
   soft: string
   tint: string
   pop: string
-  // Font stack for the page title (default: the Zync wordmark font).
-  font?: string
   // White-on-transparent mark in public/brand/, drawn in the accent colour with a CSS mask.
   mark?: { src: string; ratio: number; full?: boolean }
 }
@@ -87,7 +85,6 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       soft: '#E6EDF9',
       tint: '#D5DDED',
       pop: '#4F86E8',
-      font: 'var(--font-hanken), system-ui, sans-serif',
     },
     images: [
       { src: '/case-studies/college-management/v2-01-problem.jpg', width: 2400, height: 2040, alt: 'The old finance stats page and the 28-column Excel sheet, with the problems marked', caption: 'The old system.' },
@@ -106,7 +103,6 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       soft: '#F1EDFF',
       tint: '#E6DEFF',
       pop: '#3B82F6',
-      font: 'var(--font-outfit), var(--font-hanken), sans-serif',
       mark: { src: '/brand/ssh-client-mark.png', ratio: 84 / 80 },
     },
     images: [
@@ -148,7 +144,6 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       soft: '#E6F0FF',
       tint: '#DCCFFF',
       pop: '#FFB800',
-      font: 'var(--font-hanken), system-ui, sans-serif',
       // The original mark keeps its own colours, so it is drawn as an image rather than a mask.
       mark: { src: '/brand/pulsefit-mark.svg', ratio: 20.48 / 22.28, full: true },
     },

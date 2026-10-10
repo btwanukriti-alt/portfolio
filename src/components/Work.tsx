@@ -51,7 +51,7 @@ type Row = {
   vertical: boolean
 }
 // Room kept above the frame for the section heading (px).
-const TITLE_SPACE = 80
+const TITLE_SPACE = 120
 function rowFor(vw: number, vh: number): Row {
   const portrait = vh > vw
   const vertical = portrait && vw < 720
@@ -62,7 +62,7 @@ function rowFor(vw: number, vh: number): Row {
   const padX = Math.min(56, Math.max(16, vw * 0.035))
   const padY = Math.min(88, Math.max(48, vh * (portrait ? 0.07 : 0.08)))
   const rest = (N - 1) * (strip + gap)
-  const head = small ? 72 : TITLE_SPACE
+  const head = small ? 96 : TITLE_SPACE
   if (vertical) {
     const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest, (vw - 2 * padX) / ratio))
     return { strip, gap, fillW: fillH * ratio, fillH, w: fillH * ratio, h: fillH + rest, portrait, vertical }
@@ -91,7 +91,6 @@ export default function Work() {
   const videos = useRef<(HTMLIFrameElement | null)[]>([])
   const playing = useRef<boolean[]>([])
   const activeRef = useRef(0)
-  const openBtn = useRef<HTMLAnchorElement>(null)
   const caption = useRef<HTMLDivElement>(null)
   const cursor = useRef<HTMLDivElement>(null)
   const hovered = useRef(-1)
@@ -212,15 +211,10 @@ export default function Work() {
         })
       }
 
-      // The "Open project" button and the cards' cursors follow the fill card (set directly, so
-      // switching never re-renders the section mid-move).
+      // The cards' cursors and the caption follow the fill card (set directly, so switching never
+      // re-renders the section mid-move).
       const setOpen = (i: number) => {
         const p = PROJECTS[i]
-        const btn = openBtn.current
-        if (btn) {
-          btn.href = caseStudyHref(p.slug)
-          btn.setAttribute('aria-label', `Open project: ${p.name}`)
-        }
         cards.current.forEach((card, j) => card?.setAttribute('data-active', String(j === i)))
         const cap = caption.current
         if (cap) {
@@ -341,7 +335,7 @@ export default function Work() {
       >
         <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full flex-col items-center justify-center overflow-hidden">
           {/* The section heading, top left of the frame (its width follows the frame). */}
-          <div ref={heading} aria-hidden="true" className="mb-[clamp(28px,4vh,44px)] flex max-w-full items-end justify-between gap-4">
+          <div ref={heading} aria-hidden="true" className="mb-[clamp(44px,7vh,80px)] flex max-w-full items-end justify-between gap-4">
             <p className="m-0 text-[clamp(26px,2.6vw,40px)] leading-[1.05] font-medium tracking-[-0.035em] text-ink">{WORK_TITLE}</p>
             <p className="m-0 text-[15px] leading-none font-medium text-muted">
               Selected work <span className="text-faint">({String(N).padStart(2, '0')})</span>
@@ -456,7 +450,7 @@ export default function Work() {
               ref={caption}
               data-fade
               aria-hidden="true"
-              className="absolute top-full left-0 mt-2.5 hidden h-[29px] max-w-[calc(100%-136px)] items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink group-data-[vertical=true]/row:flex"
+              className="absolute top-full left-0 mt-2.5 hidden h-[29px] max-w-full items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink group-data-[vertical=true]/row:flex"
             >
               <span data-cap-num className="text-faint tabular-nums">
                 01
@@ -465,26 +459,6 @@ export default function Work() {
               <span className="flex-none rounded-[3px] bg-[#7B61FF]/10 px-[5px] py-[3px] text-[10px] text-[#7B61FF]">Fill</span>
             </div>
 
-            {/* "Open project" for the fill card, under the row's bottom-right corner (also for
-                keyboard and touch). */}
-            <Link
-              data-fade
-              ref={openBtn}
-              href={caseStudyHref(PROJECTS[0].slug)}
-              aria-label={`Open project: ${PROJECTS[0].name}`}
-              className="group/btn absolute top-full right-0 z-[1] mt-2.5 inline-flex flex-none items-center gap-2 bg-ink px-4 py-[9px] text-[13px] leading-none font-medium whitespace-nowrap text-white no-underline transition-[background-color] duration-200 ease-[ease] hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:transition-none max-[640px]:px-3 max-[640px]:py-2 max-[640px]:text-[13px]"
-            >
-              Open project
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                aria-hidden="true"
-                className="[transition:transform_400ms_var(--ease-out-expo)] group-hover/btn:[transform:translate(2px,-2px)] motion-reduce:transition-none"
-              >
-                <path d="M3 11L11 3M5 3h6v6" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-              </svg>
-            </Link>
           </div>
 
         </div>

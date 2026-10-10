@@ -3,13 +3,13 @@
 import { useRef, type CSSProperties, type ElementType, type ReactNode } from 'react'
 import { gsap, SplitText, useGSAP, reducedMotion } from '@/lib/gsap'
 
-// Scroll reveals (GSAP ScrollTrigger + SplitText). Elements start invisible and are revealed the
-// first time they scroll into view: blocks rise and fade in; headlines slide up word by word from
+// Scroll reveals (GSAP ScrollTrigger + SplitText). Elements start invisible and are revealed every
+// time they scroll into view, from above or below (they reset once off screen): blocks rise and fade in; headlines slide up word by word from
 // behind a mask. With reduced motion they simply appear.
 
 type Tag = 'div' | 'p' | 'span' | 'li' | 'section' | 'h1' | 'h2' | 'h3' | 'ul' | 'ol' | 'figure'
 
-const TRIGGER = { start: 'top 88%', once: true }
+const TRIGGER = { start: 'top 88%', end: 'bottom 12%', toggleActions: 'play reset play reset' }
 
 type RevealProps = {
   as?: Tag
