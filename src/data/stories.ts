@@ -52,8 +52,10 @@ export type Story = {
   summary: string
   facts: [string, string][]
   disclosure: string
-  // One project accent for section numbers and controls; must hold 4.5:1 on white.
+  // Accent for small text and controls on white; holds 4.5:1.
   accent: string
+  // The project's own colours (as on the earlier bento pages): accent, deep, soft, tint and pop.
+  brand: { accent: string; deep: string; soft: string; tint: string; pop: string }
   dark?: boolean
   sections: StorySection[]
   // Optional extra screens, behind a disclosure.
@@ -90,6 +92,7 @@ export const STORIES: Story[] = [
     ],
     disclosure: 'Screens are rebuilt for this portfolio. Names, contact details and figures are sample data.',
     accent: '#0058DB',
+    brand: { accent: '#0063F8', deep: '#003A92', soft: '#E6F0FF', tint: '#DCCFFF', pop: '#FFB800' },
     sections: [
       {
         id: 'leads',
@@ -153,6 +156,7 @@ export const STORIES: Story[] = [
     ],
     disclosure: 'Screens are rebuilt for this portfolio. Names and figures are sample data.',
     accent: '#1D4ED8',
+    brand: { accent: '#12326E', deep: '#08153A', soft: '#E6EDF9', tint: '#D5DDED', pop: '#4F86E8' },
     sections: [
       {
         id: 'summary',
@@ -216,6 +220,7 @@ export const STORIES: Story[] = [
     ],
     disclosure: 'Screens use sample market and strategy data. The figures are illustrative, not investment recommendations or verified trading performance.',
     accent: '#2652CC',
+    brand: { accent: '#2653CF', deep: '#00022B', soft: '#E8EEFF', tint: '#CFDDFF', pop: '#5985FF' },
     dark: true,
     sections: [
       {
@@ -287,6 +292,7 @@ export const STORIES: Story[] = [
     ],
     disclosure: 'Screens are refined for this portfolio. Health and activity figures are sample data.',
     accent: '#5B3FC4',
+    brand: { accent: '#644ACD', deep: '#3E2B94', soft: '#ECE8FA', tint: '#FFE8EE', pop: '#F5577D' },
     sections: [
       {
         id: 'home',
@@ -345,6 +351,7 @@ export const STORIES: Story[] = [
     ],
     disclosure: 'Screens are rebuilt for this portfolio. Host names, addresses and metrics are sample data.',
     accent: '#6D3FE0',
+    brand: { accent: '#7C5CFF', deep: '#2B1C70', soft: '#F1EDFF', tint: '#E6DEFF', pop: '#3B82F6' },
     dark: true,
     sections: [
       {
