@@ -81,7 +81,6 @@ const up = (v, l = 'vs last month') => `<div class="f"><span class="up">${i('up'
 const kpi = (ic, c, bg, l, v, ch) => `<div class="card kpi u" style="width:300px"><div class="l"><span class="ico" style="background:${bg};color:${c};width:28px;height:28px">${i(ic, 'width:15px;height:15px')}</span>${l}</div><div class="v">${v}</div>${up(ch)}</div>`
 const side = (html) => `<div class="plate" style="display:grid;place-items:center"><div>${html}</div></div>`
 const col = (t, html) => `<div class="col">${t}${side(html)}</div>`
-const toast = `<div class="card u" style="width:300px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 0 0 1px var(--line),0 20px 40px -20px rgba(15,18,34,.3)"><span class="ico" style="background:var(--grn-s);color:var(--grn);border-radius:50%">${i('check')}</span><div><div style="font-weight:600">Nithya Menon is now a member</div><div style="font-size:12.5px;color:var(--mut);margin-top:3px;line-height:1.45">Monthly plan from 10 Oct · ₹2,124 billed</div><div style="font-size:12.5px;color:var(--pri);font-weight:600;margin-top:8px">View profile</div></div></div>`
 const cats = `<div class="card u" style="width:300px;padding:6px 0"><div style="padding:12px 18px 8px;font-weight:600">Categories</div>${[['Membership', 'blue', 4, 426], ['Training', 'warm', 2, 60], ['Classes', 'grn', 2, 130], ['Student', 'cold', 2, 118], ['Corporate', 'vio', 1, 45], ['Trial', 'gray', 1, 12]].map(([n, c, k, m]) => `<div style="display:flex;align-items:center;gap:10px;padding:9px 18px;border-top:1px solid var(--line)">${P.tag(n, c, 1)}<span style="color:var(--mut);font-size:12.5px">${k} plan${k > 1 ? "s" : ""}</span><span style="margin-left:auto;font-weight:600">${m}</span></div>`).join('')}</div>`
 
 // ---------- the flow ----------
@@ -98,20 +97,21 @@ mod('m-leads', {
 const tableCard = `<div class="card u" style="width:640px;overflow:hidden"><table class="tbl"><tr><th style="width:44px"></th><th>Lead</th><th>Status</th><th>Owner</th></tr>${[[2314, 'Robert Fox', 'Cold', 'Anika Shetty'], [2789, 'Nithya Menon', 'Hot', 'Rahul Menon'], [3051, 'Neha Singh', 'Hot', 'Farah Khan'], [3168, 'Alex John', 'Warm', 'Anika Shetty'], [3294, 'Aaron Joseph', 'Warm', 'Vikram Das']].map(([id, n, t, o], k) => `<tr class="${k === 1 ? 'sel' : ''}"><td><span class="cb${k === 1 ? ' on' : ''}">${k === 1 ? i('check') : ''}</span></td><td><div class="who">${P.av(n)}<div style="font-weight:600">${n}<small>#${id}</small></div></div></td><td><span class="sel-dd">${P.temp(t)}${i('chev')}</span></td><td><div class="who" style="gap:8px">${P.av(o, 1)}${o}</div></td></tr>`).join('')}</table></div>
   <div style="margin-top:18px">${P.bulkBar(640).replace('2 selected', '1 selected')}</div>`
 const conv = mod('m-convert', {
-  cells: [col(tile('02 · Convert', 'Lead to member, no retyping', 'Convert from the table. The member form opens with the lead\'s details already in.'), toast),
-    `<div class="plate cell flow" style="height:980px">
-      <div class="ft" style="position:absolute;left:56px;top:80px;zoom:.72">${tableCard}</div>
-      <div class="fm" style="position:absolute;right:56px;top:56px;zoom:.82">${P.convertModal()}</div>
-      <span class="pill p1" style="position:absolute;left:56px;top:500px">Convert opens the member form</span>
-      <span class="pill p2" style="position:absolute;left:56px;top:640px">5 of 6 fields come from the lead</span>
-      <span class="pill p3" style="position:absolute;left:56px;top:780px">The total updates as you toggle</span></div>`],
+  cols: '1fr',
+  cells: [`<div class="plate cell flow" style="height:1060px">
+      <div style="position:absolute;left:56px;top:56px;width:560px">${tile('02 · Convert', 'Lead to member, no retyping', 'Convert from the table. The member form opens with the lead\'s details already in.')}</div>
+      <div class="ft" style="position:absolute;left:56px;top:340px;zoom:.9">${tableCard}</div>
+      <div class="fm" style="position:absolute;right:56px;top:56px;zoom:.92">${P.convertModal()}</div>
+      <span class="pill p1" style="position:absolute;left:56px;top:800px">Convert opens the member form</span>
+      <span class="pill p2" style="position:absolute;left:56px;top:880px">5 of 6 fields come from the lead</span>
+      <span class="pill p3" style="position:absolute;left:56px;top:960px">The total updates as you toggle</span></div>`],
 })
 conv._links = box => {
   const fm = rel(box, box.querySelector('.fm > div')), mx = fm.l - 24
   const btn = rel(box, box.querySelector('.ft .btn.sm[style*="margin-left:auto"]'))
   const p1 = rel(box, box.querySelector('.p1')), p2 = rel(box, box.querySelector('.p2')), p3 = rel(box, box.querySelector('.p3'))
   line(box, { x: p1.r, y: p1.t + p1.h / 2 }, { x: fm.l, y: fm.t + 50 }, mx - 56)
-  line(box, { x: btn.l + btn.w / 2, y: p1.t }, { x: btn.l + btn.w / 2, y: btn.b })
+  line(box, { x: p1.r, y: p1.t + p1.h / 2 }, { x: btn.l + btn.w / 2, y: btn.b }, btn.l + btn.w / 2)
   const f = rel(box, box.querySelector('.fm .inp.pf'))
   line(box, { x: p2.r, y: p2.t + p2.h / 2 }, { x: fm.l, y: f.t + f.h / 2 }, mx - 28)
   const t = rel(box, box.querySelector('.fm .sum'))
