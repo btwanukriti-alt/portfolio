@@ -12,7 +12,7 @@ import { getLenis, pageScroll } from './SmoothScroll'
 // card widens as the one before compacts back to a strip, like a horizontal swipe. When the scroll
 // comes to rest, the nearest project eases fully into place. The fill card carries the black
 // selection (border and handles), plays its looping showcase once settled, and over it the
-// pointer becomes a black "Open" label; clicking a strip scrolls to that project.
+// pointer becomes a black "Open" label. One click on any card, fill or strip, opens its project.
 
 // Selection handles: corners and edge midpoints (x%, y%).
 const HANDLES = [
@@ -143,7 +143,7 @@ export default function Work() {
     gsap.set(cursor.current, { x: e.clientX, y: e.clientY })
     follow.current?.x(e.clientX)
     follow.current?.y(e.clientY)
-    setCursor(i === activeRef.current)
+    setCursor(true)
   }
   const leaveCard = (e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse') return
@@ -154,13 +154,6 @@ export default function Work() {
     if (e.pointerType !== 'mouse') return
     follow.current?.x(e.clientX)
     follow.current?.y(e.clientY)
-  }
-
-  // A strip glides the page to its project instead of opening it.
-  const goTo = (e: React.MouseEvent, i: number) => {
-    if (i === activeRef.current || !track.current) return
-    e.preventDefault()
-    scrollToProject(track.current, i)
   }
 
   // Driven by ScrollTrigger (in step with the smooth scroll): the fill follows the scroll along the
@@ -293,7 +286,6 @@ export default function Work() {
         if (next !== activeRef.current) {
           activeRef.current = next
           setOpen(next)
-          if (hovered.current >= 0) setCursor(hovered.current === next)
         }
         render()
         // When the scroll rests between two projects, ease the nearest one into place.
@@ -370,12 +362,11 @@ export default function Work() {
                   <Link
                     href={caseStudyHref(project.slug)}
                     aria-label={`Open ${project.name}`}
-                    onClick={(e) => goTo(e, i)}
                     onPointerEnter={(e) => enterCard(e, i)}
                     onPointerMove={moveCursor}
                     onPointerLeave={leaveCard}
                     style={{ background: project.color }}
-                    className="absolute inset-0 block cursor-pointer overflow-hidden [@media(hover:hover)]:in-data-[active=true]:cursor-none"
+                    className="absolute inset-0 block cursor-pointer overflow-hidden [@media(hover:hover)]:cursor-none"
                   >
                     {project.showcase ? (
                       // The video keeps the fill card's size, centred, so a strip shows a slice of it.
