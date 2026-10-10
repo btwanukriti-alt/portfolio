@@ -16,6 +16,6 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .pill{height:44px;padding:0 20px;border-radius:22px;background:#fff;color:#1B1530;font:500 19px/44px Inter;white-space:nowrap;box-shadow:0 12px 28px -12px rgba(40,24,110,.35),0 0 0 1px rgba(40,24,110,.05);z-index:5}
 .arw{width:44px;height:44px;border-radius:50%;background:#fff;color:#644ACD;display:grid;place-items:center;box-shadow:0 10px 24px -10px rgba(40,24,110,.45);flex:none}
 
-.cc .z>*{height:auto!important;max-height:none!important}
-.stg .z>*{height:auto!important;position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;transform:none!important}
+.comp .z>*{height:auto!important;max-height:none!important}
+.comp .z>*{height:auto!important;position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;transform:none!important}
 .stg{filter:drop-shadow(0 20px 30px rgba(40,24,110,.12))}
