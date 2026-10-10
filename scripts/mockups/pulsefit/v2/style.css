@@ -135,7 +135,8 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .hm .hl{font-size:11px;color:var(--mut);text-align:center}
 /* bento */
 .bento{display:grid;gap:24px}
-.tile{border-radius:40px;background:#fff;box-shadow:inset 0 0 0 1px #E3E5EC;padding:40px 38px;display:flex;flex-direction:column;justify-content:space-between;min-height:420px}
+.tile{border-radius:40px;background:#fff;box-shadow:inset 0 0 0 1px #E3E5EC;padding:34px 34px 36px;display:flex;flex-direction:column;gap:22px}
+.col{display:flex;flex-direction:column;gap:24px}.col>.plate{flex:1;padding:28px!important}
 .tile .ts{font:600 15px Inter;letter-spacing:.1em;text-transform:uppercase;color:#0063F8}
 .tile h3{font:500 32px/1.15 Poppins,sans-serif;letter-spacing:-.02em;color:#14171F;margin:0}
 .tile p{font:400 17px/1.55 Inter;color:#5B6074;margin:14px 0 0}

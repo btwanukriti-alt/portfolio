@@ -76,12 +76,20 @@ function siteModule() {
   M.appendChild(s)
 }
 
+// ---------- small cards for under the text tiles ----------
+const up = (v, l = 'vs last month') => `<div class="f"><span class="up">${i('up', 'width:13px;height:13px;stroke-width:2.4')}${v}</span>${l}</div>`
+const kpi = (ic, c, bg, l, v, ch) => `<div class="card kpi u" style="width:300px"><div class="l"><span class="ico" style="background:${bg};color:${c};width:28px;height:28px">${i(ic, 'width:15px;height:15px')}</span>${l}</div><div class="v">${v}</div>${up(ch)}</div>`
+const side = (html) => `<div class="plate" style="display:grid;place-items:center"><div>${html}</div></div>`
+const col = (t, html) => `<div class="col">${t}${side(html)}</div>`
+const toast = `<div class="card u" style="width:300px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 0 0 1px var(--line),0 20px 40px -20px rgba(15,18,34,.3)"><span class="ico" style="background:var(--grn-s);color:var(--grn);border-radius:50%">${i('check')}</span><div><div style="font-weight:600">Nithya Menon is now a member</div><div style="font-size:12.5px;color:var(--mut);margin-top:3px;line-height:1.45">Monthly plan from 10 Oct · ₹2,124 billed</div><div style="font-size:12.5px;color:var(--pri);font-weight:600;margin-top:8px">View profile</div></div></div>`
+const cats = `<div class="card u" style="width:300px;padding:6px 0"><div style="padding:12px 18px 8px;font-weight:600">Categories</div>${[['Membership', 'blue', 4, 426], ['Training', 'warm', 2, 60], ['Classes', 'grn', 2, 130], ['Student', 'cold', 2, 118], ['Corporate', 'vio', 1, 45], ['Trial', 'gray', 1, 12]].map(([n, c, k, m]) => `<div style="display:flex;align-items:center;gap:10px;padding:9px 18px;border-top:1px solid var(--line)">${P.tag(n, c, 1)}<span style="color:var(--mut);font-size:12.5px">${k} plan${k > 1 ? "s" : ""}</span><span style="margin-left:auto;font-weight:600">${m}</span></div>`).join('')}</div>`
+
 // ---------- the flow ----------
 logoModule()
 
 mod('m-leads', {
   cols: '340px 1fr 1fr',
-  cells: [tile('01 · Spot', 'Each alert has its fix', 'Stale and missed leads open the day, each row with one quiet action.'),
+  cells: [col(tile('01 · Spot', 'Each alert has its fix', 'Stale and missed leads open the day, each row with one quiet action.'), kpi('cal', '#0E9F6E', 'var(--grn-s)', 'Trial booking rate', '42%', '5%')),
     plate(P.taskCard('missed', { hov: 0, w: 440 }), 1.1), plate(P.taskCard('stale', { w: 440 }), 1.1)],
   frame: P.leadDash(), url: 'app.pulsefit.app/leads',
 })
@@ -90,7 +98,7 @@ mod('m-leads', {
 const tableCard = `<div class="card u" style="width:640px;overflow:hidden"><table class="tbl"><tr><th style="width:44px"></th><th>Lead</th><th>Status</th><th>Owner</th></tr>${[[2314, 'Robert Fox', 'Cold', 'Anika Shetty'], [2789, 'Nithya Menon', 'Hot', 'Rahul Menon'], [3051, 'Neha Singh', 'Hot', 'Farah Khan'], [3168, 'Alex John', 'Warm', 'Anika Shetty'], [3294, 'Aaron Joseph', 'Warm', 'Vikram Das']].map(([id, n, t, o], k) => `<tr class="${k === 1 ? 'sel' : ''}"><td><span class="cb${k === 1 ? ' on' : ''}">${k === 1 ? i('check') : ''}</span></td><td><div class="who">${P.av(n)}<div style="font-weight:600">${n}<small>#${id}</small></div></div></td><td><span class="sel-dd">${P.temp(t)}${i('chev')}</span></td><td><div class="who" style="gap:8px">${P.av(o, 1)}${o}</div></td></tr>`).join('')}</table></div>
   <div style="margin-top:18px">${P.bulkBar(640).replace('2 selected', '1 selected')}</div>`
 const conv = mod('m-convert', {
-  cells: [tile('02 · Convert', 'Lead to member, no retyping', 'Convert from the table. The member form opens with the lead\'s details already in.'),
+  cells: [col(tile('02 · Convert', 'Lead to member, no retyping', 'Convert from the table. The member form opens with the lead\'s details already in.'), toast),
     `<div class="plate cell flow" style="height:980px">
       <div class="ft" style="position:absolute;left:56px;top:80px;zoom:.72">${tableCard}</div>
       <div class="fm" style="position:absolute;right:56px;top:56px;zoom:.82">${P.convertModal()}</div>
@@ -112,19 +120,19 @@ conv._links = box => {
 }
 
 mod('m-plans', {
-  cells: [tile('03 · Plan', 'Every plan on one card', 'Price with GST, extension and pause days, and who is on it. Colour marks the category.'),
-    plate(`<div style="display:flex;gap:20px">${[0, 4, 6].map(k => P.planCard(P.PLANS[k], 1)).join('')}</div>`, 1)],
+  cells: [col(tile('03 · Plan', 'Every plan on one card', 'Price with GST, extension and pause days, and who is on it. Colour marks the category.'), cats),
+    plate(`<div style="display:flex;gap:20px">${[0, 4, 6].map(k => P.planCard(P.PLANS[k], 1)).join('')}</div>`, 1, 'min-height:700px')],
   frame: P.plansFrame(), url: 'app.pulsefit.app/plans',
 })
 
 mod('m-members', {
-  cells: [tile('04 · Keep', 'Renew before it lapses', 'This week\'s renewals, each with its trainer. Renew is the main step; Remind stays quiet.'),
+  cells: [col(tile('04 · Keep', 'Renew before it lapses', 'This week\'s renewals, each with its trainer. Renew is the main step; Remind stays quiet.'), kpi('refresh', '#D97706', 'var(--amb-s)', 'Renewal rate', '86%', '3%')),
     plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch"><span class="ico" style="background:var(--amb-s);color:var(--amb)">${i('refresh')}</span><h3>Expiring this week</h3><span class="cnt" style="background:var(--amb-s);color:var(--amb)">8</span><span class="ct">View all${i('chevR', 'width:14px;height:14px')}</span></div><table class="tbl"><tr><th>Member</th><th>Plan</th><th>Expires</th><th>Trainer</th><th class="r">Next step</th></tr>${P.EXP.map((e, k) => P.expRow(e, k === 0)).join('')}</table></div>`, 1.06)],
   frame: P.membersDash(), url: 'app.pulsefit.app/members',
 })
 
 mod('m-email', {
-  cells: [tile('05 · Nurture', 'Emails follow the lifecycle', 'Each email is sent by a trigger: a new lead, a booked trial, a plan about to expire.'),
+  cells: [col(tile('05 · Nurture', 'Emails follow the lifecycle', 'Each email is sent by a trigger: a new lead, a booked trial, a plan about to expire.'), kpi('eye', '#0E9F6E', 'var(--grn-s)', 'Open rate', '48%', '4%')),
     plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch">${i('refresh', 'color:var(--mut)')}<h3>Subscriptions</h3><span style="font-size:12.5px;color:var(--mut)">3 emails · 3 on</span><span class="ct">${i('plus', 'width:14px;height:14px')}Add</span></div>${P.CAMP.Subscriptions.map(r => P.campRow(r)).join('')}</div>`, 1.06)],
   frame: P.emailFrame(), url: 'app.pulsefit.app/communication',
 })
