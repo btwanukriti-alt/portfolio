@@ -232,7 +232,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       mark: { src: '/brand/ssh-client-mark.png', ratio: 84 / 80 },
     },
     images: [
-      { src: '/case-studies/ssh-client/v2-01-logo.jpg', width: 2400, height: 1470, alt: 'The clihub mark on a construction grid, and the logo with its clear space', caption: 'One mark: a C, a security ring and a hub.' },
+      { src: '/case-studies/ssh-client/v3-01-logo.jpg', width: 2400, height: 1470, alt: 'The product mark on a construction grid, and its clear space', caption: 'One mark: a security ring around a hub.' },
       { src: '/case-studies/ssh-client/v2-02-add-host.jpg', width: 2400, height: 2657, alt: 'Two host cards and the New Host panel above the full hosts screen', caption: 'All servers as cards.' },
       { src: '/case-studies/ssh-client/v2-03-health.jpg', width: 2400, height: 2645, alt: 'The network and security insights cards above the full host overview', caption: 'Check a server’s health.' },
       { src: '/case-studies/ssh-client/v2-04-keys.jpg', width: 2400, height: 1499, alt: 'Select host, export key and connection successful, linked in order', caption: 'Send a key to a server.' },

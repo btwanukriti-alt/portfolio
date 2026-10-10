@@ -1,4 +1,4 @@
-// clihub: her original screens rebuilt as they are in Figma (layout, sidebar, tabs, buttons), with modern colours and
+// SSH client: her original screens rebuilt as they are in Figma (layout, sidebar, tabs, buttons), with modern colours and
 // small fixes only: real host names and IPs, rounder corners, cleaner borders. Every name and number is sample data.
 (function(){
 const i = P.i, os = P.os
