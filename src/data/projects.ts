@@ -3,7 +3,9 @@
 
 export type Project = {
   slug: string
+  // title: the case-study page; name: the work card, two or three words on what the software is.
   title: string
+  name: string
   description: string
   role: string
   timeline: string
@@ -27,36 +29,9 @@ const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
 // "The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
 export const PROJECTS: Project[] = [
   {
-    slug: 'jaadu-2',
-    title: 'Jaadu 2.0',
-    description:
-      "Charts, alerts, backtesting and an AI strategy lab for active traders, in one terminal.",
-    role: 'Sole Designer',
-    timeline: '2 months',
-    problem:
-      "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
-    card: '/work/project-1.jpg',
-    hero: caseStudyImage('jaadu-2'),
-    showcase: '/showcase/jaadu-2.html?embed&v=5',
-    color: '#CFDDFF',
-  },
-  {
-    slug: 'fitness-tracker',
-    title: 'Zync',
-    description:
-      "The member app for a gym software company: classes, workouts and health tracking in one place.",
-    role: 'Sole Designer',
-    timeline: '2 months',
-    problem:
-      "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
-    card: '/case-studies/zync/01-home.jpg',
-    hero: caseStudyImage('fitness-tracker'),
-    showcase: '/showcase/fitness-tracker.html?v=5',
-    color: '#FFE8EE',
-  },
-  {
     slug: 'bosch-customer-experience',
     title: 'Gym Management CRM',
+    name: 'Gym Management CRM',
     description:
       "Leads, members, payments and follow-ups for gym owners and staff, in one dashboard.",
     role: 'Sole Designer',
@@ -69,8 +44,39 @@ export const PROJECTS: Project[] = [
     color: '#DCCFFF',
   },
   {
+    slug: 'college-management',
+    title: 'College Group ERP',
+    name: 'College Group ERP',
+    description:
+      "A group-level ERP for college trusts and admin staff, with one dashboard and role-based access.",
+    role: 'Sole Designer',
+    timeline: '3 months',
+    problem:
+      "A college group had no way to see all its colleges at once. The redesign puts them on one dashboard, with access set by role.",
+    card: '/case-studies/college-management/hero-v2.jpg',
+    hero: '/case-studies/college-management/hero-v2.jpg',
+    showcase: '/showcase/college-management.html?embed&v=5',
+    color: '#FFE4D3',
+  },
+  {
+    slug: 'fitness-tracker',
+    title: 'Zync',
+    name: 'Gym Member App',
+    description:
+      "The member app for a gym software company: classes, workouts and health tracking in one place.",
+    role: 'Sole Designer',
+    timeline: '2 months',
+    problem:
+      "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
+    card: '/case-studies/zync/01-home.jpg',
+    hero: caseStudyImage('fitness-tracker'),
+    showcase: '/showcase/fitness-tracker.html?v=5',
+    color: '#FFE8EE',
+  },
+  {
     slug: 'ssh-client',
-    title: 'SSH client',
+    title: 'SSH Client',
+    name: 'SSH Client',
     description:
       "A multi-platform SSH client with saved commands, live server stats and an AI terminal assistant.",
     role: 'Sole Designer',
@@ -83,18 +89,19 @@ export const PROJECTS: Project[] = [
     color: '#C9EEDC',
   },
   {
-    slug: 'college-management',
-    title: 'College Management',
+    slug: 'jaadu-2',
+    title: 'Jaadu 2.0',
+    name: 'AI Trading Terminal',
     description:
-      "A group-level ERP for college trusts and admin staff, with one dashboard and role-based access.",
+      "Charts, alerts, backtesting and an AI strategy lab for active traders, in one terminal.",
     role: 'Sole Designer',
-    timeline: '3 months',
+    timeline: '2 months',
     problem:
-      "A college group had no way to see all its colleges at once. The redesign puts them on one dashboard, with access set by role.",
-    card: '/case-studies/college-management/hero-v2.jpg',
-    hero: '/case-studies/college-management/hero-v2.jpg',
-    showcase: '/showcase/college-management.html?embed&v=5',
-    color: '#FFE4D3',
+      "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
+    card: '/work/project-1.jpg',
+    hero: caseStudyImage('jaadu-2'),
+    showcase: '/showcase/jaadu-2.html?embed&v=5',
+    color: '#CFDDFF',
   },
 ]
 

@@ -301,7 +301,7 @@ export default function Contact({ current }: { current?: string } = {}) {
                     href={caseStudyHref(p.slug)}
                     className="text-[clamp(18px,1.6vw,24px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink no-underline underline-offset-4 hover:underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                   >
-                    {p.title}
+                    {p.name}
                   </Link>
                 </li>
               ))}

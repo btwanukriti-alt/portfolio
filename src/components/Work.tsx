@@ -226,13 +226,13 @@ export default function Work() {
         const btn = openBtn.current
         if (btn) {
           btn.href = caseStudyHref(p.slug)
-          btn.setAttribute('aria-label', `Open project: ${p.title}`)
+          btn.setAttribute('aria-label', `Open project: ${p.name}`)
         }
         cards.current.forEach((card, j) => card?.setAttribute('data-active', String(j === i)))
         const cap = caption.current
         if (cap) {
           cap.querySelector('[data-cap-num]')!.textContent = String(i + 1).padStart(2, '0')
-          cap.querySelector('[data-cap-title]')!.textContent = p.title
+          cap.querySelector('[data-cap-title]')!.textContent = p.name
         }
       }
       setOpen(0)
@@ -369,7 +369,7 @@ export default function Work() {
                 >
                   <Link
                     href={caseStudyHref(project.slug)}
-                    aria-label={`Open ${project.title}`}
+                    aria-label={`Open ${project.name}`}
                     onClick={(e) => goTo(e, i)}
                     onPointerEnter={(e) => enterCard(e, i)}
                     onPointerMove={moveCursor}
@@ -386,7 +386,7 @@ export default function Work() {
                         }}
                         className="pointer-events-none absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 group-data-[vertical=true]/row:top-1/2 group-data-[vertical=true]/row:left-0 group-data-[vertical=true]/row:h-[var(--fill-h)] group-data-[vertical=true]/row:w-full group-data-[vertical=true]/row:translate-x-0 group-data-[vertical=true]/row:-translate-y-1/2 border-0"
                         src={near ? project.showcase : undefined}
-                        title={`${project.title} showcase`}
+                        title={`${project.name} showcase`}
                         loading="lazy"
                         tabIndex={-1}
                         onLoad={() => onVideoLoad(i)}
@@ -407,7 +407,7 @@ export default function Work() {
                   <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[var(--sel)]">
                     <div className="absolute bottom-full left-0 mb-2 flex items-center gap-2 font-hero text-[12px] leading-none font-medium whitespace-nowrap text-ink group-data-[vertical=true]/row:hidden">
                       <span className="text-faint tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                      <span>{project.title}</span>
+                      <span>{project.name}</span>
                       <span className="rounded-[3px] bg-[#7B61FF]/10 px-[5px] py-[3px] text-[10px] text-[#7B61FF]">Fill</span>
                     </div>
                     <div className="absolute inset-0 border border-ink" />
@@ -470,7 +470,7 @@ export default function Work() {
               <span data-cap-num className="text-faint tabular-nums">
                 01
               </span>
-              <span data-cap-title className="min-w-0 truncate">{PROJECTS[0].title}</span>
+              <span data-cap-title className="min-w-0 truncate">{PROJECTS[0].name}</span>
               <span className="flex-none rounded-[3px] bg-[#7B61FF]/10 px-[5px] py-[3px] text-[10px] text-[#7B61FF]">Fill</span>
             </div>
 
@@ -480,7 +480,7 @@ export default function Work() {
               data-fade
               ref={openBtn}
               href={caseStudyHref(PROJECTS[0].slug)}
-              aria-label={`Open project: ${PROJECTS[0].title}`}
+              aria-label={`Open project: ${PROJECTS[0].name}`}
               className="group/btn absolute top-full right-0 z-[1] mt-2.5 inline-flex flex-none items-center gap-2 bg-ink px-4 py-[9px] text-[13px] leading-none font-medium whitespace-nowrap text-white no-underline transition-[background-color] duration-200 ease-[ease] hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:transition-none max-[640px]:px-3 max-[640px]:py-2 max-[640px]:text-[13px]"
             >
               Open project
