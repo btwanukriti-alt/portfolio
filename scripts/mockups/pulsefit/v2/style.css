@@ -141,3 +141,10 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .tile h3{font:500 32px/1.15 Poppins,sans-serif;letter-spacing:-.02em;color:#14171F;margin:0}
 .tile p{font:400 17px/1.55 Inter;color:#5B6074;margin:14px 0 0}
 .flow .pill{height:46px;padding:0 22px;border-radius:23px;background:#fff;color:#14171F;font:500 20px/46px Inter;white-space:nowrap;box-shadow:0 12px 28px -12px rgba(20,12,60,.35),0 0 0 1px rgba(20,12,60,.05);z-index:5}
+/* colour pass: brand blue ground, deep-blue text tiles, the logo's yellow on the small plates */
+.mod{background:radial-gradient(1200px 700px at 0% 0%,#D3E2FF 0%,rgba(211,226,255,0) 70%),radial-gradient(1000px 800px at 100% 100%,#E4DCFF 0%,rgba(228,220,255,0) 70%),#EDF2FC}
+.plate{background:linear-gradient(180deg,#FFFFFF 0%,#EDF3FF 100%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.9),0 30px 60px -40px rgba(0,58,146,.25)}
+.plate.bot{background:linear-gradient(180deg,#0A57D6 0%,#003A92 100%);box-shadow:none}
+.tile{background:radial-gradient(420px 260px at 100% 0%,#0B5FE0 0%,rgba(11,95,224,0) 70%),#003A92;box-shadow:none}
+.tile .ts{color:#FFC93D}.tile h3{color:#fff}.tile p{color:#C9DAFF}
+.col>.plate{background:linear-gradient(160deg,#FFF3CF 0%,#FFE19A 100%)}
