@@ -16,7 +16,7 @@ function line(box, a, b, mx) {
   let svg = box.querySelector('svg.links')
   if (!svg) { box.insertAdjacentHTML('beforeend', '<svg class="links" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4"></svg>'); svg = box.querySelector('svg.links') }
   const d = mx === undefined ? `M${a.x} ${a.y} V${b.y}` : `M${a.x} ${a.y} H${mx} V${b.y} H${b.x}`
-  svg.insertAdjacentHTML('beforeend', `<path d="${d}" fill="none" stroke="#8C93C8" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${b.x}" cy="${b.y}" r="8" fill="#6F8EF5" stroke="#fff" stroke-width="4"/>`)
+  svg.insertAdjacentHTML('beforeend', `<path d="${d}" fill="none" stroke="#8C93C8" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${b.x}" cy="${b.y}" r="8" fill="#8B5CF6" stroke="#fff" stroke-width="4"/>`)
 }
 const rel = (box, el) => { const b = box.getBoundingClientRect(), r = el.getBoundingClientRect(); return { l: r.left - b.left, t: r.top - b.top, r: r.right - b.left, b: r.bottom - b.top, w: r.width, h: r.height } }
 
@@ -51,9 +51,8 @@ function logoModule() {
 
 logoModule()
 mod('m-hosts', {
-  cols: '340px 1fr',
-  cells: [tile('01 · Add', 'Add a server', 'Click + to add a host. Enter its address, port and label.'), plate(P.newHost(), 1.05, 'padding:40px')],
-  frame: P.hostsFrame(), tab: 'Hosts',
+  cols: '340px 1fr 430px',
+  cells: [tile('01 · Add', 'Add a server', 'Click + to add a host. Enter its address, port and label.'), plate(`<div style="width:690px">${P.hostsCard(6, 1)}</div>`, .92, 'padding:32px'), plate(P.newHost(), .9, 'padding:28px')],
 })
 mod('m-health', {
   cols: '340px 1fr 1fr',
@@ -62,10 +61,10 @@ mod('m-health', {
 })
 const key = mod('m-keys', {
   cols: '1fr',
-  cells: [`<div class="plate cell flow" style="height:1040px">
-    <div style="position:absolute;left:56px;top:56px;width:640px">${tile('03 · Connect', 'Send a key to a server', 'Generate a key, pick a host and export it. Each step shows until it connects.')}</div>
-    <div style="position:absolute;left:56px;right:56px;top:330px;display:flex;justify-content:space-between">${[P.keyGen(), P.keyHost(), P.keyProgress(), P.keyDone()].map((h, k) => `<div class="kp k${k}">${h}</div>`).join('')}</div>
-    ${['Pick a key type', 'Choose the host', 'Each step is checked', 'Log in without a password'].map((t, k) => `<span class="pill q${k}" style="position:absolute;top:965px">${t}</span>`).join('')}</div>`],
+  cells: [`<div class="plate cell flow" style="padding:48px 44px 130px;display:grid;grid-template-columns:445px 445px 445px;justify-content:space-between">
+    <div style="display:flex;flex-direction:column;gap:24px" class="kcol">${tile('03 · Connect', 'Send a key to a server', 'Pick a host and export your key. Each step shows until it connects.')}<div class="kp" style="zoom:.766">${P.kSelect()}</div></div>
+    <div class="kp">${P.kExport()}</div><div class="kp">${P.kDone()}</div>
+    ${['Pick the host', 'Check where the key goes', 'Log in without a password'].map((t, k) => `<span class="pill q${k}" style="position:absolute;bottom:44px">${t}</span>`).join('')}</div>`],
 })
 key._links = box => {
   const panels = [...box.querySelectorAll('.kp')]
@@ -75,8 +74,8 @@ key._links = box => {
     const pr = rel(box, pill)
     line(box, { x: r.l + r.w / 2, y: pr.t }, { x: r.l + r.w / 2, y: r.b })
     if (k < panels.length - 1) {
-      const n = rel(box, panels[k + 1].firstElementChild), y = r.t + r.h / 2
-      box.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${(r.r + n.l) / 2 - 18}px;top:${y - 18}px;width:36px;height:36px;border-radius:50%;background:#fff;color:#4357C9;display:grid;place-items:center;z-index:5">${i('arrowR', 'width:18px;height:18px;stroke-width:2.4')}</span>`)
+      const n = rel(box, panels[k + 1].firstElementChild), y = n.t + n.h / 2
+      box.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${(Math.max(r.r, 0) + n.l) / 2 - 20}px;top:${y - 20}px;width:40px;height:40px;border-radius:50%;background:#fff;color:#6D28D9;display:grid;place-items:center;z-index:5;box-shadow:0 10px 24px -10px rgba(0,0,0,.6)">${i('arrowR', 'width:18px;height:18px;stroke-width:2.4')}</span>`)
     }
   })
 }
