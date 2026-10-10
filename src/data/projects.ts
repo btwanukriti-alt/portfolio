@@ -24,7 +24,7 @@ const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
 
 // Figma sources: Fitness Tracker -> "Zync — Case Study", BOSCH card (Pulsefit screens) ->
 // "Pulsefit — Case Study", SSH client -> "SSH client — Case Study", College Management ->
-// "Dhondi — The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
+// "The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
 export const PROJECTS: Project[] = [
   {
     slug: 'jaadu-2',
@@ -90,9 +90,9 @@ export const PROJECTS: Project[] = [
     role: 'Sole Designer',
     timeline: '3 months',
     problem:
-      "A college group had no way to see all its colleges at once. Dhondi puts them on one dashboard, with access set by role.",
-    card: caseStudyImage('college-management'),
-    hero: caseStudyImage('college-management'),
+      "A college group had no way to see all its colleges at once. The redesign puts them on one dashboard, with access set by role.",
+    card: '/case-studies/college-management/hero-v2.jpg',
+    hero: '/case-studies/college-management/hero-v2.jpg',
     showcase: '/showcase/college-management.html?embed&v=5',
     color: '#FFE4D3',
   },

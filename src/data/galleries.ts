@@ -65,22 +65,6 @@ const text = (kicker: string, title: string, body: string, span: string): BentoC
 
 const block = (name: string, label: string, span: string): BentoCard => ({ kind: 'block', block: name, label, span })
 
-// College ERP bento cards: laptop screens from public/case-studies/college-management/ui/.
-const cui = (file: string, alt: string, span: string, surface?: Surface, fit?: 'fill', size: [number, number] = [2776, 1884]): BentoCard => ({
-  kind: 'ui',
-  src: `/case-studies/college-management/ui/${file}.webp`,
-  width: size[0],
-  height: size[1],
-  alt,
-  span,
-  surface,
-  fit,
-})
-
-const cblock = (name: string, label: string, span: string, surface?: Surface): BentoCard => ({ kind: 'block', block: name, label, span, surface })
-
-const ctext = (kicker: string, title: string, body: string, span: string, surface?: Surface): BentoCard => ({ kind: 'text', kicker, title, text: body, span, surface })
-
 const jaadu = (file: string, height: number, alt: string, caption: string): GalleryImage => ({
   src: `/case-studies/jaadu-2/${file}`,
   width: 2400,
@@ -162,61 +146,12 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pop: '#4F86E8',
       font: 'var(--font-hanken), system-ui, sans-serif',
     },
-    images: [],
-    // The flow: the drill-down drawers (the main feature), the finance dashboard, then staff attendance and profiles.
-    sections: [
-      {
-        label: 'Main feature: drill-down drawers',
-        rows: 3,
-        cards: [
-          ctext(
-            'Main feature · Drill-down',
-            'Group to batch, without losing your place',
-            'Each level opens as a drawer over the finance dashboard. The levels behind stay as spines on the left, so the path is always in view.',
-            'min-[901px]:col-span-4',
-          ),
-          cui(
-            'laptops-drawer-finance',
-            'The B.Tech drawer open over the college and group drawers, above the finance overview it opens from',
-            'min-[901px]:col-span-8 min-[901px]:row-span-3',
-            'deep',
-            undefined,
-            [2712, 3448],
-          ),
-          cblock('drill-path', 'Group, college, programme and batch stacked as drawers, each with its collection', 'min-[901px]:col-span-4', 'tint'),
-          cblock('lowest-line', 'The lowest-collection line at group, college and programme level', 'min-[901px]:col-span-4', 'plate'),
-        ],
-      },
-      {
-        label: 'Alerts',
-        rows: 'auto',
-        cards: [
-          ctext(
-            'Alerts',
-            'Each alert says what, where and who',
-            'Alerts are sorted into finance and staff, and each type has its own colour. Every card carries the college, and finance alerts add the amount, the student and the owner.',
-            'min-[901px]:col-span-4',
-          ),
-          cblock('alert-types', 'The four alert types in two groups, with what raises each one', 'min-[901px]:col-span-8', 'white'),
-          cblock('finance-alerts', 'The finance alerts panel: a cancelled receipt and a fee reduction, with amount, student and owner', 'min-[901px]:col-span-6', 'tint'),
-          cblock('staff-alerts', 'The staff alerts panel: an absence trend and uninformed absences', 'min-[901px]:col-span-6', 'plate'),
-        ],
-      },
-      {
-        label: 'Staff: dashboard, register and profiles',
-        rows: 'auto',
-        cards: [
-          ctext(
-            'Staff · Dashboard and register',
-            "From the staff dashboard to one person's record",
-            'The overview shows who is in, by college, and flags absence patterns. The register filters by status in one row of tabs, and any name opens that person’s history.',
-            'min-[901px]:col-span-4',
-          ),
-          cui('laptop-staff', 'The staff overview: totals with trends, attendance by college, alerts and most days absent', 'min-[901px]:col-span-8', 'tint', 'fill'),
-          cblock('attendance-table', 'The employee attendance register with status tabs, division, check-in and check-out times and status', 'min-[901px]:col-span-12', 'plate'),
-          cblock('profile', 'An employee profile: ID, tabs, work experience and education', 'min-[901px]:col-span-12', 'tint'),
-        ],
-      },
+    images: [
+      { src: '/case-studies/college-management/v2-01-problem.jpg', width: 2400, height: 2040, alt: 'The old finance stats page and the 28-column Excel sheet, with the problems marked', caption: 'The old system.' },
+      { src: '/case-studies/college-management/v2-02-dashboard.jpg', width: 2400, height: 3245, alt: 'The group summary banner above the full group finance dashboard', caption: 'One view of every college.' },
+      { src: '/case-studies/college-management/v2-03-drill-down.jpg', width: 2400, height: 2448, alt: 'The hierarchy from group to batch, and the stacked drawers for a college and a programme', caption: 'See it by level, group to batch.' },
+      { src: '/case-studies/college-management/v2-04-staff.jpg', width: 2400, height: 1274, alt: 'The old staff list beside the new attendance screen with status tabs and filters', caption: 'Staff attendance.' },
+      { src: '/case-studies/college-management/v2-05-settlements.jpg', width: 2400, height: 1286, alt: 'The old settlements list beside the new settlements screen with tabs and search', caption: 'Settlements.' },
     ],
   },
   'ssh-client': {

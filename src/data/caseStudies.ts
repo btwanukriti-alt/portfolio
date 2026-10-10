@@ -277,7 +277,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     fixBeforePublishing: [
       'Only 4 of the 8 solution slides exist (counters read 1/8 to 4/8)',
       'Label the "before" screens as the existing system',
-      'Names conflict: College Management, Dhondi, Vertex, CMR logo on the rail',
+      'Names conflict: use the placeholder Vertex Group everywhere',
       'Label figures (94.30 Cr, 91.4%) as sample data',
       'Site problem line promises role-based access; no such screen seen',
       'Mock report reads "Generated 12/01/2026"; confirm the real months',
