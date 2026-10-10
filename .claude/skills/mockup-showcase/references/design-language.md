@@ -66,3 +66,4 @@ Source: `scripts/mockups/pulsefit/v2/` (index.html, style.css, ui.js, modules.js
 - **Colour:** ground is a soft blue to lilac wash; plates white to pale blue; text tiles deep brand colour with white text and a yellow step label. No yellow plates, no coloured frame plates. Full-frame plates radius 28, windows radius 12.
 - **Website:** show her original website frame exactly as designed (export at full size with `get_screenshot`, saved from the tool-result blob), no wrapper, no rebuild.
 - **Publishing:** new file names for changed images (`-v2`), or browsers keep the cached old ones.
+- **NDA projects (SSH client): never write the product name** anywhere (site, mockups, alt text, file names, PR titles). Use the mark alone; say "SSH client".
