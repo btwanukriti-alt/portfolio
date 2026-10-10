@@ -89,7 +89,7 @@ logoModule()
 
 mod('m-leads', {
   cols: '340px 1fr 1fr',
-  cells: [col(tile('01 · Spot', 'Each alert has its fix', 'Stale and missed leads open the day, each row with one quiet action.'), kpi('cal', '#0E9F6E', 'var(--grn-s)', 'Trial booking rate', '42%', '5%')),
+  cells: [tile('01 · Spot', 'Each alert has its fix', 'Stale and missed leads open the day, each row with one quiet action.'),
     plate(P.taskCard('missed', { hov: 0, w: 440 }), 1.1), plate(P.taskCard('stale', { w: 440 }), 1.1)],
   frame: P.leadDash(), url: 'app.pulsefit.app/leads',
 })
@@ -126,13 +126,13 @@ mod('m-plans', {
 })
 
 mod('m-members', {
-  cells: [col(tile('04 · Keep', 'Renew before it lapses', 'This week\'s renewals, each with its trainer. Renew is the main step; Remind stays quiet.'), kpi('refresh', '#D97706', 'var(--amb-s)', 'Renewal rate', '86%', '3%')),
+  cells: [tile('04 · Keep', 'Renew before it lapses', 'This week\'s renewals, each with its trainer. Renew is the main step; Remind stays quiet.'),
     plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch"><span class="ico" style="background:var(--amb-s);color:var(--amb)">${i('refresh')}</span><h3>Expiring this week</h3><span class="cnt" style="background:var(--amb-s);color:var(--amb)">8</span><span class="ct">View all${i('chevR', 'width:14px;height:14px')}</span></div><table class="tbl"><tr><th>Member</th><th>Plan</th><th>Expires</th><th>Trainer</th><th class="r">Next step</th></tr>${P.EXP.map((e, k) => P.expRow(e, k === 0)).join('')}</table></div>`, 1.06)],
   frame: P.membersDash(), url: 'app.pulsefit.app/members',
 })
 
 mod('m-email', {
-  cells: [col(tile('05 · Nurture', 'Emails follow the lifecycle', 'Each email is sent by a trigger: a new lead, a booked trial, a plan about to expire.'), kpi('eye', '#0E9F6E', 'var(--grn-s)', 'Open rate', '48%', '4%')),
+  cells: [tile('05 · Nurture', 'Emails follow the lifecycle', 'Each email is sent by a trigger: a new lead, a booked trial, a plan about to expire.'),
     plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch">${i('refresh', 'color:var(--mut)')}<h3>Subscriptions</h3><span style="font-size:12.5px;color:var(--mut)">3 emails · 3 on</span><span class="ct">${i('plus', 'width:14px;height:14px')}Add</span></div>${P.CAMP.Subscriptions.map(r => P.campRow(r)).join('')}</div>`, 1.06)],
   frame: P.emailFrame(), url: 'app.pulsefit.app/communication',
 })
