@@ -19,3 +19,4 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .comp .z>*{height:auto!important;max-height:none!important}
 .comp .z>*{height:auto!important;position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;transform:none!important}
 .stg{filter:drop-shadow(0 20px 30px rgba(40,24,110,.12))}
+.comp .ring .c b{font-size:30px!important;line-height:1.1!important}
