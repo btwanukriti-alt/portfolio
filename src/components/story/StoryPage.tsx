@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 import { STORIES, type Shot, type Story, type StorySection } from '@/data/stories'
 import { PROJECTS, projectBySlug } from '@/data/projects'
+import { caseStudyByKey } from '@/data/caseStudies'
 import SiteHeader from '../SiteHeader'
 import ShowcaseVideo from '../ShowcaseVideo'
 import Contact from '../Contact'
@@ -30,6 +31,8 @@ const FRAME = 'ring-1 ring-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.45)]'
 
 export default function StoryPage({ story }: { story: Story }) {
   const project = projectBySlug(story.slug)
+  // The two project paragraphs of the first version (src/data/caseStudies.ts).
+  const paragraphs = caseStudyByKey(story.slug === 'gym-crm' ? 'pulsefit-crm' : story.slug)?.paragraphs ?? []
   const vars = {
     '--accent': story.accent,
     '--c-accent': story.brand.accent,
@@ -80,6 +83,19 @@ export default function StoryPage({ story }: { story: Story }) {
           {project?.showcase && (
             <div className="relative isolate mx-[calc(50%-50vw)] mt-[clamp(48px,8vh,88px)] aspect-video w-screen overflow-hidden bg-[var(--c-tint)] portrait:mx-[calc(50%-min(50vw,24.1875svh))] portrait:aspect-[9/16] portrait:w-[min(100vw,48.375svh)]">
               <ShowcaseVideo className="pointer-events-none absolute inset-0 h-full w-full border-0" src={project.showcase} title={`${story.title} showcase`} />
+            </div>
+          )}
+
+          {paragraphs.length > 0 && (
+            <div className="mt-[clamp(56px,9vh,104px)] grid grid-cols-1 gap-4 min-[901px]:grid-cols-[minmax(160px,1fr)_3fr]">
+              <p className="m-0 text-[15px] leading-[1.4] font-medium text-muted">The project</p>
+              <div className="flex max-w-[44ch] flex-col gap-6 text-[clamp(19px,1.7vw,26px)] leading-[1.5] font-normal text-ink">
+                {paragraphs.map((text) => (
+                  <p key={text.slice(0, 24)} className="m-0">
+                    {text}
+                  </p>
+                ))}
+              </div>
             </div>
           )}
 
