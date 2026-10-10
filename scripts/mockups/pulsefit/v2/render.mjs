@@ -3,7 +3,7 @@ import {chromium} from '/opt/node22/lib/node_modules/playwright/index.mjs'
 import {fileURLToPath} from 'url'
 const out=process.argv[2], only=process.argv.slice(3)
 const page=fileURLToPath(new URL('index.html',import.meta.url))
-const NAMES=[['m-logo','01-logo'],['m-leads','02-lead-dashboard'],['m-table','03-leads-table'],['m-convert','04-convert'],['m-plans','05-plans'],['m-members','06-members'],['m-email','07-email'],['m-site','08-website']]
+const NAMES=[['m-logo','01-logo'],['m-leads','02-lead-dashboard'],['m-convert','03-convert'],['m-plans','04-plans'],['m-members','05-members'],['m-email','06-email'],['m-site','07-website']]
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'})
 const p=await b.newPage({viewport:{width:1600,height:1200},deviceScaleFactor:1.5})
 p.on('pageerror',e=>console.log('ERR',e.message));p.on('console',m=>console.log('LOG',m.text()))

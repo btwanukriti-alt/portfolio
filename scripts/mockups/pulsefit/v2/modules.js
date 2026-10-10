@@ -1,38 +1,29 @@
-// Module layout: the component enlarged on a plate, the title block beside it, the full frame below.
+// Module layout: a bento row (a small text tile and whole components on plates), then the full frame.
 (function(){
 const M = document.getElementById('mods')
 const i = P.i
 
-// Callouts are anchored to an element inside the plate, measured after layout.
-// side: where the pill sits relative to the target (r, l, d, u).
-function callout(plate, { sel, side = 'r', len = 80, text, at = 0.5 }) {
-  const t = plate.querySelector(sel)
-  if (!t) { console.log('callout target missing', sel); return }
-  const pr = plate.getBoundingClientRect(), r = t.getBoundingClientRect()
-  const el = document.createElement('div')
-  el.className = 'co' + (side === 'd' || side === 'u' ? ' v' : '')
-  const ln = side === 'd' || side === 'u' ? `height:${len}px` : `width:${len}px`
-  el.innerHTML = `<span class="dot"></span><span class="ln" style="${ln}"></span><span class="pill">${text}</span>`
-  if (side === 'r') { el.style.left = (r.right - pr.left - 8) + 'px'; el.style.top = (r.top - pr.top + r.height * at - 23) + 'px' }
-  if (side === 'l') { el.style.flexDirection = 'row-reverse'; el.style.right = (pr.right - r.left - 8) + 'px'; el.style.top = (r.top - pr.top + r.height * at - 23) + 'px' }
-  if (side === 'd') { el.style.left = (r.left - pr.left + r.width * at) + 'px'; el.style.top = (r.bottom - pr.top - 8) + 'px'; el.style.transform = 'translateX(-50%)' }
-  if (side === 'u') { el.style.flexDirection = 'column-reverse'; el.style.left = (r.left - pr.left + r.width * at) + 'px'; el.style.bottom = (pr.bottom - r.top - 8) + 'px'; el.style.transform = 'translateX(-50%)' }
-  plate.appendChild(el)
-}
-
-const block = (step, title, desc) => `<div class="block" style="flex:1"><div class="st">${step}</div><div class="bar"></div><h3>${title}</h3><p>${desc}</p></div>`
+const tile = (step, title, desc) => `<div class="tile"><div class="ts">${step}</div><div><h3>${title}</h3><p>${desc}</p></div></div>`
+const plate = (html, zoom = 1, st = '') => `<div class="plate cell" style="padding:48px;display:grid;place-items:center;${st}"><div style="zoom:${zoom}">${html}</div></div>`
 // a browser window holding a frame scaled to fit `w`
 const browser = (html, w, url) => `<div class="win" style="width:${w}px"><div class="tb"><i></i><i></i><i></i><div class="url">${url}</div></div><div class="fit" data-w="${w}"><div class="inner" style="width:1440px">${html}</div></div></div>`
 
-function mod(id, { comp, scale, h, pos = 'center', pad = '0', step, title, desc, frame, url, callouts = [], frameCallouts = [] }) {
+function mod(id, { cols = '340px 1fr', cells, frame, url }) {
   const s = document.createElement('div')
   s.className = 'mod'; s.id = id
-  s.innerHTML = `<div class="row" style="height:${h}px"><div class="plate ptop" style="width:940px;flex:none"><div class="stage" style="place-items:${pos};padding:${pad}"><div class="zoom" style="transform:scale(${scale});transform-origin:${pos.includes('start') ? 'left center' : 'center'}">${comp}</div></div></div>${block(step, title, desc)}</div>
+  s.innerHTML = `<div class="bento" style="grid-template-columns:${cols}">${cells.join('')}</div>
     <div class="plate bot" style="padding:48px;display:flex;justify-content:center">${browser(frame, 1424, url)}</div>`
   M.appendChild(s)
-  s._co = [callouts, frameCallouts]
+  return s
 }
 
+// Dashed elbow line from a pill to a point, with a dot at the point. Coordinates are relative to `box`.
+function line(box, a, b, mx) {
+  const svg = box.querySelector('svg.links') || box.insertAdjacentHTML('beforeend', '<svg class="links" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4"></svg>') || box.querySelector('svg.links')
+  const d = mx === undefined ? `M${a.x} ${a.y} V${b.y}` : `M${a.x} ${a.y} H${mx} V${b.y} H${b.x}`
+  svg.insertAdjacentHTML('beforeend', `<path d="${d}" fill="none" stroke="#8C93AA" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${b.x}" cy="${b.y}" r="8" fill="#0063F8" stroke="#fff" stroke-width="4"/>`)
+}
+const rel = (box, el) => { const b = box.getBoundingClientRect(), r = el.getBoundingClientRect(); return { l: r.left - b.left, t: r.top - b.top, r: r.right - b.left, b: r.bottom - b.top, w: r.width, h: r.height } }
 // ---------- 01 Logo construction ----------
 function logoModule() {
   const s = document.createElement('div')
@@ -48,7 +39,7 @@ function logoModule() {
   // round ends of the three bars and the bowl
   const circ = [[15.15, 2.075, 2.075], [11.53, 6.37, 2.23], [9.0, 10.84, 2.23], [14.08, 6.54, 6.54]].map(([cx, cy, r]) => `<circle cx="${cx * k}" cy="${cy * k}" r="${r * k}" class="g c"/><circle cx="${cx * k}" cy="${cy * k}" r="4" class="pt"/>`).join('')
   const ang = Math.round(Math.atan(sl) * 180 / Math.PI)
-  s.innerHTML = `<div class="plate" style="height:1000px"><style>
+  s.innerHTML = `<div class="plate" style="height:980px"><style>
     #m-logo .g{stroke:#A9AFC4;stroke-width:2;stroke-dasharray:6 7;fill:none}
     #m-logo .g.s{stroke:#7F8AB5}#m-logo .g.c{stroke:#0063F8;stroke-opacity:.55;stroke-dasharray:4 6}
     #m-logo .pt{fill:#0063F8;stroke:#fff;stroke-width:2.5}
@@ -76,68 +67,77 @@ function logoModule() {
   M.appendChild(s)
 }
 
-// ---------- 08 Website ----------
+// ---------- Website: the original homepage, unchanged ----------
 function siteModule() {
   const s = document.createElement('div')
-  s.className = 'mod'; s.id = 'm-site'; s.style.background = '#E9EEF8'
-  s.innerHTML = `<div class="row" style="height:330px"><div class="block" style="flex:1;flex-direction:row;align-items:flex-end;gap:60px"><div style="flex:1"><div class="st" style="margin-bottom:60px">The website</div><div class="bar"></div><h3>The homepage, top to bottom</h3></div><p style="flex:1;margin:0">One scroll from the promise to features, the lead-to-member flow, setup, pricing and FAQ.</p></div></div>
-  <div class="plate bot" style="padding:48px;display:flex;justify-content:center;background:linear-gradient(180deg,#F6F8FD,#E4EAF6)">${browser(P.site(), 1424, 'pulsefit.app')}</div>`
+  s.className = 'mod'; s.id = 'm-site'
+  s.innerHTML = `<div class="bento" style="grid-template-columns:1fr"><div class="tile" style="flex-direction:row;align-items:flex-end;gap:40px;min-height:0;padding:34px 40px"><div><div class="ts" style="margin-bottom:14px">07 · Website</div><h3>The homepage, top to bottom</h3></div><p style="max-width:520px;margin-left:auto">From the promise to features, setup, pricing and FAQ, in one scroll.</p></div></div>
+  <div class="plate bot" style="padding:48px;display:flex;justify-content:center"><div class="win" style="width:1424px"><div class="tb"><i></i><i></i><i></i><div class="url">pulsefit.app</div></div><img src="website-original.png" style="display:block;width:100%"></div></div>`
   M.appendChild(s)
 }
 
+// ---------- the flow ----------
 logoModule()
+
 mod('m-leads', {
-  step: '01 · Spot', title: 'Each alert has its fix', desc: 'Stale, missed and incomplete leads open the day. One quiet action per row; the row in focus fills.',
-  comp: P.taskCard('missed', { hov: 0, w: 420 }), scale: 1.32, h: 760, pos: 'center start', pad: '0 0 0 70px',
+  cols: '340px 1fr 1fr',
+  cells: [tile('01 · Spot', 'Each alert has its fix', 'Stale and missed leads open the day, each row with one quiet action.'),
+    plate(P.taskCard('missed', { hov: 0, w: 440 }), 1.1), plate(P.taskCard('stale', { w: 440 }), 1.1)],
   frame: P.leadDash(), url: 'app.pulsefit.app/leads',
-  callouts: [{ sel: '.tr.hov .btn.p', side: 'r', len: 60, text: 'Only the row in focus fills' }, { sel: '.tr:nth-of-type(4) .btn.s', side: 'r', len: 60, text: 'The rest stay quiet' }],
 })
-mod('m-table', {
-  step: '02 · Sort', title: 'Triage without opening a record', desc: 'Status and owner change inline. Select leads and the bar offers bulk actions, ending in Convert.',
-  comp: `<div style="display:flex;flex-direction:column;gap:22px;align-items:flex-end"><div class="card u" style="width:520px;overflow:hidden"><table class="tbl">${P.leadRow([2789, 'Nithya Menon', '+91 78798 63288', 'Hot', 'Rahul Menon', 'Instagram', '2 Oct'], 1).replace(/<td style="color:var\(--t2\)">.*?<\/td>/g, '').replace(/<td>\+91.*?<\/td>/, '').replace(/<td><span class="sel-dd"><span class="who".*?<\/td>/, '')}</table></div><div style="margin-right:60px;margin-top:-14px">${P.statusMenu()}</div>${P.bulkBar(620)}</div>`,
-  scale: 1.18, h: 760,
-  frame: P.leadsTable(), url: 'app.pulsefit.app/leads/all',
-  callouts: [{ sel: '.zoom .card.u:not(.tbl) div[style*="width:220px"], .zoom .card[style*="width:220px"]', side: 'l', len: 70, text: 'Set status inline' }],
-})
-mod('m-convert', {
-  step: '03 · Convert', title: 'Convert without retyping', desc: 'The lead\'s details carry into the member form. Pick a plan and see the total before you confirm.',
-  comp: P.convertModal(), scale: 0.86, h: 1160, pos: 'center start', pad: '0 0 0 40px',
+
+// lead to member: the table with two leads selected, and the member form it opens
+const tableCard = `<div class="card u" style="width:640px;overflow:hidden"><table class="tbl"><tr><th style="width:44px"></th><th>Lead</th><th>Status</th><th>Owner</th></tr>${[[2314, 'Robert Fox', 'Cold', 'Anika Shetty'], [2789, 'Nithya Menon', 'Hot', 'Rahul Menon'], [3051, 'Neha Singh', 'Hot', 'Farah Khan'], [3168, 'Alex John', 'Warm', 'Anika Shetty'], [3294, 'Aaron Joseph', 'Warm', 'Vikram Das']].map(([id, n, t, o], k) => `<tr class="${k === 1 ? 'sel' : ''}"><td><span class="cb${k === 1 ? ' on' : ''}">${k === 1 ? i('check') : ''}</span></td><td><div class="who">${P.av(n)}<div style="font-weight:600">${n}<small>#${id}</small></div></div></td><td><span class="sel-dd">${P.temp(t)}${i('chev')}</span></td><td><div class="who" style="gap:8px">${P.av(o, 1)}${o}</div></td></tr>`).join('')}</table></div>
+  <div style="margin-top:18px">${P.bulkBar(640).replace('2 selected', '1 selected')}</div>`
+const conv = mod('m-convert', {
+  cells: [tile('02 · Convert', 'Lead to member, no retyping', 'Convert from the table. The member form opens with the lead\'s details already in.'),
+    `<div class="plate cell flow" style="height:980px">
+      <div class="ft" style="position:absolute;left:56px;top:80px;zoom:.72">${tableCard}</div>
+      <div class="fm" style="position:absolute;right:56px;top:56px;zoom:.82">${P.convertModal()}</div>
+      <span class="pill p1" style="position:absolute;left:56px;top:500px">Convert opens the member form</span>
+      <span class="pill p2" style="position:absolute;left:56px;top:640px">5 of 6 fields come from the lead</span>
+      <span class="pill p3" style="position:absolute;left:56px;top:780px">The total updates as you toggle</span></div>`],
   frame: P.convertFrame(), url: 'app.pulsefit.app/leads/2789/convert',
-  callouts: [{ sel: '.fl:nth-child(2) .inp.pf', side: 'r', len: 30, text: 'Carried from the lead' }, { sel: '.sum', side: 'r', len: 30, text: 'Live total', at: .88 }],
 })
+conv._links = box => {
+  const fm = rel(box, box.querySelector('.fm > div')), mx = fm.l - 24
+  const btn = rel(box, box.querySelector('.ft .btn.sm[style*="margin-left:auto"]'))
+  const p1 = rel(box, box.querySelector('.p1')), p2 = rel(box, box.querySelector('.p2')), p3 = rel(box, box.querySelector('.p3'))
+  line(box, { x: p1.r, y: p1.t + p1.h / 2 }, { x: fm.l, y: fm.t + 50 }, mx - 56)
+  line(box, { x: btn.l + btn.w / 2, y: p1.t }, { x: btn.l + btn.w / 2, y: btn.b })
+  const f = rel(box, box.querySelector('.fm .inp.pf'))
+  line(box, { x: p2.r, y: p2.t + p2.h / 2 }, { x: fm.l, y: f.t + f.h / 2 }, mx - 28)
+  const t = rel(box, box.querySelector('.fm .sum'))
+  line(box, { x: p3.r, y: p3.t + p3.h / 2 }, { x: fm.l, y: t.b - 22 }, mx)
+}
+
 mod('m-plans', {
-  step: '04 · Plan', title: 'Every plan on one card', desc: 'Price with GST, extension and pause days, and who is on it. Category colour groups the grid.',
-  comp: P.planCard(P.PLANS[0], 1), scale: 1.4, h: 760, pos: 'center start', pad: '0 0 0 150px',
+  cells: [tile('03 · Plan', 'Every plan on one card', 'Price with GST, extension and pause days, and who is on it. Colour marks the category.'),
+    plate(`<div style="display:flex;gap:20px">${[0, 4, 6].map(k => P.planCard(P.PLANS[k], 1)).join('')}</div>`, 1)],
   frame: P.plansFrame(), url: 'app.pulsefit.app/plans',
-  callouts: [{ sel: '.zoom .tag', side: 'u', len: 60, text: 'Category colour' }, { sel: '.zoom div[style*="grid-template-columns:1fr 1fr"]', side: 'r', len: 40, text: 'Pause and extension days', at: .5 }],
 })
+
 mod('m-members', {
-  step: '05 · Keep', title: 'Renew before it lapses', desc: 'Expiring plans, attendance drops and frozen members. Renew is the main step; Remind stays secondary.',
-  comp: `<div class="card u" style="width:600px;overflow:hidden"><table class="tbl"><tr><th>Member</th><th>Expires</th><th class="r">Next step</th></tr>${P.EXP.slice(0, 3).map((e, k) => P.expRow(e, k === 0).replace(/<td>(<span class="tag[^]*?)<\/td>/, '').replace(/<td><div class="who" style="gap:8px">.*?<\/td>/, '')).join('')}</table></div>`,
-  scale: 1.3, h: 760,
+  cells: [tile('04 · Keep', 'Renew before it lapses', 'This week\'s renewals, each with its trainer. Renew is the main step; Remind stays quiet.'),
+    plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch"><span class="ico" style="background:var(--amb-s);color:var(--amb)">${i('refresh')}</span><h3>Expiring this week</h3><span class="cnt" style="background:var(--amb-s);color:var(--amb)">8</span><span class="ct">View all${i('chevR', 'width:14px;height:14px')}</span></div><table class="tbl"><tr><th>Member</th><th>Plan</th><th>Expires</th><th>Trainer</th><th class="r">Next step</th></tr>${P.EXP.map((e, k) => P.expRow(e, k === 0)).join('')}</table></div>`, 1.06)],
   frame: P.membersDash(), url: 'app.pulsefit.app/members',
-  callouts: [{ sel: 'tr.sel .btn.p', side: 'u', len: 90, text: 'One filled button: Renew' }, { sel: 'tr:last-child .btn.g', side: 'd', len: 90, text: 'Remind stays quiet' }],
 })
+
 mod('m-email', {
-  step: '06 · Nurture', title: 'Emails follow the lifecycle', desc: 'Lead, member and subscription emails, each sent by a trigger, each with its own results.',
-  comp: P.campRow(P.CAMP.Subscriptions[0], 1), scale: .98, h: 560,
+  cells: [tile('05 · Nurture', 'Emails follow the lifecycle', 'Each email is sent by a trigger: a new lead, a booked trial, a plan about to expire.'),
+    plate(`<div class="card u" style="width:960px;overflow:hidden"><div class="ch">${i('refresh', 'color:var(--mut)')}<h3>Subscriptions</h3><span style="font-size:12.5px;color:var(--mut)">3 emails · 3 on</span><span class="ct">${i('plus', 'width:14px;height:14px')}Add</span></div>${P.CAMP.Subscriptions.map(r => P.campRow(r)).join('')}</div>`, 1.06)],
   frame: P.emailFrame(), url: 'app.pulsefit.app/communication',
-  callouts: [{ sel: '.zoom .tg', side: 'u', len: 90, text: 'Pause without deleting' }, { sel: '.zoom > div', side: 'd', len: 90, text: 'Sent by a trigger, not by hand', at: .2 }],
 })
 siteModule()
 
-// size the frames, then place the callouts
-document.fonts.ready.then(() => {
+// size the frames, then draw the flow lines
+Promise.all([document.fonts.ready, ...[...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r }))]).then(() => {
   document.querySelectorAll('.fit').forEach(f => {
     const w = +f.dataset.w, inner = f.firstElementChild, s = w / 1440
     inner.style.transform = `scale(${s})`
     f.style.height = Math.ceil(inner.offsetHeight * s) + 'px'
   })
-  document.querySelectorAll('.mod').forEach(m => {
-    if (!m._co) return
-    const [top] = m._co
-    top.filter(c => !c.skip).forEach(c => callout(m.querySelector('.plate.ptop'), c))
-  })
+  conv._links(conv.querySelector('.flow'))
   window.READY = true
 })
 })()

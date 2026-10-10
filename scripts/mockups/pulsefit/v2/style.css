@@ -133,3 +133,10 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .hm .c{height:30px;border-radius:6px}
 .hm .lb{font-size:11.5px;color:var(--mut);display:flex;align-items:center}
 .hm .hl{font-size:11px;color:var(--mut);text-align:center}
+/* bento */
+.bento{display:grid;gap:24px}
+.tile{border-radius:40px;background:#fff;box-shadow:inset 0 0 0 1px #E3E5EC;padding:40px 38px;display:flex;flex-direction:column;justify-content:space-between;min-height:420px}
+.tile .ts{font:600 15px Inter;letter-spacing:.1em;text-transform:uppercase;color:#0063F8}
+.tile h3{font:500 32px/1.15 Poppins,sans-serif;letter-spacing:-.02em;color:#14171F;margin:0}
+.tile p{font:400 17px/1.55 Inter;color:#5B6074;margin:14px 0 0}
+.flow .pill{height:46px;padding:0 22px;border-radius:23px;background:#fff;color:#14171F;font:500 20px/46px Inter;white-space:nowrap;box-shadow:0 12px 28px -12px rgba(20,12,60,.35),0 0 0 1px rgba(20,12,60,.05);z-index:5}
