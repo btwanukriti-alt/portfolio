@@ -55,13 +55,13 @@ drill._links = box => {
 }
 
 // 04 Staff attendance, before and after
-const ba = (id, step, title, desc, before, after, notes, flip) => { const m = add(id, `<div class="bento" style="grid-template-columns:${flip ? '1fr 400px' : '400px 1fr'}"><div style="display:flex;flex-direction:column;gap:24px;${flip ? 'order:2' : ''}">${tile(step, title, desc)}<div class="plate" style="flex:1;padding:44px 28px 28px;display:grid;place-items:center"><div style="position:relative">${img(before, 344, 'filter:saturate(.6);opacity:.92')}<span class="chip b" style="left:-10px;top:-17px">Before</span></div></div></div>
-  <div class="plate flow" style="padding:${48 + 140}px 40px 40px"><div class="af" style="position:relative">${browser(after, 1036)}<span class="chip a" style="left:-10px;top:-17px">After</span></div>
+const ba = (id, step, title, desc, before, after, notes, flip) => { const m = add(id, `<div class="bento" style="grid-template-columns:${flip ? '1fr 540px' : '540px 1fr'}"><div style="display:flex;flex-direction:column;gap:24px;${flip ? 'order:2' : ''}">${tile(step, title, desc)}<div class="plate" style="flex:1;padding:44px 28px 28px;display:grid;place-items:center"><div style="position:relative">${img(before, 480, 'filter:saturate(.6);opacity:.92')}<span class="chip b" style="left:-10px;top:-17px">Before</span></div></div></div>
+  <div class="plate flow" style="padding:${48 + 140}px 40px 40px"><div class="af" style="position:relative">${browser(after, 896)}<span class="chip a" style="left:-10px;top:-17px">After</span></div>
    ${notes.map(([t], k) => `<span class="pill good r${k}" style="position:absolute">${t}</span>`).join('')}</div></div>`)
   m._links = box => { const f = rel(box, box.querySelector('.af .inner')), s = f.w / 1440
     notes.forEach(([t, x, y, row], k) => { const el = box.querySelector('.r' + k), tx = f.l + x * s; el.style.left = Math.max(40, Math.min(box.clientWidth - 40 - el.offsetWidth, tx - el.offsetWidth / 2)) + 'px'; el.style.top = (40 + row * 62) + 'px'; const p = rel(box, el); line(box, { x: tx, y: p.b, c: '#10B981' }, { x: tx, y: f.t + y * s }) }) }
   return m }
-const staff = ba('m-staff', '04 · Staff', 'Staff attendance', 'Before: one long list. After: status tabs with counts, and filters by college, department and division.', 'old-staff.png', P.attendance(), [['Tabs show each status with its count', 560, 244, 0], ['Filter by college, department and division', 1283, 320, 0]])
+const staff = ba('m-staff', '04 · Staff', 'Staff attendance', 'Before: one long list. After: status tabs with counts, and filters by college, department and division.', 'old-staff.png', P.attendance(), [['Status tabs with counts', 560, 244, 0], ['Filter by college, department and division', 1283, 320, 1]])
 const settle = ba('m-settle', '05 · Settlements', 'Settlements', 'Before: one long list. After: tabs by status, search, and late ones stand out.', 'old-settle.png', P.settlements(), [['Tabs by status, with counts', 443, 300, 0], ['Search by number or bank reference', 800, 368, 1], ['Late settlements stand out', 1280, 465, 0]], 1)
 
 Promise.all([document.fonts.ready, ...[...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r }))]).then(() => {
