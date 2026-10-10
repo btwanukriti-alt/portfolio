@@ -1,10 +1,9 @@
-// Case-study pages (src/components/StoryPage.tsx): one editorial template, filled from this file.
+// Case-study pages (src/components/story/StoryPage.tsx): one bento template, filled from this file.
 //
 // Rules the copy follows:
 // - captions describe what the screen shows; nothing here claims research, testing, a launch or a metric;
 // - every name and figure in a screen is sample data, and each page says so;
-// - facts (role, timeline, scope) are only the confirmed ones; a disputed fact is left out, not guessed;
-// - the "Proposed recovery states" are portfolio refinements, labelled as such on the page.
+// - facts (role, timeline, scope) are only the confirmed ones; a disputed fact is left out, not guessed.
 //
 // Images live in public/case-studies/<slug>/story/ and are exported from the design's own HTML source by
 // scripts/mockups/story-render.mjs (see scripts/mockups/STORY.md). Sizes come from storySizes.ts.
@@ -26,7 +25,7 @@ export type Shot = {
   maxWidth?: number
 }
 
-export type Demo = 'pulsefit' | 'college' | 'zync' | 'ssh' | 'jaadu-shortlist' | 'footprint-legend'
+export type Demo = 'jaadu-shortlist' | 'footprint-legend'
 
 export type StorySection = {
   id: string
@@ -41,11 +40,9 @@ export type StorySection = {
   details?: Shot[]
   // A caption shared by the close-ups.
   detailCaption?: string
-  // Code-rendered UI shown in the section (recovery examples, legends, the illustrative shortlist).
+  // Code-rendered UI shown in the section (the footprint legend, the illustrative shortlist).
   demo?: Demo
   demoAfter?: boolean
-  // A recovery-state section: shows the proposed label and the disclosure.
-  proposed?: boolean
 }
 
 export type Story = {
@@ -66,9 +63,6 @@ export type Story = {
   closing?: { heading: string; copy: string }
   related: [string, string]
 }
-
-export const PROPOSED_DISCLOSURE =
-  'These states are portfolio refinements to show recovery behaviour. They are not evidence of shipped or tested functionality.'
 
 const shot = (slug: string) => (name: string, alt: string, extra: Partial<Shot> = {}): Shot => {
   const src = `/case-studies/${slug}/story/${name}.webp`
@@ -136,7 +130,6 @@ export const STORIES: Story[] = [
         caption: 'Subscription email rules are grouped around the membership event they respond to.',
         details: [pf('email-subscriptions', 'The subscriptions group: renewal reminder, plan changed and payment receipt, each with its trigger', { label: 'Subscription email rules' })],
       },
-      { id: 'recovery', heading: 'Proposed recovery states', proposed: true, demo: 'pulsefit', caption: 'Recovery examples keep entered details available and show what changed after an action.' },
     ],
     visualSystem: {
       heading: 'Visual system',
@@ -204,7 +197,6 @@ export const STORIES: Story[] = [
         setLayout: 'stack',
         caption: 'Tabs and search give the settlements list a clearer route into the records that need attention.',
       },
-      { id: 'recovery', heading: 'Proposed recovery states', proposed: true, demo: 'college' },
     ],
     closing: {
       heading: 'What changed in the presentation',
@@ -338,7 +330,6 @@ export const STORIES: Story[] = [
         caption: 'The plan connects its summary to an exercise list and a clear start action.',
         details: [zy('workout-list', 'The exercise list with four stretches of 30 seconds each, and the Start workout button', { label: 'Exercise list and Start workout', maxWidth: 420 })],
       },
-      { id: 'recovery', heading: 'Proposed recovery states', proposed: true, demo: 'zync', caption: 'A mistaken log can be reviewed, edited or removed without adding a second entry.' },
     ],
     related: ['gym-crm', 'jaadu'],
   },
@@ -394,7 +385,6 @@ export const STORIES: Story[] = [
           ss('ask-ai', 'The Ask AI panel answering how to find .txt files with two find commands', { label: 'Ask AI panel', dark: true, maxWidth: 400 }),
         ],
       },
-      { id: 'recovery', heading: 'Proposed recovery states', proposed: true, demo: 'ssh' },
     ],
     more: {
       heading: 'More screens',

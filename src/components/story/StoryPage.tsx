@@ -1,26 +1,31 @@
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
-import { PROPOSED_DISCLOSURE, STORIES, type Shot, type Story, type StorySection } from '@/data/stories'
+import { STORIES, type Shot, type Story, type StorySection } from '@/data/stories'
 import { PROJECTS } from '@/data/projects'
 import SiteHeader from '../SiteHeader'
 import Contact from '../Contact'
 import { ViewButton, ViewerProvider } from './Viewer'
 import { StoryDemo } from './Demos'
 
-// The case-study template shared by all five projects: a light editorial page (1160px wide, a 680px text column),
-// a short header with confirmed facts, a contents list, then 4-6 numbered sections. Each section has one primary
-// screen and, where needed, a few close-ups with live-text captions. No reveal animations: every image is visible
-// as soon as it loads.
+// The case-study template shared by all five projects, laid out as a bento grid (the earlier project-page style):
+// rounded tiles on a 12-column grid. Each numbered section has a text tile (number, heading, caption), its screen in
+// the largest tile, and close-ups in their own tiles with the caption beside the image. Below 1024px every tile
+// takes the full width, one under another. No reveal animations: every image shows as soon as it loads.
 
-const TEXT = 'max-w-[680px]'
 const focus = 'focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]'
+const GRID = 'grid grid-cols-1 gap-[clamp(12px,1.4vw,20px)] lg:grid-cols-12'
+const TILE = 'min-w-0 rounded-[clamp(20px,2.2vw,32px)]'
+// Light tiles: the soft plate of the earlier bento pages. Dark tiles keep dark product UI on a dark ground.
+const plate = (dark?: boolean) =>
+  dark
+    ? 'bg-[linear-gradient(180deg,#15151B,#0B0B10)] ring-1 ring-white/[0.08]'
+    : 'bg-[linear-gradient(180deg,#F8F9FC,#ECEDF3)] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.95)]'
+const PAD = 'p-[clamp(14px,2vw,28px)]'
 
 export default function StoryPage({ story }: { story: Story }) {
-  const recovery = story.sections.find((s) => s.proposed)
   const contents: [string, string][] = [
     ['Overview', 'overview'],
     ['Key flows', 'key-flows'],
-    ...(recovery ? ([['Recovery states', recovery.id]] as [string, string][]) : []),
     ...(story.more ? ([[story.more.heading, 'more-screens']] as [string, string][]) : []),
     ...(story.visualSystem ? ([[story.visualSystem.heading, 'visual-system']] as [string, string][]) : []),
   ]
@@ -31,26 +36,31 @@ export default function StoryPage({ story }: { story: Story }) {
     <div className="min-h-screen overflow-x-clip bg-paper" style={{ '--accent': story.accent } as CSSProperties}>
       <SiteHeader />
       <ViewerProvider>
-        <main className="mx-auto max-w-[1160px] px-5 pt-[104px] pb-14 max-[359px]:px-4 md:px-12 md:pt-[120px] md:pb-24">
-          <header id="overview" className={`${TEXT} scroll-mt-24`}>
-            <Link href="/#work" className={`inline-flex min-h-11 items-center text-[15px] font-medium text-muted no-underline hover:text-ink ${focus}`}>
-              <span aria-hidden="true" className="mr-2">←</span>All work
-            </Link>
-            <p className="m-0 mt-4 text-[14px] leading-[1.4] font-semibold tracking-[0.02em] text-[var(--accent)]">{story.category}</p>
-            <h1 className="m-0 mt-2 font-title text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] text-ink md:text-[48px]">{story.title}</h1>
-            <p className="m-0 mt-4 text-[18px] leading-[1.5] text-ink md:text-[20px]">{story.summary}</p>
-            <dl className="m-0 mt-8 grid grid-cols-1 gap-x-6 gap-y-4 border-t border-line pt-6 md:grid-cols-[112px_1fr]">
-              {story.facts.map(([term, value]) => (
-                <div key={term} className="contents">
-                  <dt className="text-[14px] leading-[1.6] font-semibold text-muted">{term}</dt>
-                  <dd className="m-0 -mt-3 text-[16px] leading-[1.6] text-ink md:mt-0">{value}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="m-0 mt-6 rounded-xl bg-soft px-4 py-3 text-[14px] leading-[1.5] text-[#4a4a4f]">{story.disclosure}</p>
+        <main className="mx-auto max-w-[1440px] px-4 pt-[104px] pb-14 min-[360px]:px-5 md:px-[clamp(24px,4vw,64px)] md:pt-[120px] md:pb-24">
+          <Link href="/#work" className={`inline-flex min-h-11 items-center text-[15px] font-medium text-muted no-underline hover:text-ink ${focus}`}>
+            <span aria-hidden="true" className="mr-2">←</span>All work
+          </Link>
+
+          <header id="overview" className={`${GRID} mt-4 scroll-mt-24`}>
+            <div className={`${TILE} ${plate()} ${PAD} flex flex-col justify-end lg:col-span-7`}>
+              <p className="m-0 text-[14px] leading-[1.4] font-semibold tracking-[0.02em] text-[var(--accent)]">{story.category}</p>
+              <h1 className="m-0 mt-2 font-title text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] text-ink md:text-[48px]">{story.title}</h1>
+              <p className="m-0 mt-4 max-w-[34ch] text-[18px] leading-[1.5] text-ink md:text-[20px]">{story.summary}</p>
+            </div>
+            <div className={`${TILE} ${plate()} ${PAD} lg:col-span-5`}>
+              <dl className="m-0 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-[96px_1fr]">
+                {story.facts.map(([term, value]) => (
+                  <div key={term} className="contents">
+                    <dt className="text-[14px] leading-[1.6] font-semibold text-muted">{term}</dt>
+                    <dd className="m-0 -mt-3 text-[16px] leading-[1.6] text-ink md:mt-0">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="m-0 mt-5 rounded-xl bg-white/80 px-4 py-3 text-[14px] leading-[1.5] text-[#4a4a4f]">{story.disclosure}</p>
+            </div>
           </header>
 
-          <nav aria-label="On this page" className="mt-8">
+          <nav aria-label="On this page" className="mt-6">
             <ul className="m-0 flex list-none flex-wrap gap-x-2 gap-y-1 p-0">
               {contents.map(([label, id]) => (
                 <li key={id}>
@@ -64,29 +74,27 @@ export default function StoryPage({ story }: { story: Story }) {
 
           <div id="key-flows" className="scroll-mt-24">
             {story.sections.map((section, i) => (
-              <Section key={section.id} section={section} n={i + 1} eager={i === 0} />
+              <Section key={section.id} section={section} n={i + 1} first={i === 0} />
             ))}
           </div>
 
-          {story.more && (
-            <Collapsed id="more-screens" heading={story.more.heading} shots={story.more.shots} summary="Show more screens" />
-          )}
+          {story.more && <Collapsed id="more-screens" heading={story.more.heading} shots={story.more.shots} summary="Show more screens" />}
           {story.visualSystem && (
             <Collapsed id="visual-system" heading={story.visualSystem.heading} shots={story.visualSystem.shots} summary="Show the logo construction" />
           )}
 
           {story.closing && (
-            <section aria-labelledby="closing" className={`${TEXT} mt-14 border-t border-line pt-10 md:mt-24`}>
-              <h2 id="closing" className="m-0 text-[24px] leading-[1.25] font-semibold tracking-[-0.015em] text-ink md:text-[28px]">{story.closing.heading}</h2>
-              <p className="m-0 mt-4 text-[16px] leading-[1.6] text-ink md:text-[18px]">{story.closing.copy}</p>
+            <section aria-labelledby="closing" className={`${TILE} mt-[clamp(48px,7vw,96px)] bg-[var(--accent)] ${PAD} text-white`}>
+              <h2 id="closing" className="m-0 text-[24px] leading-[1.25] font-semibold tracking-[-0.015em] md:text-[28px]">{story.closing.heading}</h2>
+              <p className="m-0 mt-4 max-w-[680px] text-[16px] leading-[1.6] md:text-[18px]">{story.closing.copy}</p>
             </section>
           )}
 
-          <nav aria-labelledby="more-work" className="mt-14 border-t border-line pt-10 md:mt-24">
+          <nav aria-labelledby="more-work" className="mt-[clamp(48px,7vw,96px)]">
             <h2 id="more-work" className="m-0 text-[24px] leading-[1.25] font-semibold tracking-[-0.015em] text-ink md:text-[28px]">More work</h2>
-            <ul className="m-0 mt-6 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2">
+            <ul className={`${GRID} m-0 mt-6 list-none p-0`}>
               {related.map((slug) => (
-                <li key={slug}>
+                <li key={slug} className="lg:col-span-6">
                   <RelatedCard slug={slug} />
                 </li>
               ))}
@@ -99,58 +107,50 @@ export default function StoryPage({ story }: { story: Story }) {
   )
 }
 
-function Section({ section, n, eager }: { section: StorySection; n: number; eager: boolean }) {
+// One numbered section as a bento group. The first section's screen is the page's hero: the largest tile, full
+// width. Later screens sit beside their text tile.
+function Section({ section, n, first }: { section: StorySection; n: number; first: boolean }) {
   const num = String(n).padStart(2, '0')
+  const besideText = !!section.primary && !first
+  const before = section.set?.filter((s) => s.label === 'Before') ?? []
+  const rest = section.set?.filter((s) => s.label !== 'Before') ?? []
+  const details = section.details ?? []
+  // Steps of a flow and narrow components (class cards, phones) share a row; wide screens take the full width.
+  const sideBySide = section.setLayout === 'row' || (rest.length > 1 && rest.every((s) => s.maxWidth))
+  const setSpan = !sideBySide ? 'lg:col-span-12' : rest.length === 2 ? 'lg:col-span-6' : 'lg:col-span-4'
   return (
-    <section id={section.id} aria-labelledby={`${section.id}-h`} className="mt-14 scroll-mt-24 md:mt-24">
-      <div className={TEXT}>
-        <p aria-hidden="true" className="m-0 font-title text-[14px] leading-none font-semibold tracking-[0.06em] text-[var(--accent)]">{num}</p>
-        <h2 id={`${section.id}-h`} className="m-0 mt-3 text-[24px] leading-[1.25] font-semibold tracking-[-0.015em] text-ink md:text-[32px]">
-          <span className="sr-only">{num}. </span>
-          {section.heading}
-        </h2>
-        {section.proposed && (
-          <p className="m-0 mt-4 rounded-xl border border-dashed border-[var(--accent)] px-4 py-3 text-[15px] leading-[1.55] text-ink">
-            <strong className="font-semibold">Proposed recovery states.</strong> {PROPOSED_DISCLOSURE}
-          </p>
-        )}
+    <section id={section.id} aria-labelledby={`${section.id}-h`} className={`${GRID} mt-[clamp(48px,7vw,96px)] scroll-mt-24`}>
+      <div className={`${TILE} flex flex-col justify-end bg-[var(--accent)] ${PAD} text-white ${besideText ? 'lg:col-span-4' : 'lg:col-span-12'}`}>
+        <p aria-hidden="true" className="m-0 font-title text-[14px] leading-none font-semibold tracking-[0.08em] text-white/80">{num}</p>
+        <div className={besideText ? '' : 'lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-end lg:gap-12'}>
+          <h2 id={`${section.id}-h`} className="m-0 mt-3 text-[24px] leading-[1.2] font-semibold tracking-[-0.015em] md:text-[32px]">
+            <span className="sr-only">{num}. </span>
+            {section.heading}
+          </h2>
+          {section.caption && <p className="m-0 mt-4 max-w-[680px] text-[16px] leading-[1.6] text-white">{section.caption}</p>}
+        </div>
       </div>
 
       {section.primary && (
-        <figure className="m-0 mt-6">
-          <Media shot={section.primary} eager={eager} />
-          <Caption shot={section.primary} text={section.caption} />
-        </figure>
+        <ShotTile shot={section.primary} span={first ? 'lg:col-span-12' : 'lg:col-span-8'} eager={first} />
       )}
 
-      {section.set && (
-        <figure className="m-0 mt-6">
-          <div className={section.setLayout === 'row' ? 'grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6' : 'flex flex-col gap-8'}>
-            {section.set.map((shot, k) => (
-              <figure key={shot.src} className="m-0" style={shot.maxWidth ? { maxWidth: shot.maxWidth } : undefined}>
-                <figcaption className="mb-2 text-[14px] leading-[1.4] font-semibold text-ink">{shot.label}</figcaption>
-                <Media shot={shot} eager={eager && k === 0} />
-                <div className="mt-1 flex justify-end">
-                  <ViewButton shot={shot} />
-                </div>
-              </figure>
-            ))}
-          </div>
-          {section.caption && <figcaption className={`${TEXT} mt-3 text-[16px] leading-[1.6] text-ink`}>{section.caption}</figcaption>}
-        </figure>
+      {before.map((shot) => (
+        <ShotTile key={shot.src} shot={shot} span={before.length > 1 ? 'lg:col-span-6' : 'lg:col-span-12'} labelled eager={first} />
+      ))}
+      {rest.map((shot) => (
+        <ShotTile key={shot.src} shot={shot} span={setSpan} labelled eager={first} />
+      ))}
+
+      {details.map((shot) => (
+        <DetailTile key={shot.src} shot={shot} />
+      ))}
+      {section.detailCaption && (
+        <p className="m-0 max-w-[680px] px-1 text-[16px] leading-[1.6] text-ink lg:col-span-12">{section.detailCaption}</p>
       )}
 
-      {section.demo && !section.demoAfter && (
-        <div className="mt-6" role="group" aria-label={section.proposed ? 'Proposed recovery states' : undefined}>
-          <StoryDemo kind={section.demo} />
-          {section.caption && !section.primary && !section.set && <p className={`${TEXT} m-0 mt-3 text-[16px] leading-[1.6] text-ink`}>{section.caption}</p>}
-        </div>
-      )}
-
-      {section.details && <Details shots={section.details} caption={section.detailCaption} />}
-
-      {section.demo && section.demoAfter && (
-        <div className="mt-8">
+      {section.demo && (
+        <div className="lg:col-span-12">
           <StoryDemo kind={section.demo} />
         </div>
       )}
@@ -158,83 +158,72 @@ function Section({ section, n, eager }: { section: StorySection; n: number; eage
   )
 }
 
-// The image area: the screen at its natural ratio, never cropped by CSS. Dark UI keeps a dark ground.
-function Media({ shot, eager = false }: { shot: Shot; eager?: boolean }) {
+// A screen in its own tile, at its natural ratio (never cropped by CSS), with the full-size control.
+function ShotTile({ shot, span, eager = false, labelled = false }: { shot: Shot; span: string; eager?: boolean; labelled?: boolean }) {
   return (
-    <div
-      className={`overflow-hidden rounded-[12px] border md:rounded-[14px] ${shot.dark ? 'border-[#2a2a31] bg-[#0B0B10]' : 'border-line bg-[#F7F8FA]'}`}
-      style={shot.maxWidth ? { maxWidth: shot.maxWidth } : undefined}
-    >
-      { }
-      <img
-        className="block h-auto w-full object-contain"
-        src={shot.src}
-        width={shot.width}
-        height={shot.height}
-        alt={shot.alt}
-        loading={eager ? 'eager' : 'lazy'}
-        decoding="async"
-      />
-    </div>
-  )
-}
-
-function Caption({ shot, text }: { shot: Shot; text?: string }) {
-  return (
-    <div className="mt-2 flex flex-col gap-1 md:flex-row md:items-start md:justify-between md:gap-6">
-      {text ? <figcaption className={`${TEXT} pt-2 text-[16px] leading-[1.6] text-ink`}>{text}</figcaption> : <span />}
-      <ViewButton shot={shot} />
-    </div>
-  )
-}
-
-// Close-ups: one beside a caption column on desktop, or two balanced cards. A shared caption sits under them.
-function Details({ shots, caption }: { shots: Shot[]; caption?: string }) {
-  const single = shots.length === 1
-  return (
-    <figure className="m-0 mt-8">
-      <div className={single ? '' : 'grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6'}>
-        {shots.map((shot) => (
-          <figure
-            key={shot.src}
-            className={`m-0 ${single ? 'grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,var(--w))_minmax(280px,320px)] md:items-start md:gap-8' : ''}`}
-            style={{ '--w': shot.maxWidth ? `${shot.maxWidth}px` : '1fr', ...(!single && shot.maxWidth ? { maxWidth: shot.maxWidth } : {}) } as CSSProperties}
-          >
-            <Media shot={shot} />
-            <div className={single ? 'md:pt-1' : 'mt-2'}>
-              <figcaption className="text-[14px] leading-[1.55] text-ink">
-                {shot.label && <strong className="block font-semibold">{shot.label}</strong>}
-                {shot.caption && <span className="mt-1 block text-[15px] leading-[1.55]">{shot.caption}</span>}
-                {single && caption && <span className="mt-1 block text-[15px] leading-[1.55]">{caption}</span>}
-              </figcaption>
-              <ViewButton shot={shot} />
-            </div>
-          </figure>
-        ))}
+    <figure className={`${TILE} ${plate(shot.dark)} ${PAD} m-0 flex flex-col ${span}`}>
+      {labelled && shot.label && (
+        <figcaption className={`mb-3 text-[14px] leading-[1.4] font-semibold ${shot.dark ? 'text-white' : 'text-ink'}`}>{shot.label}</figcaption>
+      )}
+      <div className="flex flex-1 items-center justify-center">
+        <Img shot={shot} eager={eager} />
       </div>
-      {!single && caption && <figcaption className={`${TEXT} mt-4 text-[16px] leading-[1.6] text-ink`}>{caption}</figcaption>}
+      <div className="mt-2 flex justify-end">
+        <ViewButton shot={shot} dark={shot.dark} />
+      </div>
     </figure>
+  )
+}
+
+// A close-up with its caption beside it (under it on phones). Each close-up has a full-width tile, so the crop stays
+// large enough to read; the caption column sits to its right.
+function DetailTile({ shot }: { shot: Shot }) {
+  return (
+    <figure className={`${TILE} ${plate(shot.dark)} ${PAD} m-0 grid grid-cols-1 items-center gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(180px,300px)] sm:gap-8 lg:col-span-12`}>
+      <div className="mx-auto w-full max-w-[860px]">
+        <Img shot={shot} />
+      </div>
+      <div>
+        <figcaption className={`text-[14px] leading-[1.55] ${shot.dark ? 'text-white' : 'text-ink'}`}>
+          {shot.label && <strong className="block text-[15px] font-semibold">{shot.label}</strong>}
+          {shot.caption && <span className="mt-1 block text-[15px] leading-[1.55]">{shot.caption}</span>}
+        </figcaption>
+        <div className="-ml-2 mt-1">
+          <ViewButton shot={shot} dark={shot.dark} />
+        </div>
+      </div>
+    </figure>
+  )
+}
+
+function Img({ shot, eager = false }: { shot: Shot; eager?: boolean }) {
+  return (
+     
+    <img
+      className={`mx-auto block h-auto w-full rounded-[10px] object-contain ${shot.dark ? 'ring-1 ring-white/10' : 'ring-1 ring-black/[0.06]'}`}
+      style={shot.maxWidth ? { maxWidth: shot.maxWidth } : undefined}
+      src={shot.src}
+      width={shot.width}
+      height={shot.height}
+      alt={shot.alt}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+    />
   )
 }
 
 function Collapsed({ id, heading, shots, summary }: { id: string; heading: string; shots: Shot[]; summary: string }) {
   return (
-    <section id={id} aria-labelledby={`${id}-h`} className="mt-14 scroll-mt-24 border-t border-line pt-10 md:mt-24">
+    <section id={id} aria-labelledby={`${id}-h`} className="mt-[clamp(48px,7vw,96px)] scroll-mt-24">
       <h2 id={`${id}-h`} className="m-0 text-[24px] leading-[1.25] font-semibold tracking-[-0.015em] text-ink md:text-[28px]">{heading}</h2>
       <details className="group mt-4">
         <summary className={`inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-full border border-line px-4 text-[15px] font-medium text-ink hover:border-ink [&::-webkit-details-marker]:hidden ${focus}`}>
           <span aria-hidden="true" className="transition-transform group-open:rotate-90 motion-reduce:transition-none">›</span>
           {summary}
         </summary>
-        <div className="mt-6 flex flex-col gap-8">
+        <div className={`${GRID} mt-6`}>
           {shots.map((shot) => (
-            <figure key={shot.src} className="m-0">
-              <figcaption className="mb-2 text-[14px] leading-[1.4] font-semibold text-ink">{shot.label}</figcaption>
-              <Media shot={shot} />
-              <div className="mt-1 flex justify-end">
-                <ViewButton shot={shot} />
-              </div>
-            </figure>
+            <ShotTile key={shot.src} shot={shot} span="lg:col-span-12" labelled />
           ))}
         </div>
       </details>
@@ -249,15 +238,15 @@ function RelatedCard({ slug }: { slug: string }): ReactNode {
   // The redesigned screen, never a Before image.
   const thumb = first.primary ?? first.set?.[first.set.length - 1]
   return (
-    <Link href={`/work/${slug}`} className={`group block rounded-[14px] border border-line p-3 text-ink no-underline hover:border-ink ${focus}`}>
+    <Link href={`/work/${slug}`} className={`${TILE} ${plate()} group block p-3 text-ink no-underline ${focus}`}>
       {thumb && (
-        <div className={`aspect-[16/10] overflow-hidden rounded-[10px] ${thumb.dark ? 'bg-[#0B0B10]' : 'bg-[#F7F8FA]'}`}>
+        <div className={`aspect-[16/10] overflow-hidden rounded-[14px] ${thumb.dark ? 'bg-[#0B0B10]' : 'bg-white'}`}>
           { }
           <img src={thumb.src} alt="" width={thumb.width} height={thumb.height} loading="lazy" decoding="async" className="block h-full w-full object-contain" />
         </div>
       )}
-      <p className="m-0 mt-4 px-1 text-[14px] font-semibold text-[var(--accent)]">{story.category}</p>
-      <p className="m-0 mt-1 px-1 pb-1 text-[20px] leading-[1.3] font-semibold tracking-[-0.01em] group-hover:underline">{story.title}</p>
+      <p className="m-0 mt-4 px-2 text-[14px] font-semibold text-[var(--accent)]">{story.category}</p>
+      <p className="m-0 mt-1 px-2 pb-2 text-[20px] leading-[1.3] font-semibold tracking-[-0.01em] group-hover:underline">{story.title}</p>
     </Link>
   )
 }

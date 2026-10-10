@@ -106,13 +106,14 @@ export function ViewerProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function ViewButton({ shot }: { shot: Shot }) {
+// On a dark tile the control is white, so it keeps its contrast.
+export function ViewButton({ shot, dark = false }: { shot: Shot; dark?: boolean }) {
   const open = useContext(ViewerContext)
   return (
     <button
       type="button"
       onClick={(e) => open(shot, e.currentTarget)}
-      className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-2 text-[14px] leading-none font-medium text-[var(--accent)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+      className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-2 text-[14px] leading-none font-medium underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 ${dark ? 'text-white focus-visible:outline-white' : 'text-[var(--accent)] focus-visible:outline-[var(--accent)]'}`}
     >
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
