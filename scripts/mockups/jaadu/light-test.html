@@ -1,0 +1,51 @@
+<!doctype html><meta charset="utf-8">
+<style>
+@font-face{font-family:Geist;font-weight:100 900;src:url(../../../node_modules/next/dist/next-devtools/server/font/geist-latin.woff2)}
+
+body{margin:0;background:#fff}
+.bd{position:relative;width:1600px;overflow:hidden;margin:0 0 60px;font-family:Geist,sans-serif;background:radial-gradient(1000px 700px at 0% 0%,#E3E8F3 0%,rgba(227,232,243,0) 70%),#EEF0F4}
+.rim::after{display:none}
+.tl{position:absolute;overflow:hidden;border-radius:40px;background:linear-gradient(180deg,#FFFFFF 0%,#F5F6F9 100%);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9),0 30px 60px -40px rgba(15,23,42,.25)}
+.tl img{position:absolute;display:block;border-radius:18px;box-shadow:0 0 0 1px rgba(10,18,64,.08),0 30px 60px -24px rgba(10,18,64,.45)}
+.ex{position:absolute;box-sizing:border-box;border-radius:40px;padding:34px 34px 36px;color:#fff;background:radial-gradient(420px 260px at 100% 0%,#1B3A9E 0%,rgba(27,58,158,0) 70%),#0A1240;height:auto!important}
+.ex .lb{font:500 15px Geist;letter-spacing:.1em;text-transform:uppercase;color:#7FA2FF}
+.ex h3{font:500 34px/1.15 Geist;margin:0;letter-spacing:-.02em}
+.ex p{font:400 18px/1.55 Geist;color:#C3CDEB;margin:14px 0 0;max-width:640px}
+.chip{position:absolute;z-index:6;display:flex;align-items:center;gap:12px;background:#fff;border-radius:999px;padding:12px 22px 12px 16px;font:500 20px Geist;color:#0A1240;box-shadow:0 12px 28px -12px rgba(10,18,64,.35),0 0 0 1px rgba(10,18,64,.06);white-space:nowrap}
+.chip i{width:12px;height:12px;border-radius:50%;background:var(--c,#5985ff)}
+.dl{position:absolute;left:0;top:0;z-index:6;overflow:visible;pointer-events:none}
+</style>
+<div id="root"></div>
+<script>
+const F='feat/'
+const M=(id,h,inner)=>`<div class="bd" id="${id}" style="height:${h}px">${inner}</div>`
+const tile=(l,t,w,h,inner)=>`<div class="tl rim" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px">${inner}</div>`
+const img=(n,w,l,t,r=18)=>`<img src="${F}${n}.png" style="left:${l}px;top:${t}px;width:${w}px;border-radius:${r}px">`
+const ex=(l,t,w,h,lb,title,body,items=[])=>`<div class="ex" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><h3>${title}</h3><p>${body}</p></div>`
+const call=(x1,y1,x2,y2,c,txt,cx,cy)=>`<svg class="dl" width="1600" height="1200"><path d="M${x1} ${y1} L${x2} ${y2}" fill="none" stroke="#8A97B8" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="9" fill="${c}" stroke="#fff" stroke-width="3"/></svg><div class="chip" style="--c:${c};left:${cx}px;top:${cy}px"><i></i>${txt}</div>`
+const S=[]
+const T=(l,t,w,lb,title,body)=>ex(l,t,w,230,lb,title,body)
+S.push(M('f1',760,tile(40,40,1100,680,img('fp-zoom',1060,20,60,14))+
+ call(1031,434,900,640,'#45FFB5','One candle, split into price bins',680,640)+
+ call(457,179,330,640,'#5CB5FF','Buys, sells and delta for a bin',90,640)+
+ T(1160,40,400,'Footprint chart','See inside every candle','Each candle splits into price bins, with the volume traded in each.')+
+ tile(1160,340,400,380,img('c-trades',360,20,96,18))))
+S.push(M('f2',760,T(40,20,560,'Regime','Read the market’s mood','Sideways, breakout, volatile or reversal, with a share for each.')+
+ tile(40,280,560,440,img('c-crypto',500,30,70,22))+tile(620,40,940,680,img('c-regime',820,60,150,36))))
+S.push(M('f3',780,tile(40,40,520,700,img('c-create-alert',440,40,30,18))+
+ T(580,20,980,'Alerts','Alerts on more than price','Price, POC, footprint and regime conditions, firing only when all of them hold.')+
+ tile(580,270,980,470,img('c-alert',1500,20,30,14))))
+S.push(M('f4',1240,T(40,40,1520,'Quant Lab · Overnight Discoveries','Set it up. Wake up to a shortlist.','Hundreds of strategies tested overnight. Only the survivors reach your morning shortlist.')+
+ tile(40,290,1520,470,img('funnel',1440,40,30))+tile(40,780,1520,420,img('cards',1440,40,40))))
+S.push(M('f5',1000,tile(40,40,1040,920,img('library',1000,20,20))+
+ T(1100,20,460,'Quant Lab · Library','Every strategy, one card','Regime, direction, win rate and backtest, with paper trade and fork on the card.')+
+ tile(1100,340,460,620,img('card1',420,20,100,22))))
+S.push(M('f6',1250,T(40,40,1520,'Quant Lab · Comparison','Compare strategies side by side','Five metrics in one table, and every equity curve on one chart.')+
+ tile(40,240,1520,450,img('cmp',1440,40,32))+tile(40,710,1520,500,img('equity',1440,40,24))))
+S.push(M('f7',760,T(40,20,400,'Quant Lab · Déjà Vu','Has this happened before?','Finds similar moments in market history and shows what happened next.')+
+ tile(40,320,400,400,img('deja-outcome',360,20,70,18))+tile(460,40,1100,680,img('deja',1060,20,60))))
+S.push(M('f8',760,tile(40,40,960,680,img('c-prompt-suggested',800,80,90,26)+img('c-prompt-typing',800,80,420,26))+
+ T(1020,20,540,'AI chart prompt','Ask about any point','Tap the chart and ask. On mobile it docks to the bottom.')+
+ tile(1020,300,540,420,img('c-prompt-generating',500,20,130,24))))
+document.getElementById('root').innerHTML=S.join('')
+</script>
