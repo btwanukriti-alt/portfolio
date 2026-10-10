@@ -4,7 +4,7 @@
 //   orbit   - a tilted 3D circle around the centre. Tiles stream out of the intro's frame (on the
 //             right), sweep across the front, round the far side and back.
 //   ring    - first scroll: an even circle around the headline.
-//   scatter - second scroll: spread around the About paragraph at different depths, drifting.
+//   scatter - second scroll: a loose scatter on either side of the About paragraph, drifting.
 
 // The formation was laid out around a 1600 x 837 face illustration (the earlier hero); its
 // proportions still set the circle's size and centre line, so the motion stays the same.
@@ -162,6 +162,33 @@ export type Spot = { x: number; y: number; d: number; seed: number }
 // Scatter positions (normalised 0..1), clear of the paragraph in the middle. Seeded, so the
 // layout is the same on every visit.
 export function scatterSpots(n: number, mobile: boolean): Spot[] {
+  // Desktop: a loose scatter on a hidden grid, two staggered columns on each side of the
+  // paragraph. Each screen is nudged off its cell and sized a little differently, so it reads as
+  // scattered, but the cells keep the screens from overlapping.
+  if (!mobile) {
+    let seed = 11
+    const rand = () => {
+      seed = (seed * 16807) % 2147483647
+      return seed / 2147483647
+    }
+    const spots: Spot[] = []
+    const cols = [
+      { x: 0.09, y0: 0.2 },
+      { x: 0.215, y0: 0.29 },
+      { x: 0.785, y0: 0.27 },
+      { x: 0.91, y0: 0.19 },
+    ]
+    for (let i = 0; i < n; i++) {
+      const c = cols[i % 4]
+      spots.push({
+        x: c.x + (rand() - 0.5) * 0.03,
+        y: c.y0 + Math.floor(i / 4) * 0.2 + (rand() - 0.5) * 0.07,
+        d: 0.8 + rand() * 0.25,
+        seed: rand() * 10,
+      })
+    }
+    return spots
+  }
   // mulberry32
   let seed = mobile ? 7 : 3
   const rand = () => {
@@ -189,11 +216,22 @@ export function scatterSpots(n: number, mobile: boolean): Spot[] {
 
 export function scatterPose(L: Layout, spot: Spot, time: number, mx: number, my: number): Pose {
   const t = time / 1000
+  // Desktop: every screen drifts gently, sized by its spot (0.8 to 1.05 of the base size).
+  if (!L.mobile) {
+    return {
+      x: spot.x * L.w + Math.sin(t * 0.35 + spot.seed) * 8 + mx * 16 * spot.d,
+      y: spot.y * L.h + Math.cos(t * 0.29 + spot.seed * 1.3) * 7 + my * 12 * spot.d,
+      s: Math.min(0.66, (L.w * 0.1) / L.tileW) * spot.d,
+      o: 0.82 + (spot.d - 0.8) * 0.72,
+      blur: 0,
+      z: spot.d * 100 - 50,
+    }
+  }
   const drift = 0.5 + spot.d
   return {
     x: spot.x * L.w + Math.sin(t * 0.35 + spot.seed) * 12 * drift + mx * 26 * drift,
     y: spot.y * L.h + Math.cos(t * 0.29 + spot.seed * 1.3) * 10 * drift + my * 18 * drift,
-    s: L.mobile ? 0.6 + spot.d * 0.35 : 0.48 + spot.d * 0.7,
+    s: 0.6 + spot.d * 0.35,
     o: 0.6 + spot.d * 0.4,
     blur: (1 - spot.d) * 1.3,
     z: spot.d * 100 - 50,

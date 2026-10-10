@@ -20,13 +20,16 @@
   --color-zync-mint: #2dc6a0;
   --color-zync-amber: #f5b01d;
 
-  --font-body: var(--font-hanken), system-ui, sans-serif;
-  --font-wordmark: var(--font-rubik-mono), var(--font-hanken), sans-serif;
-  --font-hand: var(--font-architects), cursive;
-  --font-slides: var(--font-poppins), var(--font-hanken), sans-serif;
-  --font-hero: var(--font-inter-tight), var(--font-hanken), sans-serif;
-  --font-hero-mono: var(--font-jetbrains), ui-monospace, monospace;
-  --font-wordmark-zync: var(--font-montserrat), var(--font-hanken), sans-serif;
+  /* Two fonts site-wide: Inter Tight for titles, Inter for running text. The older names below
+     all point at Inter Tight, so every label and wordmark uses it too. */
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-title: var(--font-inter-tight), var(--font-inter), sans-serif;
+  --font-wordmark: var(--font-title);
+  --font-hand: var(--font-title);
+  --font-slides: var(--font-title);
+  --font-hero: var(--font-title);
+  --font-hero-mono: var(--font-title);
+  --font-wordmark-zync: var(--font-title);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -66,6 +69,15 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-title);
   }
 
   ::selection {

@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
+import Logo from './Logo'
 import { Reveal } from './Reveal'
 import { getLenis } from './SmoothScroll'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
@@ -147,17 +148,24 @@ function BuildHeading() {
         gsap.set(real, { opacity: 0 })
         gsap.set([outline, nodes, handle], { opacity: 0 })
         update()
-        // Play once the visitor is actually at the frame: (nearly) all of it on screen, or as
-        // much of it as fits when it's taller than the window.
+        // Play every time the visitor arrives at the frame: (nearly) all of it on screen, or as
+        // much of it as fits when it's taller than the window. Once it's off screen it resets.
         const frame = h.closest<HTMLElement>('[data-frame]') ?? h
         const need = Math.min(0.9, (0.9 * window.innerHeight) / frame.offsetHeight)
+        let start: gsap.core.Tween | undefined
         io = new IntersectionObserver(
           ([e]) => {
-            if (e.intersectionRatio < need) return
-            io?.disconnect()
-            gsap.delayedCall(0.3, () => tl.play())
+            if (!e.isIntersecting) {
+              start?.kill()
+              start = undefined
+              tl.pause(0)
+              update()
+              return
+            }
+            if (e.intersectionRatio < need || start || tl.progress() > 0) return
+            start = gsap.delayedCall(0.3, () => tl.play(0))
           },
-          { threshold: [need] },
+          { threshold: [0, need] },
         )
         io.observe(frame)
       })
@@ -256,7 +264,6 @@ export default function Contact({ current }: { current?: string } = {}) {
             <Shapes />
             <div className="relative flex flex-col gap-10 min-h-[clamp(320px,30vw,440px)] justify-end px-[clamp(24px,5vw,72px)] py-[clamp(44px,5vw,72px)] min-[901px]:flex-row min-[901px]:items-end min-[901px]:justify-between">
               <div>
-                <p className="m-0 text-[15px] leading-none font-medium text-white/55">Contact</p>
                 <BuildHeading />
               </div>
               <div className="flex flex-col items-start gap-5 min-[901px]:items-end">
@@ -310,11 +317,10 @@ export default function Contact({ current }: { current?: string } = {}) {
         )}
       </section>
 
-      {/* Site footer: name on the left, copyright in the centre, socials and back to top as icons. */}
+      {/* Site footer: the logo on the left, copyright in the centre, socials and back to top as icons. */}
       <footer className="mx-auto mt-[clamp(40px,6vh,72px)] grid max-w-[var(--max)] grid-cols-[1fr_auto] items-center gap-4 border-t border-line px-[var(--gutter)] py-6 font-body text-[14px] leading-none min-[641px]:grid-cols-[1fr_auto_1fr]">
-        <Link href="/" className="inline-flex items-center gap-2.5 justify-self-start text-[16px] font-medium tracking-[-0.02em] text-ink no-underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
-          <span aria-hidden className="size-[9px] rounded-full bg-ink shadow-[0_0_0_3px_rgba(13,13,12,.1)]" />
-          Anukriti Mishra
+        <Link href="/" aria-label="Anukriti Mishra, home" className="inline-flex items-center justify-self-start text-ink no-underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+          <Logo className="block h-[20px] w-auto" />
         </Link>
         <p className="col-span-2 row-start-2 m-0 text-center text-faint min-[641px]:col-span-1 min-[641px]:row-start-auto">
           © {new Date().getFullYear()} Anukriti Mishra

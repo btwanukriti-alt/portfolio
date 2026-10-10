@@ -62,10 +62,9 @@ export default function About() {
       typed.textContent = ''
       gsap.set(pin, { autoAlpha: 0, scale: 0.6 })
       gsap.set(bar, { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 0%' })
-      // Starts as soon as the heading comes on screen (and plays again after scrolling back above
-      // it), with quick beats before the typing, so it's under way while the title is in view.
+      // Starts every time the heading comes on screen, from above or below, with quick beats before the typing, so it's under way while the title is in view.
       gsap
-        .timeline({ scrollTrigger: { trigger: h, start: 'top bottom', toggleActions: 'restart none none reset' } })
+        .timeline({ scrollTrigger: { trigger: h, start: 'top bottom', end: 'bottom top', toggleActions: 'restart none restart reset' } })
         .set(typed, { textContent: '' })
         .to(pin, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(1.6)' })
         .to(bar, { autoAlpha: 1, scaleY: 1, duration: 0.2, ease: 'power2.out' }, '-=0.1')
@@ -93,7 +92,7 @@ export default function About() {
         gsap.set([...cards, ...dots], { autoAlpha: 1, y: 0, scale: 1 })
         return
       }
-      const scrollTrigger = { trigger: timeline.current, start: 'top 75%', once: true }
+      const scrollTrigger = { trigger: timeline.current, start: 'top 75%', end: 'bottom 25%', toggleActions: 'play reset play reset' }
       gsap.to(line, { scale: 1, duration: 1.4, ease: 'power2.inOut', scrollTrigger })
       gsap.fromTo(dots, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out', stagger: 0.22, delay: 0.15, scrollTrigger })
       gsap.fromTo(cards, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12, delay: 0.25, scrollTrigger })

@@ -47,7 +47,6 @@ export default function GalleryCaseStudy({
     '--c-soft': brand.soft,
     '--c-tint': brand.tint,
     '--c-pop': brand.pop,
-    ...(brand.font ? { '--c-font': brand.font } : {}),
   } as CSSProperties
   const title = study.title ?? project.title
   const meta = [study.label, study.company, study.dates].filter(Boolean).join(' · ')
@@ -77,7 +76,7 @@ export default function GalleryCaseStudy({
             </Reveal>
             <SplitReveal
               as="h1"
-              className={`m-0 mt-6 ${brand.font ? '[font-family:var(--c-font)]' : 'font-wordmark-zync'} text-[clamp(40px,5.5vw,84px)] leading-[1] font-bold tracking-[-0.035em] text-ink`}
+              className="m-0 mt-6 font-title text-[clamp(40px,5.5vw,84px)] leading-[1] font-bold tracking-[-0.035em] text-ink"
               text={title}
             />
           </div>
