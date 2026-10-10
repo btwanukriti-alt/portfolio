@@ -6,7 +6,7 @@ import { caseStudyHref } from '@/data/projects'
 import { gsap, reducedMotion } from '@/lib/gsap'
 import { getLenis, pageScroll } from '../SmoothScroll'
 import NavBar from '../NavBar'
-import { EMAIL as CONTACT_EMAIL, LINKEDIN } from '@/data/site'
+import { EMAIL as CONTACT_EMAIL } from '@/data/site'
 import {
   Spring,
   clamp,
@@ -32,9 +32,8 @@ import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 // upright). The three cards draw UX, branding and motion, then lift off in 3D, turning over to UI
 // screenshots as they fly, onto the front of a 3D ring of screenshots that appears around them;
 // the ring turns and settles. Then "Let's build something" fades in.
-// The whole intro plays by itself on load. Scrolling (the hero stays pinned) then gathers the
-// screens into a ring around the headline, then scatters them at different depths around a short
-// About paragraph.
+// The whole intro plays by itself on load. Scrolling (the hero stays pinned) then scatters the
+// screens around a short About paragraph.
 
 const EMAIL = `mailto:${CONTACT_EMAIL}`
 
@@ -44,7 +43,6 @@ const CARD_SIZES = '(max-width: 719px) 80vw, 420px'
 
 const LINE_1 = 'Hello, I am Anukriti.'
 const LINE_2 = 'Experience Designer'
-const HEADLINE = 'The app. The website. The brand. The motion. One designer.'
 const ABOUT =
   "I'm Anukriti, an experience designer for SaaS. I've designed products for traders, gyms, colleges and engineers, and everything users see around them."
 
@@ -66,9 +64,9 @@ const N = TILES.length
 const CHAIN_GAP = 0.2 // radians between screenshots while they stream out
 const SPREAD_GAP = (Math.PI * 2) / N
 const IDLE_SPEED = 0.14
-// Scroll: the hero is pinned for 1.8 extra screens. Stage 1 (ring + headline) takes the first,
-// stage 2 (scatter + About) the rest, then a short hold.
-const SCROLL_STAGES = 1.8
+// Scroll: the hero is pinned for 1.1 extra screens: the screens leave the intro's ring and scatter
+// around the About paragraph, then a short hold.
+const SCROLL_STAGES = 1.1
 const HERO_HEIGHT = `${(1 + SCROLL_STAGES) * 100}svh`
 // Where the ring's angle starts as the cards lift: screenshot 1 (the middle card) faces the viewer
 // and 0 and 2 sit either side of it; whole turns ahead keep every angle positive.
@@ -122,7 +120,6 @@ function TypedLine({ text, lineRef }: { text: string; lineRef: RefObject<HTMLDiv
 function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
   const stage = useRef<HTMLDivElement>(null)
   const tiles = useRef<(HTMLAnchorElement | null)[]>([])
-  const intro = useRef<HTMLDivElement>(null)
   const about = useRef<HTMLDivElement>(null)
   const hint = useRef<HTMLDivElement>(null)
   const centre = useRef<HTMLDivElement>(null)
@@ -140,7 +137,6 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
   useEffect(() => {
     const root = scrollRoot.current
     const space = stage.current
-    const introEl = intro.current
     const aboutEl = about.current
     const hintEl = hint.current
     const centreEl = centre.current
@@ -154,13 +150,11 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
     const chip = shortcut.current
     const deck = cards.current.filter((c): c is HTMLDivElement => !!c)
     if (
-      !root || !space || !introEl || !aboutEl || !hintEl || !centreEl || !l1 || !l2 || !finaleEl ||
+      !root || !space || !aboutEl || !hintEl || !centreEl || !l1 || !l2 || !finaleEl ||
       !sel || !guideEl || !cur || !chromeEl || !chip || deck.length !== 3
     )
       return
     const reduce = reducedMotion()
-    const headWords = [...introEl.querySelectorAll<HTMLElement>('[data-word]')]
-    const introBits = [...introEl.querySelectorAll<HTMLElement>('[data-fade]')]
     const aboutWords = [...aboutEl.querySelectorAll<HTMLElement>('[data-word]')]
     const aboutLabel = aboutEl.querySelector<HTMLElement>('[data-fade]')
     const typed1 = l1.querySelector<HTMLElement>('[data-typed]')!
@@ -246,29 +240,15 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         el.style.opacity = away > 0 ? String(1 - away) : ''
         el.style.visibility = away > 0.99 ? 'hidden' : ''
       }
-      // Headline: words rise from behind a mask as the ring forms; it lifts away for the About.
-      headWords.forEach((w, i) => {
-        const p = smooth((a * 1.35 - i * 0.07) / 0.45)
-        w.style.transform = `translateY(${(1 - p) * 110}%)`
-      })
-      introBits.forEach((el) => {
-        const p = smooth((a - Number(el.dataset.fade)) / 0.3)
-        el.style.opacity = String(p)
-        el.style.transform = `translateY(${(1 - p) * 14}px)`
-      })
-      const out = smooth(b * 2.2)
-      introEl.style.opacity = String(1 - out)
-      introEl.style.transform = `translateY(${-out * 40}px)`
-      introEl.style.visibility = a > 0.01 && out < 0.99 ? 'visible' : 'hidden'
-      introEl.style.pointerEvents = a > 0.7 && out < 0.3 ? 'auto' : 'none'
       // About: fades up, then reads in word by word, light grey to ink.
-      const inn = smooth(b * 2.5)
+      // It waits until the screens have mostly cleared the middle.
+      const inn = smooth((b - 0.45) / 0.35)
       aboutEl.style.opacity = String(inn)
       aboutEl.style.transform = `translateY(${(1 - inn) * 30}px)`
-      aboutEl.style.visibility = b > 0.01 ? 'visible' : 'hidden'
+      aboutEl.style.visibility = inn > 0.01 ? 'visible' : 'hidden'
       if (aboutLabel) aboutLabel.style.opacity = String(inn)
       aboutWords.forEach((w, i) => {
-        const p = clamp((b * 1.2 - 0.12 - (i / aboutWords.length) * 0.75) / 0.18)
+        const p = clamp(((b - 0.45) * 2 - (i / aboutWords.length) * 0.75) / 0.18)
         w.style.opacity = String(0.16 + 0.84 * p)
       })
       hintEl.style.opacity = String(hintOn)
@@ -292,8 +272,8 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
       if (!reduce && (!tl || tl.progress() >= 1)) idle += IDLE_SPEED * dt
       lastAngle = baseAngle + st.spin + idle
       const flying = st.fly > 0.5
-      const a = smooth(scroll)
-      const b = smooth((scroll - 0.95) / 0.75)
+      const a = smooth(scroll / 0.5)
+      const b = smooth((scroll - 0.2) / 0.7)
 
       mouse.x += (mouse.tx - mouse.x) * Math.min(1, dt * 3)
       mouse.y += (mouse.ty - mouse.y) * Math.min(1, dt * 3)
@@ -796,46 +776,8 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
         ))}
       </div>
 
-      {/* Headline (ring stage) and About (scatter stage), centred over the screenshots. */}
+      {/* The About paragraph, centred over the scattered screenshots. */}
       <div className="pointer-events-none absolute inset-0 z-[400] flex items-center justify-center px-6">
-        <div ref={intro} className="invisible absolute flex max-w-[min(560px,64vw)] flex-col items-center text-center max-[719px]:max-w-[72vw]">
-          <p data-fade="0" className="m-0 mb-5 font-hero-mono text-[11px] tracking-[0.12em] text-muted uppercase opacity-0">
-            Anukriti Mishra · Experience Designer
-          </p>
-          <p className="m-0 font-hero text-[clamp(28px,3.9vw,58px)] leading-[1.06] [@media(max-height:500px)]:text-[26px] font-medium tracking-[-0.035em] text-ink">
-            {words(HEADLINE).map((w, i) => (
-              <span key={i} className="inline-block overflow-hidden pb-[0.1em] align-bottom -mb-[0.1em]">
-                <span data-word className="inline-block will-change-transform" style={{ transform: 'translateY(110%)' }}>
-                  {w}
-                </span>
-                {' '}
-              </span>
-            ))}
-          </p>
-          <div data-fade="0.55" className="mt-8 [@media(max-height:500px)]:mt-5 flex flex-wrap items-center justify-center gap-2.5 opacity-0">
-            <a
-              href="#work"
-              className="bg-ink px-5 py-3 font-hero text-[14px] leading-none font-medium text-white transition-colors hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              See my work
-            </a>
-            <a
-              href={EMAIL}
-              className="border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              Email me
-            </a>
-            <a
-              href={LINKEDIN}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-[#0d0d0c26] px-5 py-3 font-hero text-[14px] leading-none font-medium text-ink transition-colors hover:border-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              LinkedIn
-            </a>
-          </div>
-        </div>
-
         <div ref={about} className="invisible absolute max-w-[min(720px,52vw)] text-center max-[719px]:max-w-[86vw] [@media(max-height:500px)]:max-w-[62vw]">
           <p data-fade className="m-0 mb-5 font-hero-mono text-[11px] tracking-[0.12em] text-muted uppercase">
             About

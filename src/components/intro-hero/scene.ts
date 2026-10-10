@@ -3,8 +3,8 @@
 //
 //   orbit   - a tilted 3D circle around the centre. Tiles stream out of the intro's frame (on the
 //             right), sweep across the front, round the far side and back.
-//   ring    - first scroll: an even circle around the headline.
-//   scatter - second scroll: a loose scatter on either side of the About paragraph, drifting.
+//   ring    - start of the scroll: an even circle, on the way to the scatter.
+//   scatter - second scroll: scattered around the About paragraph without overlapping, drifting.
 
 // The formation was laid out around a 1600 x 837 face illustration (the earlier hero); its
 // proportions still set the circle's size and centre line, so the motion stays the same.
@@ -162,32 +162,35 @@ export type Spot = { x: number; y: number; d: number; seed: number }
 // Scatter positions (normalised 0..1), clear of the paragraph in the middle. Seeded, so the
 // layout is the same on every visit.
 export function scatterSpots(n: number, mobile: boolean): Spot[] {
-  // Desktop: a loose scatter on a hidden grid, two staggered columns on each side of the
-  // paragraph. Each screen is nudged off its cell and sized a little differently, so it reads as
-  // scattered, but the cells keep the screens from overlapping.
+  // Desktop: a balanced scatter, every screen about the same size: six above the paragraph, six
+  // below and two either side, each nudged a little off its spot (never far enough to touch a
+  // neighbour).
   if (!mobile) {
-    let seed = 11
+    let seed = 5
     const rand = () => {
       seed = (seed * 16807) % 2147483647
       return seed / 2147483647
     }
-    const spots: Spot[] = []
-    const cols = [
-      { x: 0.09, y0: 0.2 },
-      { x: 0.215, y0: 0.29 },
-      { x: 0.785, y0: 0.27 },
-      { x: 0.91, y0: 0.19 },
+    const row = [0.1, 0.26, 0.42, 0.58, 0.74, 0.9]
+    const base = [
+      ...row.map((x) => [x, 0.21]),
+      [0.1, 0.42],
+      [0.9, 0.42],
+      [0.1, 0.62],
+      [0.9, 0.62],
+      ...row.map((x) => [x, 0.83]),
     ]
-    for (let i = 0; i < n; i++) {
-      const c = cols[i % 4]
-      spots.push({
-        x: c.x + (rand() - 0.5) * 0.03,
-        y: c.y0 + Math.floor(i / 4) * 0.2 + (rand() - 0.5) * 0.07,
-        d: 0.8 + rand() * 0.25,
+    // Screens alternate between the top, the sides and the bottom, so neighbours in the list
+    // (the same project often) land apart.
+    const order = [0, 12, 6, 3, 15, 8, 1, 13, 7, 4, 9, 2, 14, 5, 10, 11]
+    return order
+      .slice(0, n)
+      .map((k) => ({
+        x: base[k][0] + (rand() - 0.5) * 0.05,
+        y: base[k][1] + (rand() - 0.5) * 0.07,
+        d: 0.97 + rand() * 0.06,
         seed: rand() * 10,
-      })
-    }
-    return spots
+      }))
   }
   // mulberry32
   let seed = mobile ? 7 : 3
@@ -216,13 +219,13 @@ export function scatterSpots(n: number, mobile: boolean): Spot[] {
 
 export function scatterPose(L: Layout, spot: Spot, time: number, mx: number, my: number): Pose {
   const t = time / 1000
-  // Desktop: every screen drifts gently, sized by its spot (0.8 to 1.05 of the base size).
+  // Desktop: every screen drifts gently, within a few percent of the same size.
   if (!L.mobile) {
     return {
       x: spot.x * L.w + Math.sin(t * 0.35 + spot.seed) * 8 + mx * 16 * spot.d,
       y: spot.y * L.h + Math.cos(t * 0.29 + spot.seed * 1.3) * 7 + my * 12 * spot.d,
-      s: Math.min(0.66, (L.w * 0.1) / L.tileW) * spot.d,
-      o: 0.82 + (spot.d - 0.8) * 0.72,
+      s: ((L.w * 0.105) / L.tileW) * spot.d,
+      o: 1,
       blur: 0,
       z: spot.d * 100 - 50,
     }
