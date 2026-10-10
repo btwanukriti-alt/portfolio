@@ -3,8 +3,8 @@
 //
 //   orbit   - a tilted 3D circle around the centre. Tiles stream out of the intro's frame (on the
 //             right), sweep across the front, round the far side and back.
-//   ring    - first scroll: an even circle around the headline.
-//   scatter - second scroll: a loose scatter on either side of the About paragraph, drifting.
+//   ring    - start of the scroll: an even circle, on the way to the scatter.
+//   scatter - second scroll: a staggered circle round the About paragraph, drifting.
 
 // The formation was laid out around a 1600 x 837 face illustration (the earlier hero); its
 // proportions still set the circle's size and centre line, so the motion stays the same.
@@ -159,35 +159,58 @@ export function ringPose(L: Layout, i: number, n: number, turn: number): Pose {
 
 export type Spot = { x: number; y: number; d: number; seed: number }
 
+// Desktop scatter: a screen is a tenth of the window wide, but no wider than this share of its
+// height, so a wide, short window still has room for them all.
+const SCATTER_MAX_H = 0.17
+
 // Scatter positions (normalised 0..1), clear of the paragraph in the middle. Seeded, so the
 // layout is the same on every visit.
-export function scatterSpots(n: number, mobile: boolean): Spot[] {
-  // Desktop: a loose scatter on a hidden grid, two staggered columns on each side of the
-  // paragraph. Each screen is nudged off its cell and sized a little differently, so it reads as
-  // scattered, but the cells keep the screens from overlapping.
+export function scatterSpots(n: number, mobile: boolean, ratio = 1.6): Spot[] {
+  // Desktop: a staggered circle round the paragraph. Screens alternate between a slightly inner
+  // and a slightly outer ring, each at a random angle within its own slot, so it reads as a
+  // circle but scattered. A spot that would touch a screen already placed is drawn again; if a
+  // screen finds no room the whole draw starts over with the next seed.
   if (!mobile) {
-    let seed = 11
+    let seed = 3
     const rand = () => {
       seed = (seed * 16807) % 2147483647
       return seed / 2147483647
     }
-    const spots: Spot[] = []
-    const cols = [
-      { x: 0.09, y0: 0.2 },
-      { x: 0.215, y0: 0.29 },
-      { x: 0.785, y0: 0.27 },
-      { x: 0.91, y0: 0.19 },
-    ]
-    for (let i = 0; i < n; i++) {
-      const c = cols[i % 4]
-      spots.push({
-        x: c.x + (rand() - 0.5) * 0.03,
-        y: c.y0 + Math.floor(i / 4) * 0.2 + (rand() - 0.5) * 0.07,
-        d: 0.8 + rand() * 0.25,
-        seed: rand() * 10,
-      })
+    // A screen's footprint (shares of the window, see scatterPose) with a small gap.
+    const W = Math.min(0.105, SCATTER_MAX_H / ratio) * 1.03 + 0.017
+    const H = (Math.min(0.105 * ratio, SCATTER_MAX_H) * 1.03) / 1.5 + 0.02
+    const place = () => {
+      const spots: Spot[] = []
+      for (let i = 0; i < n; i++) {
+        let spot: Spot | undefined
+        for (let tries = 0; tries < 600 && !spot; tries++) {
+          const t = ((i + (rand() - 0.5) * 0.9) / n) * Math.PI * 2
+          const r = (i % 2 ? 1.1 : 0.9) + (rand() - 0.5) * 0.08
+          const x = 0.5 + Math.cos(t) * 0.41 * r
+          const y = 0.53 + Math.sin(t) * 0.35 * r
+          if (y < 0.15 || y > 0.91 || x < 0.06 || x > 0.94) continue
+          if (Math.abs(x - 0.5) < 0.3 && Math.abs(y - 0.5) < 0.15) continue
+          if (spots.some((q) => Math.abs(q.x - x) < W && Math.abs(q.y - y) < H)) continue
+          spot = { x, y, d: 0.97 + rand() * 0.06, seed: rand() * 10 }
+        }
+        if (!spot) return undefined
+        spots.push(spot)
+      }
+      return spots
     }
-    return spots
+    let spots = place()
+    for (let start = 4; !spots && start < 80; start++) {
+      seed = start
+      spots = place()
+    }
+    // A window too short for them all: fall back to one even circle.
+    spots ??= Array.from({ length: n }, (_, i) => {
+      const t = (i / n) * Math.PI * 2
+      return { x: 0.5 + Math.cos(t) * 0.4, y: 0.53 + Math.sin(t) * 0.36, d: 1, seed: i * 1.7 }
+    })
+    // Neighbours in the list are often the same project: deal them out round the circle.
+    const placed = spots
+    return placed.map((_, i) => placed[(i * 5) % n])
   }
   // mulberry32
   let seed = mobile ? 7 : 3
@@ -216,13 +239,13 @@ export function scatterSpots(n: number, mobile: boolean): Spot[] {
 
 export function scatterPose(L: Layout, spot: Spot, time: number, mx: number, my: number): Pose {
   const t = time / 1000
-  // Desktop: every screen drifts gently, sized by its spot (0.8 to 1.05 of the base size).
+  // Desktop: every screen drifts gently, within a few percent of the same size.
   if (!L.mobile) {
     return {
       x: spot.x * L.w + Math.sin(t * 0.35 + spot.seed) * 8 + mx * 16 * spot.d,
       y: spot.y * L.h + Math.cos(t * 0.29 + spot.seed * 1.3) * 7 + my * 12 * spot.d,
-      s: Math.min(0.66, (L.w * 0.1) / L.tileW) * spot.d,
-      o: 0.82 + (spot.d - 0.8) * 0.72,
+      s: (Math.min(L.w * 0.105, L.h * SCATTER_MAX_H) / L.tileW) * spot.d,
+      o: 1,
       blur: 0,
       z: spot.d * 100 - 50,
     }
