@@ -38,15 +38,15 @@ function logoModule() {
     <div class="cap" style="left:80px;top:64px">Mark construction</div>
     <div style="position:absolute;left:120px;top:150px;width:${84 * k}px;height:${80 * k}px"><img src="mark.svg" style="position:absolute;inset:0;width:100%;height:100%"><svg style="position:absolute;left:0;top:0;overflow:visible" width="${84 * k}" height="${80 * k}">${g}</svg></div>
     <div class="nb" style="left:${120 + X(42) + 130}px;top:${150 + Y(50) - 70}px">${ang}°</div>
-    <div class="nb" style="left:70px;top:${150 + 80 * k + 20}px">C and a security ring</div>
+    <div class="nb" style="left:70px;top:${150 + 80 * k + 20}px">Security ring</div>
     <div class="nb" style="left:${120 + X(42) - 40}px;top:${150 + Y(50) + 120}px">Hub</div>
     <div class="nb" style="left:${120 + X(80) + 70}px;top:${150 + Y(27) - 18}px">Connections</div>
     <div style="position:absolute;left:940px;top:0;bottom:0;border-left:2px dashed rgba(140,147,200,.35)"></div>
-    <div class="cap" style="left:1000px;top:64px">Lockup and clear space</div>
-    <div style="position:absolute;left:1000px;top:330px;width:500px;height:240px;outline:2px dashed #7C86C4">
-      <div style="position:absolute;left:56px;top:56px;right:56px;bottom:56px;display:flex;align-items:center;gap:20px;outline:1.5px dashed rgba(140,147,200,.4);justify-content:center"><img src="mark.svg" style="width:110px;height:110px"><span style="font:500 64px 'JetBrains Mono',monospace;color:#fff;letter-spacing:-.03em">clihub</span></div>
+    <div class="cap" style="left:1000px;top:64px">Clear space</div>
+    <div style="position:absolute;left:1080px;top:300px;width:300px;height:280px;outline:2px dashed #7C86C4">
+      <div style="position:absolute;left:56px;top:56px;right:56px;bottom:56px;display:flex;align-items:center;outline:1.5px dashed rgba(140,147,200,.4);justify-content:center"><img src="mark.svg" style="width:128px;height:128px"></div>
       <div class="nb" style="left:12px;top:12px;height:30px;line-height:30px;font-size:15px">x</div><div class="nb" style="right:12px;bottom:12px;height:30px;line-height:30px;font-size:15px">x</div></div>
-    <div class="nb" style="left:1000px;top:610px">x = the hub's width</div></div>`
+    <div class="nb" style="left:1080px;top:620px">x = the hub's width</div></div>`
   M.appendChild(s)
 }
 

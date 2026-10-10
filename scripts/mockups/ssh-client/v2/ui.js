@@ -1,4 +1,4 @@
-// clihub v2 product UI: helpers, the app shell and the screens used in the modules. Every name and number is sample data.
+// SSH client v2 product UI: helpers, the app shell and the screens used in the modules. Every name and number is sample data.
 (function(){
 const P = {}
 window.P = P
@@ -39,7 +39,7 @@ Object.assign(P, { av, tag })
 
 // ---- shell ----
 const NAV = [['server', 'Hosts'], ['term', 'Terminal'], ['key', 'Keys'], ['ports', 'Port mapping'], ['folder', 'SFTP'], ['users', 'Sessions']]
-P.shell = (active, content, { tab = active, vault = true } = {}) => `<div class="app u"><aside class="side"><div class="brand"><img src="mark.svg">clihub</div>
+P.shell = (active, content, { tab = active, vault = true } = {}) => `<div class="app u"><aside class="side"><div class="brand"><img src="mark.svg"></div>
   <div class="nl">Workspace</div>${NAV.map(([ic, n]) => `<div class="it${n === active ? ' on' : ''}">${i(ic)}${n}${n === 'Sessions' ? '<span class="n">5</span>' : ''}</div>`).join('')}
   <div class="nl" style="margin-top:8px">Vaults</div><div class="it"><span class="dot" style="background:var(--pri)"></span>Personal</div><div class="it"><span class="dot" style="background:var(--grn)"></span>Team · Platform</div>
   <div class="me">${av('Ira Sen')}<div>Ira Sen<small>ira@platform.dev</small></div><span class="ib" style="margin-left:auto">${i('gear')}</span></div></aside>
