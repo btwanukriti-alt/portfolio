@@ -1,5 +1,5 @@
-// Project data shared by the work cards and the case-study pages. Images live in public/;
-// presentation slides are listed at build time by src/lib/slides.ts.
+// Project data shared by the work cards and the case-study pages (in this order: Pulsefit, College ERP, Jaadu,
+// Zync, SSH Client). Images live in public/; case-study content is in src/data/stories.ts.
 
 export type Project = {
   slug: string
@@ -59,6 +59,21 @@ export const PROJECTS: Project[] = [
     color: '#FFE4D3',
   },
   {
+    slug: 'jaadu',
+    title: 'Jaadu 2.0',
+    name: 'AI Trading Terminal',
+    description:
+      "Charts, alerts, backtesting and an AI strategy lab for active traders, in one terminal.",
+    role: 'Sole Designer',
+    timeline: '2 months',
+    problem:
+      "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
+    card: '/work/project-1.jpg',
+    hero: caseStudyImage('jaadu'),
+    showcase: '/showcase/jaadu.html?embed&v=5',
+    color: '#CFDDFF',
+  },
+  {
     slug: 'zync',
     title: 'Zync',
     name: 'Gym Member App',
@@ -87,21 +102,6 @@ export const PROJECTS: Project[] = [
     hero: caseStudyImage('ssh-client'),
     showcase: '/showcase/ssh-client.html?embed&v=10',
     color: '#D3F0F5',
-  },
-  {
-    slug: 'jaadu',
-    title: 'Jaadu 2.0',
-    name: 'AI Trading Terminal',
-    description:
-      "Charts, alerts, backtesting and an AI strategy lab for active traders, in one terminal.",
-    role: 'Sole Designer',
-    timeline: '2 months',
-    problem:
-      "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
-    card: '/work/project-1.jpg',
-    hero: caseStudyImage('jaadu'),
-    showcase: '/showcase/jaadu.html?embed&v=5',
-    color: '#CFDDFF',
   },
 ]
 

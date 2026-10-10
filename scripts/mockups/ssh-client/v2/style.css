@@ -1,7 +1,7 @@
 /* SSH client v2: the dark product UI, plus the module layout on a navy ground taken from the logo. */
 :root{
   --bg:#121216;--side:#0D0D10;--card:#18181D;--card2:#212128;--line:#2A2A31;--line2:#34343D;
-  --tx:#EDEDF0;--t2:#A1A1AA;--mut:#71717A;
+  --tx:#EDEDF0;--t2:#B4B4BE;--mut:#9C9CA8;--edge:#6E6E7A;
   --pri:#8B5CF6;--pri-d:#6D28D9;--pri-s:rgba(139,92,246,.16);--cy:#38BDF8;--cy-s:rgba(56,189,248,.13);
   --grn:#34D399;--grn-s:rgba(52,211,153,.13);--amb:#FBBF24;--amb-s:rgba(251,191,36,.13);--red:#F87171;--red-s:rgba(248,113,113,.13);--vio:#A78BFA;--vio-s:rgba(167,139,250,.14);
 }
@@ -87,7 +87,7 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .os{width:32px;height:32px;border-radius:9px;background:var(--card2);box-shadow:inset 0 0 0 1px var(--line);display:grid;place-items:center;flex:none}
 .os svg{width:18px;height:18px}
 .fl{display:flex;flex-direction:column;gap:7px;font-size:12.5px;font-weight:500;color:var(--t2)}
-.inp{height:40px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line2);background:var(--bg);display:flex;align-items:center;gap:8px;padding:0 12px;font-size:13.5px;color:var(--tx);font-weight:400}
+.inp{height:40px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--edge);background:var(--bg);display:flex;align-items:center;gap:8px;padding:0 12px;font-size:13.5px;color:var(--tx);font-weight:400}
 .inp.ph{color:var(--mut)}
 .inp.foc{box-shadow:inset 0 0 0 1px var(--pri),0 0 0 3px rgba(139,92,246,.22)}
 .inp .sfx{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--mut)}
