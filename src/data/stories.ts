@@ -140,7 +140,7 @@ export const STORIES: Story[] = [
     },
     closing: {
       heading: 'What the screens show',
-      copy: 'The strongest part of this flow is the connection between a lead record, membership details and the next task. The recovery examples extend that flow without adding another dashboard.',
+      copy: 'The strongest part of this flow is the connection between a lead record, membership details and the next task.',
     },
     related: ['college-erp', 'zync'],
   },
@@ -204,7 +204,7 @@ export const STORIES: Story[] = [
     ],
     closing: {
       heading: 'What changed in the presentation',
-      copy: 'The before-and-after views show the shift in hierarchy. The return-path example makes the connection between overview and detail explicit.',
+      copy: 'The before-and-after views show the shift in hierarchy.',
     },
     related: ['gym-crm', 'jaadu'],
   },
