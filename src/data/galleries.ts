@@ -154,7 +154,7 @@ export const GALLERIES: Record<string, GalleryConfig> = {
       pf('04-plans-v2.jpg', 2672, 'Plan categories and two plan cards above the full plans screen', 'All plans in one place.'),
       pf('05-members-v2.jpg', 3131, 'The expiring this week table above the full members dashboard', 'Renew expiring plans.'),
       pf('06-email-v2.jpg', 2795, 'The subscription emails card above the full automated emails screen', 'Automatic emails.'),
-      { ...pf('07-website-full.jpg', 6157, 'The full Pulsefit homepage, as designed', 'The homepage, top to bottom.'), width: 1440 },
+      { ...pf('v2-07-website-full.jpg', 6157, 'The full Pulsefit homepage, as designed', 'The homepage, top to bottom.'), width: 1440 },
     ],
   },
 }
