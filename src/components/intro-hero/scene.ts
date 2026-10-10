@@ -191,6 +191,9 @@ export function scatterSpots(n: number, mobile: boolean, ratio = 1.6): Spot[] {
       return (k / steps) * Math.PI * 2
     }
     const slice = at[steps] / n
+    // How far a screen may sit in or out from the oval: kept tight so it reads as a circle, and
+    // loosened only when a wide, short window can't fit every screen.
+    let band = 0.16
     const place = () => {
       const spots: Spot[] = []
       for (let i = 0; i < n; i++) {
@@ -199,7 +202,7 @@ export function scatterSpots(n: number, mobile: boolean, ratio = 1.6): Spot[] {
           // Later tries may reach further along the oval, into the neighbouring slices.
           const reach = tries < 200 ? 0.7 : 1.6
           const t = angleAt((i + 0.5 + (rand() - 0.5) * reach) * slice)
-          const r = 0.8 + rand() * 0.42
+          const r = 1 - band / 2 + rand() * band
           const x = 0.5 + Math.cos(t) * rx * r
           const y = 0.53 + Math.sin(t) * ry * r
           if (y < 0.15 || y > 0.91 || x < 0.06 || x > 0.94) continue
@@ -213,8 +216,9 @@ export function scatterSpots(n: number, mobile: boolean, ratio = 1.6): Spot[] {
       return spots
     }
     let spots = place()
-    for (let start = 10; !spots && start < 60; start++) {
+    for (let start = 10; !spots && start < 90; start++) {
       seed = start
+      band = start < 40 ? 0.16 : start < 65 ? 0.3 : 0.42
       spots = place()
     }
     // A window too short for them all: fall back to even slices on the oval.
