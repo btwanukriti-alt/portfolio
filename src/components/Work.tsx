@@ -326,7 +326,9 @@ export default function Work() {
   }
 
   return (
-    <section ref={section} id="work" aria-labelledby="work-heading" className="relative bg-paper">
+    // Margin above and below keeps a gap from the hero and from About (margin, not padding, so
+    // #work links still land on the frame).
+    <section ref={section} id="work" aria-labelledby="work-heading" className="relative my-[clamp(96px,16vh,200px)] bg-paper">
       {/* The visible heading sits above the frame (aria-hidden there). */}
       <h2 id="work-heading" className="sr-only">
         Selected work: {WORK_TITLE}
