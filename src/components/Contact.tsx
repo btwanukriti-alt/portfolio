@@ -7,7 +7,7 @@ import { Reveal } from './Reveal'
 import { getLenis } from './SmoothScroll'
 import { gsap, useGSAP, reducedMotion } from '@/lib/gsap'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
-import { EMAIL, LINKEDIN } from '@/data/site'
+import { EMAIL, EMAIL_LINK, LINKEDIN } from '@/data/site'
 
 // Contact footer: a black frame, selected like a Figma layer, that says "Let's BUILD". The D's
 // curve is shaped with the pen tool: its straight edge is pulled out by a handle into the bowl.
@@ -268,7 +268,7 @@ export default function Contact({ current }: { current?: string } = {}) {
               </div>
               <div className="flex flex-col items-start gap-5 min-[901px]:items-end">
                 <a
-                  href={`mailto:${EMAIL}`}
+                  {...EMAIL_LINK}
                   className="group inline-flex items-center gap-2.5 bg-white px-6 py-4 text-[16px] leading-none font-medium text-ink no-underline [transition:translate_300ms_var(--ease-out-expo),box-shadow_300ms_var(--ease-out-expo)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[3px_3px_0_#7B61FF] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7B61FF] motion-reduce:transition-none"
                 >
                   Drop me a line
@@ -278,7 +278,7 @@ export default function Contact({ current }: { current?: string } = {}) {
                 </a>
                 {/* The address itself, and LinkedIn, for anyone without a mail app set up. */}
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[15px] leading-none font-medium">
-                  <a href={`mailto:${EMAIL}`} className={ctaLink}>
+                  <a {...EMAIL_LINK} className={ctaLink}>
                     {EMAIL}
                   </a>
                   <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className={ctaLink}>
@@ -331,7 +331,7 @@ export default function Contact({ current }: { current?: string } = {}) {
               <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.75h4v11H3zM9.5 9.75h3.8v1.5h.06c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1v5.45h-4v-4.83c0-1.15-.02-2.63-1.6-2.63-1.6 0-1.85 1.25-1.85 2.55v4.91h-4z" />
             </svg>
           </a>
-          <a href={`mailto:${EMAIL}`} aria-label={`Email ${EMAIL}`} className={iconButton}>
+          <a {...EMAIL_LINK} aria-label={`Email ${EMAIL}`} className={iconButton}>
             <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
               <rect x="3" y="5" width="18" height="14" />
               <path d="M3.5 6l8.5 7 8.5-7" />

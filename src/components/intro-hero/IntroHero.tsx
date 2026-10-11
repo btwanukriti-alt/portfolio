@@ -6,7 +6,7 @@ import { caseStudyHref } from '@/data/projects'
 import { gsap, reducedMotion } from '@/lib/gsap'
 import { getLenis, pageScroll } from '../SmoothScroll'
 import NavBar from '../NavBar'
-import { EMAIL as CONTACT_EMAIL } from '@/data/site'
+import { EMAIL_LINK } from '@/data/site'
 import {
   Spring,
   clamp,
@@ -34,8 +34,6 @@ import { DISCIPLINES, disciplinesTimeline } from './disciplines'
 // the ring turns and settles. Then "Let's build something" fades in.
 // The whole intro plays by itself on load. Scrolling (the hero stays pinned) then scatters the
 // screens around a short About paragraph.
-
-const EMAIL = `mailto:${CONTACT_EMAIL}`
 
 // The screens' drawn width (scene.ts tileW), for picking the image size.
 const TILE_SIZES = '(max-width: 719px) 124px, 236px'
@@ -623,7 +621,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               Anukriti Mishra · Experience Designer
             </p>
             <a
-              href={EMAIL}
+              {...EMAIL_LINK}
               className="pointer-events-auto inline-flex items-center gap-2.5 bg-ink px-6 py-[15px] font-hero text-[17px] leading-none font-normal tracking-[-0.01em] whitespace-nowrap text-white transition-[background-color,translate] duration-300 hover:-translate-y-px hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7B61FF]"
             >
               Let&apos;s build something

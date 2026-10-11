@@ -52,22 +52,24 @@ type Row = {
 }
 // Room kept above the frame for the section heading (px).
 const TITLE_SPACE = 120
-function rowFor(vw: number, vh: number): Row {
+// The row spans the same content width as the other sections (--max less the --gutter each side);
+// pageW is the page's width without the scrollbar, head the heading's height with its margin.
+function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
   const portrait = vh > vw
   const vertical = portrait && vw < 720
   const ratio = portrait ? 9 / 16 : 16 / 9 // fill card width / height
   const small = vw < 720
   const strip = small ? 10 : Math.min(26, Math.max(16, vw * 0.015))
   const gap = small ? 4 : 8
-  const padX = Math.min(56, Math.max(16, vw * 0.035))
-  const padY = Math.min(88, Math.max(48, vh * (portrait ? 0.07 : 0.08)))
+  const gutter = Math.min(64, Math.max(20, vw * 0.04))
+  const contentW = Math.min(pageW, 1440) - 2 * gutter
+  const padY = Math.min(72, Math.max(32, vh * (portrait ? 0.07 : 0.06)))
   const rest = (N - 1) * (strip + gap)
-  const head = small ? 96 : TITLE_SPACE
   if (vertical) {
-    const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest, (vw - 2 * padX) / ratio))
+    const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest, contentW / ratio))
     return { strip, gap, fillW: fillH * ratio, fillH, w: fillH * ratio, h: fillH + rest, portrait, vertical }
   }
-  const fillW = Math.max(120, Math.min(vw - 2 * padX - rest, (vh - 2 * padY - head) * ratio))
+  const fillW = Math.max(120, Math.min(contentW - rest, (vh - 2 * padY - head) * ratio))
   return { strip, gap, fillW, fillH: fillW / ratio, w: fillW + rest, h: fillW / ratio, portrait, vertical }
 }
 
@@ -159,10 +161,15 @@ export default function Work() {
   // row, and only the settled fill card's video plays.
   useGSAP(
     () => {
-      let row = rowFor(window.innerWidth, window.innerHeight)
+      const rowNow = () => {
+        const h = heading.current
+        const head = h ? h.offsetHeight + parseFloat(getComputedStyle(h).marginBottom) : undefined
+        return rowFor(window.innerWidth, window.innerHeight, stage.current?.clientWidth || window.innerWidth, head)
+      }
+      let row = rowNow()
 
       const layout = () => {
-        row = rowFor(window.innerWidth, window.innerHeight)
+        row = rowNow()
         const f = frame.current
         if (!f) return
         f.style.width = `${row.w}px`
