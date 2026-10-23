@@ -90,7 +90,7 @@ export const STORIES: Story[] = [
     category: 'Gym management CRM',
     summary: 'A gym CRM that connects lead follow-ups, member conversion, renewals and automated emails.',
     facts: [
-      ['Role', 'Sole designer (internship at Pulsefit)'],
+      ['Role', 'Product designer, sole designer (internship at Pulsefit)'],
       ['Timeline', '3 months'],
       ['Scope', 'Logo, design system, every CRM flow, and the company website built in WordPress'],
     ],
@@ -287,7 +287,7 @@ export const STORIES: Story[] = [
     category: 'Fitness tracking app',
     summary: 'A fitness app that brings daily tracking, gym check-in, classes and workouts into one place.',
     facts: [
-      ['Role', 'Sole designer (internship at Pulsefit)'],
+      ['Role', 'Product designer, sole designer (internship at Pulsefit)'],
       ['Timeline', '2 months, Feb–Mar 2025'],
       ['Scope', 'Visual system, logo, every screen, and the calorie and health tracking I proposed'],
       ['Team', 'Two Pulsefit founders (PRD and walkthrough). No developers during the design work.'],
@@ -348,7 +348,7 @@ export const STORIES: Story[] = [
     category: 'Developer tools',
     summary: 'An SSH client that shows a server’s health before you connect.',
     facts: [
-      ['Role', 'Sole designer (internship)'],
+      ['Role', 'Product designer, sole designer (internship at Gamalabs)'],
       ['Timeline', '3 months'],
       ['Scope', 'The entire UI, designed from scratch, for desktop, laptop and mobile'],
     ],

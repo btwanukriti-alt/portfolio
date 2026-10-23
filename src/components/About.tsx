@@ -28,9 +28,9 @@ const ALIGN = [
 
 const STOPS: Stop[] = [
   { year: '2024', role: 'UI/UX Designer', company: 'IAS Sathi', dot: '#4F86E8', kind: 'Internship' },
-  { year: '2024', role: 'UI/UX Designer', company: 'Pulsefit', dot: '#F28C28', kind: 'Internship' },
-  { year: '2025', role: 'UI/UX Designer', company: 'Gamalabs', dot: '#F5577D', kind: 'Internship' },
-  { year: '2026', role: 'Freelance Product Designer', company: 'Alzyon Tech Solutions', dot: '#1A9E6E', kind: 'Freelance' },
+  { year: '2024', role: 'Product Designer', company: 'Pulsefit', dot: '#F28C28', kind: 'Internship' },
+  { year: '2025', role: 'Product Designer', company: 'Gamalabs', dot: '#F5577D', kind: 'Internship' },
+  { year: '2026', role: 'Product Designer', company: 'Alzyon Tech Solutions', dot: '#1A9E6E', kind: 'Freelance' },
 ]
 
 const ABOUT = [
