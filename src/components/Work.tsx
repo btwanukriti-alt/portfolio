@@ -37,10 +37,12 @@ const N = PROJECTS.length
 const SEGMENT = 0.55
 // After the scroll rests this long, the nearest project eases into place.
 const SETTLE_MS = 140
-// Carousel steps: one card per gesture. Seconds per step, and quicker going back up after
-// returning from About.
+// Carousel steps: one card per gesture, in seconds.
 const STEP = 0.7
-const STEP_BACK = 0.45
+// Coming back up from About the row isn't a carousel: it scrolls freely, this much faster, and only
+// eases onto the nearest card after resting this long (ms).
+const RETURN_SPEED = 2.5
+const RETURN_SETTLE_MS = 600
 // Wheel input after a pause this long (ms) starts a new gesture; a swipe must travel this far (px).
 const GESTURE_GAP = 220
 const TOUCH_STEP = 28
@@ -307,7 +309,15 @@ export default function Work() {
         const base = Math.floor(at)
         const frac = at - base
         const aimed = dir > 0 ? (frac > 0.12 ? base + 1 : base) : dir < 0 ? (frac < 0.88 ? base : base + 1) : Math.round(at)
-        const target = landed >= 0 ? landed : anchor < 0 ? 0 : anchor > N - 1 ? N - 1 : Math.min(anchor + 1, Math.max(anchor - 1, aimed))
+        const target = returning
+          ? Math.round(at)
+          : landed >= 0
+            ? landed
+            : anchor < 0
+              ? 0
+              : anchor > N - 1
+                ? N - 1
+                : Math.min(anchor + 1, Math.max(anchor - 1, aimed))
         if (Math.abs(at - target) > 0.01) scrollToProject(t, target, 0.45)
       }
 
@@ -353,14 +363,14 @@ export default function Work() {
         render()
         // When the scroll rests between two projects, ease the nearest one into place.
         clearTimeout(settle)
-        if (onScreen && moving && !stepping && !reducedMotion()) settle = window.setTimeout(settleNow, SETTLE_MS)
+        if (onScreen && moving && !stepping && !reducedMotion()) settle = window.setTimeout(settleNow, returning ? RETURN_SETTLE_MS : SETTLE_MS)
       }
 
       // Carousel: inside the row, one scroll gesture (a wheel flick, a trackpad or finger swipe, an
       // arrow key) moves exactly one card, and input that arrives while a card is moving is let go,
       // so no card is ever skipped. Past the last card the next gesture carries on down to About;
-      // before the first, back up to the hero. Coming back up from About lands on the last card, and
-      // from there each step back up is quicker.
+      // before the first, back up to the hero. Coming back up from About, though, the visitor is on
+      // their way to the top: the row scrolls freely and fast until they turn back down.
       const startY = () => trackTop
       const yOf = (i: number) => trackTop + i * SEGMENT * window.innerHeight
       const at = () => Math.round((pageScroll() - trackTop) / (SEGMENT * window.innerHeight))
@@ -369,7 +379,8 @@ export default function Work() {
       let gestureUsed = false
       let lastInput = 0
       let touchTravel = 0
-      let fromBelow = false
+      // Scrolling up through the row after coming back from below it.
+      let returning = false
       const go = (i: number, duration: number) => {
         const lenis = getLenis()
         if (!lenis) return
@@ -391,9 +402,8 @@ export default function Work() {
       const step = (d: number) => {
         const next = at() + d
         if (next < 0 || next > N - 1) return false
-        if (d > 0) fromBelow = false
-        go(next, d < 0 && fromBelow ? STEP_BACK : STEP)
-        if (next === 0) fromBelow = false
+        returning = false
+        go(next, STEP)
         return true
       }
 
@@ -421,21 +431,28 @@ export default function Work() {
         }
         const inside = y > startY() - 2 && y < yOf(N - 1) + 2
         if (!inside) {
+          // Above the row the way back up is done.
+          if (y < startY()) returning = false
           // Arriving from above: the gesture stops on the first card instead of running on into the row.
           if (dy > 0 && y < startY() && target + dy > startY()) {
             if (!stepping) go(0, 0.5)
             gestureUsed = true
-            fromBelow = false
             return block()
           }
-          // Arriving from About: it lands on the last card, a little quicker.
-          if (dy < 0 && y > yOf(N - 1) && target + dy < yOf(N - 1)) {
-            if (!stepping) go(N - 1, STEP_BACK)
-            gestureUsed = true
-            fromBelow = true
-            return block()
-          }
+          // Coming back up from About: the way up stays free.
+          if (dy < 0 && y > yOf(N - 1)) returning = true
           return true
+        }
+        if (returning) {
+          // Heading back down turns the carousel on again, from the nearest card.
+          if (dy > 0) returning = false
+          else {
+            // On the way up, the row goes by fast. (A finger swipe scrolls natively, at its own pace.)
+            const lenis = getLenis()
+            if (touch || !lenis || stepping) return true
+            lenis.scrollTo(Math.max(0, lenis.targetScroll + dy * RETURN_SPEED), { lerp: 0.16 })
+            return block()
+          }
         }
         // The rest of a gesture that has already moved a card, or input during a move, goes nowhere.
         if (stepping || gestureUsed) return block()
@@ -446,10 +463,7 @@ export default function Work() {
         }
         const d = (touch ? touchTravel : dy) > 0 ? 1 : -1
         // At either end of the row the gesture leaves the section as normal scrolling.
-        if (!step(d)) {
-          if (d < 0) fromBelow = false
-          return true
-        }
+        if (!step(d)) return true
         gestureUsed = true
         return block()
       })
@@ -461,7 +475,7 @@ export default function Work() {
         const base = stepping ? goingTo : Math.min(N - 1, Math.max(0, at()))
         const next = base + d
         if (next < 0 || next > N - 1) return
-        if (d > 0) fromBelow = false
+        returning = false
         goingTo = next
         if (getLenis()) go(next, STEP)
         else window.scrollTo({ top: yOf(next) })
