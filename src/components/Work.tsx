@@ -113,6 +113,11 @@ export default function Work() {
   const activeRef = useRef(0)
   const caption = useRef<HTMLDivElement>(null)
   const cursor = useRef<HTMLDivElement>(null)
+  // The Back / Next buttons, and what they do (set up with the carousel below). Their disabled state is
+  // set there too, never as a prop: React drops clicks on a button whose disabled prop is true.
+  const prevBtn = useRef<HTMLButtonElement>(null)
+  const nextBtn = useRef<HTMLButtonElement>(null)
+  const nav = useRef<(d: number) => void>(() => {})
   const hovered = useRef(-1)
   const follow = useRef<{ x: (v: number) => void; y: (v: number) => void } | null>(null)
 
@@ -270,6 +275,8 @@ export default function Work() {
       const setOpen = (i: number) => {
         const p = PROJECTS[i]
         cards.current.forEach((card, j) => card?.setAttribute('data-active', String(j === i)))
+        if (prevBtn.current) prevBtn.current.disabled = i === 0
+        if (nextBtn.current) nextBtn.current.disabled = i === N - 1
         const cap = caption.current
         if (cap) {
           cap.querySelector('[data-cap-num]')!.textContent = String(i + 1).padStart(2, '0')
@@ -447,6 +454,19 @@ export default function Work() {
         return block()
       })
 
+      // Back / Next: one card per click. Clicks during a move count from the card it's heading to, so
+      // quick clicks each move one card on.
+      let goingTo = 0
+      nav.current = (d: number) => {
+        const base = stepping ? goingTo : Math.min(N - 1, Math.max(0, at()))
+        const next = base + d
+        if (next < 0 || next > N - 1) return
+        if (d > 0) fromBelow = false
+        goingTo = next
+        if (getLenis()) go(next, STEP)
+        else window.scrollTo({ top: yOf(next) })
+      }
+
       // Keys move one card too, while the row is pinned.
       const onKey = (e: KeyboardEvent) => {
         if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return
@@ -523,11 +543,37 @@ export default function Work() {
       <div ref={track} className="relative w-full" style={{ height: `calc(${(N - 1) * SEGMENT * 100}svh + 100svh)` }} data-fullscreen>
         <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full flex-col items-center justify-center overflow-hidden">
           {/* The section heading, top left of the frame (its width follows the frame). */}
-          <div ref={heading} aria-hidden="true" className="mb-[clamp(44px,7vh,80px)] flex max-w-full items-end justify-between gap-4">
-            <p className="m-0 text-[clamp(26px,2.6vw,40px)] leading-[1.05] font-medium tracking-[-0.035em] text-ink">{WORK_TITLE}</p>
-            <p className="m-0 text-[15px] leading-none font-medium text-muted">
-              Selected work <span className="text-faint">({String(N).padStart(2, '0')})</span>
+          <div ref={heading} className="mb-[clamp(44px,7vh,80px)] flex max-w-full items-end justify-between gap-4">
+            <p aria-hidden="true" className="m-0 text-[clamp(26px,2.6vw,40px)] leading-[1.05] font-medium tracking-[-0.035em] text-ink">
+              {WORK_TITLE}
             </p>
+            <div className="flex flex-none items-center gap-4">
+              <p aria-hidden="true" className="m-0 text-[15px] leading-none font-medium text-muted max-[719px]:hidden">
+                Selected work <span className="text-faint">({String(N).padStart(2, '0')})</span>
+              </p>
+              {/* Back / Next: one card per click. */}
+              <div className="flex gap-2">
+                {(
+                  [
+                    [prevBtn, -1, 'Previous project', 'M15 6l-6 6 6 6'],
+                    [nextBtn, 1, 'Next project', 'M9 6l6 6-6 6'],
+                  ] as const
+                ).map(([ref, d, label, path]) => (
+                  <button
+                    key={d}
+                    ref={ref}
+                    type="button"
+                    aria-label={label}
+                    onClick={() => nav.current(d)}
+                    className="grid size-11 place-items-center rounded-[10px] border border-ink/20 bg-paper text-ink transition-[background-color,color,border-color,opacity] duration-200 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7B61FF] disabled:pointer-events-none disabled:opacity-30 md:size-10"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d={path} />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           {/* The auto-layout frame (sized by layout()). */}
           <div ref={frame} className="group/row relative">
