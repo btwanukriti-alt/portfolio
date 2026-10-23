@@ -40,7 +40,8 @@ export function ViewerProvider({ children }: { children: ReactNode }) {
     getLenis()?.start()
     document.documentElement.style.overflow = ''
     setShot(null)
-    opener.current?.focus()
+    // Back to the button that opened it (an image that was tapped can't take focus).
+    if (opener.current instanceof HTMLButtonElement) opener.current.focus()
   }
 
   // Tab and Shift+Tab cycle through the viewer's own controls; a modal dialog alone lets focus leave for the
@@ -125,13 +126,26 @@ export function ViewerProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// The image itself opens the viewer when clicked or tapped. Keyboards and screen readers use the View
+// full size button for the same thing, and still hear the image's description.
+export function ViewArea({ shot, children }: { shot: Shot; children: ReactNode }) {
+  const open = useContext(ViewerContext)
+  return (
+    <div onClick={(e) => open(shot, e.currentTarget)} className="cursor-zoom-in">
+      {children}
+    </div>
+  )
+}
+
+// On phones the button is visually hidden (tapping the image opens the viewer) but stays available
+// to screen readers.
 export function ViewButton({ shot }: { shot: Shot }) {
   const open = useContext(ViewerContext)
   return (
     <button
       type="button"
       onClick={(e) => open(shot, e.currentTarget)}
-      className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-2 text-[14px] leading-none font-medium text-[var(--accent)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+      className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-2 text-[14px] leading-none font-medium text-[var(--accent)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] max-[767px]:sr-only"
     >
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />

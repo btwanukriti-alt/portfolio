@@ -1,5 +1,5 @@
-// Project data shared by the work cards and the case-study pages (in this order: Pulsefit, College ERP, Jaadu,
-// Zync, SSH Client). Images live in public/; case-study content is in src/data/stories.ts.
+// Project data shared by the work cards and the case-study pages (in this order: College ERP, Pulsefit, Jaadu,
+// SSH Client, Zync). Images live in public/; case-study content is in src/data/stories.ts.
 
 export type Project = {
   slug: string
@@ -23,26 +23,14 @@ export type Project = {
 }
 
 const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
+// The project's still everywhere it's shown small (the More work cards, link previews): the opening
+// frame of its work-card video, as on the homepage (rendered by showcase-video/).
+export const posterOf = (slug: string) => `/showcase/posters/${slug}-land.jpg`
 
 // Figma sources: Fitness Tracker -> "Zync — Case Study", BOSCH card (Pulsefit screens) ->
 // "Pulsefit — Case Study", SSH client -> "SSH client — Case Study", College Management ->
 // "The Solution" (problem/solution pairs). Jaadu 2.0 has no presentation yet.
 export const PROJECTS: Project[] = [
-  {
-    slug: 'gym-crm',
-    title: 'Gym Management CRM',
-    name: 'Gym Management CRM',
-    description:
-      "Leads, members, payments and follow-ups for gym owners and staff, in one dashboard.",
-    role: 'Sole Designer',
-    timeline: '3 months',
-    problem:
-      "The front desk handles calls, walk-ins and messages all day. Leads written on paper got lost. I designed a CRM that keeps every lead in view until it becomes a member.",
-    card: '/work/project-3.jpg',
-    hero: caseStudyImage('gym-crm'),
-    showcase: '/showcase/gym-crm.html?embed&v=3',
-    color: '#DCCFFF',
-  },
   {
     slug: 'college-erp',
     title: 'College Group ERP',
@@ -53,10 +41,25 @@ export const PROJECTS: Project[] = [
     timeline: '3 months',
     problem:
       "A college group had no way to see all its colleges at once. The redesign puts them on one dashboard, with access set by role.",
-    card: '/case-studies/college-erp/hero-v2.jpg',
+    card: posterOf('college-erp'),
     hero: '/case-studies/college-erp/hero-v2.jpg',
     showcase: '/showcase/college-erp.html?embed&v=5',
     color: '#FFE4D3',
+  },
+  {
+    slug: 'gym-crm',
+    title: 'Gym Management CRM',
+    name: 'Gym Management CRM',
+    description:
+      "Leads, members, payments and follow-ups for gym owners and staff, in one dashboard.",
+    role: 'Sole Designer',
+    timeline: '3 months',
+    problem:
+      "The front desk handles calls, walk-ins and messages all day. Leads written on paper got lost. I designed a CRM that keeps every lead in view until it becomes a member.",
+    card: posterOf('gym-crm'),
+    hero: caseStudyImage('gym-crm'),
+    showcase: '/showcase/gym-crm.html?embed&v=3',
+    color: '#DCCFFF',
   },
   {
     slug: 'jaadu',
@@ -68,25 +71,10 @@ export const PROJECTS: Project[] = [
     timeline: '2 months',
     problem:
       "Traders had every number they needed: charts, order flow, footprint, alerts. What they didn't have was an answer to where to trade. The work was to keep the depth active traders rely on, and add QuantLab, which narrows hundreds of strategies to the few that fit the current market.",
-    card: '/work/project-1.jpg',
+    card: posterOf('jaadu'),
     hero: caseStudyImage('jaadu'),
     showcase: '/showcase/jaadu.html?embed&v=5',
     color: '#CFDDFF',
-  },
-  {
-    slug: 'zync',
-    title: 'Zync',
-    name: 'Gym Member App',
-    description:
-      "The member app for a gym software company: classes, workouts and health tracking in one place.",
-    role: 'Sole Designer',
-    timeline: '2 months',
-    problem:
-      "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
-    card: '/case-studies/zync/01-home.jpg',
-    hero: caseStudyImage('zync'),
-    showcase: '/showcase/zync.html?v=5',
-    color: '#FFE8EE',
   },
   {
     slug: 'ssh-client',
@@ -98,10 +86,25 @@ export const PROJECTS: Project[] = [
     timeline: '3 months',
     problem:
       "A sysadmin managing 40 servers shouldn't need to remember 400 commands. I designed it to remember them, and to write the next one on request.",
-    card: '/case-studies/ssh-client/01-health.jpg',
+    card: posterOf('ssh-client'),
     hero: caseStudyImage('ssh-client'),
     showcase: '/showcase/ssh-client.html?embed&v=10',
     color: '#D3F0F5',
+  },
+  {
+    slug: 'zync',
+    title: 'Zync',
+    name: 'Gym Member App',
+    description:
+      "The member app for a gym software company: classes, workouts and health tracking in one place.",
+    role: 'Sole Designer',
+    timeline: '2 months',
+    problem:
+      "Gym members signed up, came for a few weeks and stopped. Booking a class, logging a workout and tracking calories each happened somewhere different, and none of it showed progress. The work was to put all three in one app, so members could see their effort add up and had a reason to come back.",
+    card: posterOf('zync'),
+    hero: caseStudyImage('zync'),
+    showcase: '/showcase/zync.html?v=5',
+    color: '#FFE8EE',
   },
 ]
 

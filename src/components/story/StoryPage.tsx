@@ -4,7 +4,7 @@ import { PROPOSED_DISCLOSURE, STORIES, type Shot, type Story, type StorySection 
 import { PROJECTS } from '@/data/projects'
 import SiteHeader from '../SiteHeader'
 import Contact from '../Contact'
-import { ViewButton, ViewerProvider } from './Viewer'
+import { ViewArea, ViewButton, ViewerProvider } from './Viewer'
 import { StoryDemo } from './Demos'
 
 // The case-study template shared by all five projects: a light editorial page (1160px wide, a 680px text column),
@@ -159,22 +159,24 @@ function Section({ section, n, eager }: { section: StorySection; n: number; eage
 }
 
 // The image area: the screen at its natural ratio, never cropped by CSS. Dark UI keeps a dark ground.
+// Clicking or tapping it opens the full-size viewer.
 function Media({ shot, eager = false }: { shot: Shot; eager?: boolean }) {
   return (
     <div
       className={`overflow-hidden rounded-[12px] border md:rounded-[14px] ${shot.dark ? 'border-[#2a2a31] bg-[#0B0B10]' : 'border-line bg-[#F7F8FA]'}`}
       style={shot.maxWidth ? { maxWidth: shot.maxWidth } : undefined}
     >
-      { }
-      <img
-        className="block h-auto w-full object-contain"
-        src={shot.src}
-        width={shot.width}
-        height={shot.height}
-        alt={shot.alt}
-        loading={eager ? 'eager' : 'lazy'}
-        decoding="async"
-      />
+      <ViewArea shot={shot}>
+        <img
+          className="block h-auto w-full object-contain"
+          src={shot.src}
+          width={shot.width}
+          height={shot.height}
+          alt={shot.alt}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </ViewArea>
     </div>
   )
 }
@@ -244,18 +246,14 @@ function Collapsed({ id, heading, shots, summary }: { id: string; heading: strin
 
 function RelatedCard({ slug }: { slug: string }): ReactNode {
   const story = STORIES.find((s) => s.slug === slug)
-  if (!story) return null
-  const first = story.sections[0]
-  // The redesigned screen, never a Before image.
-  const thumb = first.primary ?? first.set?.[first.set.length - 1]
+  const project = PROJECTS.find((p) => p.slug === slug)
+  if (!story || !project) return null
   return (
     <Link href={`/work/${slug}`} className={`group block rounded-[14px] border border-line p-3 text-ink no-underline hover:border-ink ${focus}`}>
-      {thumb && (
-        <div className={`aspect-[16/10] overflow-hidden rounded-[10px] ${thumb.dark ? 'bg-[#0B0B10]' : 'bg-[#F7F8FA]'}`}>
-          { }
-          <img src={thumb.src} alt="" width={thumb.width} height={thumb.height} loading="lazy" decoding="async" className="block h-full w-full object-contain" />
-        </div>
-      )}
+      {/* The same still as the project's card on the homepage. */}
+      <div className="aspect-video overflow-hidden rounded-[10px]" style={{ background: project.color }}>
+        <img src={project.card} alt="" width={2560} height={1440} loading="lazy" decoding="async" className="block h-full w-full object-cover" />
+      </div>
       <p className="m-0 mt-4 px-1 text-[14px] font-semibold text-[var(--accent)]">{story.category}</p>
       <p className="m-0 mt-1 px-1 pb-1 text-[20px] leading-[1.3] font-semibold tracking-[-0.01em] group-hover:underline">{story.title}</p>
     </Link>
