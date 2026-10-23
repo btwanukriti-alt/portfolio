@@ -82,7 +82,7 @@ export default function Lightbox({ tile, ref, onClosed }: LightboxProps) {
           tile's shape to the screenshot's own. */}
       <img
         ref={image}
-        className="fixed max-w-none rounded-[14px] object-cover shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]"
+        className="fixed max-w-none rounded-[14px] object-cover"
         src={tile.currentSrc || tile.src}
         alt=""
       />

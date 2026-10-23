@@ -129,7 +129,7 @@ export default function About() {
               {/* Anukriti's comment pin, riding on the cursor. */}
               <span
                 data-pin
-                className="absolute bottom-full left-[0.03em] mb-[6px] origin-bottom-left rounded-[14px] rounded-bl-none px-[10px] py-[6px] text-[clamp(12px,0.95vw,14px)] leading-none font-semibold tracking-normal whitespace-nowrap text-white shadow-[0_6px_16px_-6px_rgba(123,97,255,.7)]"
+                className="absolute bottom-full left-[0.03em] mb-[6px] origin-bottom-left rounded-[14px] rounded-bl-none px-[10px] py-[6px] text-[clamp(12px,0.95vw,14px)] leading-none font-semibold tracking-normal whitespace-nowrap text-white"
                 style={{ background: SELECT }}
               >
                 Anukriti

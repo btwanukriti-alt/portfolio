@@ -54,8 +54,8 @@ export default function NavBar({ home = false, onReplay }: { home?: boolean; onR
           href={RESUME}
           target="_blank"
           rel="noopener noreferrer"
-          // Square and black; on hover it lifts off a violet offset, like a dragged Figma layer.
-          className={`group inline-flex items-center gap-2 bg-ink px-5 py-3 text-[14px] leading-none font-medium text-white no-underline [transition:translate_300ms_var(--ease-out-expo),box-shadow_300ms_var(--ease-out-expo)] hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[3px_3px_0_#7B61FF] motion-reduce:transition-none ${focus}`}
+          // Square and black; a touch lighter on hover.
+          className={`group inline-flex items-center gap-2 bg-ink px-5 py-3 text-[14px] leading-none font-medium text-white no-underline transition-colors duration-300 hover:bg-[#2a2a2d] motion-reduce:transition-none ${focus}`}
         >
           Resume
           <svg width="11" height="11" viewBox="0 0 14 14" aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-[2px] group-hover:-translate-y-[2px]">

@@ -180,7 +180,7 @@ function ReturnPath() {
       </p>
 
       {batch && (
-        <div className="absolute inset-y-0 right-0 left-[12%] sm:left-[36%] flex flex-col border-l bg-white p-4 shadow-[-24px_0_40px_-24px_rgba(11,31,58,0.45)]" style={{ borderColor: CE.line }} role="region" aria-label={`${batch[0]} detail`}>
+        <div className="absolute inset-y-0 right-0 left-[12%] sm:left-[36%] flex flex-col border-l bg-white p-4" style={{ borderColor: CE.line }} role="region" aria-label={`${batch[0]} detail`}>
           <nav aria-label="Level">
             <ol className="m-0 flex list-none flex-wrap items-center gap-1 p-0 text-[13px]" style={{ color: CE.t2 }}>
               {['Group', 'College', 'Programme', 'Batch'].map((l, k) => (
@@ -369,7 +369,7 @@ function ZyncDemo() {
                 </button>
               </div>
               {menu && (
-                <div role="menu" className="absolute top-full right-0 z-10 mt-1 w-44 rounded-xl border bg-white p-1 shadow-lg" style={{ borderColor: ZY.line }}
+                <div role="menu" className="absolute top-full right-0 z-10 mt-1 w-44 rounded-xl border bg-white p-1" style={{ borderColor: ZY.line }}
                   onKeyDown={(e) => { if (e.key === 'Escape') { setMenu(false); menuButton.current?.focus() } }}>
                   <button type="button" role="menuitem" autoFocus onClick={() => { setMenu(false); setEditing(entry) }} className={`block min-h-11 w-full rounded-lg px-3 text-left text-[14px] hover:bg-[#F6F5FA] ${focusRing} focus-visible:outline-[#5B3FC4]`}>Edit entry</button>
                   <button type="button" role="menuitem" onClick={() => { setMenu(false); setConfirm(true) }} className={`block min-h-11 w-full rounded-lg px-3 text-left text-[14px] hover:bg-[#F6F5FA] ${focusRing} focus-visible:outline-[#5B3FC4]`} style={{ color: ZY.pink }}>Delete entry</button>

@@ -690,7 +690,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
                 </div>
                 <div
                   data-back
-                  className="absolute inset-0 overflow-hidden bg-soft shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
+                  className="absolute inset-0 overflow-hidden bg-soft shadow-[0_0_0_1px_rgba(0,0,0,.06)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
                 >
                   <img src={TILES[k].src} srcSet={`${TILES[k].small} 420w, ${TILES[k].src} 840w`} sizes={CARD_SIZES} fetchPriority="high" alt="" draggable={false} className="block h-full w-full max-w-none object-cover" />
                 </div>
@@ -732,7 +732,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
 
           {/* Anukriti's multiplayer cursor. */}
           <div ref={cursor} aria-hidden className="invisible absolute top-0 left-0 origin-top-left opacity-0" style={{ zIndex: 450 }}>
-            <svg width="20" height="22" viewBox="0 0 20 22" className="block drop-shadow-[0_1px_2px_rgba(0,0,0,.2)]">
+            <svg width="20" height="22" viewBox="0 0 20 22" className="block">
               <path
                 d="M3 2.2 L3 17.6 L7.2 13.6 L10.1 20 L12.9 18.8 L10.1 12.5 L15.9 12.5 Z"
                 fill={CURSOR}
@@ -742,7 +742,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
               />
             </svg>
             <span
-              className="absolute top-[19px] left-[13px] rounded-[6px] rounded-tl-[2px] px-2 py-[4px] font-hero text-[12px] leading-none font-medium whitespace-nowrap text-white shadow-[0_2px_8px_rgba(123,97,255,.35)]"
+              className="absolute top-[19px] left-[13px] rounded-[6px] rounded-tl-[2px] px-2 py-[4px] font-hero text-[12px] leading-none font-medium whitespace-nowrap text-white"
               style={{ background: CURSOR }}
             >
               Anukriti
@@ -767,7 +767,7 @@ function Scene({ scrollRoot }: { scrollRoot: RefObject<HTMLElement | null> }) {
             onPointerLeave={() => engine.current?.hover(i, false)}
             onFocus={() => engine.current?.hover(i, true)}
             onBlur={() => engine.current?.hover(i, false)}
-            className="pointer-events-none absolute top-0 left-0 block origin-center overflow-hidden rounded-[8px] bg-soft opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06),0_22px_44px_-20px_rgba(20,20,10,.35)] will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="pointer-events-none absolute top-0 left-0 block origin-center overflow-hidden rounded-[8px] bg-soft opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,.06)] will-change-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <img src={tile.src} srcSet={`${tile.small} 420w, ${tile.src} 840w`} sizes={TILE_SIZES} fetchPriority="low" alt="" draggable={false} decoding="async" className="block h-full w-full max-w-none object-cover" />
           </Link>

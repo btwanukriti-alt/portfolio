@@ -151,7 +151,7 @@ export default function Hero() {
           {/* Nav pill (Figma: 366 x 39, 4/5 padding, 10 gap), inverted for the white page. */}
           <nav
             aria-label="Primary"
-            className="flex items-center gap-[calc(10*var(--px))] rounded-[calc(9*var(--px))] border border-line bg-white px-[calc(5*var(--px))] py-[calc(4*var(--px))] shadow-[0_6px_20px_-10px_rgba(0,0,0,0.18)] max-[640px]:gap-[2px]"
+            className="flex items-center gap-[calc(10*var(--px))] rounded-[calc(9*var(--px))] border border-line bg-white px-[calc(5*var(--px))] py-[calc(4*var(--px))] max-[640px]:gap-[2px]"
           >
             {NAV.map(({ href, label }) => (
               <a
@@ -195,7 +195,7 @@ export default function Hero() {
               aria-label="Borrow my glasses: see what I've been designing"
               aria-expanded={open}
               onClick={putOn}
-              className="pointer-events-auto block w-full cursor-zoom-in border-0 bg-transparent p-0 transition-[filter] duration-300 ease-[ease] [opacity:calc(var(--glasses-opacity)*var(--in-glasses))] [transform:scale(var(--glasses-scale))] group-data-[open]/hero:pointer-events-none hover:drop-shadow-[0_18px_30px_rgba(0,0,0,0.14)] focus-visible:rounded-[24px] focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
+              className="pointer-events-auto block w-full cursor-zoom-in border-0 bg-transparent p-0 [opacity:calc(var(--glasses-opacity)*var(--in-glasses))] [transform:scale(var(--glasses-scale))] group-data-[open]/hero:pointer-events-none focus-visible:rounded-[24px] focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
             >
               <Glasses lensRef={lens} />
             </button>
@@ -231,7 +231,7 @@ export default function Hero() {
           type="button"
           onClick={() => (focused ? lightbox.current?.close() : setOpen(false))}
           autoFocus
-          className="absolute top-6 left-1/2 z-[3] inline-flex animate-close-in cursor-pointer items-center gap-2 rounded-full border-0 bg-ink px-[18px] py-[11px] text-[14px] leading-none font-medium text-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] transition-[background-color] duration-150 ease-[ease] [transform:translateX(-50%)] hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:animate-none"
+          className="absolute top-6 left-1/2 z-[3] inline-flex animate-close-in cursor-pointer items-center gap-2 rounded-full border-0 bg-ink px-[18px] py-[11px] text-[14px] leading-none font-medium text-white transition-[background-color] duration-150 ease-[ease] [transform:translateX(-50%)] hover:bg-[#2a2a2d] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent motion-reduce:animate-none"
         >
           {focused ? (
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
