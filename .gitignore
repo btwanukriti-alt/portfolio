@@ -33,4 +33,6 @@ next-env.d.ts
 # Local working files: exports and rendered videos (the site uses public/showcase/)
 Claude outputs/
 *.mp4
+# ...except the work-card videos the site serves (rendered by showcase-video/).
+!public/showcase/video/*.mp4
 *.zip

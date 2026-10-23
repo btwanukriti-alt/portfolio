@@ -1,0 +1,22 @@
+{
+  "name": "showcase-video",
+  "private": true,
+  "description": "Renders the work-card showcase loops (public/showcase/*.html) to MP4 with Remotion.",
+  "scripts": {
+    "studio": "node sync.mjs && remotion studio src/index.ts",
+    "render": "node sync.mjs && node render.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.538",
+    "@remotion/cli": "4.0.538",
+    "@remotion/renderer": "4.0.538",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.538"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "sharp": "^0.34.0",
+    "typescript": "~6.0.2"
+  }
+}
