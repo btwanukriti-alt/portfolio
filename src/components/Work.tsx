@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { PROJECTS, caseStudyHref } from '@/data/projects'
 import { gsap, ScrollTrigger, useGSAP, reducedMotion } from '@/lib/gsap'
-import { getLenis, pageScroll, setScrollInterceptor } from './SmoothScroll'
+import { getLenis, pageScroll, setScrollInterceptor, touchScreen } from './SmoothScroll'
 
 // Work: the projects as a Figma auto-layout row. One card is set to "fill" and takes the room;
 // the others are thin strips of solid colour (each showcase's background) on either side. The
@@ -43,9 +43,8 @@ const STEP = 0.7
 // eases onto the nearest card after resting this long (ms).
 const RETURN_SPEED = 2.5
 const RETURN_SETTLE_MS = 600
-// Wheel input after a pause this long (ms) starts a new gesture; a swipe must travel this far (px).
+// Wheel input after a pause this long (ms) starts a new gesture.
 const GESTURE_GAP = 220
-const TOUCH_STEP = 28
 
 // Row geometry for a window size: strip thickness, auto-layout gap, the fill card's size and the
 // frame's. On a phone held upright the auto layout is vertical: the fill card spans the width,
@@ -62,6 +61,9 @@ type Row = {
 }
 // Room kept above the frame for the section heading (px).
 const TITLE_SPACE = 120
+// On a phone held upright, Back / Next sit centred under the row: room for the fill card's name
+// under the row (39px), a gap, and the buttons (44px).
+const NAV_SPACE = 96
 // The row spans the same content width as the other sections (--max less the --gutter each side);
 // pageW is the page's width without the scrollbar, head the heading's height with its margin.
 function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
@@ -76,7 +78,7 @@ function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
   const padY = Math.min(72, Math.max(32, vh * (portrait ? 0.07 : 0.06)))
   const rest = (N - 1) * (strip + gap)
   if (vertical) {
-    const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest, contentW / ratio))
+    const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest - NAV_SPACE, contentW / ratio))
     return { strip, gap, fillW: fillH * ratio, fillH, w: fillH * ratio, h: fillH + rest, portrait, vertical }
   }
   const fillW = Math.max(120, Math.min(contentW - rest, (vh - 2 * padY - head) * ratio))
@@ -95,9 +97,9 @@ const playVideo = (v: HTMLVideoElement) => {
   v.play().catch(() => {})
 }
 
-// Scrolls the page to project i's place in the pinned section.
-function scrollToProject(track: HTMLElement, i: number, duration = 0.6) {
-  const y = track.getBoundingClientRect().top + window.scrollY + i * SEGMENT * window.innerHeight
+// Scrolls the page to project i's place in the pinned section (seg: the scrolling per project, px).
+function scrollToProject(track: HTMLElement, i: number, seg: number, duration = 0.6) {
+  const y = track.getBoundingClientRect().top + window.scrollY + i * seg
   const lenis = getLenis()
   if (lenis) lenis.scrollTo(y, { duration, easing: (x) => 1 - Math.pow(1 - x, 3), force: true })
   else window.scrollTo({ top: y, behavior: 'smooth' })
@@ -115,10 +117,10 @@ export default function Work() {
   const activeRef = useRef(0)
   const caption = useRef<HTMLDivElement>(null)
   const cursor = useRef<HTMLDivElement>(null)
-  // The Back / Next buttons, and what they do (set up with the carousel below). Their disabled state is
-  // set there too, never as a prop: React drops clicks on a button whose disabled prop is true.
-  const prevBtn = useRef<HTMLButtonElement>(null)
-  const nextBtn = useRef<HTMLButtonElement>(null)
+  // The Back / Next buttons (beside the heading, or under the row on a phone held upright: Back,
+  // Next, Back, Next), and what they do (set up with the carousel below). Their disabled state is set
+  // there too, never as a prop: React drops clicks on a button whose disabled prop is true.
+  const navButtons = useRef<(HTMLButtonElement | null)[]>([])
   const nav = useRef<(d: number) => void>(() => {})
   const hovered = useRef(-1)
   const follow = useRef<{ x: (v: number) => void; y: (v: number) => void } | null>(null)
@@ -214,10 +216,16 @@ export default function Work() {
   // row, and only the settled fill card's video plays.
   useGSAP(
     () => {
+      // Heights come from the stage, which is 100svh: on a phone the address bar coming and going changes
+      // the window's height mid-scroll, but not this, so the cards and their stopping points hold still.
+      const viewH = () => stage.current?.clientHeight || window.innerHeight
+      const seg = () => SEGMENT * viewH()
+      // Touch screens scroll natively and the cards are CSS snap points (below); no scripted carousel.
+      const touch = touchScreen()
       const rowNow = () => {
         const h = heading.current
         const head = h ? h.offsetHeight + parseFloat(getComputedStyle(h).marginBottom) : undefined
-        return rowFor(window.innerWidth, window.innerHeight, stage.current?.clientWidth || window.innerWidth, head)
+        return rowFor(window.innerWidth, viewH(), stage.current?.clientWidth || window.innerWidth, head)
       }
       let row = rowNow()
 
@@ -277,8 +285,9 @@ export default function Work() {
       const setOpen = (i: number) => {
         const p = PROJECTS[i]
         cards.current.forEach((card, j) => card?.setAttribute('data-active', String(j === i)))
-        if (prevBtn.current) prevBtn.current.disabled = i === 0
-        if (nextBtn.current) nextBtn.current.disabled = i === N - 1
+        navButtons.current.forEach((b, k) => {
+          if (b) b.disabled = k % 2 === 0 ? i === 0 : i === N - 1
+        })
         const cap = caption.current
         if (cap) {
           cap.querySelector('[data-cap-num]')!.textContent = String(i + 1).padStart(2, '0')
@@ -290,9 +299,9 @@ export default function Work() {
       let settle = 0
       let lastPos = 0
       let dir = 0 // the way the scroll was last heading through the row: 1 on, -1 back
-      // Where the last gesture began: a card's index, -1 above the row or N below it. A phone swipe
-      // that has started scrolling can't be held back, so the row is put right when it comes to rest:
-      // on the first or last card if the swipe came in from outside, else at most one card on.
+      // Where the last gesture began: a card's index, -1 above the row or N below it. Scrolling that
+      // runs on past a step is put right when it comes to rest: on the first or last card if it came
+      // in from outside, else at most one card on.
       let anchor = 0
       // The card the current gesture has already moved to: the rest of that gesture stays there.
       let landed = -1
@@ -300,8 +309,7 @@ export default function Work() {
         settle = 0
         const t = track.current
         if (!t) return
-        const vh = window.innerHeight
-        const at = -t.getBoundingClientRect().top / (SEGMENT * vh)
+        const at = -t.getBoundingClientRect().top / seg()
         // Only inside the pinned stretch, and only if it isn't already in place.
         if (at <= 0.01 || at >= N - 1.01) return
         // A swipe that has started toward the next project finishes there; one that barely moved
@@ -318,7 +326,7 @@ export default function Work() {
               : anchor > N - 1
                 ? N - 1
                 : Math.min(anchor + 1, Math.max(anchor - 1, aimed))
-        if (Math.abs(at - target) > 0.01) scrollToProject(t, target, 0.45)
+        if (Math.abs(at - target) > 0.01) scrollToProject(t, target, seg(), 0.45)
       }
 
       // The track's place on the page, measured on layout changes rather than every frame.
@@ -339,7 +347,7 @@ export default function Work() {
         const vh = window.innerHeight
         if (!vh) return // a window with no height yet (an embedded preview while it loads)
         // Scroll progress in projects, followed directly (the page scroll is already smoothed).
-        const pos = Math.min(N - 1, Math.max(0, -r.top / (SEGMENT * vh)))
+        const pos = Math.min(N - 1, Math.max(0, -r.top / seg()))
         onScreen = r.bottom > 0 && r.top < vh
         // Off screen, the stage (a fixed, viewport-sized box) skips rendering altogether, so its
         // cards and videos cost nothing while the rest of the page scrolls.
@@ -361,9 +369,33 @@ export default function Work() {
           loadNext.current()
         }
         render()
+        if (touch) {
+          freeWayUp()
+          return
+        }
         // When the scroll rests between two projects, ease the nearest one into place.
         clearTimeout(settle)
         if (onScreen && moving && !stepping && !reducedMotion()) settle = window.setTimeout(settleNow, returning ? RETURN_SETTLE_MS : SETTLE_MS)
+      }
+
+      // Touch screens: coming back up from About, the snap points are switched off (data-work-free on
+      // <html>) so the way up is free; turning back down, reaching the top of the row or resting for a
+      // moment switches them on again, and the browser settles on the nearest card.
+      let lastY = pageScroll()
+      let freeTimer = 0
+      const setFree = (on: boolean) => {
+        returning = on
+        document.documentElement.toggleAttribute('data-work-free', on)
+      }
+      const freeWayUp = () => {
+        const y = pageScroll()
+        if (y === lastY) return
+        const up = y < lastY
+        lastY = y
+        if (up && y > yOf(N - 1) + 2) setFree(true)
+        else if (!up || y < startY() - 2) setFree(false)
+        window.clearTimeout(freeTimer)
+        if (returning) freeTimer = window.setTimeout(() => setFree(false), RETURN_SETTLE_MS)
       }
 
       // Carousel: inside the row, one scroll gesture (a wheel flick, a trackpad or finger swipe, an
@@ -372,13 +404,12 @@ export default function Work() {
       // before the first, back up to the hero. Coming back up from About, though, the visitor is on
       // their way to the top: the row scrolls freely and fast until they turn back down.
       const startY = () => trackTop
-      const yOf = (i: number) => trackTop + i * SEGMENT * window.innerHeight
-      const at = () => Math.round((pageScroll() - trackTop) / (SEGMENT * window.innerHeight))
+      const yOf = (i: number) => trackTop + i * seg()
+      const at = () => Math.round((pageScroll() - trackTop) / seg())
       let stepping = false
       let stepTimer = 0
       let gestureUsed = false
       let lastInput = 0
-      let touchTravel = 0
       // Scrolling up through the row after coming back from below it.
       let returning = false
       const go = (i: number, duration: number) => {
@@ -409,18 +440,17 @@ export default function Work() {
 
       const unintercept = setScrollInterceptor((data) => {
         const e = data.event
-        const touch = e.type.startsWith('touch')
-        // A new gesture: a touch that has just begun, or wheel input after a pause.
+        // Finger input keeps its own native scrolling.
+        if (e.type !== 'wheel') return true
+        // A new gesture: wheel input after a pause.
         const now = performance.now()
-        if (e.type === 'touchstart' || (!touch && now - lastInput > GESTURE_GAP)) {
+        if (now - lastInput > GESTURE_GAP) {
           gestureUsed = false
-          touchTravel = 0
           const y0 = pageScroll()
           anchor = y0 < startY() - 2 ? -1 : y0 > yOf(N - 1) + 2 ? N : at()
           landed = -1
         }
         lastInput = now
-        if (e.type !== 'wheel' && e.type !== 'touchmove') return true
         const dy = data.deltaY
         if (!dy) return true
         const y = pageScroll()
@@ -447,21 +477,16 @@ export default function Work() {
           // Heading back down turns the carousel on again, from the nearest card.
           if (dy > 0) returning = false
           else {
-            // On the way up, the row goes by fast. (A finger swipe scrolls natively, at its own pace.)
+            // On the way up, the row goes by fast.
             const lenis = getLenis()
-            if (touch || !lenis || stepping) return true
+            if (!lenis || stepping) return true
             lenis.scrollTo(Math.max(0, lenis.targetScroll + dy * RETURN_SPEED), { lerp: 0.16 })
             return block()
           }
         }
         // The rest of a gesture that has already moved a card, or input during a move, goes nowhere.
         if (stepping || gestureUsed) return block()
-        // A swipe has to travel a little before it counts, so a tap or a wobble doesn't change cards.
-        if (touch) {
-          touchTravel += dy
-          if (Math.abs(touchTravel) < TOUCH_STEP) return block()
-        }
-        const d = (touch ? touchTravel : dy) > 0 ? 1 : -1
+        const d = dy > 0 ? 1 : -1
         // At either end of the row the gesture leaves the section as normal scrolling.
         if (!step(d)) return true
         gestureUsed = true
@@ -471,14 +496,18 @@ export default function Work() {
       // Back / Next: one card per click. Clicks during a move count from the card it's heading to, so
       // quick clicks each move one card on.
       let goingTo = 0
+      let glideUntil = 0
       nav.current = (d: number) => {
-        const base = stepping ? goingTo : Math.min(N - 1, Math.max(0, at()))
+        const base = stepping || performance.now() < glideUntil ? goingTo : Math.min(N - 1, Math.max(0, at()))
         const next = base + d
         if (next < 0 || next > N - 1) return
         returning = false
         goingTo = next
-        if (getLenis()) go(next, STEP)
-        else window.scrollTo({ top: yOf(next) })
+        if (getLenis()) return go(next, STEP)
+        // Native scrolling (touch screens, reduced motion): the browser's own smooth scroll, which lands
+        // on the card's snap point.
+        glideUntil = performance.now() + STEP * 1000
+        window.scrollTo({ top: yOf(next), behavior: reducedMotion() ? 'auto' : 'smooth' })
       }
 
       // Keys move one card too, while the row is pinned.
@@ -516,6 +545,8 @@ export default function Work() {
       return () => {
         clearTimeout(settle)
         window.clearTimeout(stepTimer)
+        window.clearTimeout(freeTimer)
+        document.documentElement.removeAttribute('data-work-free')
         unintercept()
         window.removeEventListener('keydown', onKey)
         window.removeEventListener('resize', onResize)
@@ -543,6 +574,33 @@ export default function Work() {
     idle(() => loadNext.current(), { timeout: 2000 })
   }
 
+  // Back / Next: one card per click. slot 0 sits beside the heading, slot 1 under the row.
+  const navPair = (slot: number, className: string) => (
+    <div className={className}>
+      {(
+        [
+          [-1, 'Previous project', 'M15 6l-6 6 6 6'],
+          [1, 'Next project', 'M9 6l6 6-6 6'],
+        ] as const
+      ).map(([d, label, path], k) => (
+        <button
+          key={d}
+          ref={(el) => {
+            navButtons.current[slot * 2 + k] = el
+          }}
+          type="button"
+          aria-label={label}
+          onClick={() => nav.current(d)}
+          className="grid size-11 place-items-center rounded-[10px] border border-ink/20 bg-paper text-ink transition-[background-color,color,border-color,opacity] duration-200 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7B61FF] disabled:pointer-events-none disabled:opacity-30 md:size-10"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d={path} />
+          </svg>
+        </button>
+      ))}
+    </div>
+  )
+
   return (
     // Margin above and below keeps a gap from the hero and from About (margin, not padding, so
     // #work links still land on the frame).
@@ -555,6 +613,11 @@ export default function Work() {
       {/* A stretch of scrolling per project; the stage stays pinned while the fill moves. The
           videos own the screen: the site header stays away while they fill it. */}
       <div ref={track} className="relative w-full" style={{ height: `calc(${(N - 1) * SEGMENT * 100}svh + 100svh)` }} data-fullscreen>
+        {/* Each card's place in the scroll, as a snap point: on touch screens (globals.css) every swipe
+            stops on the next card and never passes one. */}
+        {PROJECTS.map((p, i) => (
+          <div key={p.slug} aria-hidden="true" className="pointer-events-none absolute left-0 h-px w-px snap-start snap-always" style={{ top: `${i * SEGMENT * 100}svh` }} />
+        ))}
         <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full flex-col items-center justify-center overflow-hidden">
           {/* The section heading, top left of the frame (its width follows the frame). */}
           <div ref={heading} className="mb-[clamp(44px,7vh,80px)] flex max-w-full items-end justify-between gap-4">
@@ -565,28 +628,8 @@ export default function Work() {
               <p aria-hidden="true" className="m-0 text-[15px] leading-none font-medium text-muted max-[719px]:hidden">
                 Selected work <span className="text-faint">({String(N).padStart(2, '0')})</span>
               </p>
-              {/* Back / Next: one card per click. */}
-              <div className="flex gap-2">
-                {(
-                  [
-                    [prevBtn, -1, 'Previous project', 'M15 6l-6 6 6 6'],
-                    [nextBtn, 1, 'Next project', 'M9 6l6 6-6 6'],
-                  ] as const
-                ).map(([ref, d, label, path]) => (
-                  <button
-                    key={d}
-                    ref={ref}
-                    type="button"
-                    aria-label={label}
-                    onClick={() => nav.current(d)}
-                    className="grid size-11 place-items-center rounded-[10px] border border-ink/20 bg-paper text-ink transition-[background-color,color,border-color,opacity] duration-200 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7B61FF] disabled:pointer-events-none disabled:opacity-30 md:size-10"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d={path} />
-                    </svg>
-                  </button>
-                ))}
-              </div>
+              {/* Back / Next, beside the heading (under the row instead on a phone held upright). */}
+              {navPair(0, 'flex gap-2 max-[719px]:portrait:hidden')}
             </div>
           </div>
           {/* The auto-layout frame (sized by layout()). */}
@@ -694,7 +737,7 @@ export default function Work() {
               aria-hidden="true"
               className="pointer-events-none invisible absolute top-0 left-0 z-[3] origin-top-left opacity-0"
             >
-              <svg width="20" height="22" viewBox="0 0 20 22" className="-mt-[2px] -ml-[3px] block drop-shadow-[0_1px_2px_rgba(0,0,0,.2)]">
+              <svg width="20" height="22" viewBox="0 0 20 22" className="-mt-[2px] -ml-[3px] block">
                 <path
                   d="M3 2.2 L3 17.6 L7.2 13.6 L10.1 20 L12.9 18.8 L10.1 12.5 L15.9 12.5 Z"
                   fill={DRAW_CURSOR}
@@ -704,7 +747,7 @@ export default function Work() {
                 />
               </svg>
               <span
-                className="absolute top-[17px] left-[10px] rounded-[6px] rounded-tl-[2px] px-2 py-[4px] font-hero text-[12px] leading-none font-medium whitespace-nowrap text-white shadow-[0_2px_8px_rgba(123,97,255,.35)]"
+                className="absolute top-[17px] left-[10px] rounded-[6px] rounded-tl-[2px] px-2 py-[4px] font-hero text-[12px] leading-none font-medium whitespace-nowrap text-white"
                 style={{ background: DRAW_CURSOR }}
               >
                 Anukriti
@@ -728,6 +771,8 @@ export default function Work() {
               <span className="flex-none rounded-[3px] bg-[#7B61FF]/10 px-[5px] py-[3px] text-[10px] text-[#7B61FF]">Fill</span>
             </div>
           </div>
+          {/* Back / Next on a phone held upright: centred under the row, clear of the card's name. */}
+          {navPair(1, 'mt-[52px] hidden gap-3 max-[719px]:portrait:flex')}
         </div>
       </div>
 
@@ -735,7 +780,7 @@ export default function Work() {
       <div
         ref={cursor}
         aria-hidden="true"
-        className="pointer-events-none invisible fixed top-0 left-0 z-[60] flex items-center gap-2 bg-ink px-5 py-3 text-[14px] leading-none font-medium tracking-[0.01em] text-white opacity-0 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.5)]"
+        className="pointer-events-none invisible fixed top-0 left-0 z-[60] flex items-center gap-2 bg-ink px-5 py-3 text-[14px] leading-none font-medium tracking-[0.01em] text-white opacity-0"
       >
         Open
         <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">

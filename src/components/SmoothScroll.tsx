@@ -7,13 +7,17 @@ import { gsap, ScrollTrigger, reducedMotion } from '@/lib/gsap'
 
 // Smooth, inertial page scrolling (Lenis), driven by GSAP's ticker so ScrollTrigger stays in sync.
 // Components can stop it (the glasses view) or intercept wheel input (the work-card magnet)
-// through the helpers below. With reduced motion the page keeps native scrolling.
+// through the helpers below. With reduced motion, and on touch screens, the page keeps native scrolling.
 
 let lenis: Lenis | null = null
 type Interceptor = (data: VirtualScrollData) => boolean
 let interceptor: Interceptor | null = null
 
 export const getLenis = () => lenis
+
+// Touch screens keep the browser's own scrolling: its momentum and the address bar coming and going
+// can't be smoothed without fighting them. The work row snaps with CSS there instead.
+export const touchScreen = () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
 
 // The page's scroll position without asking the browser for layout (reading window.scrollY right
 // after other code has changed styles forces a style recalculation).
@@ -56,7 +60,7 @@ export default function SmoothScroll() {
   const pathname = usePathname()
 
   useEffect(() => {
-    if (reducedMotion()) return
+    if (reducedMotion() || touchScreen()) return
     const instance = new Lenis({
       autoRaf: false,
       // Quick to answer the wheel, with a short glide: smooth without feeling heavy or slow.

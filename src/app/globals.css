@@ -62,6 +62,18 @@
     line-height: normal;
   }
 
+  /* Touch screens scroll natively, and the work row's cards are snap points (Work.tsx): each swipe
+     stops on the next card. Proximity, so the rest of the page scrolls freely. Coming back up from
+     About, data-work-free switches the snapping off so the way up isn't held at every card. */
+  @media (pointer: coarse) {
+    html {
+      scroll-snap-type: y proximity;
+    }
+    html[data-work-free] {
+      scroll-snap-type: none;
+    }
+  }
+
   html,
   body {
     background: var(--color-paper);
