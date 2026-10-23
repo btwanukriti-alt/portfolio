@@ -44,7 +44,9 @@
   /* One Figma pixel. On desktop the 1440 x 725 hero frame scales to fit the window. */
   --px: 1px;
 
-  color-scheme: light;
+  /* Always light: "only" also keeps phone browsers (Chrome's auto-dark, Samsung Internet) from
+     darkening the site when the system is in dark mode. */
+  color-scheme: only light;
 }
 
 @media (min-width: 901px) {

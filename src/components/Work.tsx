@@ -62,8 +62,8 @@ type Row = {
 // Room kept above the frame for the section heading (px).
 const TITLE_SPACE = 120
 // On a phone held upright, Back / Next sit centred under the row: room for the fill card's name
-// under the row (39px), a gap, and the buttons (44px).
-const NAV_SPACE = 96
+// under the row (39px), a small gap (8px), and the buttons (44px).
+const NAV_SPACE = 91
 // The row spans the same content width as the other sections (--max less the --gutter each side);
 // pageW is the page's width without the scrollbar, head the heading's height with its margin.
 function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
@@ -75,7 +75,9 @@ function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
   const gap = small ? 4 : 8
   const gutter = Math.min(64, Math.max(20, vw * 0.04))
   const contentW = Math.min(pageW, 1440) - 2 * gutter
-  const padY = Math.min(72, Math.max(32, vh * (portrait ? 0.07 : 0.06)))
+  // A phone held upright keeps the margins tight, so the cards stay as large as they were before the
+  // Back / Next buttons went under the row.
+  const padY = vertical ? 12 : Math.min(72, Math.max(32, vh * (portrait ? 0.07 : 0.06)))
   const rest = (N - 1) * (strip + gap)
   if (vertical) {
     const fillH = Math.max(200, Math.min(vh - 2 * padY - head - rest - NAV_SPACE, contentW / ratio))
@@ -620,7 +622,7 @@ export default function Work() {
         ))}
         <div ref={stage} className="sticky top-0 flex h-screen h-svh w-full flex-col items-center justify-center overflow-hidden">
           {/* The section heading, top left of the frame (its width follows the frame). */}
-          <div ref={heading} className="mb-[clamp(44px,7vh,80px)] flex max-w-full items-end justify-between gap-4">
+          <div ref={heading} className="mb-[clamp(44px,7vh,80px)] flex max-w-full items-end justify-between gap-4 max-[719px]:portrait:mb-6">
             <p aria-hidden="true" className="m-0 text-[clamp(26px,2.6vw,40px)] leading-[1.05] font-medium tracking-[-0.035em] text-ink">
               {WORK_TITLE}
             </p>
@@ -772,7 +774,7 @@ export default function Work() {
             </div>
           </div>
           {/* Back / Next on a phone held upright: centred under the row, clear of the card's name. */}
-          {navPair(1, 'mt-[52px] hidden gap-3 max-[719px]:portrait:flex')}
+          {navPair(1, 'mt-[47px] hidden gap-3 max-[719px]:portrait:flex')}
         </div>
       </div>
 

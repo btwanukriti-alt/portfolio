@@ -29,7 +29,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#ffffff',
-  colorScheme: 'light',
+  // Always light, even with the system in dark mode (see globals.css).
+  colorScheme: 'only light',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

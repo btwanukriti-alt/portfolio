@@ -105,8 +105,9 @@ export default function SmoothScroll() {
   }, [])
 
   // Route changes start at the top; keep Lenis's position in step with the new page.
-  // When scrolling comes to rest in the upper half of a section with a marked title (or just above
-  // it), the page glides to that section's resting point, so its title sits clear of the header.
+  // When scrolling comes to rest just above a section's marked title, the page glides on down to its
+  // resting point, so the title sits clear of the header. Never back up: once past the title, the
+  // visitor is reading the section (on a phone, About's notes) and stays where they stopped.
   useEffect(() => {
     if (reducedMotion()) return
     let timer = 0
@@ -118,11 +119,9 @@ export default function SmoothScroll() {
       for (const title of document.querySelectorAll<HTMLElement>('[data-rest]')) {
         const section = title.closest('section')
         if (!section) continue
-        const top = docTop(section)
         const rest = Math.max(0, restOf(title))
-        // From a little above the resting point down to the section's halfway mark.
-        const half = top + section.offsetHeight / 2
-        if (y < rest - vh * 0.3 || y > Math.max(rest, half)) continue
+        // Only from a little above the resting point, gliding down to it.
+        if (y < rest - vh * 0.3 || y > rest) continue
         if (Math.abs(y - rest) < 4) return
         gliding = true
         const done = () => {
