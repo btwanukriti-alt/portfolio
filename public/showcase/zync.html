@@ -118,7 +118,7 @@ function Cursor({ t, keys, clicks, show }) {
     const k = ease(g / 0.6)
     return h('circle', { key: i, cx: 6, cy: 4, r: 8 + k * 26, fill: 'none', stroke: 'rgba(24,119,242,0.5)', strokeWidth: 2, opacity: 1 - k })
   })
-  return h('svg', { width: 80, height: 80, style: { position: 'absolute', left: x - 6, top: y - 4, opacity: show, overflow: 'visible', zIndex: 50, transform: `scale(${s})`, transformOrigin: '6px 4px', filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.28))' } },
+  return h('svg', { width: 80, height: 80, style: { position: 'absolute', left: x - 6, top: y - 4, opacity: show, overflow: 'visible', zIndex: 50, transform: `scale(${s})`, transformOrigin: '6px 4px' } },
     rings,
     h('path', { d: 'M6 4 L6 34 L14 26 L20 40 L26 37 L20 24 L31 24 Z', fill: '#fff', stroke: '#111', strokeWidth: '1.6', strokeLinejoin: 'round' }),
   )
@@ -126,7 +126,7 @@ function Cursor({ t, keys, clicks, show }) {
 
 function Callout({ t, s, e, x, y, side = 'left', w = 330, pad = '22px 24px', children }) {
   const a = ramp(t, s, s + 0.6), o = ramp(t, e - 0.45, e), dx = (1 - a) * (side === 'left' ? -40 : 40)
-  return h('div', { style: { position: 'absolute', left: x, top: y, width: w, opacity: a * (1 - o), zIndex: 40, transform: `translate(${dx}px, ${(1 - a) * 30 - o * 24}px)`, fontFamily: APP, color: Z.ink, background: 'rgba(255,255,255,0.96)', borderRadius: 20, padding: pad, boxSizing: 'border-box', border: '1px solid rgba(255,255,255,0.9)', boxShadow: '0 30px 60px -12px rgba(11,42,91,0.28), 0 8px 18px rgba(11,42,91,0.08)' } }, children)
+  return h('div', { style: { position: 'absolute', left: x, top: y, width: w, opacity: a * (1 - o), zIndex: 40, transform: `translate(${dx}px, ${(1 - a) * 30 - o * 24}px)`, fontFamily: APP, color: Z.ink, background: 'rgba(255,255,255,0.96)', borderRadius: 20, padding: pad, boxSizing: 'border-box', border: '1px solid rgba(255,255,255,0.9)' } }, children)
 }
 
 // Dashed + drawn connector between two points, as in the Fee collection scene.
@@ -210,7 +210,7 @@ function Phone({ x, y, op = 1, dy = 0, tilt = 0, z = 10, name = '', children }) 
   const handle = (l, t) => h('div', { key: l + t, style: { position: 'absolute', left: l - hs / 2, top: t - hs / 2, width: hs, height: hs, boxSizing: 'border-box', background: '#fff', border: `${1.5 * u}px solid #111`, zIndex: 22 } })
   return h('div', { style: { position: 'absolute', left: x, top: y, width: 390, height: 844, transformOrigin: '0 0', transform: `translateY(${dy}px) scale(${PS}) perspective(1600px) rotateX(${tilt}deg)`, opacity: op, zIndex: z } },
     h('div', { style: { position: 'absolute', left: 0, bottom: '100%', marginBottom: 8 * u, fontFamily: FONT, fontSize: 14 * u, fontWeight: 500, color: '#3D3A5C', whiteSpace: 'nowrap' } }, name),
-    h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden', background: Z.bg, fontFamily: APP, color: Z.ink, boxShadow: '0 40px 80px -28px rgba(11,42,91,0.30), 0 8px 18px rgba(11,42,91,0.06)' } },
+    h('div', { style: { position: 'absolute', inset: 0, overflow: 'hidden', background: Z.bg, fontFamily: APP, color: Z.ink } },
       children,
       h(StatusBar)),
     h('div', { style: { position: 'absolute', inset: 0, border: `${1.5 * u}px solid #111`, pointerEvents: 'none', zIndex: 21 } }),
@@ -235,7 +235,7 @@ function NavBar({ active, plus }) {
     }))
 }
 
-const CardBox = ({ style, children }) => h('div', { style: { background: Z.card, borderRadius: 18, boxShadow: '0 1px 2px rgba(17,17,17,0.03)', ...style } }, children)
+const CardBox = ({ style, children }) => h('div', { style: { background: Z.card, borderRadius: 18, ...style } }, children)
 
 // ---------- Screens ----------
 
@@ -513,7 +513,7 @@ function Trackers({ t, s0, out, end }) {
         const a = chip(i), m = glide(i)
         const fx = lerp(k.start[0], P(1010, 330), m), fy = lerp(k.start[1], P(cy - 150 + i * 116, 1180 + i * 116), m)
         return h('div', { key: k.n, style: { position: 'absolute', left: fx, top: fy, width: 420, display: 'flex', alignItems: 'center', gap: 16, opacity: a, transform: `scale(${(0.7 + 0.3 * a) * (1.08 - 0.08 * m)})`, transformOrigin: '0 50%' } },
-          h('div', { style: { width: 64, height: 64, borderRadius: 32, background: '#fff', boxShadow: '0 14px 30px -10px rgba(11,42,91,0.28)', display: 'grid', placeItems: 'center' } },
+          h('div', { style: { width: 64, height: 64, borderRadius: 32, background: '#fff', display: 'grid', placeItems: 'center' } },
             h('div', { style: { width: 48, height: 48, borderRadius: 24, background: k.tint, display: 'grid', placeItems: 'center' } }, h(Icon, { n: k.icon, c: k.c, s: 24, w: 2.2 }))),
           h('div', null,
             h('div', { style: { fontSize: 18, fontWeight: 500, color: Z.sub } }, k.n),

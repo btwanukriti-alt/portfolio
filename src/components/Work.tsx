@@ -90,7 +90,7 @@ function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 
 // Bump when the videos or stills in public/showcase/ are re-rendered (they're cached for a day).
-const VIDEO_VERSION = 4
+const VIDEO_VERSION = 5
 // Plays a card video; with reduced motion it stays on its opening frame.
 const playVideo = (v: HTMLVideoElement) => {
   if (reducedMotion() || !v.getAttribute('src')) return
