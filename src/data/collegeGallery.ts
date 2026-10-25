@@ -1,0 +1,33 @@
+// Mockup modules for the college group ERP case study (mockup-showcase layout): 2400px-wide JPEGs
+// rendered from the redesigned screens by scripts/mockups/college. Every figure in them is sample
+// data. Captions state what each image proves in one line.
+
+export type CollegeImage = { src: string; width: number; height: number; alt: string; caption: string }
+
+const img = (file: string, height: number, alt: string, caption: string): CollegeImage => ({
+  src: `/case-studies/college-erp/${file}`,
+  width: 2400,
+  height,
+  alt,
+  caption,
+})
+
+export const COLLEGE_BRAND = {
+  accent: '#12326E',
+  deep: '#08153A',
+  soft: '#E6EDF9',
+  tint: '#FFE4D3',
+  pop: '#4F86E8',
+}
+
+export const COLLEGE_IMAGES: CollegeImage[] = [
+  img('01-spines.jpg', 1230, 'A laptop showing the B.Tech batch drawer beside the enlarged drawer header, with the group, college and programme spines', 'Every level stays on screen.'),
+  img('02-target.jpg', 1290, 'The total received card with the 80% target marked, beside a laptop showing the finance overview', 'One bar shows whether the group is on track.'),
+  img('03-totals.jpg', 1230, 'A laptop showing the college drawer beside the Engineering and B.Tech summary banners', 'Each drawer shows its own totals.'),
+  img('04-ranked.jpg', 1500, 'The ranked college table, collection chips, progress bars and gap-to-target cards as separate components', 'One column to scan for the weakest college.'),
+  img('05-weakest.jpg', 1290, 'Two laptops showing the college and programme drawers, with the lowest-collection line below the title', 'The weakest row is named at every level.'),
+  img('06-attendance.jpg', 1230, 'A laptop showing the staff overview beside the attendance-by-college card', 'Attendance by college in one bar each.'),
+  img('07-staff.jpg', 1500, 'Staff KPI cards, the needs-attention list, the absence table and the absent card as separate components', 'Staff numbers, alerts and absences as separate cards.'),
+  img('08-colour.jpg', 1350, 'The navy and blue palette, the canvas colour, and the green, amber and red status colours with collection chips and progress bars', 'One status system across every screen.'),
+  img('09-process.jpg', 1290, 'The earlier finance and drawer layouts next to the redesigned drawer on a laptop', 'Earlier layouts next to the redesign.'),
+]
