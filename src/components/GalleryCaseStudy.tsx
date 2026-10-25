@@ -2,7 +2,6 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import type { Project } from '@/data/projects'
 import type { CaseStudy } from '@/data/caseStudies'
-import type { Story } from '@/data/stories'
 import type { BentoCard, Brand, GalleryImage, GallerySection, Surface } from '@/data/galleries'
 import SiteHeader from './SiteHeader'
 import ShowcaseVideo from './ShowcaseVideo'
@@ -30,16 +29,15 @@ const SURFACE: Record<Surface, string> = {
 export default function GalleryCaseStudy({
   project,
   study,
-  copy,
   brand,
+  note,
   images,
   sections,
 }: {
   project: Project
   study: CaseStudy
-  // Page text: title, category, summary, confirmed facts and the sample-data note.
-  copy: Story
   brand: Brand
+  note: string
   images: GalleryImage[]
   sections?: GallerySection[]
 }) {
@@ -50,10 +48,14 @@ export default function GalleryCaseStudy({
     '--c-tint': brand.tint,
     '--c-pop': brand.pop,
   } as CSSProperties
-  const title = copy.title
-  const meta = copy.category
-  const facts = copy.facts
-  const note = copy.disclosure
+  const title = study.title ?? project.title
+  const meta = [study.label, study.company, study.dates].filter(Boolean).join(' · ')
+  const facts = [
+    ['Role', study.role],
+    ['Team', study.team],
+    ['Timeline', study.timeline],
+    ['Outcome', study.outcome],
+  ]
 
   return (
     <div className="min-h-screen overflow-x-clip bg-paper" style={vars}>
@@ -79,7 +81,7 @@ export default function GalleryCaseStudy({
             />
           </div>
           <Reveal as="p" className="m-0 max-w-[24ch] text-[clamp(22px,2.4vw,36px)] leading-[1.25] font-medium tracking-[-0.02em] text-ink" delay={150}>
-            {copy.summary}
+            {study.hook}
           </Reveal>
         </header>
 
@@ -192,7 +194,7 @@ export default function GalleryCaseStudy({
 }
 
 // Dark screens on a dark card need an edge.
-const FRAME = 'rounded-[clamp(8px,1vw,14px)] ring-1 ring-white/10'
+const FRAME = 'rounded-[clamp(8px,1vw,14px)] ring-1 ring-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.45)]'
 
 // One bento card: a UI component on a soft plate with room around it, or the feature's text box.
 function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {

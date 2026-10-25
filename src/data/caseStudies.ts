@@ -54,7 +54,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     company: 'Pulsefit',
     dates: 'Feb-Mar 2025',
     timeline: '2 months',
-    role: 'Sole designer. Visual system, logo, every screen, and the calorie and health tracking I proposed.',
+    role: 'Product designer, sole designer. Visual system, logo, every screen, and the calorie and health tracking I proposed.',
     team: 'Two Pulsefit founders (PRD and walkthrough). No developers during the design work.',
     outcome: 'Design delivered to the founders. Development began after handoff.',
     paragraphs: [
@@ -110,7 +110,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     company: 'Pulsefit',
     dates: null,
     timeline: '3 months',
-    role: 'Sole designer. Logo, design system, every CRM flow, and the company website built in WordPress.',
+    role: 'Product designer, sole designer. Logo, design system, every CRM flow, and the company website built in WordPress.',
     team: 'Sole designer. Who defined the feature scope is to be confirmed.',
     outcome: 'Design delivered.',
     paragraphs: [
@@ -174,7 +174,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     company: null,
     dates: null,
     timeline: '3 months',
-    role: 'Sole designer. The entire UI, designed from scratch, for desktop, laptop and mobile.',
+    role: 'Product designer, sole designer. The entire UI, designed from scratch, for desktop, laptop and mobile.',
     team: 'Sole designer.',
     outcome: 'Design delivered.',
     paragraphs: [

@@ -62,7 +62,7 @@ export function DrillPath() {
         {levels.map(([level, name, value, p], i) => (
           <div
             key={level}
-            className="flex items-center justify-between gap-3 rounded-[16px] px-4 py-3"
+            className="flex items-center justify-between gap-3 rounded-[16px] px-4 py-3 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]"
             style={{ marginLeft: `${i * 7}%`, background: shades[i] }}
           >
             <span className="flex min-w-0 flex-col leading-tight">
@@ -94,7 +94,7 @@ export function LowestLine() {
         {lines.map(([level, title, detail], i) => (
           <div
             key={level}
-            className={`flex items-start gap-3 rounded-[16px] bg-white p-4 ${i === 0 ? 'ring-1 ring-[#F7C9C4]' : ''}`}
+            className={`flex items-start gap-3 rounded-[16px] bg-white p-4 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)] ${i === 0 ? 'ring-1 ring-[#F7C9C4]' : ''}`}
           >
             <Warn className={i === 0 ? 'text-[#D92D20]' : 'text-[#D9910A]'} />
             <span className="flex min-w-0 flex-col gap-0.5 leading-snug">
@@ -181,7 +181,7 @@ export function AttendanceTable() {
   return (
     <div className="flex h-full flex-col">
       <Head title="Employee attendance" note="Engineering College · today" />
-      <div className="mt-5 rounded-[20px] bg-white p-[clamp(12px,1.6vw,24px)]">
+      <div className="mt-5 rounded-[20px] bg-white p-[clamp(12px,1.6vw,24px)] shadow-[0_10px_30px_-18px_rgba(16,24,40,0.25)]">
         <div className="flex gap-1 overflow-x-auto border-b border-[#E6E9EF] pb-3">
           {tabs.map(([label, n, cls], i) => (
             <span
@@ -266,7 +266,7 @@ export function Profile() {
     ['Higher Secondary, PCMB', 'Central PU College', '2012 – 2014'],
   ]
   const list = (title: string, items: [string, string, string][]) => (
-    <div className="rounded-[18px] bg-white p-5">
+    <div className="rounded-[18px] bg-white p-5 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
       <p className="m-0 text-[14px] font-semibold text-[#12326E]">{title}</p>
       <ol className="m-0 mt-4 flex list-none flex-col gap-4 p-0">
         {items.map(([a, b, c], i) => (
@@ -379,13 +379,13 @@ function AlertPanel({ items }: { items: [string, 'bad' | 'warn', string, string,
         </span>
       </div>
       <div className="mt-4 grid grid-cols-3 rounded-xl bg-[#E4E7EE] p-1 text-center text-[12px] font-medium">
-        <span className={`rounded-lg bg-white py-1.5 ${ink}`}>All</span>
+        <span className={`rounded-lg bg-white py-1.5 shadow-[0_1px_3px_rgba(16,24,40,0.08)] ${ink}`}>All</span>
         <span className={`py-1.5 ${sub}`}>Read</span>
         <span className={`py-1.5 ${sub}`}>Unread</span>
       </div>
       <div className="mt-4 flex flex-col gap-3">
         {items.map(([tag, t, title, text, details]) => (
-          <div key={title} className="flex flex-col gap-2 rounded-[16px] bg-white p-4">
+          <div key={title} className="flex flex-col gap-2 rounded-[16px] bg-white p-4 shadow-[0_8px_20px_-14px_rgba(16,24,40,0.3)]">
             <span className="flex items-center justify-between">
               <Tag t={t}>{tag}</Tag>
               <span className="text-[11px] text-[#98A2B3]">Today, 12:00</span>

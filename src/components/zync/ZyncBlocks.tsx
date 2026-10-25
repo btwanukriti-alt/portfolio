@@ -22,7 +22,7 @@ function Toggle({ items, active = 0 }: { items: [string, string]; active?: 0 | 1
       {items.map((item, i) => (
         <span
           key={item}
-          className={i === active ? `rounded-full bg-white px-3.5 py-1.5 ${ink}` : `px-3.5 py-1.5 ${sub}`}
+          className={i === active ? `rounded-full bg-white px-3.5 py-1.5 shadow-[0_1px_3px_rgba(18,16,28,0.08)] ${ink}` : `px-3.5 py-1.5 ${sub}`}
         >
           {item}
         </span>
@@ -154,7 +154,7 @@ export function Consumed() {
         </div>
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {parts.map(([name, grams, pct, color]) => (
-            <li key={name} className="flex items-center gap-4 rounded-[18px] bg-white px-4 py-3.5">
+            <li key={name} className="flex items-center gap-4 rounded-[18px] bg-white shadow-[0_8px_24px_-14px_rgba(30,20,80,0.18)] px-4 py-3.5">
               <span className="h-8 w-1.5 rounded-full" style={{ background: color }} />
               <span className="flex flex-1 flex-col leading-tight">
                 <span className={`text-[15px] font-semibold ${ink}`}>{name}</span>
@@ -227,7 +227,7 @@ export function Classes() {
       <Head title="Thursday, 20 Feb" right={<span className={`text-[13px] ${sub}`}>3 classes</span>} />
       <ul className="m-0 mt-4 flex flex-1 list-none flex-col justify-between gap-3 p-0">
         {rows.map(([time, name, meta, fill, spots, state]) => (
-          <li key={name} className="flex items-center gap-4 rounded-[20px] bg-white p-3 pr-5">
+          <li key={name} className="flex items-center gap-4 rounded-[20px] bg-white shadow-[0_8px_24px_-14px_rgba(30,20,80,0.18)] p-3 pr-5">
             <span className="flex size-14 shrink-0 flex-col items-center justify-center rounded-[14px] bg-[#F6F5FA] leading-tight">
               <span className={`text-[15px] font-semibold ${ink}`}>{time}</span>
               <span className={`text-[10px] ${sub}`}>PM</span>
@@ -281,7 +281,7 @@ export function Hydration() {
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-between rounded-full bg-white p-1.5">
+      <div className="flex items-center justify-between rounded-full bg-white shadow-[0_8px_24px_-14px_rgba(30,20,80,0.18)] p-1.5">
         <span className="flex size-10 items-center justify-center rounded-full bg-[#E4EEFF] text-[20px] text-[#4F8BFF]">−</span>
         <span className="flex flex-col items-center leading-tight">
           <span className={`text-[16px] font-semibold ${ink}`}>250 ml</span>
@@ -312,7 +312,7 @@ export function Plans() {
         <Head title="Suggested for you" right={<span className="text-[13px] font-medium text-[#644ACD]">View all</span>} />
         <ul className="m-0 mt-5 flex list-none flex-col gap-3 p-0">
           {plans.map(([name, img, level]) => (
-            <li key={name} className="flex items-center gap-4 rounded-[22px] bg-white p-3">
+            <li key={name} className="flex items-center gap-4 rounded-[22px] bg-white shadow-[0_8px_24px_-14px_rgba(30,20,80,0.18)] p-3">
               <img
                 src={`/case-studies/zync/ui/${img}.webp`}
                 alt=""
@@ -397,7 +397,7 @@ export function Food() {
           <span className="flex size-9 items-center justify-center rounded-full bg-[#FFE8EE] text-[18px] text-[#F5577D]">+</span>
         </div>
         {meals.map(([name, qty, cal]) => (
-          <div key={name} className="flex items-center justify-between rounded-[16px] bg-white px-4 py-3">
+          <div key={name} className="flex items-center justify-between rounded-[16px] bg-white shadow-[0_8px_24px_-14px_rgba(30,20,80,0.18)] px-4 py-3">
             <span className="flex flex-col leading-tight">
               <span className={`text-[14px] font-semibold ${ink}`}>{name}</span>
               <span className={`text-[12px] ${sub}`}>{qty}</span>
