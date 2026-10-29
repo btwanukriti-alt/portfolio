@@ -162,30 +162,6 @@ export default function GalleryCaseStudy({
             ))}
           </ol>
         )}
-
-        <Reveal className="mt-[clamp(72px,12vh,140px)] grid grid-cols-1 gap-10 border-t border-line pt-8 min-[901px]:grid-cols-2 min-[901px]:gap-16">
-          <div>
-            <h2 className="m-0 text-[15px] leading-[1.4] font-medium text-muted">What I delivered</h2>
-            <ul className="m-0 mt-5 flex list-none flex-wrap gap-2 p-0">
-              {study.delivered.map((item) => (
-                <li key={item} className="rounded-full bg-[var(--c-soft)] px-4 py-[9px] text-[15px] leading-none font-medium text-[var(--c-deep)]">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h2 className="m-0 text-[15px] leading-[1.4] font-medium text-muted">Next</h2>
-            <ul className="m-0 mt-5 flex list-none flex-col gap-3 p-0">
-              {study.next.map((item) => (
-                <li key={item} className="flex items-baseline gap-3 text-[16px] leading-[1.5] text-ink">
-                  <span aria-hidden="true" className="mt-[0.5em] size-[7px] shrink-0 rounded-full bg-[var(--c-pop)]" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
       </main>
 
       <Contact current={project.slug} />
