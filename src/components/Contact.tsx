@@ -305,8 +305,11 @@ export default function Contact({ current }: { current?: string } = {}) {
             <ul className="m-0 mt-5 flex list-none flex-wrap gap-x-8 gap-y-3 p-0">
               {PROJECTS.filter((p) => p.slug !== current).map((p) => (
                 <li key={p.slug}>
+                  {/* Not prefetched on sight: that pulled the other projects' large images in while this
+                      page's own were still loading. */}
                   <Link
                     href={caseStudyHref(p.slug)}
+                    prefetch={false}
                     className="text-[clamp(18px,1.6vw,24px)] leading-[1.3] font-medium tracking-[-0.02em] text-ink no-underline underline-offset-4 hover:underline focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                   >
                     {p.name}

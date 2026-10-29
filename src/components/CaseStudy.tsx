@@ -60,7 +60,7 @@ export default function CaseStudy({ project, slides }: { project: Project; slide
           >
             <ShowcaseVideo
               className="pointer-events-none absolute inset-0 h-full w-full border-0"
-              src={project.showcase}
+              slug={project.slug}
               title={`${project.title} showcase`}
             />
           </Reveal>

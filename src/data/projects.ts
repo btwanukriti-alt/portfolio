@@ -26,6 +26,8 @@ const caseStudyImage = (slug: string) => `/case-studies/${slug}/hero.jpg`
 // The project's still everywhere it's shown small (the More work cards, link previews): the opening
 // frame of its work-card video, as on the homepage (rendered by showcase-video/).
 export const posterOf = (slug: string) => `/showcase/posters/${slug}-land.jpg`
+// Bump when the videos or stills in public/showcase/ are re-rendered (they're cached for a day).
+export const SHOWCASE_VERSION = 5
 
 // Figma sources: Fitness Tracker -> "Zync — Case Study", BOSCH card (Pulsefit screens) ->
 // "Pulsefit — Case Study", SSH client -> "SSH client — Case Study", College Management ->

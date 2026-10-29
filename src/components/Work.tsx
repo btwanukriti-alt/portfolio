@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { PROJECTS, caseStudyHref } from '@/data/projects'
+import { PROJECTS, SHOWCASE_VERSION, caseStudyHref } from '@/data/projects'
 import { gsap, ScrollTrigger, useGSAP, reducedMotion } from '@/lib/gsap'
 import { getLenis, pageScroll, setScrollInterceptor, touchScreen } from './SmoothScroll'
 
@@ -89,8 +89,6 @@ function rowFor(vw: number, vh: number, pageW = vw, head = TITLE_SPACE): Row {
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 
-// Bump when the videos or stills in public/showcase/ are re-rendered (they're cached for a day).
-const VIDEO_VERSION = 5
 // Plays a card video; with reduced motion it stays on its opening frame.
 const playVideo = (v: HTMLVideoElement) => {
   if (reducedMotion() || !v.getAttribute('src')) return
@@ -149,7 +147,7 @@ export default function Work() {
       requested.current[i] = true
       loading.current = true
       const cut = matchMedia('(orientation: portrait) and (max-width: 719px)').matches ? 'port' : 'land'
-      frame.src = `/showcase/video/${PROJECTS[i].slug}-${cut}.mp4?v=${VIDEO_VERSION}`
+      frame.src = `/showcase/video/${PROJECTS[i].slug}-${cut}.mp4?v=${SHOWCASE_VERSION}`
     }
   }, [])
   useEffect(() => {
@@ -202,6 +200,24 @@ export default function Work() {
     follow.current?.x(e.clientX)
     follow.current?.y(e.clientY)
     setCursor(true)
+  }
+  // One tap opens a project. Right after a swipe the page is still gliding onto its card, and a
+  // phone spends that tap on stopping the glide instead of following the link; so a quick tap
+  // (barely moving, soon lifted) on a card goes to its project directly.
+  const tap = useRef<{ x: number; y: number; t: number } | null>(null)
+  const touchStart = (e: React.TouchEvent, i: number) => {
+    const p = e.touches[0]
+    tap.current = e.touches.length === 1 ? { x: p.clientX, y: p.clientY, t: e.timeStamp } : null
+    router.prefetch(caseStudyHref(PROJECTS[i].slug))
+  }
+  const touchEnd = (e: React.TouchEvent, i: number) => {
+    const start = tap.current
+    tap.current = null
+    const p = e.changedTouches[0]
+    if (!start || !p || e.timeStamp - start.t > 400 || Math.hypot(p.clientX - start.x, p.clientY - start.y) > 10) return
+    // The link's own click would follow; this one goes now and the click is dropped.
+    e.preventDefault()
+    router.push(caseStudyHref(PROJECTS[i].slug))
   }
   const leaveCard = (e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse') return
@@ -653,6 +669,8 @@ export default function Work() {
                     onPointerEnter={(e) => enterCard(e, i)}
                     onPointerMove={moveCursor}
                     onPointerLeave={leaveCard}
+                    onTouchStart={(e) => touchStart(e, i)}
+                    onTouchEnd={(e) => touchEnd(e, i)}
                     style={{ background: project.color }}
                     className="absolute inset-0 block cursor-pointer overflow-hidden [@media(hover:hover)]:cursor-none"
                   >
@@ -662,11 +680,11 @@ export default function Work() {
                         <picture>
                           <source
                             media="(orientation: portrait) and (max-width: 719px)"
-                            srcSet={`/showcase/posters/${project.slug}-port.jpg?v=${VIDEO_VERSION}`}
+                            srcSet={`/showcase/posters/${project.slug}-port.jpg?v=${SHOWCASE_VERSION}`}
                           />
                           <img
                             className="absolute top-0 left-1/2 h-full w-[var(--fill-w)] max-w-none -translate-x-1/2 object-cover group-data-[vertical=true]/row:top-1/2 group-data-[vertical=true]/row:left-0 group-data-[vertical=true]/row:h-[var(--fill-h)] group-data-[vertical=true]/row:w-full group-data-[vertical=true]/row:translate-x-0 group-data-[vertical=true]/row:-translate-y-1/2"
-                            src={`/showcase/posters/${project.slug}-land.jpg?v=${VIDEO_VERSION}`}
+                            src={`/showcase/posters/${project.slug}-land.jpg?v=${SHOWCASE_VERSION}`}
                             alt=""
                             decoding="async"
                           />

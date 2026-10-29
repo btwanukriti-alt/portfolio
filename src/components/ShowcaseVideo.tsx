@@ -1,36 +1,33 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { SHOWCASE_VERSION } from '@/data/projects'
+import { reducedMotion } from '@/lib/gsap'
 
-// A project's looping showcase (public/showcase/, see scripts/build-showcases.mjs), playing only
-// while it's on screen. The embed listens for postMessage 'showcase:play' / 'showcase:pause'.
-export default function ShowcaseVideo({ src, title, className }: { src: string; title: string; className?: string }) {
-  const frame = useRef<HTMLIFrameElement>(null)
-  const visible = useRef(false)
+// A project's looping showcase: the MP4 rendered from its showcase page (showcase-video/), as on the
+// homepage cards, so the phone decodes it instead of running the page itself. Screens held upright
+// get the portrait cut. Its opening frame shows straight away, and it plays only while on screen.
+export default function ShowcaseVideo({ slug, title, className }: { slug: string; title: string; className?: string }) {
+  const video = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const el = frame.current
-    if (!el) return
+    const v = video.current
+    if (!v) return
+    const cut = window.matchMedia('(orientation: portrait)').matches ? 'port' : 'land'
+    v.poster = `/showcase/posters/${slug}-${cut}.jpg?v=${SHOWCASE_VERSION}`
+    v.src = `/showcase/video/${slug}-${cut}.mp4?v=${SHOWCASE_VERSION}`
+    // React doesn't always set the muted property, and browsers only autoplay muted video.
+    v.muted = true
     const io = new IntersectionObserver(
       ([entry]) => {
-        visible.current = entry.isIntersecting
-        el.contentWindow?.postMessage(entry.isIntersecting ? 'showcase:play' : 'showcase:pause', '*')
+        if (entry.isIntersecting && !reducedMotion()) v.play().catch(() => {})
+        else v.pause()
       },
-      { threshold: 0.25 },
+      { threshold: 0.1 },
     )
-    io.observe(el)
+    io.observe(v)
     return () => io.disconnect()
-  }, [])
+  }, [slug])
 
-  return (
-    <iframe
-      ref={frame}
-      className={className}
-      src={src}
-      title={title}
-      tabIndex={-1}
-      // Pick up the current play state once the embed has loaded.
-      onLoad={() => visible.current && frame.current?.contentWindow?.postMessage('showcase:play', '*')}
-    />
-  )
+  return <video ref={video} className={className} aria-label={title} muted loop playsInline preload="auto" disablePictureInPicture />
 }

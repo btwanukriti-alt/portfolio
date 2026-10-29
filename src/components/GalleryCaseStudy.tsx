@@ -99,7 +99,7 @@ export default function GalleryCaseStudy({
             className="relative isolate mx-[calc(50%-50vw)] mt-[clamp(48px,8vh,88px)] aspect-video w-screen overflow-hidden bg-[var(--c-tint)] portrait:mx-[calc(50%-min(50vw,24.1875svh))] portrait:aspect-[9/16] portrait:w-[min(100vw,48.375svh)]"
             delay={200}
           >
-            <ShowcaseVideo className="pointer-events-none absolute inset-0 h-full w-full border-0" src={project.showcase} title={`${title} showcase`} />
+            <ShowcaseVideo className="pointer-events-none absolute inset-0 h-full w-full border-0" slug={project.slug} title={`${title} showcase`} />
           </Reveal>
         )}
 
@@ -149,6 +149,8 @@ export default function GalleryCaseStudy({
                   <img
                     className="block h-auto w-full"
                     src={img.src}
+                    srcSet={srcSetOf(img.src, img.width)}
+                    sizes={FULL}
                     width={img.width}
                     height={img.height}
                     alt={img.alt}
@@ -166,6 +168,17 @@ export default function GalleryCaseStudy({
     </div>
   )
 }
+
+// Phones and tablets get the 1200 / 1600px copies of a wide mockup (scripts/responsive-images.mjs,
+// which makes each copy narrower than the original); large or sharp screens the original.
+const COPIES = [1200, 1600]
+const srcSetOf = (src: string, width: number) => {
+  if (!src.endsWith('.jpg') || width <= COPIES[0]) return undefined
+  const copies = COPIES.filter((w) => w < width).map((w) => `${src.replace(/\.jpg$/, `-${w}.jpg`)} ${w}w`)
+  return [...copies, `${src} ${width}w`].join(', ')
+}
+// A mockup across the page's content width.
+const FULL = '(max-width: 1440px) 94vw, 1340px'
 
 // Dark screens on a dark card need an edge.
 const FRAME = 'rounded-[clamp(8px,1vw,14px)] ring-1 ring-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.45)]'
@@ -202,6 +215,8 @@ function Bento({ card, eager }: { card: BentoCard; eager: boolean }) {
         <img
           className={`mx-auto block h-auto w-full max-w-[1080px] ${card.surface === 'night' ? FRAME : ''}`}
           src={card.src}
+          srcSet={srcSetOf(card.src, card.width)}
+          sizes="(max-width: 1200px) 90vw, 1080px"
           width={card.width}
           height={card.height}
           alt={card.alt}
