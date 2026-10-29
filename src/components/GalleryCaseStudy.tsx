@@ -52,9 +52,7 @@ export default function GalleryCaseStudy({
   const meta = [study.label, study.company, study.dates].filter(Boolean).join(' · ')
   const facts = [
     ['Role', study.role],
-    ['Team', study.team],
     ['Timeline', study.timeline],
-    ['Outcome', study.outcome],
   ]
 
   return (
@@ -85,7 +83,7 @@ export default function GalleryCaseStudy({
           </Reveal>
         </header>
 
-        <Reveal className="mt-[clamp(40px,7vh,72px)] grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line pt-7 min-[701px]:grid-cols-2 min-[1101px]:grid-cols-4">
+        <Reveal className="mt-[clamp(40px,7vh,72px)] grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line pt-7 min-[701px]:grid-cols-2">
           {facts.map(([term, value]) => (
             <dl key={term} className="m-0 flex flex-col gap-2">
               <dt className="text-[12px] leading-none font-semibold tracking-[0.08em] text-[var(--c-accent)] uppercase">{term}</dt>
