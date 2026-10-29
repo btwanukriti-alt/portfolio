@@ -22,9 +22,10 @@ export const metadata: Metadata = {
     siteName: 'Anukriti Mishra',
     title: 'Anukriti Mishra | Experience Designer',
     description: DESCRIPTION,
-    images: [{ url: '/work/project-1.jpg' }],
+    // A snapshot of the hero once its screens have settled round "Let's build something".
+    images: [{ url: '/og-hero.jpg', width: 1200, height: 630, alt: 'Anukriti Mishra, Experience Designer: a ring of product screens around "Let\'s build something"' }],
   },
-  twitter: { card: 'summary_large_image' },
+  twitter: { card: 'summary_large_image', images: ['/og-hero.jpg'] },
 }
 
 export const viewport: Viewport = {
