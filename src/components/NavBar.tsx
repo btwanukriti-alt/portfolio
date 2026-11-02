@@ -6,7 +6,8 @@ import Logo from './Logo'
 
 // The header row shared by the landing hero and every other page: name on the left, Work, About
 // and Contact in the middle, Replay (quiet) and Resume (the one black button) on the right.
-// On the landing page `onReplay` restarts the intro; elsewhere Replay goes home, where it plays.
+// Replay only shows on the landing page, where `onReplay` restarts the intro; the project pages
+// have no Replay.
 const focus = 'focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent'
 
 const navLink = `relative py-2 text-muted no-underline transition-colors hover:text-ink after:absolute after:inset-x-0 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-[var(--ease-out-expo)] hover:after:origin-left hover:after:scale-x-100 motion-reduce:after:transition-none ${focus}`
@@ -45,10 +46,12 @@ export default function NavBar({ home = false, onReplay }: { home?: boolean; onR
             Replay
           </button>
         ) : (
-          <Link href="/" className={`group no-underline ${replayClass}`}>
-            {replayIcon}
-            Replay
-          </Link>
+          home && (
+            <Link href="/" className={`group no-underline ${replayClass}`}>
+              {replayIcon}
+              Replay
+            </Link>
+          )
         )}
         <a
           href={RESUME}
